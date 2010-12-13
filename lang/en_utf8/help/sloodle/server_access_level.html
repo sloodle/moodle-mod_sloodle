@@ -1,0 +1,18 @@
+<h4>Server Access level</h4>
+<p>
+ When an object in Second Life talks to Moodle, it sends the details of the avatar using it.
+ Moodle then finds out which Moodle user the avatar belongs to, and can be instructed only to
+ allow access to particular users:
+</p>
+
+<ul>
+ <li><strong>Public</strong>: any user is allowed</li>
+ <li><strong>Course</strong>: only users who are already enrolled in the course are allowed (prevents guest access to the course and auto-enrolment)</li>
+ <li><strong>Site</strong>: only users who are already registered on the site are allowed (prevents guest access and auto-registration)</li>
+ <li><strong>Staff</strong>: only users who are teacher status or higher are allowed</li>
+</ul>
+
+<p>
+ For example, if you are setting up a WebIntercom, you can prevent guests participating in it by setting the Server Access Level to "Course". Alternatively, you could restrict to teachers only by setting it to "Staff". (Note: this won't prevent users clicking on the WebIntercom... it will simply stop their chat messages reaching the Moodle chatroom.)
+</p>
+

@@ -1,0 +1,34 @@
+Updated APRIL 2010
+************************
+Hi there! This version of the quiz chair works with th SLOODLE AWARDS SYSTEM with the New Api - which can be found in the 1.0-with-lsl-api branch on googlecode - 
+You can obtain that here: 
+http://download.socialminds.jp/sloodle/latest/sloodle_all.zip
+
+
+Using this quiz chair, students can now get points  listed on the scoreboard, and recorded on the MOODLE Website if they answer questions correctly.
+
+To enable this functionality, you will have to generate two notecards
+1) a notecard for the sloodle awards system which you will call "sloodle_award_config"
+2) another notecard for the quiz chair which you will call sloodle_config
+
+ Instructions are listed below:
+
+ You can generate a sloodle_awards_config by:
+
+1) Logging into your MOODLE/SLOODLE website as administrator
+2) Go into your course
+3) Click on your SLOODLE Controller
+4) Click on the link called "Sloodle Awards System" and generate the notecard
+5) Copy and paste the text generated into a notecard called sloodle_award_config
+6)add a line to the sloodle_award_config to define how many points will be given per question:
+
+eg.
+
+points|100
+
+7) Press save, and copy it into the quiz chair!
+8) now create another notecard and call it sloodle_config and drop it into the quiz chair
+
+
+NOTE: If you don't see the "Sloodle Awards System" in your list of options in the Controller page, either
+a) you have either Sloodle 0.4, or 0.3 installed - you need Sloole 1.0-with-lsl-api branch

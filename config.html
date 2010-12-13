@@ -1,0 +1,143 @@
+<?php
+    /**
+    * Sloodle module configuration fragment.
+    *
+    * This PHP/HTML fragment shows a web-form for configuring the Sloodle module.
+    *
+    * @package sloodle
+    * @copyright Copyright (c) 2007 Sloodle (various contributors)
+    * @license http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
+    *
+    * @contributor (various)
+    * @contributor Peter R. Bloomfield
+    *
+    */
+    
+
+    // Get our Sloodle configuration
+    require_once($CFG->dirroot.'/mod/sloodle/sl_config.php');
+    require_once(SLOODLE_LIBROOT.'/general.php');
+    
+    // Attempt to get the configuration settings
+    $allow_autoreg = (sloodle_autoreg_enabled_site()) ? 1 : 0;
+    $allow_autoenrol = (sloodle_autoenrol_enabled_site()) ? 1 : 0;
+    $active_object_lifetime = 7; // Give active objects a week by default
+    if (!empty($CFG->sloodle_active_object_lifetime)) $active_object_lifetime = $CFG->sloodle_active_object_lifetime;
+    $user_object_lifetime = 21; // Give user objects 3 weeks by default
+    if (!empty($CFG->sloodle_user_object_lifetime)) $user_object_lifetime = $CFG->sloodle_user_object_lifetime;
+?>
+
+
+<!-- Version Numbers -->
+<?php
+    // Display the Sloodle version
+    print_heading(get_string('sloodleversion','sloodle').': '.(string)SLOODLE_VERSION, 'center', 3);
+    // Get and display the module version number (from version.php)
+    $sloodlemodule = get_record('modules', 'name', 'sloodle');
+    $releasenum = 0;
+    if ($sloodlemodule !== FALSE) $releasenum = $sloodlemodule->version;
+    print_heading(get_string('releasenum','sloodle').': '.(string)$releasenum, 'center', 5);
+    
+    // Display a help button regarding the version numbers
+    echo '<div style="text-align:center;">(';
+    helpbutton('version_numbers', get_string('help:versionnumbers', 'sloodle'), 'sloodle', true, true);
+    echo ')</div>';
+?>
+
+
+<!-- Sloodle configuration form -->
+
+<form method="post" action="module.php" id="form">
+<!--<div>-->
+<!-- Session key and module name -->
+<input type="hidden" name="sesskey" value="<?php echo $USER->sesskey ?>" />
+<input type="hidden" name="module" value="sloodle" />
+
+<table cellpadding="9" cellspacing="0" >
+
+<!-- Notecard -->
+<!-- N.B: ****** possibly add a note here to say how to find the new notecard configuration pages? *******
+<tr>
+    <td colspan="3" align="left">
+            <h3><?php print_string("objectconfig:header", "sloodle"); ?></h3>
+            <p>
+             <?php print_string("objectconfig:body", "sloodle"); ?>
+             <a href="<?php echo SLOODLE_WWWROOT; ?>/sl_setup_notecard.php"><?php print_string("createnotecard", "sloodle"); ?></a>
+            </p>
+    </td>
+</tr>-->
+
+<!-- Auto-registration -->
+<tr>
+    <td colspan="3" align="left">
+
+        <h3><?php print_string('autoreg', 'sloodle'); ?> <?php echo helpbutton('auto_registration', get_string('help:autoreg','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <p>
+         <?php
+            print_string("autoreg:allowforsite", "sloodle");
+            echo ': ';
+            choose_from_menu_yesno('allow_autoreg', $allow_autoreg);
+         ?>
+        </p>
+    </td>
+</tr>
+
+<!-- Auto-enrolment -->
+<tr>
+    <td colspan="3" align="left">
+
+        <h3><?php print_string('autoenrol', 'sloodle'); ?> <?php echo helpbutton('auto_enrolment', get_string('help:autoenrol','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <p>
+         <?php
+            print_string("autoenrol:allowforsite", "sloodle");
+            echo ': ';
+            choose_from_menu_yesno('allow_autoenrol', $allow_autoenrol);
+         ?>
+        </p>
+    </td>
+</tr>
+
+
+<!-- Active object lifetime -->
+<tr>
+    <td colspan="3" align="left">
+
+        <h3><?php print_string('activeobjectlifetime', 'sloodle'); ?> <?php echo helpbutton('object_authorization', get_string('activeobjects','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <p>
+         <?php
+            print_string("activeobjectlifetime:info", "sloodle");
+            echo ': ';
+            echo '<input type="text" name="active_object_lifetime" value="'.$active_object_lifetime.'" >';
+         ?>
+        </p>
+    </td>
+</tr>
+
+
+<!-- User object lifetime -->
+<tr>
+    <td colspan="3" align="left">
+
+        <h3><?php print_string('userobjectlifetime', 'sloodle'); ?> <?php echo helpbutton('user_objects', get_string('userobjects','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <p>
+         <?php
+            print_string("userobjectlifetime:info", "sloodle");
+            echo ': ';
+            echo '<input type="text" name="user_object_lifetime" value="'.$user_object_lifetime.'" >';
+         ?>
+        </p>
+    </td>
+</tr>
+
+
+<!-- Form Submission -->
+<tr>
+    <td colspan="3" align="center">
+        <input type="submit" value="<?php print_string("savechanges") ?>" />
+    </td>
+</tr>
+</table>
+<!--</div>-->
+</form>
+
+<!-- End Sloodle configuration form -->

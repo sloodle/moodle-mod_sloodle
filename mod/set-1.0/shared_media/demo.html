@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Avatar Classroom Configuration</title>
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+<link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
+<meta name="apple-touch-fullscreen" content="YES" />
+<style type="text/css" media="screen">@import "iui/iui.css";</style>
+<style type="text/css" media="screen">@import "iui/iui_ext.css";</style>
+<script type="application/x-javascript" src="iui/iui.js"></script>
+<script type="application/x-javascript" src="iui/iui_ext.js"></script>
+<script type="text/javascript">
+	iui.animOn = true;
+</script>
+<!--
+<script type="application/x-javascript" src="http://10.0.1.2:1840/ibug.js"></script>
+-->
+</head>
+
+<body>
+
+    <div class="toolbar">
+        <h1 id="pageTitle"></h1>
+        <a id="backButton" class="button" href="#"></a>
+        <a class="button" href="#searchForm">Logout</a>
+    </div>
+     
+    <ul id="home" title="Avatar Classroom Site" selected="true">
+        <li><a href="#site1">http://edmund_earp.avatarclassroom.com</a></li>
+        <li><a href="#site2">http://fire_centaur.avatarclassroom.com</a></li>
+    </ul>
+    <ul id="site1" title="Site 1">
+        <li><a href="#course1">My Course</a></li>
+        <li><a href="#course2">My Course 2</a></li>
+    </ul>
+    <ul id="site2" title="Site 2">
+        <li><a href="#course3">My Course</a></li>
+        <li><a href="#course4">My Course 2</a></li>
+    </ul>
+
+    <ul id="course1" title="My Course">
+        <li class="group">B</li>
+        <li><a href="#classroom1">Boxy Classroom Layout</a></li>
+        <li class="group">U</li>
+        <li><a href="#ufo">UFO Layout</a></li>
+    </ul>
+    <ul id="classroom1" title="Boxy Classroom Layout">
+        <li class="group">P</li>
+        <li><a href="#presenter1">Presenter</a></li>
+        <li class="group">Q</li>
+        <li><a href="#quizchair1">Quiz Chair 1</a></li>
+        <li><a href="#quizchair2">Quiz Chair 2</a></li>
+    </ul>
+    <ul id="quizchair1" title="Quiz Chair 1">
+        <li><a href="#player">Song 1</a></li>
+        <li><a href="#player">Song 2</a></li>
+        <li><a href="#player">Song 3</a></li>
+        <li><a href="#player">Song 4</a></li>
+        <li><a href="#player">Song 5</a></li>
+        <li><a href="#player">Song 6</a></li>
+        <li><a href="#player">Song 7</a></li>
+        <li><a href="#player">Song 8</a></li>
+        <li><a href="#player">Song 9</a></li>
+        <li><a href="#player">Song 10</a></li>
+        <li><a href="#player">Song 11</a></li>
+    </ul>
+    
+<form id="presenter1" class="panel" title="Presenter">
+<fieldset>
+<div class="row"><label for="buy_fromStation">From</label><select id="buy_fromStation" class="az" name="from">
+<option value="ABD">Aberdeen</option>
+<option value="ABW">Aberystwyth</option>
+<option value="BGR">Bognor Regis</option>
+<option value="CAM">Cambridge</option>
+<option value="CAN">Canterbury</option>
+<option value="CUL">Culloden</option>
+<option value="ELY">Ely</option>
+<option value="EXE">Exeter</option>
+<option value="FAR">Farnsworth</option>
+</select></div>
+<div class="row"><a href="#az__buy_fromStation" onClick="window.ticketsales.destination()">To <input type="hidden" name="destination" value="..."/><var id="from-whatever" class="_lookup" title="destination">...</var></a></div>
+
+<div class="row">
+<label for="buy_journeytype">Journey Type</label>
+<select id="buy_journeytype" name="journeytype" class="panel">
+<option value="tt_single" selected>Single</option>
+<option value="tt_day">Day Return</option>
+<option value="tt_month">Month Return</option>
+</select>
+</div>
+<div class="row"><label for="buy_travelDate">Outbound Date</label> <input name="travelDate" id="buy_travelDate" type="date" class="date future today" value="Today"></div>
+</fieldset>
+<fieldset>
+
+<div class="row">
+<label for="buy_travellertype">Traveller</label>
+<select id="buy_travellertype" name="travellertype" class="panel">
+<option value="pt_adult" selected>Adult Traveller</option>
+<option value="pt_child">Child Traveller</option>
+</select>
+</div>
+<div class="row">
+<label for="buy_travellerclass">Class</label>
+<select id="buy_travellerclass" name="travellerclass" class="panel">
+<option value="tc_1st">1st Class</option>
+<option value="tc_std" selected>Standard Class</option>
+
+</select>
+</div>
+<div class="row">
+<label for="buy_railcard">Railcard</label>
+<select id="buy_railcard" name="railcard" class="panel">
+<option value="rc_none" selected>No Railcard</option>
+<option value="rc_youth">Youth</option>
+<option value="rc_family">Family</option>
+<option value="rc_senior">Senior</option>
+<option value="rc_disabled">Disabled</option>
+<option value="rc_network">Network</option>
+
+<option value="rc_hm">HM Services</option>
+</select>
+</div>
+</fieldset>
+<a class="whiteButton" type="submit" href="#scr_buy_pricelist">Retrieve Prices</a>
+</form>
+
+    <div id="player" class="panel" title="Now Playing">
+        <h2>If this weren't just a demo, you might be hearing a song...</h2>
+    </div>
+    
+    <form id="searchForm" class="dialog" action="search.php">
+        <fieldset>
+            <h1>Music Search</h1>
+            <a class="button leftButton" type="cancel">Cancel</a>
+            <a class="button blueButton" type="submit">Search</a>
+            
+            <label>Artist:</label>
+            <input id="artist" type="text" name="artist"/>
+            <label>Song:</label>
+            <input type="text" name="song"/>
+        </fieldset>
+    </form>
+
+    <div id="settings" title="Settings" class="panel">
+        <h2>Playback</h2>
+        <fieldset>
+            <div class="row">
+                <label>Repeat</label>
+                <div class="toggle" onclick=""><span class="thumb"></span><span class="toggleOn">ON</span><span class="toggleOff">OFF</span></div>
+            </div>
+            <div class="row">
+                <label>Shuffle</label>
+                <div class="toggle" onclick="" toggled="true"><span class="thumb"></span><span class="toggleOn">ON</span><span class="toggleOff">OFF</span></div>
+            </div>
+        </fieldset>
+        
+        <h2>User</h2>
+        <fieldset>
+            <div class="row">
+                <label>Name</label>
+                <input type="text" name="userName" value="johnappleseed"/>
+            </div>
+            <div class="row">
+                <label>Password</label>
+                <input type="password" name="password" value="delicious"/>
+            </div>
+            <div class="row">
+                <label>Confirm</label>
+                <input type="password" name="password" value="delicious"/>
+            </div>
+        </fieldset>
+    </div>
+<div class="container" style="width:400px">
+</div>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/sloodle/db" VERSION="20101106" COMMENT="XMLDB file for Sloodle"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="sloodle" COMMENT="Defines instances of Sloodle modules." NEXT="sloodle_controller">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="type"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Shortname of the type of this Sloodle module." PREVIOUS="course" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="The name of this Sloodle instance" PREVIOUS="type" NEXT="intro"/>
+        <FIELD NAME="intro" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Intro text for this Sloodle isntance" PREVIOUS="name" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="intro" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="timecreated"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for sloodle"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_controller" COMMENT="Defines instances of Sloodle controllers." PREVIOUS="sloodle" NEXT="sloodle_distributor">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Identifies which Sloodle instance this refers to." PREVIOUS="id" NEXT="enabled"/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Indicates whether or not this Controller is enabled.." PREVIOUS="sloodleid" NEXT="password"/>
+        <FIELD NAME="password" TYPE="char" LENGTH="9" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Prim Password for this instance. If left blank, it should use the site default." PREVIOUS="enabled"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="sloodleid" UNIQUE="true" FIELDS="sloodleid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_distributor" COMMENT="Defines instances of Sloodle distributors." PREVIOUS="sloodle_controller" NEXT="sloodle_distributor_entry">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Identifies which Sloodle instance this refers to." PREVIOUS="id" NEXT="channel"/>
+        <FIELD NAME="channel" TYPE="char" LENGTH="36" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="UUID of the XMLRPC channel opened by the Distributor object in-world" PREVIOUS="sloodleid" NEXT="timeupdated"/>
+        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="channel"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="sloodle_distributor_entry" COMMENT="Defines entries in Sloodle Distributors." PREVIOUS="sloodle_distributor" NEXT="sloodle_users">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="distributorid"/>
+        <FIELD NAME="distributorid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Identifies which Distributor instance this refers to." PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="The name of this Sloodle distributor entry" PREVIOUS="distributorid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="sloodle_users" COMMENT="Associates Moodle user IDs with Second Life avatar UUIDs and names" PREVIOUS="sloodle_distributor_entry" NEXT="sloodle_course">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="Primary index field" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Index of the associated Moodle user account." PREVIOUS="id" NEXT="uuid"/>
+        <FIELD NAME="uuid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="UUID of the user agent" PREVIOUS="userid" NEXT="avname"/>
+        <FIELD NAME="avname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Name of the avatar" PREVIOUS="uuid" NEXT="profilepic"/>
+        <FIELD NAME="profilepic" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Profile url of the avatar" PREVIOUS="avname" NEXT="lastactive"/>
+        <FIELD NAME="lastactive" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Timestamp of the last time the avatar did any Sloodle activity" PREVIOUS="profilepic"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for sloodle_users"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="uuid" UNIQUE="false" FIELDS="uuid" NEXT="userid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" PREVIOUS="uuid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_course" COMMENT="Stores Sloodle data about each course" PREVIOUS="sloodle_users" NEXT="sloodle_pending_avatars">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="Primary index field" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Index of the Moodle course this record relates to" PREVIOUS="id" NEXT="autoreg"/>
+        <FIELD NAME="autoreg" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Indicates whether or not auto-registration is enabled for this course" PREVIOUS="course" NEXT="autoenrol"/>
+        <FIELD NAME="autoenrol" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Indicates whether or not auto-enrolment is enabled for this course" PREVIOUS="autoreg" NEXT="loginzonepos"/>
+        <FIELD NAME="loginzonepos" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Position vector of the LoginZone for this course" PREVIOUS="autoenrol" NEXT="loginzonesize"/>
+        <FIELD NAME="loginzonesize" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Size vector of the LoginZone for this course" PREVIOUS="loginzonepos" NEXT="loginzoneregion"/>
+        <FIELD NAME="loginzoneregion" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Name of the region where the LoginZone is rezzed" PREVIOUS="loginzonesize" NEXT="loginzoneupdated"/>
+        <FIELD NAME="loginzoneupdated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Timestamp of the last time the LoginZone was updated" PREVIOUS="loginzoneregion"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for sloodle_users"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_pending_avatars" COMMENT="Lists avatars which are awaiting a link to a Moodle account" PREVIOUS="sloodle_course" NEXT="sloodle_active_object">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="Primary index field" NEXT="uuid"/>
+        <FIELD NAME="uuid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="UUID of the user agent" PREVIOUS="id" NEXT="avname"/>
+        <FIELD NAME="avname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Name of the avatar" PREVIOUS="uuid" NEXT="lst"/>
+        <FIELD NAME="lst" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="The Login Security Token to secure the registration." PREVIOUS="avname" NEXT="timeupdated"/>
+        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Timestamp for when this entry was created or updated. Entries expire after a certain period." PREVIOUS="lst"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="uuid" UNIQUE="false" FIELDS="uuid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_active_object" COMMENT="Lists objects which have been authorised to access specific controllers" PREVIOUS="sloodle_pending_avatars" NEXT="sloodle_object_config">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="Primary index field" NEXT="controllerid"/>
+        <FIELD NAME="controllerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="The controller which this object is authorised for." PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="ID of the user who authorised this object, directly or indirectly. If 0, then it is not yet authorised." PREVIOUS="controllerid" NEXT="uuid"/>
+        <FIELD NAME="uuid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="UUID of the object" PREVIOUS="userid" NEXT="password"/>
+        <FIELD NAME="password" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Object-specific password" PREVIOUS="uuid" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Name of the object" PREVIOUS="password" NEXT="type"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Type identifier of the object. Used to determine which configuration script to use." PREVIOUS="name" NEXT="timeupdated"/>
+        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Timestamp for when this entry was created or updated. Entries expire after a certain period." PREVIOUS="type" NEXT="httpinurl"/>
+        <FIELD NAME="httpinurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Use this field to save and update the httpin url, which is to be used to send the object configuration data from Sloodle Server code, and potentially other info" PREVIOUS="timeupdated"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="uuid" UNIQUE="true" FIELDS="uuid" COMMENT="Objects cannot be authorised more than once, although their authorisation can change."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_object_config" COMMENT="Configuration settings for registered active objects" PREVIOUS="sloodle_active_object" NEXT="sloodle_login_notifications">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="Primary index field" NEXT="object"/>
+        <FIELD NAME="object" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Identifies which object this setting refers to." PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Name of the setting" PREVIOUS="object" NEXT="value"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Value of the setting" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="object-name" UNIQUE="true" FIELDS="object, name" COMMENT="Setting names must be unique for a given object"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_login_notifications" COMMENT="Contains the details of auto-registration login details which are to be sent" PREVIOUS="sloodle_object_config" NEXT="sloodle_layout">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="Primary index field" NEXT="destination"/>
+        <FIELD NAME="destination" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="UUID of the object which will relay the notification" PREVIOUS="id" NEXT="avatar"/>
+        <FIELD NAME="avatar" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="UUID of the user agent to whom the notification is being sent" PREVIOUS="destination" NEXT="username"/>
+        <FIELD NAME="username" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Username of the new account" PREVIOUS="avatar" NEXT="password"/>
+        <FIELD NAME="password" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Plaintext password of the new account" PREVIOUS="username"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="sloodle_layout" COMMENT="Defines classroom layout profiles" PREVIOUS="sloodle_login_notifications" NEXT="sloodle_layout_entry">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Identifies which course this profile belongs to. Relates to the Moodle course table" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="The name of this layout profile" PREVIOUS="course" NEXT="timeupdated"/>
+        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Timestamps for when this profile was last updated" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course-name" UNIQUE="true" FIELDS="course, name" COMMENT="Profile names must be unique within each course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_layout_entry" COMMENT="Defines an object entry in a classroom layout" PREVIOUS="sloodle_layout" NEXT="sloodle_layout_entry_config">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="layout"/>
+        <FIELD NAME="layout" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Identifies which layout profile this entry belongs to" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="The name of the object" PREVIOUS="layout" NEXT="position"/>
+        <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="The position of the object, as a 3d SL-style vector" PREVIOUS="name" NEXT="rotation"/>
+        <FIELD NAME="rotation" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="The rotation of the object, stored as a 3d SL-style vector of Euler angles" PREVIOUS="position"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="layout" UNIQUE="false" FIELDS="layout"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_layout_entry_config" COMMENT="Defines configuration parameters for layout entries, providing defaults for active_object configurations" PREVIOUS="sloodle_layout_entry" NEXT="sloodle_loginzone_allocation">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="layout_entry"/>
+        <FIELD NAME="layout_entry" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Foreign key of layout_entry item" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="name of paramter" PREVIOUS="layout_entry" NEXT="value"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="sloodle_loginzone_allocation" COMMENT="Gives allocation of a loginzone for a given user" PREVIOUS="sloodle_layout_entry_config" NEXT="sloodle_user_object">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Identifies which course this allocation is for" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Identifies which user this allocation is for" PREVIOUS="course" NEXT="position"/>
+        <FIELD NAME="position" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="The position of the allocation, relative to the LoginZone centre" PREVIOUS="userid" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Timestamps for when this allocation was created" PREVIOUS="position"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course" NEXT="userid"/>
+        <INDEX NAME="userid" UNIQUE="true" FIELDS="userid" COMMENT="Each user can have only one allocation" PREVIOUS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_user_object" COMMENT="Lists user-centric objects which individual users have authorised for use with their own accounts, such as blogging" PREVIOUS="sloodle_loginzone_allocation" NEXT="sloodle_presenter">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="Primary index field" NEXT="avuuid"/>
+        <FIELD NAME="avuuid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="UUID of the avatar" PREVIOUS="id" NEXT="objuuid"/>
+        <FIELD NAME="objuuid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="UUID of the object" PREVIOUS="avuuid" NEXT="objname"/>
+        <FIELD NAME="objname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Name of the object" PREVIOUS="objuuid" NEXT="password"/>
+        <FIELD NAME="password" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Object- and avatar-specific password" PREVIOUS="objname" NEXT="authorised"/>
+        <FIELD NAME="authorised" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Indicates whether or not this object has been authorised.." PREVIOUS="password" NEXT="timeupdated"/>
+        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Timestamp for when this entry was created or updated. Entries expire after a certain period." PREVIOUS="authorised"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for table"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="objuuid" UNIQUE="true" FIELDS="objuuid" COMMENT="User objects can only be authorised against one avatar at a time."/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_presenter" COMMENT="Each record stores data about a Presenter instance." PREVIOUS="sloodle_user_object" NEXT="sloodle_presenter_entry">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Indicates which SLOODLE module instance this Presenter information relates to." PREVIOUS="id" NEXT="framewidth"/>
+        <FIELD NAME="framewidth" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="true" DEFAULT="512" SEQUENCE="false" ENUM="false" COMMENT="Indicates the width of the frame for displaying content in Moodle." PREVIOUS="sloodleid" NEXT="frameheight"/>
+        <FIELD NAME="frameheight" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="true" DEFAULT="512" SEQUENCE="false" ENUM="false" COMMENT="Indicates the height of the frame for displaying content in Moodle." PREVIOUS="framewidth"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="sloodleid"/>
+        <KEY NAME="sloodleid" TYPE="unique" FIELDS="sloodleid" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="sloodle_presenter_entry" COMMENT="sloodle_presenter_entry table retrofitted from MySQL" PREVIOUS="sloodle_presenter" NEXT="sloodle_awards">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Specifies the name for this entry in the presentation." PREVIOUS="sloodleid" NEXT="source"/>
+        <FIELD NAME="source" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="name" NEXT="type"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="web" SEQUENCE="false" ENUM="false" PREVIOUS="source" NEXT="ordering"/>
+        <FIELD NAME="ordering" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="type"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloopresentr_slo_ix" UNIQUE="false" FIELDS="sloodleid" NEXT="mdl_sloopresentr_typ_ix"/>
+        <INDEX NAME="mdl_sloopresentr_typ_ix" UNIQUE="false" FIELDS="type" PREVIOUS="mdl_sloopresentr_slo_ix"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_awards" COMMENT="sloodle_awards table retrofitted from MySQL" PREVIOUS="sloodle_presenter_entry" NEXT="sloodle_award_trans">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="default_currency"/>
+        <FIELD NAME="default_currency" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Lindens" SEQUENCE="false" ENUM="false" PREVIOUS="sloodleid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="default_currency"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloostip_slo_ix" UNIQUE="false" FIELDS="sloodleid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_award_trans" COMMENT="sloodle_award_trans table retrofitted from MySQL" PREVIOUS="sloodle_awards" NEXT="sloodle_award_scoreboards">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="sloodleid" NEXT="gameid"/>
+        <FIELD NAME="gameid" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="courseid" NEXT="avuuid"/>
+        <FIELD NAME="avuuid" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="gameid" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="avuuid" NEXT="avname"/>
+        <FIELD NAME="avname" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="userid" NEXT="currency"/>
+        <FIELD NAME="currency" TYPE="char" LENGTH="50" NOTNULL="false" DEFAULT="Credits" SEQUENCE="false" ENUM="false" PREVIOUS="avname" NEXT="itype"/>
+        <FIELD NAME="itype" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="currency" NEXT="amount"/>
+        <FIELD NAME="amount" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="itype" NEXT="idata"/>
+        <FIELD NAME="idata" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="amount" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="idata"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloostiptran_slo_ix" UNIQUE="false" FIELDS="sloodleid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_award_scoreboards" COMMENT="sloodle_award_scoreboards" PREVIOUS="sloodle_award_trans" NEXT="sloodle_award_games">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="sloodleid" NEXT="url"/>
+        <FIELD NAME="url" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" ENUM="false" PREVIOUS="name" NEXT="type"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="url" NEXT="enabled"/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="type" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="enabled"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloostipscore_slo_ix" UNIQUE="false" FIELDS="sloodleid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_award_games" COMMENT="sloodle_award_players table retrofitted from MySQL" PREVIOUS="sloodle_award_scoreboards" NEXT="sloodle_award_players">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="sloodleid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloostiptran_slo_ix" UNIQUE="false" FIELDS="sloodleid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_award_players" COMMENT="sloodle_award_players table retrofitted from MySQL" PREVIOUS="sloodle_award_games" NEXT="sloodle_logs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="gameid"/>
+        <FIELD NAME="gameid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="avuuid"/>
+        <FIELD NAME="avuuid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="gameid" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="avuuid" NEXT="avname"/>
+        <FIELD NAME="avname" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="userid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="avname"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloostiptran_slo_ix" UNIQUE="false" FIELDS="gameid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_logs" COMMENT="sloodle log for avatar tracking" PREVIOUS="sloodle_award_players" NEXT="sloodle_awards_teams">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="avuuid"/>
+        <FIELD NAME="avuuid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="userid" NEXT="avname"/>
+        <FIELD NAME="avname" TYPE="char" LENGTH="70" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="avuuid" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="avname" NEXT="action"/>
+        <FIELD NAME="action" TYPE="char" LENGTH="150" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="course" NEXT="url"/>
+        <FIELD NAME="url" TYPE="char" LENGTH="150" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="action" NEXT="slurl"/>
+        <FIELD NAME="slurl" TYPE="char" LENGTH="150" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="url" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="slurl"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloostiptran_slo_ix" UNIQUE="false" FIELDS="id"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_awards_teams" COMMENT="sloodle_award_players table retrofitted from MySQL" PREVIOUS="sloodle_logs" NEXT="sloodle_currency_types">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="sloodleid"/>
+        <FIELD NAME="sloodleid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="gameid"/>
+        <FIELD NAME="gameid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="sloodleid" NEXT="groupid"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="gameid" NEXT="groupname"/>
+        <FIELD NAME="groupname" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="groupid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="groupname"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloostiptran_slo_ix" UNIQUE="false" FIELDS="gameid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="sloodle_currency_types" COMMENT="sloodle currency types" PREVIOUS="sloodle_awards_teams">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mdl_sloostiptran_slo_ix" UNIQUE="false" FIELDS="id"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
