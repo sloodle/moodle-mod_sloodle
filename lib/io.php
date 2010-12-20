@@ -1148,11 +1148,13 @@ class SloodleDebugLogger {
         // Write the contents to the debug log, if one is defined in SLOODLE_DEBUG_REQUEST_LOG. 
         // Return true if we write something, false if we don't.
         function log($type, $contents = null) {
-            $str = '';
-            $str = '------START-'.$type.'-'.$_SERVER['REQUEST_URI'].'---'.$_SERVER['REMOTE_ADDR'].'---'.$_SERVER['REMOTE_PORT'].'---'.$_SERVER['REQUEST_TIME'].'------'."\n";
+
             if ( SLOODLE_DEBUG_REQUEST_LOG == '' ) {
                 return false;
             }
+
+            $str = '';
+            $str = '------START-'.$type.'-'.$_SERVER['REQUEST_URI'].'---'.$_SERVER['REMOTE_ADDR'].'---'.$_SERVER['REMOTE_PORT'].'---'.$_SERVER['REQUEST_TIME'].'------'."\n";
 
             if ( ($type == 'REQUEST') && ($contents == null) ) {
                if (!empty($_GET)) {

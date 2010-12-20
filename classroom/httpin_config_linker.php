@@ -1,4 +1,3 @@
-
 <?
 /*  Released under the GNU GPL 3.0
 *  This script can be used in your scripts, but you must include this copyright header as per the GPL Licence

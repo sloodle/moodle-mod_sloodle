@@ -60,13 +60,43 @@
         */
         var $user = null;
 
-            /**
+        /**
         * The httpin for this object
         * @var string
         * @access public
         */
-        var $response = null;
         var $httpinurl = null;
+
+        /**
+        * The layoutentryid this object was rezzed to represent, if there is one.
+        * @var string
+        * @access public
+        */
+        var $layoutentryid = null;
+
+        /**
+        * The rezzeruuid of the object that controls this object, if there is one.
+        * @var string
+        * @access public
+        */
+        var $rezzeruuid = null;
+
+        /**
+        * The position of the object relative to its rezzer, or the position the object should go to if it has just been configured.
+        * @var string
+        * @access public
+        */
+        var $position = null;
+
+        /**
+        * The rotation of the object relative to its rezzer, or the rotation the object should adopt if it has just been configured.
+        * @var string
+        * @access public
+        */
+        var $rotation = null;
+
+        var $response = null;
+
 
         //sends a curl message to our objects httpinurl
         public function sendMessage($msg){
@@ -82,12 +112,44 @@
                 curl_close($ch);
                 return array('info'=>$info,'result'=>$result);
             }
+
+	// Sends a message to the object telling it to derez itself.
+	// Deletes the active_object record if successful.
+	// NB the object can't report back whether it successfully derezzed itself, because it no longer exists.	
+	// We'll go by whether it acknowledged the derez command, which is as close as we can get.
+	// Return true on success, false on failure
+	public function deRez() {
+
+		if (!$this->httpinurl) {
+			return false;
+		}
+		//build response string
+		$response = new SloodleResponse();
+		$response->set_status_code(1);
+		$response->set_status_descriptor('SYSTEM');
+		$response->set_request_descriptor('DEREZ');
+		$response->add_data_line('do:derez');
+
+		//create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
+		$renderStr="";
+		$response->render_to_string($renderStr);
+		//send message to httpinurl
+		$reply = $this->sendMessage($renderStr);
+		if ( !( $reply['info']['http_code'] == 200 ) ) {
+			return false;
+		}
+
+		return $this->delete();
+
+	}
+
         /*
         * writes config data to a response object, and sends it this objects httpinurl
         * @var $extraParameters array()
         *
         */
         public function sendConfig( $extraParameters = NULL ){//inside active_object.php
+		global $CFG;
             //construct the body
            if ($extraParameters === NULL) {
                $extraParameters = array();
@@ -97,12 +159,17 @@
             $response->add_data_line(array('set:sloodlecontrollerid', $this->controllerid));
             $response->add_data_line(array('set:sloodlecoursename_short', $this->course->get_short_name()));
             $response->add_data_line(array('set:sloodlecoursename_full', $this->course->get_short_name()));
-            $response->add_data_line(array('set:sloodlepwd', $this->password));
-            $response->add_data_line(array('set:sloodleserverroot', SLOODLE_WWWROOT));
+            $response->add_data_line(array('set:sloodlepwd', $this->uuid.'|'.$this->password)); // NB We need to prepend the UUID - otherwise Sloodle treats it like a prim password
+            $response->add_data_line(array('set:sloodleserverroot', $CFG->wwwroot));
+            $response->add_data_line(array('set:position', $this->position, $this->rotation, $this->rezzeruuid));
+            //$response->add_data_line(array('set:rezzeruuid', $this->rezzeruuid));
+            //$response->add_data_line(array('set:rotation', $this->rotation));
+            $response->add_data_line(array('set:layoutentryid', $this->layoutentryid));
             //search for setings for this object
             $settings = get_records('sloodle_object_config', 'object', $this->id);
              if (!$settings) {
                 // Error: no configuration settings... there should be at least one indicating the type
+/*
                 $response->set_status_code(-103);
                 $response->set_status_descriptor('SYSTEM');
                 $response->add_data_line('Object not configured yet.');
@@ -110,9 +177,10 @@
                 //create message
                 $response->render_to_string($renderStr);
                 //send message to httpinurl
-                $this->sendMessage($renderStr);
-                return;
+                return $this->sendMessage($renderStr);
+*/
             }
+	/*
             $layoutentry = NULL;
             $position = NULL;
             $rotation = NULL;
@@ -130,6 +198,7 @@
                     } //endif
                 }//endif
             }//end foreach
+	*/
             foreach( $extraParameters as $n => $v) {
                 $response->add_data_line( 'set:'.$n.'|'.$v );
             }//endforeach
@@ -138,8 +207,25 @@
             $renderStr="";
             $response->render_to_string($renderStr);
             //curl send this to our object's httpinurl
+
+            SloodleDebugLogger::log('HTTP-IN', $renderStr);
+
             return $this->sendMessage( $renderStr );
         }
+
+	// Deletes a record from the active object table.
+	// Returns true on success.
+	// NB If you need to get rid of the record from world as well, use deRez(). 
+	// deRez will call this function in turn.
+	public function delete() {
+ 	    if (!$this->id) {
+	        return false;
+	    } 
+
+            // Delete all config entries and the object record itself
+            return ( delete_records('sloodle_object_config', 'object', $this->id) && delete_records('sloodle_active_object', 'id', $this->id) );
+
+	}
 
         public function save(){
            //write local data to a new or existing record
@@ -154,6 +240,10 @@
                     $result->userid = $this->userid;
                     $result->uuid = $this->uuid;
                     $result->httpinurl = $this->httpinurl;
+                    $result->position = $this->position;
+                    $result->rotation = $this->rotation;
+                    $result->rezzeruuid = $this->rezzeruuid;
+                    $result->layoutentryid = $this->layoutentryid;
                     $result->password = $this->password;
                     $result->name = $this->name;
                     $result->type = $this->type;
@@ -165,6 +255,10 @@
                     $result->userid = $this->userid;
                     $result->uuid = $this->uuid;
                     $result->httpinurl = $this->httpinurl;                    
+                    $result->position = $this->position;
+                    $result->rotation = $this->rotation;
+                    $result->rezzeruuid = $this->rezzeruuid;
+                    $result->layoutentryid = $this->layoutentryid;
                     $result->password = $this->password;
                     $result->name = $this->name;
                     $result->type = $this->type;
@@ -178,6 +272,23 @@
 
            return $success;
         }//end function
+
+
+        // Load data for the specified id
+        // Return true on success, false on fail
+        public function load( $id) {
+
+            $rec = get_record('sloodle_active_object','id',$id);
+
+            if ($rec) {
+                $this->loadFromRecord($rec);
+                return true;
+            }
+
+            return false;
+
+        }
+
 
         // Load data for the specified UUID
         // Return true on success, false on fail
@@ -203,6 +314,10 @@
            $this->type = $rec->type;
            $this->timeupdated = $rec->timeupdated;
            $this->httpinurl = $rec->httpinurl;
+           $this->layoutentryid = $rec->layoutentryid;
+           $this->position = $rec->position;
+           $this->rotation = $rec->rotation;
+           $this->rezzeruuid = $rec->rezzeruuid;
         }
     }
 

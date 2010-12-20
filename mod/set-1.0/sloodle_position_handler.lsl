@@ -24,12 +24,18 @@ integer sloodle_handle_command(string str)
 {
     list bits = llParseString2List(str,["|"],[]);
     integer numbits = llGetListLength(bits);
-    if ( (numbits >= 1) && (llList2String(bits,0) == "set:position") ) {
-        rezzer_position_offset = (vector)llList2String(bits,1);
-        rezzer_rotation_offset = llList2Rot(bits,2);
-        rezzer_uuid = llList2Key(bits,3);
-        return 1;
-    }
+    
+    if (numbits >= 1 ) {
+        string name = llList2String(bits,0);
+        if (name == "set:position") {    
+            rezzer_position_offset = (vector)llList2String(bits,1);
+            rezzer_rotation_offset = llList2Rot(bits,2);
+            rezzer_uuid = llList2Key(bits,3);
+            return 1;            
+        } else if (name == "do:derez") {
+            llDie();
+        }
+    } 
     return 0;
 }
 
@@ -52,6 +58,10 @@ default
             }                  
         }
     }
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }        
 }
 
 state ready {    
@@ -81,7 +91,7 @@ state ready {
 
     listen(integer channel, string name, key id, string message) {
     
-        llOwnerSay(message);
+       // llOwnerSay(message);
     
         list bits = llParseString2List( message, ["|"], [] );
         vector change_pos = (vector)llList2String( bits, 0 );
@@ -117,5 +127,9 @@ state ready {
         //  llGetPos() + vPosOffset * llGetRot(), ZERO_VECTOR, llGetRot()        
         
     }
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }        
 }
 

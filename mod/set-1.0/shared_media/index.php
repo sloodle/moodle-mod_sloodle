@@ -37,6 +37,15 @@
     /** Sloodle course data. */
     require_once(SLOODLE_LIBROOT.'/course.php');
     require_once(SLOODLE_LIBROOT.'/layout_profile.php');
+    require_once(SLOODLE_LIBROOT.'/active_object.php');
+
+        $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
+
+	if (isset($_GET['logout'])) {
+		require_logout();
+		redirect($baseurl.'&ts='.time());
+		exit;
+	}
 
 	/*
 	$courseid = optional_param( 'courseid', 0, PARAM_INT );
@@ -47,9 +56,36 @@
 	$course_context = get_context_instance( CONTEXT_COURSE, 1);
 	$can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
 	if (!$can_use_layouts) {
-		include('../../../login/shared_media/index.php');
-		exit;
+		//include('../../../login/shared_media/index.php');
+		include('login.php');
 	}
+/*
+*/
+
+// Register the set using URL parameters
+$ao = new SloodleActiveObject();
+$object_uuid = required_param('sloodleobjuuid');
+if (!$ao->loadByUUID($object_uuid)) {
+	$ao->controllerid = 0; // Hope that's OK...
+	$ao->userid = $USER->id;
+	$ao->uuid = $object_uuid;
+	$ao->httpinurl = required_param('httpinurl');
+	$ao->password = rand(100000,9999999999);
+	$ao->name = required_param('sloodleobjname');
+	$ao->type = 'set-1.0';
+	$ao->save();
+} else 	{
+	if ($httpinurl = optional_param( 'httpinurl', NULL, PARAM_RAW )) {
+		if ($ao->httpinurl != $httpinurl) {
+			$ao->httpinurl = $httpinurl;
+			$ao->save();
+		} 
+	}
+}
+
+//httpinurl=http%3A%2F%2Fsim8910.agni.lindenlab.com%3A12046%2Fcap%2F01eac39f-fa9f-8d26-0228-bc78d617b0ef&sloodleobjuuid=441157a0-10dc-2b94-31bc-fb4126bb5369&sloodleobjname=Avatar Classroom Special Set 20101214a&sloodleuuid=746ad236-d28d-4aab-93de-1e09a076c5f3&sloodleavname=Edmund Earp
+/*
+*/
 
 	// TODO: Register the set
 
@@ -74,6 +110,9 @@
 		print '<div class="top_navigation"><a href="http://api.avatarclassroom.com/sites.php?...">Sites</a> &gt; <b>Courses</b></div>';
 	}
 	*/
+
+	// A list of all the sites the user has
+	$sites = $_REQUEST['sites'];
 
 	// REGULAR SLOODLE TODO: This should filter for courses the user has access to.
 	$courses = get_courses();
@@ -103,6 +142,9 @@
 
 	$courselayouts = array();
 
+	// TODO: This should probably be somewhere else
+	include('object_configs.php');
+
         // Construct the list of course names
         $coursenames = array();
 	$layoutentries = array();
@@ -114,25 +156,29 @@
 		$moodle_course = $sloodle_course->get_course_object();
 		$layouts = $sloodle_course->get_layouts();
 		foreach($layouts as $l) {
-			$layoutentries[$l->id] = $sloodle_course->get_layout_entries_for_layout_id($l->id);
+			$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);
+			$entriesbygroup = array();
+			foreach($entries as $e) {
+				$objectname = $e->name;
+				$grp = 'Other';
+				if (isset($object_configs[$objectname]['group'])) {
+					$grp = $object_configs[$objectname]['group'];
+				}
+				if (!isset($entriesbygroup[ $grp ] )) {
+					$entriesbygroup[ $grp ] = array();
+				}
+				$entriesbygroup[ $grp ][] = $e;	
+			}
+			$layoutentries[$l->id] = $entriesbygroup;
 		}
 		$courselayouts[$cid] = $layouts;
 		$coursenames[$cid] = $moodle_course->fullname;
         }
 
+	$hasSites = count($sites) > 0;
 	include('index.template.php');
 
 exit;
-    
-    // Authenticate the request and user, but do not allow auto-registration and enrolment
-    $sloodle = new SloodleSession();
-    $sloodle->authenticate_request();
-    $sloodle->validate_user(true, true, true);
-    
-    // We need to check certain capabilities
-    $can_use_layouts = false;
-    $can_edit_layouts = false;
-    
 ///// MOODLE-SPECIFIC /////
     $course_context = get_context_instance(CONTEXT_COURSE, $sloodle->course->get_course_id());
     $can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);

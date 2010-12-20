@@ -335,7 +335,26 @@
     	* ...is in the SloodleLayoutEntry class.
 	* TODO: Would this be better there?
 	*/
-	function configure_object_from_layout_entry($authid, $layout_entry_id) {
+	function configure_object_from_layout_entry($authid, $layout_entry_id, $rezzeruuid = null) {
+
+            $ao = new SloodleActiveObject();
+            if (!$ao->load($authid)) {
+                return false;
+            }
+ 
+            $entry = get_record('sloodle_layout_entry', 'id', $layout_entry_id);
+            if (!$entry) {
+                return false;
+            }
+
+            $ao->layoutentryid = $entry->id;
+            $ao->rotation = $entry->rotation;
+            $ao->position = $entry->position;
+            $ao->rezzeruuid = $rezzeruuid;
+            if (!$ao->save()) {
+               return false;
+            }
+
 	   $configs = get_records('sloodle_layout_entry_config','layout_entry',$layout_entry_id);
 	   $ok = true;
 	   if (count($configs) > 0) {
@@ -348,13 +367,14 @@
 	      }
 	   }
 
+	/*
          $lconfig = new stdClass();
 	 $lconfig->id = null;
          $lconfig->object = $authid;
 	 $lconfig->name = 'sloodlelayoutentryid';
 	 $lconfig->value = $layout_entry_id;
 	 insert_record('sloodle_object_config',$lconfig);
-
+	*/
 
 	   return $ok;
 
@@ -521,6 +541,10 @@
         * @param mixed $id If it is an integer, then it is treated as the active object ID. If a string, it is treated as the object UUID.
         * @return void
         */
+	// TODO: This is now duplicated by delete() in the SloodleActiveObject class. 
+	// That seems like a better place to do this.
+	// We should either change whatever's calling this to use SloodleActiveObject instead 
+	// ...or change this function to call SloodleActiveObject->delete().
         function remove_object($id)
         {
             // Check what type the ID is
@@ -611,7 +635,44 @@
             $entry->timeupdated = time();
             return update_record('sloodle_active_object', $entry);
         }
-        
+
+        /**
+        * Returns an array of active object records, or false if something went wrong.
+        * (Cannot be called statically... object must be authorised for this controller).
+        * @param string $rezzeruuid: The uuid of the rezzer which rezzed the object, or null for all active objects, regardless of rezzer.
+        * @param int $layoutentryid: The layout entry id object, or null for all active objects, regardless of layout entry.
+        * @return array() active object objects, or false on failure
+        */
+	function get_active_objects( $rezzeruuid = null, $layoutentryid = null ) {
+            $id = $this->get_id();
+            $aos = array();
+            if (!$id) {
+               return false;
+            }
+	    $recs = array();
+
+            $select = 'controllerid = '.intval($id);
+            if ($rezzeruuid) {
+               $select .= " and rezzeruuid = '".$rezzeruuid."'";
+            }
+            if ($layoutentryid) {
+               $select .= " and layoutentryid = ".intval($layoutentryid);
+            }
+
+    	    $recs = get_records_select('sloodle_active_object', $select);
+            if (!$recs) {
+                return false;        
+            }
+            foreach($recs as $rec) {
+                if ($rec && $rec->id) {
+                    $ao = new SloodleActiveObject();
+                    $ao->loadFromRecord($rec);
+                    $aos[] = $ao;
+               }
+            }
+            return $aos; 
+	}
+
     }
 
 ?>

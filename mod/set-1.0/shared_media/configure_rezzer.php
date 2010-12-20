@@ -28,46 +28,40 @@ $rezzer = new SloodleActiveObject();
 $sloodleuser = new SloodleUser();
 $sloodleuser->user_data = $USER;
 
-if (!$layoutentryid = optional_param( 'layoutentryid', 0, PARAM_INT) ) {
-	error_output( 'Layout ID missing' );
-}
-
-if (!$controllerid  = optional_param( 'controllerid', 0, PARAM_INT) ) {
+if (!$controllerid  = optional_param('controllerid', 0, PARAM_INT)) {
 	error_output( 'Controller ID missing' );
 }
 
-if ( !$rezzeruuid = optional_param( 'rezzeruuid', null, PARAM_SAFEDIR ) ) {
-	error_output('Could not load rezzer');
+if ( !$rezzeruuid = optional_param('rezzeruuid', '', PARAM_SAFEDIR) ) {
+	error_output( 'Rezzer UUID missing or incorrect' );
 }
 
-$primpassword = sloodle_random_prim_password();
-
-$controller = new SloodleController();
-
-if (!$controller->load( $controllerid )) {
-	error_output('Could not load controller');
+if ( !$rezzer->loadByUUID($rezzeruuid) ) {
+	error_output( 'Controller ID missing' );
 }
 
-$failures = array();
-//$active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
-//$active_objects = $controller->get_active_objects( null, $layoutentryid);
-$active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
-
-foreach($active_objects as $ao) {
-	if (!$ao->deRez()) {
-		$failures[] = $ao;
+if ( ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {
+	$rezzer->controllerid = $controllerid;
+	if (!$rezzer->save()) {
+		error_output('Updating rezzer failed');
 	}
-	//$rezzed_object_uuid = $reply['result'];
+	if (!$result = $rezzer->sendConfig()) {
+		error_output('Sending config failed');
+	}
+	if ($result['info']['http_code'] == 404) {
+		error_output('HTTP-in URL not found');
+	}
 }
 
-// TODO: Handle failures properly...
-
-$result = 'derezzed';
+$result = 'configured';
 
 $content = array(
 	'result' => $result,
 	'error' => $error,
 );
+
+$rand = rand(0,10);
+sleep($rand);
 
 print json_encode($content);
 

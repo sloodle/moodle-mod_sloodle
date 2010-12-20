@@ -9,16 +9,15 @@
 <link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
 <meta name="apple-touch-fullscreen" content="YES" />
 <style type="text/css" media="screen">@import "iui/iui.css";</style>
-<style type="text/css" media="screen">@import "iui/iui_ext.css";</style>
 <style type="text/css" media="screen">@import "layout.css";</style>
 <script type="application/x-javascript" src="iui/iui.js"></script>
-<script type="application/x-javascript" src="iui/iui_ext.js"></script>
 <script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
 <script type="application/x-javascript" src="layout.js"></script>
 <!--
 -->
 <script type="text/javascript">
 	iui.animOn = true;
+	var rezzer_uuid = '<?= htmlentities($_REQUEST['sloodleobjuuid']) ?>';
 </script>
 <!--
 <script type="application/x-javascript" src="http://10.0.1.2:1840/ibug.js"></script>
@@ -30,60 +29,35 @@
     <div class="toolbar">
         <h1 id="pageTitle"></h1>
         <a id="backButton" class="button" href="#"></a>
-        <a class="button" href="index.php?logout">Logout</a>
+        <a class="button" onclick="document.location.href = '<?= $baseurl.'&logout=1&ts='.time()?>'" href="<?= $baseurl.'&logout=1&ts='.time()?>">Logout</a>
     </div>
      
-<?php /*
+    <?php if ($hasSites) { ?>
     <ul id="home" title="Avatar Classroom Site" selected="true">
         <li class="group">Sites</li>
-        <li><a href="#site1">http://edmund_earp.avatarclassroom.com</a></li>
-        <li><a href="#site2">http://fire_centaur.avatarclassroom.com</a></li>
+	<?php foreach($sites as $site) { ?>
+	<?php if ('http://'.$_SERVER["SERVER_NAME"] == $site) { ?>
+        <li><a href="#site_1"><?=$site?></a></li>
+	<?php } else { ?>
+        <li><a href="<?=$site?>"><?=$site?></a></li>
+	<?php } ?>
+	<?php } ?>
 	<li></li>
         <li class="group">Add a site</li>
         <li><a href="#addsite">Add a site</a></li>
 	<li></li>
     </ul>
-*/
-        foreach($courses as $course) {
-                $cid = $course->id;
-                $cn  = $course->fullname;
-                print '<div id="course'.$cid.'" class="course">';
-                print '<h3><a href="?courseid='.$cid.'">'.htmlentities($cn).'</a></he>';
-                print '<ul class="course_list">';
-                foreach($controllers[$cid] as $cont) {
-                        print '<li class="controller_item">';
-                        print '<table><tr valign="middle">';
-                        print '<td >'.htmlentities($cont->name).'</td>';
-                        //$id = $cont->get_id();
-                        print '<td><form action="index.php"><input type="hidden" name="cmid" value="'.intval($id).'"><input type="submit" value="Use this classroom" /></form></td>';
-                        /*
-                        print '<ul class="layout_list">';
-                        $layouts = $courselayouts[ $cid ];
-                        foreach($layouts as $layoutname) {
-                                print '<li class="layout_item">';
-                                print htmlentities($layoutname);
-                                print '</li>';
-                        }
-                        print '</ul>';
-                        */
-                        print '</li>';
-                }
-                print '<input type="submit" value="Add a classroom" />';
-                print '</ul>';
-                print '</div>';
-        }
+    <?php } ?>
 
-?>
-    <ul id="site1" title="edmund_earp.avatarclassroom.com" selected="true">
+    <ul id="site_1" title="<?= "http://".$_SERVER["SERVER_NAME"]?>" <?= $hasSites ? '' : ' selected="true"' ?> >
         <li class="group">Courses</li>
 	<?php 
 	foreach($courses as $course) { 
 		$cid = $course->id; 
 		$cn = $course->fullname; 
-		foreach($controllers[$cid] as $cont) {
-			$contid = $cont->id;
+		foreach($controllers[$cid] as $contid=>$cont) {
 ?>
-			<li><a href="#controller<?= intval($cid)?>-<?= intval($contid) ?>"><?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?></a></li>
+			<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?></a></li>
 <?php
 		}
 	}
@@ -121,14 +95,13 @@
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
-		foreach($controllers[$cid] as $cont) {
-			$contid = $cont->id;
+		foreach($controllers[$cid] as $contid => $cont) {
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
 ?>
-    <ul id="controller<?= intval($cid)?>-<?= intval($contid) ?>" title="<?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?>">
+    <ul class="layout_link" id="controller_<?= intval($cid)?>-<?= intval($contid) ?>" title="<?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?>">
         <li class="group">Scenes</li>
-        <li><a href="#layout<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities($layout->name) ?></a></li>
+        <li><a href="#layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities($layout->name) ?></a></li>
 <?php if ($full) { ?>
 	<li></li>
         <li class="group">Add a scene</li>
@@ -155,35 +128,37 @@
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
-		foreach($controllers[$cid] as $cont) {
-			$contid = $cont->id;
+		foreach($controllers[$cid] as $contid => $cont) {
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
-				$entries = $layoutentries[ $layout->id ];
+				$entriesbygroup = $layoutentries[ $layout->id ];
 ?>
-			    <ul id="layout<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>">
+			    <ul class="layout_container" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>">
 				<li class="group"><?= htmlentities( $layout->name ) ?></li>
+				<span id="set_configuration_status" class="">Configuring set</span>
 				<span id="rez_all_objects" class="whiteButton activeButton">Rez All Objects</span>
-				<span id="derez_all_objects" class="hiddenButton">Rez All Objects</span>
 				<li></li>
 <?php
-				$lettergroup = '';
-				foreach($entries as $e) {
-					$entryname = $e->name;	
-					$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
-					$firstletter = substr($entryname, 0, 1);
-					if ($lettergroup != $firstletter) { 
-						$lettergroup = $firstletter;
+				foreach($entriesbygroup as $group => $entries) {
 ?>
-				<li class="group"><?= htmlentities($lettergroup) ?></li>
-<?php 
-					}
-?>
-<?php /*
-				<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
-*/ ?>
-				<li id="layoutentryid_<?= intval( $e->id ) ?>" class="rezzable_item"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item_status">&nbsp;</span> </li>
+					<li class="group"><?= htmlentities($group) ?></li>
 <?php
+					foreach($entries as $e) {
+						$entryname = $e->name;	
+						$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
+						$firstletter = substr($entryname, 0, 1);
+						if ($lettergroup != $firstletter) { 
+							$lettergroup = $firstletter;
+	?>
+	<?php 
+						}
+	?>
+	<?php /*
+					<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
+	*/ ?>
+					<li id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item_status">&nbsp;</span> </li>
+	<?php
+					}
 				}
 ?>
 			<?php if ($full) { ?>

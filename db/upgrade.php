@@ -46,7 +46,7 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         
     /// Drop 'sloodle_config' table
         $table = new XMLDBTable('sloodle_config');
-        drop_table($table);
+        
         
     /// Drop 'sloodle_active_object' table
         $table = new XMLDBTable('sloodle_active_object');
@@ -957,6 +957,68 @@ if ($result && $oldversion < 2010091200) {
     /// Launch add field httpinurl
         $result = $result && add_field($table, $field);
     }
+
+    if ($result && $oldversion < 2010121703) {
+
+    /// Define field layoutentryid to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $field = new XMLDBField('layoutentryid');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, null, null, 'httpinurl');
+
+    /// Launch add field layoutentryid
+        $result = $result && add_field($table, $field);
+
+    /// Define field rezzeruuid to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $field = new XMLDBField('rezzeruuid');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'layoutentryid');
+
+    /// Launch add field rezzeruuid
+        $result = $result && add_field($table, $field);
+
+    /// Define field position to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $field = new XMLDBField('position');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'rezzeruuid');
+
+    /// Launch add field position
+        $result = $result && add_field($table, $field);
+
+    /// Define field rotation to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $field = new XMLDBField('rotation');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'position');
+
+    /// Launch add field rotation
+        $result = $result && add_field($table, $field);
+
+    /// Define field region to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $field = new XMLDBField('region');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'rotation');
+
+    /// Launch add field region
+        $result = $result && add_field($table, $field);
+
+  /// Define index rezzeruuid (not unique) to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $index = new XMLDBIndex('rezzeruuid');
+        $index->setAttributes(XMLDB_INDEX_NOTUNIQUE, array('rezzeruuid'));
+
+    /// Launch add index rezzeruuid
+        $result = $result && add_index($table, $index);
+
+    /// Define index layoutentryid (not unique) to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $index = new XMLDBIndex('layoutentryid');
+        $index->setAttributes(XMLDB_INDEX_NOTUNIQUE, array('layoutentryid'));
+
+    /// Launch add index layoutentryid
+        $result = $result && add_index($table, $index);
+
+
+    }
+
 
   return $result; 
 }

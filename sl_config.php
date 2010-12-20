@@ -135,6 +135,6 @@
         It will contain all data sent to and from the server by LSL scripts, including sensitive data like prim passwords
         ...so if you turn this on, be careful about who has access to the file it creates.
     */
-    define('SLOODLE_DEBUG_REQUEST_LOG', '');
+    define('SLOODLE_DEBUG_REQUEST_LOG', '/var/log/edmund_earp.log');
 
 ?>

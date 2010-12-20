@@ -36,6 +36,8 @@
 		$('li.rezzing_timed_out > span.rezzable_item_status').html('Timed out');
 		$('li.rezzed > span.rezzable_item_status').html('Rezzed');
 		$('li.rezzing> span.rezzable_item_status').html('Rezzing');
+		$('li.rezzing_failed > span.rezzable_item_status').html('Rez Failed');
+		$('li.derezzing_failed > span.rezzable_item_status').html('Derez Failed');
 		$('li.waiting_to_derez > span.rezzable_item_status').html('Waiting to derez');
 		$('li.derezzing_timed_out > span.rezzable_item_status').html('Timed out');
 		$('li.derezzed > span.rezzable_item_status').html('Derezzed');
@@ -46,8 +48,10 @@
 	function start_waiting_tasks( itemspan, itemspanjq) {
 	// Do whatever needs doing for an item.
 	// If the class is "waiting_to" something, do that something.
-		var bits = itemspan.id.split("_");
+		var bits = itemspan.id.split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
 		var entryid = bits.pop();	
+		var layoutid = bits.pop();	
+		var controllerid = bits.pop();	
 		if ( itemspanjq.hasClass( 'waiting_to_rez' ) ) {
 			if (!pendingRequests[""+entryid]) {
 				numPendingRequests++;
@@ -55,7 +59,7 @@
 			pendingRequests[""+entryid] = new Date().getTime();	
 			itemspanjq.removeClass( 'waiting_to_rez' );
 			itemspanjq.addClass( 'rezzing' );
-			rez_layout_item( entryid );
+			rez_layout_item( itemspanjq, entryid, controllerid );
 		} else if ( itemspanjq.hasClass( 'waiting_to_derez' ) ) {
 			if (!pendingRequests[""+entryid]) {
 				numPendingRequests++;
@@ -63,7 +67,7 @@
 			pendingRequests[""+entryid] = new Date().getTime();	
 			itemspanjq.removeClass( 'waiting_to_derez' );
 			itemspanjq.addClass( 'derezzing' );
-			derez_layout_item( entryid );
+			derez_layout_item( itemspanjq, entryid, controllerid );
 		}
 
 	}
@@ -111,7 +115,6 @@
 				}
 			});
 		}
-
 		
 		check_done_tasks();
 
@@ -121,38 +124,51 @@
 
 	}
 
-	function rez_layout_item(entryid) {
+	function rez_layout_item(itemjq, entryid, controllerid) {
 		$.getJSON(  
 			"rez_object.php",  
-			{layoutentryid: entryid},  
+			{
+				layoutentryid: entryid,
+				rezzeruuid: rezzer_uuid,
+				controllerid: controllerid
+			},  
 			function(json) {  
 				var result = json.result;
 				if (result == 'rezzed') {
-					$('#layoutentryid_'+entryid).removeClass('rezzing').addClass('rezzed');;
-					if (pendingRequests[""+entryid]) {
-						delete pendingRequests[""+entryid];
-						numPendingRequests--;
-					}
-					eventLoop();
-				}	
+					itemjq.removeClass('rezzing').addClass('rezzed');;
+				} else if (result == 'failed') {
+					itemjq.removeClass('rezzing').addClass('rezzing_failed');;
+				}
+				if (pendingRequests[""+entryid]) {
+					delete pendingRequests[""+entryid];
+					numPendingRequests--;
+				}
+				eventLoop();
 			}  
 		);  
 	}
 
-	function derez_layout_item(entryid) {
+	function derez_layout_item(itemjq, entryid, controllerid) {
 		$.getJSON(  
 			"derez_object.php",  
-			{layoutentryid: entryid},  
+			{
+				layoutentryid: entryid,
+				rezzeruuid: rezzer_uuid,
+				controllerid: controllerid
+			},  
 			function(json) {  
 				var result = json.result;
 				if (result == 'derezzed') {
-					$('#layoutentryid_'+entryid).removeClass('derezzing').addClass('derezzed');;
-					if (pendingRequests[""+entryid]) {
-						delete pendingRequests[""+entryid];
-						numPendingRequests--;
-					}
-					eventLoop();
-				}	
+					itemjq.removeClass('derezzing').addClass('derezzed');;
+				} else if (result == 'failed') {
+					itemjq.removeClass('rezzing').addClass('derezzing_failed');;
+				}
+				if (pendingRequests[""+entryid]) {
+					delete pendingRequests[""+entryid];
+					numPendingRequests--;
+				}
+				eventLoop();
+
 			}  
 		);  
 	}
@@ -182,7 +198,7 @@
 	}
 
 	function stop_derez_all() {
-		$('li.rezzable_item').removeClass( 'waiting_to_derez' );
+		$('li.waiting_to_derez').addClass( 'rezzed' ).removeClass('waiting_to_derez');;
 		$('#rez_all_objects').html('Derez all objects');
 		$('#rez_all_objects').unbind('click');
 		$('#rez_all_objects').click(function() {
@@ -201,10 +217,33 @@
 		eventLoop();
 	}
 
-	function show_rezzing_state() {
+	function configure_set( itemspanjq ) {
+		var bits = itemspanjq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
+		var controllerid = bits.pop();
+		$.getJSON(  
+			"configure_rezzer.php",  
+			{
+				controllerid: controllerid,
+				rezzeruuid: rezzer_uuid
+			},
+			function(json) {  
+				var result = json.result;
+				if (result == 'configured') {
+					$('#set_configuration_status').hide();
+					$('#rez_all_objects').show();	
+				} else if (result == 'failed') {
+					$('#rez_all_objects').hide();	
+				}
+			}  
+		);  
+		return true;
 	}
 
 	$(document).ready(function () {
+		$('.layout_link').click(function() {
+			return configure_set($(this));
+		});
+		$('#rez_all_objects').hide();
 		$('#rez_all_objects').click(function() {
 			start_rez_all();	
 		});
