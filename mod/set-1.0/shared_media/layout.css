@@ -1,2 +1,5 @@
 .hiddenButton { visibility:hidden }
 .waiting_to_rez { font-color:red }
+.sloodle_config{ width:50%; margin-left:50% }
+.sloodle_config_label{ width:40%; margin-right:60% }
+.add_to_layout_button{ margin-top:10px; margin-bottom:10px; }

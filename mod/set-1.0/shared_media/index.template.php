@@ -5,9 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Avatar Classroom Configuration</title>
-<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 <link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
-<meta name="apple-touch-fullscreen" content="YES" />
 <style type="text/css" media="screen">@import "iui/iui.css";</style>
 <style type="text/css" media="screen">@import "layout.css";</style>
 <script type="application/x-javascript" src="iui/iui.js"></script>
@@ -19,9 +17,6 @@
 	iui.animOn = true;
 	var rezzer_uuid = '<?= htmlentities($_REQUEST['sloodleobjuuid']) ?>';
 </script>
-<!--
-<script type="application/x-javascript" src="http://10.0.1.2:1840/ibug.js"></script>
--->
 </head>
 
 <body>
@@ -45,7 +40,7 @@
 	<li></li>
         <li class="group">Add a site</li>
         <li><a href="#addsite">Add a site</a></li>
-	<li></li>
+	<li ></li>
     </ul>
     <?php } ?>
 
@@ -156,16 +151,19 @@
 	<?php /*
 					<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
 	*/ ?>
-					<li id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item_status">&nbsp;</span> </li>
+					<?php /* NB If you change this, you also need to change layout.js, which creates some of these dynamically. */ ?>
+					<li id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item_status">&nbsp;</span> </a></li>
 	<?php
 					}
+?>
+					<li class="after_group_<?=$group?>"></li>
+<?php
 				}
 ?>
+				<li class="group add_object_group">Add objects</li>
+				<li><a href="#addobjects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>">Add objects</a></li>
+				<li></li>
 			<?php if ($full) { ?>
-				<li></li>
-				<li class="group">Add objects</li>
-				<li><a href="#addobjects">Add objects</a></li>
-				<li></li>
 				<a class="whiteButton" style="width:40%" type="submit" href="#clonelayout">Save current positions</a>
 				<br />
 				<a class="whiteButton" style="float:right; width:40%" type="submit" href="#deletelayout">Delete this layout</a>
@@ -176,66 +174,142 @@
 			}
 		}
 	}
-?>
-    <form id="clonelayout" class="panel" title="Clone Boxy Classroom Layout">
-	<fieldset>
-	<div class="row" >
-		<label for="layout_name">Name</label>
-		<input id="layout_name" name="layout_name" class="panel" style="width:80%; height:40px; margin:10px;">
-	</div>
-	</fieldset>
-	<a class="whiteButton" type="submit" href="#">Clone Layout</a>
-    </form>
 
-    <ul id="addobjects" title="Add objects">
+	foreach($courses as $course) {
+		$cid = $course->id; 
+		$cn = $course->fullname; 
+		foreach($controllers[$cid] as $contid => $cont) {
+			$layouts = $courselayouts[ $cid ];
+			foreach($layouts as $layout) {
+?>
+    <ul id="addobjects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects">
+<?php 
+	foreach($object_configs as $object_title => $config) {
+?>
+        <li><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['modname']?>"><?= htmlentities($object_title) ?></a></li>
+<?php 
+	}
+?>
         <li class="group">Learning</li>
         <li><a href="#quizchair01">Quiz Chair: Japanese Vocab</a></li>
-        <li><a href="#quizchair02">Quiz Chair: Spanish Nouns</a></li>
-        <li class="group">Assignments</li>
-        <li><a href="#primdrop0">Prim Drop: Architecture Assignment</a></li>
-        <li class="group">Communication</li>
-        <li><a href="#webintercom0">Web Intercom: Class chatroom</a></li>
-        <li class="group">Registration</li>
-        <li><a href="#regenrol0">RegEnrol Booth</a></li>
-        <li><a href="#passreset0">Password Reset</a></li>
-        <li class="group">Experimental</li>
         </li>
     </ul>
-    </ul>
      
-<form id="quizchair01" class="panel" title="Quiz Chair">
-<!--
-<a class="whiteButton" type="submit" href="#scr_buy_pricelist">Rez / Derez Now</a>
--->
-<fieldset>
-<div class="row"><label for="buy_fromStation">Quiz</label>
-Japanese Vocab
-<!--
-<select id="presenter" class="az" name="from">
-<option value="1">Japanese Vocab</option>
-<option value="2">Spanish Nouns</option>
-</select>
--->
-</div>
-</fieldset>
+<?php
+			}
+		}
+	}
+?>
+<?php
+	foreach($courses as $course) {
+		$cid = $course->id; 
+		$cn = $course->fullname; 
+		foreach($controllers[$cid] as $contid => $cont) {
+			$layouts = $courselayouts[ $cid ];
+			foreach($layouts as $layout) {
 
+	foreach($object_configs as $object_title => $config) {
+/*
+The following form is used for adding the object.
+But once it's been added, it will be clone()d to make a form to update the object we added.
+*/
+?>
+<form class="add_object_form panel" id="addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['modname']?>" title="<?= htmlentities($object_title) ?>">
+<span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" data-adding-text="Adding <?= htmlentities( $object_title ) ?>" data-add-text="Add <?= htmlentities( $object_title ) ?>" class="whiteButton active_button add_to_layout_button" target="_self" type="submit">Add <?= htmlentities( $object_title ) ?></span>
+<input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
+<input type="hidden" name="objectgroup" value="<?= htmlentities($config['group']) ?>" />
+<input type="hidden" name="layoutid" value="<?= intval($layout->id) ?>" />
+<input type="hidden" name="layoutentryid" value="0" />
+<input type="hidden" name="controllerid" value="<?= intval($contid) ?>" />
+<input type="hidden" name="courseid" value="<?= intval($cid) ?>" />
+<?php foreach($config['field_sets'] as $fs) { ?>
 <fieldset>
+<?php foreach($fs as $fieldname => $ctrl) { ?>
 <div class="row">
-<label for="buy_travellertype">Moodle Access</label>
-<input type="radio" name="access"> Public
-<input type="radio" name="access"> Registered users
-<input type="radio" name="access"> Course members
-<input type="radio" name="access"> Staff
+<label for="<?= $fieldname ?>"><?= get_string($ctrl['title'], 'sloodle') ?></label>
+<?php if ($ctrl['type'] == 'radio') { ?>
+<span class="sloodle_config">
+<?php foreach($ctrl['options'] as $opn => $opv) { ?>
+<input type="radio" name="<?= $ctrl['title'] ?>" value="<?= $opn ?>" <?= $opn == $ctrl['default'] ? 'checked ' : '' ?>> <?= get_string($opv, 'sloodle') ?> 
+<?php } ?>
+</span>
+<?php } else {?>
+not radio: <?=$ctrl['type']?>
+<?php } ?>
 </div>
-<div class="row">
-<label for="buy_travellerclass">SL / OpenSim Access</label>
-<input type="radio" name="access"> Public
-<input type="radio" name="access"> Owner 
-<input type="radio" name="access"> Group
-</div>
+<?php } ?>
 </fieldset>
-<a class="whiteButton" type="submit" href="#scr_buy_pricelist">Add Quiz Chair</a>
+<?php } ?>
+<span data-delete-text="Delete <?= htmlentities($object_title) ?>" data-deleting-text="Deleting <?= htmlentities($object_title) ?>" class="whiteButton active_button delete_layout_entry_button hiddenButton" style="width:40%; float:right" type="submit">Delete <?= htmlentities($object_title) ?></span>
 </form>
+<?php 
+	}
+?>
+     
+<?php
+			}
+		}
+	}
+?>
+
+
+<?php 
+/*
+Configuration form for each 
+*/
+	foreach($courses as $course) {
+		$cid = $course->id; 
+		$cn = $course->fullname; 
+		foreach($controllers[$cid] as $contid => $cont) {
+			$layouts = $courselayouts[ $cid ];
+			foreach($layouts as $layout) {
+				$entriesbygroup = $layoutentries[ $layout->id ];
+				foreach($entriesbygroup as $group => $entries) {
+					foreach($entries as $e) {
+						$entryname = $e->name;	
+						$config = $object_configs[$entryname]; // TODO: Merge in the layout entries
+						$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
+						$object_title = $entryname;
+
+?>
+<form id="configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="panel" title="<?= htmlentities($object_title) ?>">
+<span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" class="whiteButton active_button update_layout_entry_button" target="_self" type="submit">Update <?= htmlentities( $object_title ) ?></span>
+<input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
+<input type="hidden" name="objectgroup" value="<?= htmlentities( $group ) ?>" />
+<?php foreach($config['field_sets'] as $fs) { ?>
+<fieldset>
+<?php foreach($fs as $fieldname => $ctrl) { ?>
+<div class="row">
+<label for="<?= $fieldname ?>"><?= get_string($ctrl['title'], 'sloodle') ?></label>
+<?php if ($ctrl['type'] == 'radio') { ?>
+<span class="sloodle_config">
+<?php foreach($ctrl['options'] as $opn => $opv) { ?>
+<input type="radio" name="<?= $ctrl['title'] ?>" value="<?= $opn ?>" <?= $opn == $ctrl['default'] ? 'checked ' : '' ?>> <?= get_string($opv, 'sloodle') ?> 
+<?php } ?>
+</span>
+<?php } else {?>
+not radio: <?=$ctrl['type']?>
+<?php } ?>
+</div>
+<?php } ?>
+</fieldset>
+<?php } ?>
+
+<br />
+<span data-delete-text="Delete <?= htmlentities($object_title) ?>" data-deleting-text="Deleting <?= htmlentities($object_title) ?>" class="whiteButton active_button delete_layout_entry_button" style="width:40%; float:right" type="submit">Delete <?= htmlentities($object_title) ?></span>
+</form>
+<?php 
+					}
+				}
+			}
+		}
+	}
+?>
+<span id="add_configuration_above_me"></span>
+
+
+
+
 
 
 <?php if ($full) { ?>
