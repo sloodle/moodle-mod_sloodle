@@ -184,10 +184,20 @@
 ?>
     <ul id="addobjects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects">
 <?php 
-	foreach($object_configs as $object_title => $config) {
+	foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
+?>
+        <li class="group"><?= htmlentities($group) ?></li>
+<?php
+	foreach($groupobjectconfigs as $object_title => $config) {
+		$object_title = preg_replace('/^SLOODLE /', '', $object_title);
 ?>
         <li><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['modname']?>"><?= htmlentities($object_title) ?></a></li>
 <?php 
+	}
+
+?>
+        <li></li>
+<?php
 	}
 ?>
         <li class="group">Learning</li>
