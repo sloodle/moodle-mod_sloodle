@@ -6,7 +6,7 @@ if (!isset($object_configs)) {
 
 $object_configs['SLOODLE Access Checker'] = array(
 	'modname' => 'accesschecker-1.0',
-	'group'   => 'Registration',
+	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 Access Checker'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -19,7 +19,7 @@ $object_configs['SLOODLE Access Checker'] = array(
 
 $object_configs['SLOODLE Access Checker Door'] = array(
 	'modname' => 'accesscheckerdoor-1.0',
-	'group'   => 'Registration',
+	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 Access Checker Door'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -31,9 +31,9 @@ $object_configs['SLOODLE Access Checker Door'] = array(
 );
 
 $object_configs['SLOODLE Web Intercom'] = array(
-	'modname' => 'quiz-1.0',
-	'module'  => 'quiz',
-	'group'   => 'Communication',
+	'modname' => 'chat-1.0',
+	'module'  => 'chat',
+	'group'   => 'communication',
 	'aliases' => array('SLOODLE 1.1 Web Intercom'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -69,7 +69,7 @@ $object_configs['SLOODLE Web Intercom'] = array(
 $object_configs['SLOODLE Choice'] = array(
 	'modname' => 'choice-1.0',
 	'module'  => 'choice',
-	'group'   => 'Communication',
+	'group'   => 'communication',
 	'aliases' => array('SLOODLE 1.1 Choice'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -98,7 +98,7 @@ $object_configs['SLOODLE Distributor'] = array(
 	'modname' => 'distributor-1.0',
 	'module_type'  => SLOODLE_TYPE_DISTRIB,
 	'module'  => 'sloodle',
-	'group'   => 'Communication',
+	'group'   => 'inventory',
 	'aliases' => array('SLOODLE 1.1 Distributor'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -121,7 +121,7 @@ $object_configs['SLOODLE Distributor'] = array(
 
 $object_configs['SLOODLE Enrolment Booth'] = array(
 	'modname' => 'enrolbooth-1.0',
-	'group'   => 'Registration',
+	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 Enrolment'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -129,8 +129,87 @@ $object_configs['SLOODLE Enrolment Booth'] = array(
 			//'accesslevelobjectctrl' => access_level_object_control_control(),
 			//'accesslevelserver'     => access_level_server_controls()
 		),
+		
 	 ),
 );
+
+
+$object_configs['SLOODLE Quiz Pile-On'] = array(
+	'modname' => 'quiz_pile_on-1.0',
+	'module'  => 'quiz',
+	'module_choice_message'  => 'selectquiz',// TODO: There's some extra craziness to make sure we only have sloodle stuff
+	'module_no_choices_message'  => 'noquizzes', 
+	'group'   => 'activity',
+	'aliases' => array('SLOODLE 1.1 Quiz'), 
+	'field_sets' => array( 
+		'access' => array(
+			'sloodleobjectaccessleveluse'  => access_level_object_use_control(),
+			//'accesslevelobjectctrl' => access_level_object_control_control(),
+			'accesslevelserver'     => access_level_server_controls()
+		),
+		'generalconfiguration' => array(
+			'sloodlerepeat' => yes_no_control( 'repeatquiz' ),
+			'sloodlerandomize' => yes_no_control( 'randomquestionorder' ),
+			'sloodledialog' => yes_no_control( 'usedialogs' ),
+			'sloodleplaysound' => yes_no_control( 'playsounds' ),
+		),
+	 ),
+);
+
+
+$object_configs['SLOODLE Quiz Chair'] = array(
+	'modname' => 'quiz-1.0',
+	'module'  => 'quiz',
+	'module_choice_message'  => 'selectquiz',// TODO: There's some extra craziness to make sure we only have sloodle stuff
+	'module_no_choices_message'  => 'noquizzes', 
+	'group'   => 'activity',
+	'aliases' => array('SLOODLE 1.1 Quiz'), 
+	'field_sets' => array( 
+		'access' => array(
+			'sloodleobjectaccessleveluse'  => access_level_object_use_control(),
+			//'accesslevelobjectctrl' => access_level_object_control_control(),
+			'accesslevelserver'     => access_level_server_controls()
+		),
+		'generalconfiguration' => array(
+			'sloodlerepeat' => yes_no_control( 'repeatquiz' ),
+			'sloodlerandomize' => yes_no_control( 'randomquestionorder' ),
+			'sloodledialog' => yes_no_control( 'usedialogs' ),
+			'sloodleplaysound' => yes_no_control( 'playsounds' ),
+		),
+	 ),
+);
+
+
+$object_configs['SLOODLE PrimDrop'] = array(
+	'modname' => 'primdrop-1.0',
+	'module'  => 'assignment',
+	'module_choice_message'  => 'selectglossary',// TODO: There's some extra craziness to make sure we only have sloodle stuff
+	'module_no_choices_message'  => 'noassignments', 
+	'group'   => 'inventory',
+	'aliases' => array('SLOODLE 1.1 PrimDrop'), 
+	'field_sets' => array( 
+		'access' => array(
+			'sloodleobjectaccessleveluse'  => access_level_object_use_control(),
+			'accesslevelobjectctrl' => access_level_object_control_control(),
+			'accesslevelserver'     => access_level_server_controls()
+		),
+	 ),
+);
+
+
+$object_configs['SLOODLE Password Reset'] = array(
+	'modname' => 'pwreset-1.0',
+	'group'   => 'registration',
+	'aliases' => array('SLOODLE 1.1 Password Reset'), 
+	'field_sets' => array( 
+		'access' => array(
+			'sloodleobjectaccessleveluse'  => access_level_object_use_control(),
+			//'accesslevelobjectctrl' => access_level_object_control_control(),
+			'accesslevelserver'     => access_level_server_controls()
+		),
+	 ),
+);
+
 
 
 $object_configs['SLOODLE Glossary'] = array(
@@ -138,7 +217,7 @@ $object_configs['SLOODLE Glossary'] = array(
 	'module'  => 'glossary',
 	'module_choice_message'  => 'selectglossary',
 	'module_no_choices_message'  => 'noglossaries',
-	'group'   => 'Communication',
+	'group'   => 'communication',
 	'aliases' => array('SLOODLE 1.1 Glossary'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -168,7 +247,7 @@ $object_configs['SLOODLE Presenter'] = array(
 	'module_type' => SLOODLE_TYPE_PRESENTER,
 	'module_choice_message'  => 'selectpresenter',
 	'module_no_choices_message'  => 'nopresenters',
-	'group'   => 'Communication',
+	'group'   => 'communication',
 	'aliases' => array('SLOODLE 1.1 Presenter'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -185,7 +264,7 @@ $object_configs['SLOODLE Presenter'] = array(
 
 $object_configs['SLOODLE RegEnrol Booth'] = array(
 	'modname' => 'enrolbooth-1.0',
-	'group'   => 'Registration',
+	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 RegEnrol Booth'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -197,10 +276,9 @@ $object_configs['SLOODLE RegEnrol Booth'] = array(
 );
 
 /*
-*/
 $object_configs['SLOODLE Vending Machine'] = array(
 	'modname' => 'distributor-1.0',
-	'group'   => 'Inventory',
+	'group'   => 'inventory',
 	'aliases' => array( 'SLOODLE 1.1 Vending Machine'), 
 	'field_sets' => array( 
 		'access' => array(
@@ -210,10 +288,11 @@ $object_configs['SLOODLE Vending Machine'] = array(
 		),
 	 ),
 );
+*/
 
 $object_configs['SLOODLE LoginZone'] = array(
 	'modname' => 'loginzone-1.0',
-	'group'   => 'Registration',
+	'group'   => 'registration',
 	'aliases' => array( 'SLOODLE 1.1 LoginZone'), 
 	'field_sets' => array( 
 		'generalconfiguration' => array(
@@ -282,7 +361,7 @@ function access_level_object_control_control() {
 }
 
 function yes_no_control( $title ) {
-	array(
+	return array(
 		'title'       => $title,
 		'description' => '',
 		'options'    => array(
