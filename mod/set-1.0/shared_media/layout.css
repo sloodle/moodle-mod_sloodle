@@ -1,5 +1,42 @@
 .hiddenButton { visibility:hidden }
 .waiting_to_rez { font-color:red }
-.sloodle_config{ width:50%; margin-left:50% }
-.sloodle_config_label{ width:40%; margin-right:60% }
+/*.sloodle_config{ width:50%; margin-left:200px }a*/
+/*.sloodle_config_label{ width:40%; margin-right:60% }*/
 .add_to_layout_button{ margin-top:10px; margin-bottom:10px; }
+
+
+.active_button {
+    width: 100%;
+    display: block;
+    border-width: 0 12px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: inherit;
+    color: inherit;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-right: 40px;
+}
+
+.active_button{
+    -webkit-border-image: url(iui/whiteButton.png) 0 12 0 12;
+    text-shadow: rgba(255, 255, 255, 0.7) 0 1px 0;
+}
+
+.button_goes_here_zone {
+    display: block;
+    border-width: 0 12px;
+    border: dashed 1px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: inherit;
+    color: inherit;
+    margin-top: 4px;
+    margin-bottom: 4px;
+
+}
+

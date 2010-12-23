@@ -45,7 +45,7 @@ if (!$layoutid) {
 $layoutentry = new SloodleLayoutEntry();
 $layoutentry->name = $objectname;
 $layoutentry->layout = $layoutid;
-$layoutentry->position = "<1.0,0.0,0.0>";
+$layoutentry->position = "<1.0,0.0,1.0>"; // default: behind and above the set where it's easy to see
 $layoutentry->rotation = "<0.0,0.0,0.0>";
 
 foreach($configVars as $n=>$v) {
@@ -66,6 +66,7 @@ if (!$layoutentryid = $layoutentry->insert()) {
 $content = array(
 	'result' => 'added',
 	'objectgroup' => $objectgroup, // TODO: Get this from the object_configs
+	'objectgrouptext' => get_string('objectgroup:'.$objectgroup, 'sloodle'), // TODO: Get this from the object_configs
 	'objectname' => preg_replace('/SLOODLE\s/', '', $objectname),
 	'layoutid' => $layoutid,
 	'layoutentryid' => $layoutentry->id

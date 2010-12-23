@@ -230,15 +230,16 @@
 			function(json) {  
 				var result = json.result;
 				var objectgroup = json.objectgroup;
+				var objectgrouptext = json.objectgrouptext;
 				var objectname = json.objectname;
 				var layoutid = json.layoutid;
 				var layoutentryid = json.layoutentryid;
 				if (result == 'added') {
 					//alert('added');
 					buttonjq.html( buttonjq.attr('data-add-text') );
-					insert_layout_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, frmjq);
+					insert_layout_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, frmjq);
 					//history.back();
-					history.go(-2);
+					history.go(-3);
 				} else if (result == 'failed') {
 					//alert('Adding layout entry failed');
 					buttonjq.html( buttonjq.attr('data-add-text') );
@@ -300,6 +301,7 @@
 			function(json) {  
 				var result = json.result;
 				var objectgroup = json.objectgroup;
+				var objectgrouptext = json.objectgrouptext;
 				var layoutentryid = json.layoutentryid;
 				if (result == 'updated') {
 					//alert('updated');
@@ -317,7 +319,7 @@
 
 	}
 
-	function insert_layout_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, addfrmjq ) {
+	function insert_layout_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, addfrmjq ) {
 
 		regexPtn = '^layout_.+-.+-'+layoutid+'$';
 		var re = new RegExp(regexPtn,"");
@@ -332,7 +334,7 @@
 
 			// If we don't yet have a group to put this item in, create it
 			if ( $(this).children(".after_group_"+objectgroup).size() == 0 ) {
-				var groupLi = '<li class="group">'+objectgroup+'</li>' + '<li class="after_group_'+objectgroup+'"></li>';
+				var groupLi = '<li class="group">'+objectgrouptext+'</li>' + '<li class="after_group_'+objectgroup+'"></li>';
 				$(this).children(".add_object_group").before( groupLi );
 			}
 
@@ -345,7 +347,14 @@
 			editFrm.attr('selected', ''); // Remove the selected property so that iui hides the form
 			editFrm.children('.add_to_layout_button').addClass('update_layout_entry_button').removeClass('add_to_layout_button');
 			editFrm.children('.update_layout_entry_button').html( editFrm.children('.update_layout_entry_button:first').attr('data-update-text') );
+
+			// We keep a button hidden on the add form to use for deletion when it turns into an edit form
 			editFrm.children('.delete_layout_entry_button').removeClass('hiddenButton');
+			// Seems like the original click handler doesn't get created initially - maybe because it's hidden?
+			editFrm.children('.delete_layout_entry_button').click(function() {
+				return delete_layout_configuration($(this));
+			});
+
 
 			$('#add_configuration_above_me').before(editFrm).html();
 

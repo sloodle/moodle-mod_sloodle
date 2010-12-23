@@ -268,20 +268,25 @@ body > .panel {
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border: 1px solid #999999;
+/*
     text-align: right;
+*/
     font-size: 16px;
 }
 
 .row  {
+    width:100%;
     position: relative;
+    padding-left: 10px;
     min-height: 42px;
     border-bottom: 1px solid #999999;
     -webkit-border-radius: 0;
-    text-align: right;
+/*    text-align: right;*/
 }
 
 fieldset > .row:last-child {
     border-bottom: none !important;
+    width:100%;
 }
 
 .row > input:not(input[type|=radio]):not(input[type|=checkbox]) {
@@ -301,16 +306,36 @@ fieldset > .row:last-child {
 }
 
 .row > label {
-    position: absolute;
+    float:left; 
+    width:50%
     margin: 0 0 0 14px;
     line-height: 42px;
     font-weight: bold;
 }
 
+.row > .fieldset > label {
+    /*position: absolute; ED FOR SLOODLE*/
+    float:left; 
+    width:50%
+    margin-left: 20px;
+    font-weight: bold;
+}
+
+.row > .fieldset > span{
+    /*position: absolute; ED FOR SLOODLE*/
+    float:right; 
+    width:50%
+    margin-right:20px;
+    padding-right:20px;
+    font-weight: bold;
+}
+
 .row > span {
-    position: absolute;
-    padding: 12px 10px 0 110px;
-    margin: 0;
+    float:right; 
+    width:50%
+    position: absolute; 
+    margin: 0 0 0 14px;
+    padding: 12px 20px 0 110px;
 }
 
 .row > .toggle {

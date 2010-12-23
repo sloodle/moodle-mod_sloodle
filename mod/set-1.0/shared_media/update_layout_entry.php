@@ -56,7 +56,6 @@ if (!$layoutentry->update()) {
 
 $content = array(
 	'result' => 'updated',
-	'objectgroup' => 'Registration', // TODO: Get this from the object_configs
 	'objectname' => preg_replace('/SLOODLE\s/', '', $layoutentry->name),
 	'layoutid' => $layoutentry->layout,
 	'layoutentryid' => $layoutentry->id

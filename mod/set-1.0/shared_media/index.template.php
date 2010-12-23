@@ -75,11 +75,11 @@
        </div>
        <div class="row" style="height:60px;">
           <label for="course">Course</label>
-          <select id="course" class="az" name="course" style="height:40px; width:80%; margin:1-px;">
+          <select id="course" class="az" name="course" style="height:40px; width:80%; margin:10px;">
 	  <option value="1">Japanese For Beginners</option>
         <option value="2">Spanish For Dummies</option>
       </select></div>
-	<a class="whiteButton" type="submit" href="#">Add Course</a>
+	<a class="active_button" type="submit" href="#">Add Course</a>
     </fieldset>
     </form>
 
@@ -116,7 +116,7 @@
 		<input id="layout_name" name="layout_name" class="panel" style="width:80%; height:40px; margin:10px;">
 	</div>
 	</fieldset>
-	<a class="whiteButton" type="submit" href="#">Create Layout</a>
+	<a class="active_button" type="submit" href="#">Create Layout</a>
     </form>
 
 <?php 
@@ -130,13 +130,12 @@
 ?>
 			    <ul class="layout_container" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>">
 				<li class="group"><?= htmlentities( $layout->name ) ?></li>
-				<span id="set_configuration_status" class="">Configuring set</span>
-				<span id="rez_all_objects" class="whiteButton activeButton">Rez All Objects</span>
-				<li></li>
+				<span id="set_configuration_status" class="button_goes_here_zone"><?=get_string('layoutmanager:connectingtorezzer','sloodle') ?></span>
+				<span id="rez_all_objects" class="active_button">Rez All Objects</span>
 <?php
 				foreach($entriesbygroup as $group => $entries) {
 ?>
-					<li class="group"><?= htmlentities($group) ?></li>
+					<li class="group"><?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?></li>
 <?php
 					foreach($entries as $e) {
 						$entryname = $e->name;	
@@ -161,13 +160,13 @@
 				}
 ?>
 				<li class="group add_object_group">Add objects</li>
-				<li><a href="#addobjects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>">Add objects</a></li>
+				<li><a href="#addobjectsgroups_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>">Add objects</a></li>
 				<li></li>
 			<?php if ($full) { ?>
-				<a class="whiteButton" style="width:40%" type="submit" href="#clonelayout">Save current positions</a>
+				<a class="active_button" style="width:40%" type="submit" href="#clonelayout">Save current positions</a>
 				<br />
-				<a class="whiteButton" style="float:right; width:40%" type="submit" href="#deletelayout">Delete this layout</a>
-				<a class="whiteButton" style="width:40%" type="submit" href="#clonelayout">Clone this layout</a>
+				<a class="active_button" style="float:right; width:40%" type="submit" href="#deletelayout">Delete this layout</a>
+				<a class="active_button" style="width:40%" type="submit" href="#clonelayout">Clone this layout</a>
 			<?php } ?>
 			    </ul>
 <?php
@@ -182,28 +181,48 @@
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
 ?>
-    <ul id="addobjects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects">
+    <ul id="addobjectsgroups_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects">
+        <li class="group">Add objects</li>
 <?php 
 	foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
 ?>
-        <li class="group"><?= htmlentities($group) ?></li>
+        <li ><a href="#addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities( get_string('objectgroup:'.$group, 'sloodle')) ?></a></li>
+<?php 
+	}
+?>
+    </ul>
+<?php
+			}
+		}
+	}
+
+
+	foreach($courses as $course) {
+		$cid = $course->id; 
+		$cn = $course->fullname; 
+		foreach($controllers[$cid] as $contid => $cont) {
+			$layouts = $courselayouts[ $cid ];
+			foreach($layouts as $layout) {
+?>
+<?php 
+	foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
+?>
+    <ul id="addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?>">
+        <li class="group">Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?></li>
 <?php
 	foreach($groupobjectconfigs as $object_title => $config) {
 		$object_title = preg_replace('/^SLOODLE /', '', $object_title);
 ?>
-        <li><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['modname']?>"><?= htmlentities($object_title) ?></a></li>
+        <li><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['object_code']?>"><?= htmlentities($object_title) ?></a></li>
 <?php 
 	}
 
 ?>
         <li></li>
+    </ul>
 <?php
 	}
 ?>
-        <li class="group">Learning</li>
-        <li><a href="#quizchair01">Quiz Chair: Japanese Vocab</a></li>
-        </li>
-    </ul>
      
 <?php
 			}
@@ -224,34 +243,49 @@ The following form is used for adding the object.
 But once it's been added, it will be clone()d to make a form to update the object we added.
 */
 ?>
-<form class="add_object_form panel" id="addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['modname']?>" title="<?= htmlentities($object_title) ?>">
-<span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" data-adding-text="Adding <?= htmlentities( $object_title ) ?>" data-add-text="Add <?= htmlentities( $object_title ) ?>" class="whiteButton active_button add_to_layout_button" target="_self" type="submit">Add <?= htmlentities( $object_title ) ?></span>
+<form class="add_object_form panel" id="addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['object_code']?>" title="<?= htmlentities($object_title) ?>">
+<span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" data-adding-text="Adding <?= htmlentities( $object_title ) ?>" data-add-text="Add <?= htmlentities( $object_title ) ?>" class="active_button add_to_layout_button" target="_self" type="submit">Add <?= htmlentities( $object_title ) ?></span>
 <input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities($config['group']) ?>" />
 <input type="hidden" name="layoutid" value="<?= intval($layout->id) ?>" />
 <input type="hidden" name="layoutentryid" value="0" />
 <input type="hidden" name="controllerid" value="<?= intval($contid) ?>" />
 <input type="hidden" name="courseid" value="<?= intval($cid) ?>" />
+<?php if (isset($config['module'])) { 
+$moduleoptionselect = course_module_select_for_config( $config, $cid, $val = null ); 
+?>
+<fieldset>
+<div class="row">
+<label for="<?= $fieldname ?>"><?= get_string($config['module_choice_message'], 'sloodle') ?></label>
+<span class="sloodle_config">
+<?= $moduleoptionselect ? $moduleoptionselect : get_string($config['module_no_choices_message'], 'sloodle') ?>
+</span>
+</div>
+</fieldset>
+<?php
+} ?>
 <?php foreach($config['field_sets'] as $fs) { ?>
 <fieldset>
 <?php foreach($fs as $fieldname => $ctrl) { ?>
 <div class="row">
 <label for="<?= $fieldname ?>"><?= get_string($ctrl['title'], 'sloodle') ?></label>
-<?php if ($ctrl['type'] == 'radio') { ?>
+<?php if ( ($ctrl['type'] == 'radio') || ($ctrl['type'] == 'yesno') ) { ?>
 <span class="sloodle_config">
 <?php foreach($ctrl['options'] as $opn => $opv) { ?>
 <input type="radio" name="<?= $ctrl['title'] ?>" value="<?= $opn ?>" <?= $opn == $ctrl['default'] ? 'checked ' : '' ?>> <?= get_string($opv, 'sloodle') ?> 
 <?php } ?>
 </span>
-<?php } else {?>
+<?php } else { ?>
 not radio: <?=$ctrl['type']?>
 <?php } ?>
 </div>
 <?php } ?>
 </fieldset>
 <?php } ?>
-<span data-delete-text="Delete <?= htmlentities($object_title) ?>" data-deleting-text="Deleting <?= htmlentities($object_title) ?>" class="whiteButton active_button delete_layout_entry_button hiddenButton" style="width:40%; float:right" type="submit">Delete <?= htmlentities($object_title) ?></span>
+<span data-delete-text="Delete <?= htmlentities($object_title) ?>" data-deleting-text="Deleting <?= htmlentities($object_title) ?>" class="active_button delete_layout_entry_button hiddenButton" style="width:40%; float:right" type="submit">Delete <?= htmlentities($object_title) ?></span>
 </form>
+
+<br />
 <?php 
 	}
 ?>
@@ -283,31 +317,47 @@ Configuration form for each
 
 ?>
 <form id="configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="panel" title="<?= htmlentities($object_title) ?>">
-<span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" class="whiteButton active_button update_layout_entry_button" target="_self" type="submit">Update <?= htmlentities( $object_title ) ?></span>
+<span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" class="active_button update_layout_entry_button" target="_self" type="submit">Update <?= htmlentities( $object_title ) ?></span>
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
-<input type="hidden" name="objectgroup" value="<?= htmlentities( $group ) ?>" />
+<input type="hidden" name="objectgroup" value="<?= htmlentities( get_string('objectgroup:'.$group, 'sloodle' ) ) ?>" />
+<?php if (isset($config['module'])) { 
+$moduleoptionselect = course_module_select_for_config( $config, $cid, $val = null ); 
+?>
+<fieldset>
+<div class="row">
+<label for="<?= $fieldname ?>"><?= get_string($config['module_choice_message'], 'sloodle') ?></label>
+<span class="sloodle_config">
+<?= $moduleoptionselect ? $moduleoptionselect : get_string($config['module_no_choices_message'], 'sloodle') ?>
+</span>
+</div>
+</fieldset>
+<?php
+} ?>
 <?php foreach($config['field_sets'] as $fs) { ?>
 <fieldset>
 <?php foreach($fs as $fieldname => $ctrl) { ?>
 <div class="row">
 <label for="<?= $fieldname ?>"><?= get_string($ctrl['title'], 'sloodle') ?></label>
-<?php if ($ctrl['type'] == 'radio') { ?>
 <span class="sloodle_config">
+<?php if ($ctrl['type'] == 'radio') { ?>
 <?php foreach($ctrl['options'] as $opn => $opv) { ?>
-<input type="radio" name="<?= $ctrl['title'] ?>" value="<?= $opn ?>" <?= $opn == $ctrl['default'] ? 'checked ' : '' ?>> <?= get_string($opv, 'sloodle') ?> 
+<input type="radio" name="<?= $ctrl['title'] ?>" value="<?= $opn ?>" <?= $opn == $ctrl['default'] ? 'checked ' : '' ?>> <?= get_string($opv, 'sloodle') ?>
 <?php } ?>
-</span>
+<?php } else if ($ctrl['type'] == 'input') {?>
+<input type="text" name="<?= $ctrl['title'] ?>" value="<?= $ctrl['default'] ?>" /> 
 <?php } else {?>
 not radio: <?=$ctrl['type']?>
 <?php } ?>
+</span>
 </div>
 <?php } ?>
 </fieldset>
 <?php } ?>
 
-<br />
-<span data-delete-text="Delete <?= htmlentities($object_title) ?>" data-deleting-text="Deleting <?= htmlentities($object_title) ?>" class="whiteButton active_button delete_layout_entry_button" style="width:40%; float:right" type="submit">Delete <?= htmlentities($object_title) ?></span>
+<span data-delete-text="Delete <?= htmlentities($object_title) ?>" data-deleting-text="Deleting <?= htmlentities($object_title) ?>" class="active_button delete_layout_entry_button" style="width:40%; float:right" type="submit">Delete <?= htmlentities($object_title) ?></span>
 </form>
+
+<br />
 <?php 
 					}
 				}
@@ -318,95 +368,5 @@ not radio: <?=$ctrl['type']?>
 <span id="add_configuration_above_me"></span>
 
 
-
-
-
-
-<?php if ($full) { ?>
-<form id="presenter1" class="panel" title="Presentation">
-<!--
-<a class="whiteButton" type="submit" href="#scr_buy_pricelist">Rez / Derez Now</a>
--->
-<fieldset>
-<div class="row"><label for="buy_fromStation">Presentation</label><select id="presenter" class="az" name="from">
-<option value="1">All About Dogs</option>
-<option value="2">Pictures of cats</option>
-</select></div>
-</fieldset>
-
-<fieldset>
-<div class="row">
-<label for="buy_travellertype">Moodle Access</label>
-<input type="radio" name="access"> Public
-<input type="radio" name="access"> Registered users
-<input type="radio" name="access"> Course members
-<input type="radio" name="access"> Staff
-</div>
-<div class="row">
-<label for="buy_travellerclass">SL / OpenSim Access</label>
-<input type="radio" name="access"> Public
-<input type="radio" name="access"> Owner 
-<input type="radio" name="access"> Group
-</div>
-</fieldset>
-<a class="whiteButton" type="submit" href="#scr_buy_pricelist">Change Presenter</a>
-<br />
-<a class="whiteButton" style="width:40%; float:right" type="submit" href="#scr_buy_pricelist">Delete Presenter</a>
-</form>
-<?php } else { ?>
-<div id="presenter1" class="panel" title="Presentation">
-        <p>This is an explanation about the presenter.</p>
-        <p>Eventually you'll be able to configure it, but not yet.</p>
-</div>
-<?php } ?>
-
-    <div id="player" class="panel" title="Now Playing">
-        <h2>If this weren't just a demo, you might be hearing a song...</h2>
-    </div>
-    
-    <form id="searchForm" class="dialog" action="search.php">
-        <fieldset>
-            <h1>Music Search</h1>
-            <a class="button leftButton" type="cancel">Cancel</a>
-            <a class="button blueButton" type="submit">Search</a>
-            
-            <label>Artist:</label>
-            <input id="artist" type="text" name="artist"/>
-            <label>Song:</label>
-            <input type="text" name="song"/>
-        </fieldset>
-    </form>
-
-    <div id="settings" title="Settings" class="panel">
-        <h2>Playback</h2>
-        <fieldset>
-            <div class="row">
-                <label>Repeat</label>
-                <div class="toggle" onclick=""><span class="thumb"></span><span class="toggleOn">ON</span><span class="toggleOff">OFF</span></div>
-            </div>
-            <div class="row">
-                <label>Shuffle</label>
-                <div class="toggle" onclick="" toggled="true"><span class="thumb"></span><span class="toggleOn">ON</span><span class="toggleOff">OFF</span></div>
-            </div>
-        </fieldset>
-        
-        <h2>User</h2>
-        <fieldset>
-            <div class="row">
-                <label>Name</label>
-                <input type="text" name="userName" value="johnappleseed"/>
-            </div>
-            <div class="row">
-                <label>Password</label>
-                <input type="password" name="password" value="delicious"/>
-            </div>
-            <div class="row">
-                <label>Confirm</label>
-                <input type="password" name="password" value="delicious"/>
-            </div>
-        </fieldset>
-    </div>
-<div class="container" style="width:400px">
-</div>
 </body>
 </html>

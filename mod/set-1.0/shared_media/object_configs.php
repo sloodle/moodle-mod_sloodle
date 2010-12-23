@@ -6,6 +6,7 @@ if (!isset($object_configs)) {
 
 $object_configs['SLOODLE Access Checker'] = array(
 	'modname' => 'accesschecker-1.0',
+	'object_code' => 'accesschecker',
 	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 Access Checker'), 
 	'field_sets' => array( 
@@ -19,6 +20,7 @@ $object_configs['SLOODLE Access Checker'] = array(
 
 $object_configs['SLOODLE Access Checker Door'] = array(
 	'modname' => 'accesscheckerdoor-1.0',
+	'object_code' => 'accesscheckerdoor',
 	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 Access Checker Door'), 
 	'field_sets' => array( 
@@ -30,11 +32,14 @@ $object_configs['SLOODLE Access Checker Door'] = array(
 	 ),
 );
 
-$object_configs['SLOODLE Web Intercom'] = array(
+$object_configs['SLOODLE WebIntercom'] = array(
 	'modname' => 'chat-1.0',
+	'module_choice_message'  => 'selectchatroom',// TODO: There's some extra craziness to make sure we only have sloodle stuff
+	'module_no_choices_message'  => 'nochatrooms', 
+	'object_code' => 'webintercom',
 	'module'  => 'chat',
 	'group'   => 'communication',
-	'aliases' => array('SLOODLE 1.1 Web Intercom'), 
+	'aliases' => array('SLOODLE 1.1 Web Intercom', 'SLOODLE 1.1 WebIntercom'),  // not sure if this should have a space or not
 	'field_sets' => array( 
 		'access' => array(
 			'sloodleobjectaccessleveluse'  => access_level_object_use_control(),
@@ -66,11 +71,12 @@ $object_configs['SLOODLE Web Intercom'] = array(
 	 ),
 );
 
-$object_configs['SLOODLE Choice'] = array(
+$object_configs['SLOODLE Choice Horizontal'] = array(
 	'modname' => 'choice-1.0',
+	'object_code' => 'choicehorizontal',
 	'module'  => 'choice',
 	'group'   => 'communication',
-	'aliases' => array('SLOODLE 1.1 Choice'), 
+	'aliases' => array('SLOODLE 1.1 Choice (Horizontal)'), 
 	'field_sets' => array( 
 		'access' => array(
 			'sloodleobjectaccessleveluse'  => access_level_object_use_control(),
@@ -93,9 +99,37 @@ $object_configs['SLOODLE Choice'] = array(
 	 ),
 );
 
+$object_configs['SLOODLE Choice Vertical'] = array(
+	'modname' => 'choice-1.0',
+	'object_code' => 'choicevertical',
+	'module'  => 'choice',
+	'group'   => 'communication',
+	'aliases' => array('SLOODLE 1.1 Choice (Vertical)'), 
+	'field_sets' => array( 
+		'access' => array(
+			'sloodleobjectaccessleveluse'  => access_level_object_use_control(),
+			//'accesslevelobjectctrl' => access_level_object_control_control(),
+			'accesslevelserver'     => access_level_server_controls()
+		),
+		'generalconfiguration' => array(
+			'sloodlerefreshtime' => array(
+				'title'       => 'refreshtimeseconds',
+				'description' => '',
+				'options'    => array(
+					1 => 'Yes',
+					0 => 'No',
+				),
+			'default' => 0,
+			'type' => 'input',
+			'lenght' => 8,
+			),
+		)
+	 ),
+);
 
 $object_configs['SLOODLE Distributor'] = array(
 	'modname' => 'distributor-1.0',
+	'object_code' => 'distributor',
 	'module_type'  => SLOODLE_TYPE_DISTRIB,
 	'module'  => 'sloodle',
 	'group'   => 'inventory',
@@ -121,6 +155,7 @@ $object_configs['SLOODLE Distributor'] = array(
 
 $object_configs['SLOODLE Enrolment Booth'] = array(
 	'modname' => 'enrolbooth-1.0',
+	'object_code' => 'entrolbooth',
 	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 Enrolment'), 
 	'field_sets' => array( 
@@ -136,6 +171,7 @@ $object_configs['SLOODLE Enrolment Booth'] = array(
 
 $object_configs['SLOODLE Quiz Pile-On'] = array(
 	'modname' => 'quiz_pile_on-1.0',
+	'object_code' => 'quizpileon',
 	'module'  => 'quiz',
 	'module_choice_message'  => 'selectquiz',// TODO: There's some extra craziness to make sure we only have sloodle stuff
 	'module_no_choices_message'  => 'noquizzes', 
@@ -159,6 +195,7 @@ $object_configs['SLOODLE Quiz Pile-On'] = array(
 
 $object_configs['SLOODLE Quiz Chair'] = array(
 	'modname' => 'quiz-1.0',
+	'object_code' => 'quiz',
 	'module'  => 'quiz',
 	'module_choice_message'  => 'selectquiz',// TODO: There's some extra craziness to make sure we only have sloodle stuff
 	'module_no_choices_message'  => 'noquizzes', 
@@ -182,6 +219,7 @@ $object_configs['SLOODLE Quiz Chair'] = array(
 
 $object_configs['SLOODLE PrimDrop'] = array(
 	'modname' => 'primdrop-1.0',
+	'object_code' => 'primdrop',
 	'module'  => 'assignment',
 	'module_choice_message'  => 'selectglossary',// TODO: There's some extra craziness to make sure we only have sloodle stuff
 	'module_no_choices_message'  => 'noassignments', 
@@ -199,6 +237,7 @@ $object_configs['SLOODLE PrimDrop'] = array(
 
 $object_configs['SLOODLE Password Reset'] = array(
 	'modname' => 'pwreset-1.0',
+	'object_code' => 'pwreset',
 	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 Password Reset'), 
 	'field_sets' => array( 
@@ -214,6 +253,7 @@ $object_configs['SLOODLE Password Reset'] = array(
 
 $object_configs['SLOODLE Glossary'] = array(
 	'modname' => 'glossary-1.0',
+	'object_code' => 'glossary',
 	'module'  => 'glossary',
 	'module_choice_message'  => 'selectglossary',
 	'module_no_choices_message'  => 'noglossaries',
@@ -244,6 +284,7 @@ $object_configs['SLOODLE Glossary'] = array(
 $object_configs['SLOODLE Presenter'] = array(
 	'modname' => 'presenter-2.0',
 	'module'  => 'sloodle',
+	'object_code' => 'presenter',
 	'module_type' => SLOODLE_TYPE_PRESENTER,
 	'module_choice_message'  => 'selectpresenter',
 	'module_no_choices_message'  => 'nopresenters',
@@ -263,7 +304,8 @@ $object_configs['SLOODLE Presenter'] = array(
 );
 
 $object_configs['SLOODLE RegEnrol Booth'] = array(
-	'modname' => 'enrolbooth-1.0',
+	'modname' => 'regenrolbooth-1.0',
+	'object_code' => 'regenrolbooth',
 	'group'   => 'registration',
 	'aliases' => array('SLOODLE 1.1 RegEnrol Booth'), 
 	'field_sets' => array( 
@@ -292,6 +334,7 @@ $object_configs['SLOODLE Vending Machine'] = array(
 
 $object_configs['SLOODLE LoginZone'] = array(
 	'modname' => 'loginzone-1.0',
+	'object_code' => 'loginzone',
 	'group'   => 'registration',
 	'aliases' => array( 'SLOODLE 1.1 LoginZone'), 
 	'field_sets' => array( 
@@ -371,5 +414,63 @@ function yes_no_control( $title ) {
 		'default' => 1,
 		'type' => 'yesno',
 	);
+}
+
+function course_module_select_for_config( $config, $courseid, $val = null ) {
+
+	if (!$options = course_module_options_for_config( $config, $courseid )) {
+		return false;
+	}
+	$str = '<select name="sloodlemoduleid">'."\n";
+	foreach($options as $n => $v) {
+		$selectedattr = ($val == $n) ? ' selected ' : '';
+		$str .= '<option '.$selectedattr.'value="'.htmlentities( $n ).'">'.htmlentities( $v ).'</option>'."\n";
+	}
+	$str .= '</select>';
+	return $str;	
+	
+}
+
+function course_module_options_for_config( $config, $courseid )  {
+
+	$modtype = $config['module'];
+	if (!$modtype) {
+		return false;
+	}
+
+        // Determine which course is being accessed
+        //$courseid = $auth_obj->course->get_course_id();
+
+        // We need to fetch a list of visible quizzes on the course
+        // Get the ID of the chat type
+        $rec = get_record('modules', 'name', $modtype);
+        if (!$rec) {
+		return false;
+        }
+        $moduleid = $rec->id;
+
+        // Get all visible quizzes in the current course
+        $recs = get_records_select('course_modules', "course = ".intval($courseid)." AND module = ".intval($moduleid)." AND visible = 1");
+        if (!$recs) {
+		return false;
+            //error(get_string('noquizzes','sloodle'));
+        }
+
+	$options = array();
+
+        foreach ($recs as $cm) {
+		// Fetch the quiz instance
+		$inst = get_record($modtype, 'id', $cm->instance);
+		if (!$inst) {
+			continue;
+		}
+		// Store the quiz details
+		$options[$cm->id] = $inst->name;
+        }
+        // Sort the list by name
+        natcasesort($options);
+
+	return $options;
+	
 }
 ?>
