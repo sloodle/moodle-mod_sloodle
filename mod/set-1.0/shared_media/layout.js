@@ -465,7 +465,7 @@
 			});
 
 
-			$('#add_configuration_above_me').before(editFrm).html();
+			$('#add_configuration_above_me_'+$(this).attr('id')).before(editFrm).html();
 
 			editFrm.click(function() {
 				return update_layout_configuration($(this));

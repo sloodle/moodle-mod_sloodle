@@ -59,60 +59,32 @@
 		//include('../../../login/shared_media/index.php');
 		include('login.php');
 	}
-/*
-*/
 
-// Register the set using URL parameters
-$ao = new SloodleActiveObject();
-$object_uuid = required_param('sloodleobjuuid');
-if (!$ao->loadByUUID($object_uuid)) {
-	$ao->controllerid = 0; // Hope that's OK...
-	$ao->userid = $USER->id;
-	$ao->uuid = $object_uuid;
-	$ao->httpinurl = required_param('httpinurl');
-	$ao->password = rand(100000,9999999999);
-	$ao->name = required_param('sloodleobjname');
-	$ao->type = 'set-1.0';
-	$ao->save();
-} else 	{
-	if ($httpinurl = optional_param( 'httpinurl', NULL, PARAM_RAW )) {
-		if ($ao->httpinurl != $httpinurl) {
-			$ao->httpinurl = $httpinurl;
-			$ao->save();
-		} 
-	}
-}
-
-//httpinurl=http%3A%2F%2Fsim8910.agni.lindenlab.com%3A12046%2Fcap%2F01eac39f-fa9f-8d26-0228-bc78d617b0ef&sloodleobjuuid=441157a0-10dc-2b94-31bc-fb4126bb5369&sloodleobjname=Avatar Classroom Special Set 20101214a&sloodleuuid=746ad236-d28d-4aab-93de-1e09a076c5f3&sloodleavname=Edmund Earp
-/*
-*/
-
-	// TODO: Register the set
-
-	/*
-	if ($cmid) {
-		$controller = new SloodleController();
-		if (!$controller->load($cmid)) {
-			print "Error: Could not load Sloodle course module";	
+	// Register the set using URL parameters
+	$ao = new SloodleActiveObject();
+	$object_uuid = required_param('sloodleobjuuid');
+	if (!$ao->loadByUUID($object_uuid)) {
+		$ao->controllerid = 0; // Hope that's OK...
+		$ao->userid = $USER->id;
+		$ao->uuid = $object_uuid;
+		$ao->httpinurl = required_param('httpinurl');
+		$ao->password = rand(100000,9999999999);
+		$ao->name = required_param('sloodleobjname');
+		$ao->type = 'set-1.0';
+		$ao->save();
+	} else 	{
+		if ($httpinurl = optional_param( 'httpinurl', NULL, PARAM_RAW )) {
+			if ($ao->httpinurl != $httpinurl) {
+				$ao->httpinurl = $httpinurl;
+				$ao->save();
+			} 
 		}
-
-	} if ($courseid) {
-		$sloodle_course = new SloodleCourse();
-		if (!$sloodle_course->load($courseid)) {
-			print "Error: Could not load course";	
-		}
-		$moodle_course = $sloodle_course->get_course_object();
-		$layouts = $sloodle_course->get_layout_names();
-		$courselayouts[$cid] = $layouts;
-		$coursenames[$cid] = $moodle_course->fullname;
-		print '<div class="top_navigation"><a href="http://api.avatarclassroom.com/sites.php?...">Sites</a> &gt; <a href="index.php">Courses</a> &gt; '.htmlentities($moodle_course->fullname).'</div>';
-	} else {
-		print '<div class="top_navigation"><a href="http://api.avatarclassroom.com/sites.php?...">Sites</a> &gt; <b>Courses</b></div>';
 	}
-	*/
 
-	// A list of all the sites the user has
+	// A list of all the sites the user has - gets passed by avatar classroom - won't be used for regular sloodle sites
+	// If supplied, adds an extra layer at the top above courses allowing you to switch between sites.
 	$sites = $_REQUEST['sites'];
+	$hasSites = count($sites) > 0;
 
 	// REGULAR SLOODLE TODO: This should filter for courses the user has access to.
 	$courses = get_courses();
@@ -175,8 +147,30 @@ if (!$ao->loadByUUID($object_uuid)) {
 		$coursenames[$cid] = $moodle_course->fullname;
         }
 
-	$hasSites = count($sites) > 0;
 	include('index.template.php');
+
+	$full = false; 
+
+	print_html_top();
+	print_toolbar( $baseurl );
+
+	if ($hasSites) {
+		print_site_list( $sites );
+	}
+
+	print_controller_list( $courses, $controllers ); 
+	print_layout_list( $courses, $controllers, $courselayouts );
+	print_add_layout_form( $cid );
+	print_html_bottom();
+
+	print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries);
+	print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup );
+	print_add_object_forms($courses, $controllers, $courselayouts, $object_configs ); 
+	print_edit_object_forms($courses, $controllers, $courselayouts, $layoutentries); 
+
+	print_html_bottom();
+
+
 
 exit;
 ///// MOODLE-SPECIFIC /////

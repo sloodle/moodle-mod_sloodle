@@ -1,4 +1,7 @@
-<?php $full = false; ?>
+<?php 
+
+function print_html_top() { 
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
@@ -21,11 +24,21 @@
 
 <body>
 
+<?php
+}
+
+function print_toolbar( $baseurl ) {
+?>
     <div class="toolbar">
         <h1 id="pageTitle"></h1>
         <a id="backButton" class="button" href="#"></a>
         <a class="button" onclick="document.location.href = '<?= $baseurl.'&logout=1&ts='.time()?>'" href="<?= $baseurl.'&logout=1&ts='.time()?>">Logout</a>
     </div>
+<?php
+}
+
+function print_site_list( $sites ) {
+?>
      
     <?php if ($hasSites) { ?>
     <ul id="home" title="Avatar Classroom Site" selected="true">
@@ -43,6 +56,12 @@
 	<li ></li>
     </ul>
     <?php } ?>
+
+<?php 
+}
+
+function print_controller_list( $courses, $controllers ) {
+?>
 
     <ul id="site_1" title="<?= "http://".$_SERVER["SERVER_NAME"]?>" <?= $hasSites ? '' : ' selected="true"' ?> >
         <li class="group">Courses enabled for Sloodle</li>
@@ -83,10 +102,12 @@
     </fieldset>
     </form>
 
-<?php } ?>
+<?php } 
 
+}
 
-<?php 
+function print_layout_list( $courses, $controllers, $courselayouts ) {
+
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
@@ -108,6 +129,12 @@
     </ul>
 <?php 
 		}
+
+	}
+}
+
+
+function print_add_layout_form( $cid ) {
 ?>
     <form id="addlayout_<?= intval($cid)?>" class="panel" title="Add a Scene">
 	<input type="hidden" name="courseid" value="<?= intval($cid)?>" />
@@ -120,11 +147,18 @@
 	<span class="active_button create_layout_button" type="submit" href="#">Create Scene</span>
     </form>
 <?php
+}
 
-	}
+function print_html_bottom() {
 ?>
-
+</body>
+</html>
+<?php
+}
+?>
 <?php 
+function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries) {
+
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
@@ -166,18 +200,12 @@
 				}
 ?>
 
-				<span class="active_button sync_object_positions" style="width:40%" type="submit" href="#clonelayout">Save current positions</span>
-<?php /*
-				<li class="group add_object_group">Add objects</li>
-				<li><a href="#addobjectsgroups_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>">Add objects</a></li>
-				<li></li>
-*/ ?>
-			<?php if ($full) { ?>
-				<a class="active_button" style="width:40%" type="submit" href="#clonelayout">Save current positions</a>
+				<span class="active_button sync_object_positions" style="width:98%" type="submit" href="#clonelayout">Save current positions</span>
 				<br />
-				<a class="active_button" style="float:right; width:40%" type="submit" href="#deletelayout">Delete this layout</a>
-				<a class="active_button" style="width:40%" type="submit" href="#clonelayout">Clone this layout</a>
-			<?php } ?>
+				<span class="active_button" style="float:right; width:40%" type="submit" href="#deletelayout">Delete this layout (TODO)</span>
+				<span class="active_button" style="width:40%" type="submit" href="#clonelayout">Clone this layout (TODO)</span>
+				<span class="active_button" style="width:40%" type="submit" href="#clonelayout">Edit this layout (TODO)</span>
+
 			    </ul>
 
 <?php
@@ -185,28 +213,9 @@
 		}
 	}
 
-	foreach($courses as $course) {
-		$cid = $course->id; 
-		$cn = $course->fullname; 
-		foreach($controllers[$cid] as $contid => $cont) {
-			$layouts = $courselayouts[ $cid ];
-			foreach($layouts as $layout) {
-?>
-    <ul id="addobjectsgroups_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects">
-        <li class="group">Add objects</li>
-<?php 
-	foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
-?>
-        <li ><a href="#addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities( get_string('objectgroup:'.$group, 'sloodle')) ?></a></li>
-<?php 
-	}
-?>
-    </ul>
-<?php
-			}
-		}
-	}
+}
 
+function print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup) {
 
 	foreach($courses as $course) {
 		$cid = $course->id; 
@@ -216,7 +225,7 @@
 			foreach($layouts as $layout) {
 ?>
 <?php 
-	foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
+				foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
 ?>
     <ul id="addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?>">
         <li class="group">Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?></li>
@@ -233,23 +242,22 @@
 
     </ul>
 <?php
-	}
-?>
-     
-<?php
+				}
 			}
 		}
 	}
-?>
-<?php
+
+}
+
+function print_add_object_forms($courses, $controllers, $courselayouts, $object_configs ) {
+
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
 		foreach($controllers[$cid] as $contid => $cont) {
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
-
-	foreach($object_configs as $object_title => $config) {
+				foreach($object_configs as $object_title => $config) {
 /*
 The following form is used for adding the object.
 But once it's been added, it will be clone()d to make a form to update the object we added.
@@ -301,20 +309,17 @@ not radio: <?=$ctrl['type']?>
 
 <br />
 <?php 
-	}
-?>
-     
-<?php
+				}
 			}
 		}
 	}
-?>
+}
 
-
-<?php 
 /*
 Configuration form for each 
 */
+function print_edit_object_forms($courses, $controllers, $courselayouts, $layoutentries) {
+
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
@@ -380,12 +385,11 @@ not radio: <?=$ctrl['type']?>
 <?php 
 					}
 				}
+?>
+<span id="add_configuration_above_me_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"></span>
+<?php
 			}
 		}
 	}
+}
 ?>
-<span id="add_configuration_above_me"></span>
-
-
-</body>
-</html>
