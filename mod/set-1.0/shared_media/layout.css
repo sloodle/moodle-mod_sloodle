@@ -6,7 +6,7 @@
 
 
 .active_button {
-    width: 100%;
+    width: 97%;
     display: block;
     border-width: 0 12px;
     padding: 10px;
@@ -40,3 +40,16 @@
 
 }
 
+span.rezzable_item_status {
+    float:right; 
+    margin-right:10px; 
+    color:grey; 
+    font-style:italic
+}
+
+span.rezzable_item_positioning {
+    float:right; 
+    margin-right:10px; 
+    color:grey; 
+    font-style:italic
+}

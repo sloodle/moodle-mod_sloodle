@@ -157,10 +157,10 @@ if (!$ao->loadByUUID($object_uuid)) {
 		$layouts = $sloodle_course->get_layouts();
 		foreach($layouts as $l) {
 			$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);
-			$entriesbygroup = array();
+			$entriesbygroup = array('communication'=>array(), 'inventory'=>array(), 'registration'=>array(), 'activity'=>array());
 			foreach($entries as $e) {
 				$objectname = $e->name;
-				$grp = 'Other';
+				$grp = 'other';
 				if (isset($object_configs[$objectname]['group'])) {
 					$grp = $object_configs[$objectname]['group'];
 				}

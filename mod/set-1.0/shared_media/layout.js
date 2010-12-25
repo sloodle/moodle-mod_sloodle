@@ -40,9 +40,17 @@
 		$('li.derezzing_failed span.rezzable_item_status').html('Derez Failed');
 		$('li.waiting_to_derez span.rezzable_item_status').html('Waiting to derez');
 		$('li.derezzing_timed_out span.rezzable_item_status').html('Timed out');
+
 		$('li.derezzed span.rezzable_item_status').html('Derezzed');
+		$('li.derezzed span.rezzable_item_positioning').html('&nbsp;');
+
 		$('li.derezzing span.rezzable_item_status').html('Derezzing');
 		$('li.configured span.rezzable_item_status').html('Ready');
+
+		$('li.syncing span.rezzable_item_positioning').html('Synced position');
+		$('li.synced span.rezzable_item_positioning').html('Synced');
+		$('li.sync_failed span.rezzable_item_positioning').html('Sync failed');
+		$('li.waiting_to_sync span.rezzable_item_positioning').html('Waiting to sync');
 	}
 
 	function start_waiting_tasks( itemspan, itemspanjq) {
@@ -68,61 +76,95 @@
 			itemspanjq.removeClass( 'waiting_to_derez' );
 			itemspanjq.addClass( 'derezzing' );
 			derez_layout_item( itemspanjq, entryid, controllerid );
+		} else if ( itemspanjq.hasClass( 'waiting_to_sync' ) ) {
+			if (!pendingRequests[""+entryid]) {
+				numPendingRequests++;
+			}
+			pendingRequests[""+entryid] = new Date().getTime();	
+			itemspanjq.removeClass( 'waiting_to_sync' );
+			itemspanjq.addClass( 'syncing' );
+			sync_layout_item( itemspanjq, entryid, controllerid );
 		}
 
 	}
 
-	function check_done_tasks() {
+	function check_done_tasks(parentjq) {
 	// Check if all the waiting tasks are complete. 
 	// If they are, we can change the actionStatus.
 		if (actionStatus == 'rezzing') {
-			if ( ( $('li.rezzing').length == 0 ) && ( $('li.waiting_to_rez').length == 0 ) ) {
+			if ( ( parentjq.children('li.rezzing').length == 0 ) && ( parentjq.children('li.waiting_to_rez').length == 0 ) ) {
 				actionStatus = 'rezzed';
-				$('#rez_all_objects').html('Derez all objects');
-				$('#rez_all_objects').unbind('click');
-				$('#rez_all_objects').click(function() {
-					start_derez_all();
+				parentjq.children('.rez_all_objects').html('Derez all objects');
+				parentjq.children('.rez_all_objects').unbind('click');
+				parentjq.children('.rez_all_objects').click(function() {
+					start_derez_all(parentjq);
 				});
 			}
 		} else if (actionStatus == 'derezzing') {
-			if ( ( $('li.derezzing').length == 0 ) && ( $('li.waiting_to_derez').length == 0 ) ) {
+			if ( ( parentjq.children('li.derezzing').length == 0 ) && ( parentjq.children('li.waiting_to_derez').length == 0 ) ) {
 				actionStatus = 'derezzed';
-				$('#rez_all_objects').html('Rez all objects');
-				$('#rez_all_objects').unbind('click');
-				$('#rez_all_objects').click(function() {
-					start_rez_all();
+				parentjq.children('.rez_all_objects').html('Rez all objects');
+				parentjq.children('.rez_all_objects').unbind('click');
+				parentjq.children('.rez_all_objects').click(function() {
+					start_rez_all(parentjq);
 				});
 			}
 		}
 
 	}
 
-	function eventLoop() {
+	function eventLoop(parentjq) {
 
 		clearTimeout( timer );
 
 		// Make the text labels match the CSS classes
-		update_labels();
+		update_labels(parentjq);
 
 		// Clear out any timed-out requests.
 		purgeRequestList();
 
 		if (numPendingRequests < maxPendingRequests) { // Go easy on the server / rezzer
 			// Check for anything that needs to be done
-			$('.rezzable_item').each(function(itempos,itemspan) {
+			parentjq.children('.rezzable_item').each(function(itempos,itemspan) {
 				if (numPendingRequests < maxPendingRequests) { 
 					start_waiting_tasks( itemspan, $(this) );	
 				}
 			});
 		}
 		
-		check_done_tasks();
+		check_done_tasks(parentjq);
 
-		update_labels();
+		update_labels(parentjq);
 
-		timer = setTimeout( 'eventLoop()', 10000 );
+	//	timer = setTimeout( 'eventLoop()', 10000 );
+//		timer = setTimeout( function(){ eventLoop(parentjq); }, 10000 );
 
 	}
+
+	function sync_layout_item(itemjq, entryid, controllerid) {
+		$.getJSON(  
+			"sync_layout_position.php",  
+			{
+				layoutentryid: entryid,
+				rezzeruuid: rezzer_uuid,
+				controllerid: controllerid
+			},  
+			function(json) {  
+				var result = json.result;
+				if (result == 'synced') {
+					itemjq.removeClass('syncing').addClass("synced");
+				} else if (result == 'failed') {
+					itemjq.removeClass('syncing').addClass('syncing_failed');;
+				}
+				if (pendingRequests[""+entryid]) {
+					delete pendingRequests[""+entryid];
+					numPendingRequests--;
+				}
+				eventLoop( itemjq.closest('.layout_container') );
+			}  
+		);  
+	}
+
 
 	function rez_layout_item(itemjq, entryid, controllerid) {
 		$.getJSON(  
@@ -143,7 +185,7 @@
 					delete pendingRequests[""+entryid];
 					numPendingRequests--;
 				}
-				eventLoop();
+				eventLoop( itemjq.closest('.layout_container') );
 			}  
 		);  
 	}
@@ -160,6 +202,10 @@
 				var result = json.result;
 				if (result == 'derezzed') {
 					itemjq.removeClass('derezzing').addClass('derezzed');;
+					itemjq.removeClass('syncing');
+					itemjq.removeClass('synced');
+					itemjq.removeClass('waiting_to_sync');
+					itemjq.removeClass('sync_failed');
 					if (itemjq.hasClass('deleted_from_layout')) {
 						itemjq.remove(); // TODO: Remove the config form too
 					}
@@ -170,54 +216,98 @@
 					delete pendingRequests[""+entryid];
 					numPendingRequests--;
 				}
-				eventLoop();
+				eventLoop( itemjq.closest('.layout_container') );
 
 			}  
 		);  
 	}
 
-	function start_derez_all() {
+	function start_derez_all(parentjq) {
 		actionStatus= 'derezzing';
-		$('li.rezzed').addClass( 'waiting_to_derez' );
-		$('li.waiting_to_derez').removeClass('rezzed');
-		$('#rez_all_objects').html('Stop derezzing objects');
-		$('#rez_all_objects').unbind('click');
-		$('#rez_all_objects').click(function() {
-			stop_derez_all();	
+		parentjq.children('li.rezzed').addClass( 'waiting_to_derez' );
+		parentjq.children('li.waiting_to_derez').removeClass('rezzed');
+		parentjq.children('.rez_all_objects').html('Stop derezzing objects');
+		parentjq.children('.rez_all_objects').unbind('click');
+		parentjq.children('.rez_all_objects').click(function() {
+			stop_derez_all(parentjq);	
 		});
-		eventLoop();
+		eventLoop( parentjq );
 	}
 
-	function start_rez_all() {
+	function start_rez_all(parentjq) {
 		actionStatus= 'rezzing';
-		$('li.derezzed').removeClass('derezzed');
-		$('li.rezzable_item').not('li.rezzed').addClass( 'waiting_to_rez' );
-		$('#rez_all_objects').html('Stop rezzing objects');
-		$('#rez_all_objects').unbind('click');
-		$('#rez_all_objects').click(function() {
+		parentjq.children('li.derezzed').removeClass('derezzed');
+		parentjq.children('li.rezzable_item').not('li.rezzed').addClass( 'waiting_to_rez' );
+		parentjq.children('.rez_all_objects').html('Stop rezzing objects');
+		parentjq.children('.rez_all_objects').unbind('click');
+		parentjq.children('.rez_all_objects').click(function() {
 			stop_rez_all();	
 		});
-		eventLoop();
+		eventLoop( parentjq );
 	}
 
-	function stop_derez_all() {
-		$('li.waiting_to_derez').addClass( 'rezzed' ).removeClass('waiting_to_derez');;
-		$('#rez_all_objects').html('Derez all objects');
-		$('#rez_all_objects').unbind('click');
-		$('#rez_all_objects').click(function() {
-			start_derez_all();
-		});
-		eventLoop();
+	function start_sync_all(parentjq) {
+		actionStatus= 'syncing';
+		parentjq.children('li.rezzed').addClass( 'waiting_to_sync' );
+// TODO: Stop stuff
+		eventLoop( parentjq );
 	}
 
-	function stop_rez_all() {
-		$('li.rezzable_item').removeClass( 'waiting_to_rez' );
-		$('#rez_all_objects').html('Rez all objects');
-		$('#rez_all_objects').unbind('click');
-		$('#rez_all_objects').click(function() {
-			start_rez_all();
+	function stop_derez_all(parentjq) {
+		parentjq.children('li.waiting_to_derez').addClass( 'rezzed' ).removeClass('waiting_to_derez');;
+		parentjq.children('.rez_all_objects').html('Derez all objects');
+		parentjq.children('.rez_all_objects').unbind('click');
+		parentjq.children('.rez_all_objects').click(function() {
+			start_derez_all(parentjq);
 		});
-		eventLoop();
+		eventLoop( parentjq );
+	}
+
+	function stop_rez_all(parentjq) {
+		parentjq.children('li.rezzable_item').removeClass( 'waiting_to_rez' );
+		parentjq.children('.rez_all_objects').html('Rez all objects');
+		parentjq.children('.rez_all_objects').unbind('click');
+		parentjq.children('.rez_all_objects').click(function() {
+			start_rez_all(parentjq);
+		});
+		eventLoop( parentjq );
+	}
+
+	function create_layout( buttonjq ) {
+
+		var frmjq = buttonjq.closest("form");
+		buttonjq.html( buttonjq.attr('data-adding-text') );
+		$.getJSON(  
+			"add_layout.php",  
+			frmjq.serialize(),
+			function(json) {  
+				var result = json.result;
+				var layoutid = json.layoutid;
+				var courseid = json.courseid;
+				var layoutname = json.layoutname;
+				if (result == 'added') {
+					//alert('added');
+					buttonjq.html( buttonjq.attr('data-add-text') );
+					insert_layout_into_course_divs( layoutid, courseid, layoutname, frmjq);
+					//eventLoop( $('.layout_container_'+layoutid) );
+					//history.back();
+					history.go(-1);
+				} else if (result == 'failed') {
+					//alert('Adding layout entry failed');
+					buttonjq.html( buttonjq.attr('data-add-text') );
+				}
+			}  
+		);  
+		return false;
+
+	}
+
+	function insert_layout_into_course_divs( layoutid, courseid, layoutname, frmjq ) {
+		$('.controllercourselayouts_'+courseid).each( function() {
+			var newformid = $(this).attr('data-id-prefix') + layoutid;
+			var newli = '<li><a class="layout_link" href="#' + newformid + '">'+layoutname+'</a></li>';
+			$(this).children('.add_layout_above_me').before( newli );
+		});
 	}
 
 	function add_to_layout( buttonjq ) {
@@ -238,8 +328,9 @@
 					//alert('added');
 					buttonjq.html( buttonjq.attr('data-add-text') );
 					insert_layout_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, frmjq);
+					eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
-					history.go(-3);
+					history.go(-2);
 				} else if (result == 'failed') {
 					//alert('Adding layout entry failed');
 					buttonjq.html( buttonjq.attr('data-add-text') );
@@ -281,10 +372,24 @@
 						}
 					});
 					history.back();
-				} else { //if (result == 'failed') {
+				} else { //if (result == 'failed') 
 					alert('Deleting layout entry failed');
 					buttonjq.html( buttonjq.attr('data-delete-text') );
 				} 
+			}  
+		);  
+		return false;
+
+	}
+
+	function update_layout_position( buttonjq ) {
+
+		var frmjq = buttonjq.closest("form");
+		$.getJSON(  
+			"sync_layout_position.php",  
+			frmjq.serialize(),
+			function(json) {  
+				var result = json.result;
 			}  
 		);  
 		return false;
@@ -329,8 +434,12 @@
 			// make an id for the new element	
 			var newElementID = $(this).attr('id').replace('layout_','layoutentryid_')+'-'+layoutentryid;
 
+			var actionClass = '';
+			if ( (actionStatus == 'rezzed') || (actionStatus == 'rezzing') ) {
+				actionClass =' waiting_to_rez';
+			}
 			// make a list item for the layout screen, and insert it at the bottom of its group.
-			var newItem = '<li id="'+newElementID+'" class="rezzable_item"><a href="#configure_'+newElementID+'">'+objectname+'<span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item_status">&nbsp;</span> </a></li>'
+			var newItem = '<li id="'+newElementID+'" class="rezzable_item' + actionClass + '"><a href="#configure_'+newElementID+'">'+objectname+'<span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>'
 
 			// If we don't yet have a group to put this item in, create it
 			if ( $(this).children(".after_group_"+objectgroup).size() == 0 ) {
@@ -366,8 +475,11 @@
 		
 	}
 
-	function configure_set( itemspanjq ) {
-		var bits = itemspanjq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
+	function configure_set( layoutlinkjq ) {
+		var layoutjqid = layoutlinkjq.attr('href'); // looks like #layout_2-2-1
+		var parentjq = $(layoutjqid); // the "#" happens to be the same notation as that used for the jquery id selector
+		var bits = parentjq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
+		var layoutid = bits.pop(); // pop this off - don't think we need it
 		var controllerid = bits.pop();
 		$.getJSON(  
 			"configure_rezzer.php",  
@@ -378,10 +490,10 @@
 			function(json) {  
 				var result = json.result;
 				if (result == 'configured') {
-					$('#set_configuration_status').hide();
-					$('#rez_all_objects').show();	
+					parentjq.children('.set_configuration_status').hide();
+					parentjq.children('.rez_all_objects').show();	
 				} else if (result == 'failed') {
-					$('#rez_all_objects').hide();	
+					parentjq.children('.rez_all_objects').hide();	
 				}
 			}  
 		);  
@@ -389,12 +501,15 @@
 	}
 
 	$(document).ready(function () {
+		$('.create_layout_button').click(function() {
+			return create_layout($(this));
+		});
 		$('.layout_link').click(function() {
 			return configure_set($(this));
 		});
-		$('#rez_all_objects').hide();
-		$('#rez_all_objects').click(function() {
-			start_rez_all();	
+		$('.rez_all_objects').hide();
+		$('.rez_all_objects').click(function() {
+			start_rez_all($(this).closest('.layout_container'));
 		});
 		$('.add_to_layout_button').click(function() {
 			return add_to_layout($(this));
@@ -404,5 +519,8 @@
 		});
 		$('.delete_layout_entry_button').click(function() {
 			return delete_layout_configuration($(this));
+		});
+		$('.sync_object_positions').click(function() {
+			start_sync_all( $(this).closest('.layout_container') );
 		});
 	});
