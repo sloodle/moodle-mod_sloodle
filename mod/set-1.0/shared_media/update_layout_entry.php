@@ -54,6 +54,31 @@ if (!$layoutentry->update()) {
 	error_output('Layout entry update failed');
 }
 
+
+// Send a reset to the object 
+$controller = new SloodleController();
+if (!$controller->load( $configVars['controllerid'] )) {
+        error_output('Could not load controller');
+}
+
+$failures = array();
+$active_objects = $controller->get_active_objects( $layoutentryid );
+
+foreach($active_objects as $ao) {
+        $response = $ao->sendMessage('do:reset');
+	sleep(1);
+	$response2 = $ao->sendConfig();
+        //var_dump($response['result']);
+/*
+        if (preg_match('/^(<.*?>)\|(<.*?>)\|(.*?)$/', $response['result'], $matches)) {
+                $layoutentry->position = $matches[1];
+                $layoutentry->rotation = $matches[2];
+                $saved = $layoutentry->update();
+        }
+*/
+}
+
+
 $content = array(
 	'result' => 'updated',
 	'objectname' => preg_replace('/SLOODLE\s/', '', $layoutentry->name),

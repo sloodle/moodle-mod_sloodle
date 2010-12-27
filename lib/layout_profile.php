@@ -48,6 +48,7 @@
             $rec = get_record('sloodle_layout','id',$id); 
             if (!$rec) return null;
             $loaded = $this->load_from_row($rec);
+            return true;
 
         }
 
@@ -125,6 +126,23 @@
             return $this->save_entries();
 
         }
+
+        function delete() {
+
+            $this->delete_entries();
+            if (!delete_records('sloodle_layout', 'id', $this->id)) {
+               return false;
+            }
+            return true;
+
+        }
+
+	function delete_entries() {
+
+            $this->entries = array();
+            $this->save_entries();
+
+	}
 
         function save_entries() {
 
@@ -402,8 +420,24 @@
                }
             }
 
+            return true;
+
         }
 
+	function active_objects() {
+            $recs = get_records('sloodle_active_object','layout_entry',intval($this->id));
+
+            $aos = array();
+            if ($rec) {
+		foreach($recs as $rec) {
+                    $ao = new SloodleActiveObject();
+                    $ao->loadFromRecord($rec);
+                    $aos[] = $ao;
+		}
+            }
+            return $aos;
+
+	}
     }
 
     class SloodleLayoutEntryConfig

@@ -180,13 +180,13 @@
                 return $this->sendMessage($renderStr);
 */
             }
-	/*
             $layoutentry = NULL;
             $position = NULL;
             $rotation = NULL;
             // Output each setting
             foreach ($settings as $s) {
                 $response->add_data_line(array('set:'.$s->name, $s->value));
+	/*
                 if ($s->name == 'sloodlelayoutentryid') {
                     $layoutentryid = $s->value;
                     //get position and rotation
@@ -197,8 +197,8 @@
 			$response->add_data_line("set:position|{$layoutentry->position}|{$layoutentry->rotation}|$rezzeruuid");
                     } //endif
                 }//endif
-            }//end foreach
 	*/
+            }//end foreach
             foreach( $extraParameters as $n => $v) {
                 $response->add_data_line( 'set:'.$n.'|'.$v );
             }//endforeach

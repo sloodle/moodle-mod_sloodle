@@ -11,7 +11,7 @@ function print_html_top() {
 <link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
 <style type="text/css" media="screen">@import "iui/iui.css";</style>
 <style type="text/css" media="screen">@import "layout.css";</style>
-<script type="application/x-javascript" src="iui/iui.js"></script>
+<script type="application/x-javascript" src="iui/iui_avatarclassroom.js"></script>
 <script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
 <script type="application/x-javascript" src="layout.js"></script>
 <!--
@@ -40,12 +40,11 @@ function print_toolbar( $baseurl ) {
 function print_site_list( $sites ) {
 ?>
      
-    <?php if ($hasSites) { ?>
     <ul id="home" title="Avatar Classroom Site" selected="true">
         <li class="group">Sites</li>
 	<?php foreach($sites as $site) { ?>
 	<?php if ('http://'.$_SERVER["SERVER_NAME"] == $site) { ?>
-        <li><a href="#site_1"><?=$site?></a></li>
+        <li><a class="active_site_link" href="#site_1"><?=$site?></a></li>
 	<?php } else { ?>
         <li><a href="<?=$site?>"><?=$site?></a></li>
 	<?php } ?>
@@ -55,12 +54,12 @@ function print_site_list( $sites ) {
         <li><a href="#addsite">Add a site</a></li>
 	<li ></li>
     </ul>
-    <?php } ?>
 
 <?php 
 }
 
-function print_controller_list( $courses, $controllers ) {
+function print_controller_list( $courses, $controllers, $hasSites ) {
+$hasSites = false;
 ?>
 
     <ul id="site_1" title="<?= "http://".$_SERVER["SERVER_NAME"]?>" <?= $hasSites ? '' : ' selected="true"' ?> >
@@ -171,6 +170,8 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				<li class="group"><?= htmlentities( $layout->name ) ?></li>
 				<span id="set_configuration_status_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="button_goes_here_zone set_configuration_status"><?=get_string('layoutmanager:connectingtorezzer','sloodle') ?></span>
 				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button rez_all_objects">Rez All Objects</span>
+
+				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button generate_standard_layout">Generate a scene for my course</span>
 <?php
 				foreach($entriesbygroup as $group => $entries) {
 ?>
@@ -190,7 +191,7 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 					<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
 	*/ ?>
 					<?php /* NB If you change this, you also need to change layout.js, which creates some of these dynamically. */ ?>
-					<li id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= htmlentities($entryname) ?><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
+					<li id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= htmlentities($entryname) ?><span class="module_info">mod name</span><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
 	<?php
 					}
 ?>
@@ -202,9 +203,9 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 
 				<span class="active_button sync_object_positions" style="width:98%" type="submit" href="#clonelayout">Save current positions</span>
 				<br />
-				<span class="active_button" style="float:right; width:40%" type="submit" href="#deletelayout">Delete this layout (TODO)</span>
-				<span class="active_button" style="width:40%" type="submit" href="#clonelayout">Clone this layout (TODO)</span>
-				<span class="active_button" style="width:40%" type="submit" href="#clonelayout">Edit this layout (TODO)</span>
+				<span class="active_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="Deleted, derezzing objects" data-delete-text="Delete Layout" data-deleting-text="Deleting Layout" style="float:right; width:40%" type="submit">Delete this layout</span>
+				<span class="active_button" style="width:40%" type="submit" >Clone this layout (TODO)</span>
+				<span class="active_button" style="width:40%" type="submit" >Edit this layout (TODO)</span>
 
 			    </ul>
 
@@ -212,7 +213,9 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 			}
 		}
 	}
-
+?>
+<span id="add_layout_lists_above_me"></span>
+<?php
 }
 
 function print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup) {
@@ -246,7 +249,9 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
 			}
 		}
 	}
-
+?>
+<span id="add_add_object_groups_above_me"></span>
+<?php
 }
 
 function print_add_object_forms($courses, $controllers, $courselayouts, $object_configs ) {
@@ -313,12 +318,15 @@ not radio: <?=$ctrl['type']?>
 			}
 		}
 	}
+?>
+<span id="add_add_object_forms_above_me"></span>
+<?php
 }
 
 /*
 Configuration form for each 
 */
-function print_edit_object_forms($courses, $controllers, $courselayouts, $layoutentries) {
+function print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries) {
 
 	foreach($courses as $course) {
 		$cid = $course->id; 
@@ -391,5 +399,8 @@ not radio: <?=$ctrl['type']?>
 			}
 		}
 	}
+?>
+<span id="add_edit_object_forms_above_me"></span>
+<?php
 }
 ?>

@@ -39,11 +39,11 @@
     require_once(SLOODLE_LIBROOT.'/layout_profile.php');
     require_once(SLOODLE_LIBROOT.'/active_object.php');
 
-        $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
+        $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'&sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
 
 	if (isset($_GET['logout'])) {
 		require_logout();
-		redirect($baseurl.'&ts='.time());
+		header('Location: http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/'.$baseurl.'&ts='.time().'&logout');
 		exit;
 	}
 
@@ -57,7 +57,8 @@
 	$can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
 	if (!$can_use_layouts) {
 		//include('../../../login/shared_media/index.php');
-		include('login.php');
+		include('login.avatarclassroom.php');
+		//include('login.php');
 	}
 
 	// Register the set using URL parameters
@@ -154,11 +155,13 @@
 	print_html_top();
 	print_toolbar( $baseurl );
 
+	/*
 	if ($hasSites) {
 		print_site_list( $sites );
 	}
+	*/
 
-	print_controller_list( $courses, $controllers ); 
+	print_controller_list( $courses, $controllers, $hasSites = false); 
 	print_layout_list( $courses, $controllers, $courselayouts );
 	print_add_layout_form( $cid );
 	print_html_bottom();
@@ -166,7 +169,7 @@
 	print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries);
 	print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup );
 	print_add_object_forms($courses, $controllers, $courselayouts, $object_configs ); 
-	print_edit_object_forms($courses, $controllers, $courselayouts, $layoutentries); 
+	print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries); 
 
 	print_html_bottom();
 

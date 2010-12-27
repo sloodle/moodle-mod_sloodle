@@ -7,19 +7,20 @@
 */
 
 $string['accesslevel'] = 'Access Level';
+$string['fieldset:accesslevel'] = 'Access Level';
 $string['accesslevel:public'] = 'Public';
 $string['accesslevel:owner'] = 'Owner';
-$string['accesslevel:group'] = 'Group (SL)';
-$string['accesslevel:course'] = 'Course';
+$string['accesslevel:group'] = 'Group';
+$string['accesslevel:course'] = 'Course members';
 $string['accesslevel:site'] = 'Site';
 $string['accesslevel:staff'] = 'Staff';
 
 $string['accesslevelobject'] = 'Object Access Level';
 $string['accesslevelobject:desc'] = 'This determines who may access the object in-world';
-$string['accesslevelobject:use'] = 'Use object';
-$string['accesslevelobject:control'] = 'Control object';
+$string['accesslevelobject:use'] = 'Use object (SL / OpenSim)';
+$string['accesslevelobject:control'] = 'Control object (SL / OpenSim)';
 
-$string['accesslevelserver'] = 'Server Access Level';
+$string['accesslevelserver'] = 'Use object (Moodle)';
 $string['accesslevelserver:desc'] = 'This determines who may use the server resource';
 
 $string['actions'] = 'Actions';
@@ -140,7 +141,8 @@ $string['framewidth'] = 'Frame Width';
 $string['frameheight'] = 'Frame Height';
 
 $string['getnewloginzoneallocation'] = 'Click here to get a new LoginZone allocation.';
-$string['generalconfiguration'] = 'General Configuration';
+$string['generalconfiguration'] = 'General Configuration'; // deprecated as the title of a fieldset on the config form - use fieldset:generalconfiguration
+$string['fieldset:generalconfiguration'] = 'General Configuration';
 
 $string['help:primpassword'] = 'What is the Prim Password for?';
 $string['help:userediting'] = 'What is the risk?';
@@ -262,6 +264,11 @@ $string['object:hq'] = 'SLOODLE API HQ';
 $string['object:presenter'] = 'Presenter';
 $string['object:mapmarker'] = 'Map Marker';
 $string['object:picturegloss'] = 'Picture Gloss';
+
+$string['objectgroup:registration'] = 'Registration and Enrolment';
+$string['objectgroup:communication'] = 'Communication';
+$string['objectgroup:inventory'] = 'Inventory and Assignments';
+$string['objectgroup:activity'] = 'Quizzes and Activities';
 
 
 $string['Object'] = 'Object';
@@ -556,6 +563,7 @@ $string ['secondlifetracker:notrackers'] = 'No trackers in your course';
 
 $string['layoutpage'] = 'Layouts';
 $string['layoutmanager:nopermission'] = 'You do not have permission to edit layouts';
+$string['layoutmanager:connectingtorezzer'] = 'Setting up rezzer';
 $string['layoutmanager:namealreadyexists'] = 'You do not have permission to edit layouts';
 $string['layoutmanager:savefailed'] = 'Save failed';
 $string['layoutmanager:Layouts'] = 'Layouts';

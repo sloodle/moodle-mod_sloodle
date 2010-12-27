@@ -289,6 +289,14 @@
 					//alert('added');
 					buttonjq.html( buttonjq.attr('data-add-text') );
 					insert_layout_into_course_divs( layoutid, courseid, layoutname, frmjq);
+
+					$('#add_layout_lists_above_me').before(json.add_layout_lists);
+					$('#add_edit_object_forms_above_me').before(json.edit_object_forms);
+					$('#add_add_object_forms_above_me').before(json.add_object_forms);
+					$('#add_add_object_groups_above_me').before(json.add_object_groups);
+
+					attach_event_handlers();
+
 					//eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
 					history.go(-1);
@@ -371,6 +379,33 @@
 							$(this).remove();
 						}
 					});
+					history.back();
+				} else { //if (result == 'failed') 
+					alert('Deleting layout entry failed');
+					buttonjq.html( buttonjq.attr('data-delete-text') );
+				} 
+			}  
+		);  
+		return false;
+
+	}
+
+	// NB This just removes the layout from the server and marks it for deletion.
+	// If rezzed, we'll derez the objects seperately, and only remove the layout from view when they're done
+	function delete_layout( buttonjq ) {
+
+		buttonjq.html( buttonjq.attr('data-deleting-text') );
+		$.getJSON(  
+			"delete_layout.php",  
+			{
+				layoutid: buttonjq.attr('data-layoutid')
+			},
+			function(json) {  
+				var result = json.result;
+				if (result == 'deleted') {
+					//alert('deleted');
+					buttonjq.html( buttonjq.attr('data-deleted-text') ); 
+					alert('TODO: Object derezzing, removal from screens');
 					history.back();
 				} else { //if (result == 'failed') 
 					alert('Deleting layout entry failed');
@@ -500,7 +535,7 @@
 		return true;
 	}
 
-	$(document).ready(function () {
+	function attach_event_handlers() {
 		$('.create_layout_button').click(function() {
 			return create_layout($(this));
 		});
@@ -523,4 +558,11 @@
 		$('.sync_object_positions').click(function() {
 			start_sync_all( $(this).closest('.layout_container') );
 		});
+		$('.delete_layout_button').click(function() {
+			return delete_layout( $(this) );
+		});
+	}
+
+	$(document).ready(function () {
+		attach_event_handlers();
 	});
