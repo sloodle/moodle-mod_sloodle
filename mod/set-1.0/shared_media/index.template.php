@@ -60,6 +60,7 @@ function print_site_list( $sites ) {
 
 function print_controller_list( $courses, $controllers, $hasSites ) {
 $hasSites = false;
+$full = false;
 ?>
 
     <ul id="site_1" title="<?= "http://".$_SERVER["SERVER_NAME"]?>" <?= $hasSites ? '' : ' selected="true"' ?> >
@@ -68,10 +69,12 @@ $hasSites = false;
 	foreach($courses as $course) { 
 		$cid = $course->id; 
 		$cn = $course->fullname; 
-		foreach($controllers[$cid] as $contid=>$cont) {
+		if (isset($controllers[$cid])) { 
+			foreach($controllers[$cid] as $contid=>$cont) {
 ?>
-			<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?></a></li>
+				<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?></a></li>
 <?php
+			}
 		}
 	}
 ?>
@@ -110,6 +113,9 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
+		if (!isset($controllers[$cid])) {
+			continue;
+		}
 		foreach($controllers[$cid] as $contid => $cont) {
 ?>
     <ul id="controller_<?= intval($cid)?>-<?= intval($contid) ?>" title="<?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?>" class="controllercourselayouts_<?= intval($cid)?>" data-id-prefix="layout_<?= intval($cid)?>-<?= intval($contid) ?>-">
@@ -161,6 +167,9 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
+		if (!isset($controllers[$cid])) {
+			continue;
+		}
 		foreach($controllers[$cid] as $contid => $cont) {
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
@@ -180,12 +189,12 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 					foreach($entries as $e) {
 						$entryname = $e->name;	
 						$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
+						/*
 						$firstletter = substr($entryname, 0, 1);
 						if ($lettergroup != $firstletter) { 
 							$lettergroup = $firstletter;
-	?>
-	<?php 
 						}
+						*/
 	?>
 	<?php /*
 					<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
@@ -223,6 +232,9 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
+		if (!isset($controllers[$cid])) {
+			continue;
+		}
 		foreach($controllers[$cid] as $contid => $cont) {
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
@@ -236,7 +248,7 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
 	foreach($groupobjectconfigs as $object_title => $config) {
 		$object_title = preg_replace('/^SLOODLE /', '', $object_title);
 ?>
-        <li><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['object_code']?>"><?= htmlentities($object_title) ?></a></li>
+        <li><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>"><?= htmlentities($object_title) ?></a></li>
 <?php 
 	}
 
@@ -259,7 +271,13 @@ function print_add_object_forms($courses, $controllers, $courselayouts, $object_
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
+		if (!isset($controllers[$cid])) {
+			continue;
+		}
 		foreach($controllers[$cid] as $contid => $cont) {
+			if (!isset($courselayouts[ $cid ]) ) {
+				continue;
+			}
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
 				foreach($object_configs as $object_title => $config) {
@@ -268,41 +286,42 @@ The following form is used for adding the object.
 But once it's been added, it will be clone()d to make a form to update the object we added.
 */
 ?>
-<form class="add_object_form panel" id="addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config['object_code']?>" title="<?= htmlentities($object_title) ?>">
+<form class="add_object_form panel" id="addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>" title="<?= htmlentities($object_title) ?>">
 <span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" data-adding-text="Adding <?= htmlentities( $object_title ) ?>" data-add-text="Add <?= htmlentities( $object_title ) ?>" class="active_button add_to_layout_button" target="_self" type="submit">Add <?= htmlentities( $object_title ) ?></span>
 <input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
-<input type="hidden" name="objectgroup" value="<?= htmlentities($config['group']) ?>" />
+<input type="hidden" name="objectgroup" value="<?= htmlentities($config->group) ?>" />
 <input type="hidden" name="layoutid" value="<?= intval($layout->id) ?>" />
 <input type="hidden" name="layoutentryid" value="0" />
 <input type="hidden" name="controllerid" value="<?= intval($contid) ?>" />
 <input type="hidden" name="courseid" value="<?= intval($cid) ?>" />
-<?php if (isset($config['module'])) { 
-$moduleoptionselect = course_module_select_for_config( $config, $cid, $val = null ); 
+<?php if ($config->module) { 
+$moduleoptionselect = $config->course_module_select( $cid, $val = null ); 
 ?>
 <fieldset>
 <div class="row">
-<label for="<?= $fieldname ?>"><?= get_string($config['module_choice_message'], 'sloodle') ?></label>
+<label for="<?= 'sloodlemoduleid' ?>"><?= get_string($config->module_choice_message, 'sloodle') ?></label>
 <span class="sloodle_config">
-<?= $moduleoptionselect ? $moduleoptionselect : get_string($config['module_no_choices_message'], 'sloodle') ?>
+<?= $moduleoptionselect ? $moduleoptionselect : get_string($config->module_no_choices_message, 'sloodle') ?>
 </span>
 </div>
 </fieldset>
 <?php
 } ?>
-<?php foreach($config['field_sets'] as $fs) { ?>
+<?php foreach($config->field_sets as $fs) { ?>
 <fieldset>
-<?php foreach($fs as $fieldname => $ctrl) { ?>
+<?php foreach($fs as $ctrl) { ?>
+<?php $fieldname = $ctrl->fieldname; ?>
 <div class="row">
-<label for="<?= $fieldname ?>"><?= get_string($ctrl['title'], 'sloodle') ?></label>
+<label for="<?= $fieldname ?>"><?= get_string($ctrl->title, 'sloodle') ?></label>
 <span class="sloodle_config">
-<?php if ( ($ctrl['type'] == 'radio') || ($ctrl['type'] == 'yesno') ) { ?>
-<?php foreach($ctrl['options'] as $opn => $opv) { ?>
-<input type="radio" name="<?= $fieldname ?>" value="<?= $opn ?>" <?= $opn == $ctrl['default'] ? 'checked ' : '' ?>> <?= get_string($opv, 'sloodle') ?> 
+<?php if ( ($ctrl->type == 'radio') || ($ctrl->type == 'yesno') ) { ?>
+<?php foreach($ctrl->options as $opn => $opv) { ?>
+<input type="radio" name="<?= $fieldname ?>" value="<?= $opn ?>" <?= $opn == $ctrl->default ? 'checked ' : '' ?>> <?= get_string($opv, 'sloodle') ?> 
 <?php } ?>
-<?php } else if ($ctrl['type'] == 'input') { ?>
-<input type="text" name="<?= $fieldname ?>" value="<?= $ctrl['default'] ?>" /> 
+<?php } else if ($ctrl->type == 'input') { ?>
+<input type="text" name="<?= $fieldname ?>" value="<?= $ctrl->default ?>" /> 
 <?php } else { ?>
-not radio: <?=$ctrl['type']?>
+not radio: <?=$ctrl->type?>
 <?php } ?>
 </span>
 </div>
@@ -349,35 +368,35 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
 <input type="hidden" name="controllerid" value="<?= intval($contid) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities( get_string('objectgroup:'.$group, 'sloodle' ) ) ?>" />
-<?php if (isset($config['module'])) { 
-$moduleoptionselect = course_module_select_for_config( $config, $cid, $lconfig['sloodlemoduleid'] ); 
+<?php if ($config->module) { 
+$moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemoduleid'] ); 
 ?>
 <fieldset>
 <div class="row">
-<label for="<?= $fieldname ?>"><?= get_string($config['module_choice_message'], 'sloodle') ?></label>
+<label for="<?= $fieldname ?>"><?= get_string($config->module_choice_message, 'sloodle') ?></label>
 <span class="sloodle_config">
-<?= $moduleoptionselect ? $moduleoptionselect : get_string($config['module_no_choices_message'], 'sloodle') ?>
+<?= $moduleoptionselect ? $moduleoptionselect : get_string($config->module_no_choices_message, 'sloodle') ?>
 </span>
 </div>
 </fieldset>
 <?php
 } ?>
-<?php foreach($config['field_sets'] as $fs) { ?>
+<?php foreach($config->field_sets as $fs) { ?>
 <fieldset>
-
-<?php foreach($fs as $fieldname => $ctrl) { ?>
-<?php 	$val = $lconfig[$fieldname]; ?>
+<?php foreach($fs as $ctrl) { ?>
+<?php $fieldname = $ctrl->fieldname; ?>
+<?php 	$val = isset($lconfig[$fieldname]) ? $lconfig[$fieldname] : ''; ?>
 <div class="row">
-<label for="<?= $fieldname ?>"><?= get_string($ctrl['title'], 'sloodle') ?></label>
+<label for="<?= $fieldname ?>"><?= get_string($ctrl->title, 'sloodle') ?></label>
 <span class="sloodle_config">
-<?php if ( ($ctrl['type'] == 'radio') || ($ctrl['type'] == 'yesno') ) { ?>
-<?php foreach($ctrl['options'] as $opn => $opv) { ?>
-<input type="radio" name="<?= $fieldname ?>" value="<?= $opn ?>" <?= $opn == $val ? 'checked ' : '' ?>> <?= get_string($opv, 'sloodle') ?>
+<?php if ( ($ctrl->type == 'radio') || ($ctrl->type == 'yesno') ) { ?>
+<?php foreach($ctrl->options as $opn => $opv) { ?>
+<input type="radio" name="<?= $fieldname ?>" value="<?= $opn ?>" <?= $opn == $val ? 'checked ' : '' ?>> :<?=$opv?>:<?= get_string($opv, 'sloodle') ?>
 <?php } ?>
-<?php } else if ($ctrl['type'] == 'input') {?>
+<?php } else if ($ctrl->type == 'input') {?>
 <input type="text" name="<?= $fieldname ?>" value="<?= $val ?>" /> 
 <?php } else {?>
-not radio: <?=$ctrl['type']?>
+not radio: <?=$ctrl->type?>
 <?php } ?>
 </span>
 </div>

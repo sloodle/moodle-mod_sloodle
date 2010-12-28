@@ -39,6 +39,9 @@
     require_once(SLOODLE_LIBROOT.'/layout_profile.php');
     require_once(SLOODLE_LIBROOT.'/active_object.php');
 
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+
         $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'&sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
 
 	if (isset($_GET['logout'])) {
@@ -117,6 +120,10 @@
 
 	// TODO: This should probably be somewhere else
 	include('object_configs.php');
+	//$object_configs = SloodleObjectConfig::AllAvailableAsArrayByGroup();
+	$object_configs = SloodleObjectConfig::AllAvailableAsArray();
+	$objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();
+//	include('object_configs.array.php');
 
         // Construct the list of course names
         $coursenames = array();
@@ -134,8 +141,8 @@
 			foreach($entries as $e) {
 				$objectname = $e->name;
 				$grp = 'other';
-				if (isset($object_configs[$objectname]['group'])) {
-					$grp = $object_configs[$objectname]['group'];
+				if (isset($object_configs[$objectname])) {
+					$grp = $object_configs[$objectname]->group;
 				}
 				if (!isset($entriesbygroup[ $grp ] )) {
 					$entriesbygroup[ $grp ] = array();
