@@ -14,8 +14,7 @@ require_once(SLOODLE_LIBROOT.'/layout_profile.php');
 require_once(SLOODLE_LIBROOT.'/active_object.php');
 require_once(SLOODLE_LIBROOT.'/user.php');
 
-// TODO: We'll want to manage this info in a different way.
-require_once('object_configs.php');
+require_once(SLOODLE_LIBROOT.'/object_configs.php');
 
 require_once '../../../lib/json/json_encoding.inc.php';
 

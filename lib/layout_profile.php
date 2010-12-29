@@ -217,6 +217,17 @@
 
         }
 
+	// returns an objectconfig object for the tool, based on the name of the entry
+	// returns null if it can't find one.
+	function get_object_config() {
+		
+             if ( !$name = $this->name ) {
+                 return null;
+             }
+             return SloodleObjectConfig::ForObjectName( $name );
+
+	}
+
         function load_from_row($r) {
 
             if (!$r) return null;

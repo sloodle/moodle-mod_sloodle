@@ -57,7 +57,7 @@ class SloodleObjectConfig {
 	// ultimately: loads all the object configs from their various tool directories
 	// for now, grabs them all from a single file
 	function AllAvailableAsArray() {
-		include('object_configs_load_temporary.php');
+		include(SLOODLE_DIRROOT.'/mod/object_configs_load_temporary.php');
 		return $object_configs;
         }
 

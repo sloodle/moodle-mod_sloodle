@@ -118,8 +118,7 @@
 
 	$courselayouts = array();
 
-	// TODO: This should probably be somewhere else
-	include('object_configs.php');
+	include(SLOODLE_LIBROOT.'/object_configs.php');
 	//$object_configs = SloodleObjectConfig::AllAvailableAsArrayByGroup();
 	$object_configs = SloodleObjectConfig::AllAvailableAsArray();
 	$objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();
