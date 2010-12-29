@@ -53,3 +53,9 @@ span.rezzable_item_positioning {
     color:grey; 
     font-style:italic
 }
+
+span.module_info {
+    margin-left:30px;
+    font-style: italic;
+    color: grey;
+}

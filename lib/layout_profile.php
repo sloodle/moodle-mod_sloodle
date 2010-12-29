@@ -87,7 +87,7 @@
 
             $rows = get_records('sloodle_layout_entry','layout',$this->id);
             $entries = array();
-            if (count($rows) > 0) {
+            if ($rows && ( count($rows) > 0) ) {
                foreach($rows as $row) {
                   $entries[] = new SloodleLayoutEntry($row);
                }
@@ -355,6 +355,14 @@
             $this->rotation = "<$x,$y,$z>";
         }
         
+	function get_config($name) {
+            $configs = $this->get_layout_entry_configs_as_name_value_hash();
+            if (!isset($configs[$name])) {
+                return null;
+            }
+            return $configs[$name];
+	}
+
         function set_config($name, $value) { // add config with given name/value, overwriting if necessary
             $configs = $this->configs;
             $done = false;
@@ -449,6 +457,35 @@
             return $aos;
 
 	}
+
+        // returns an instance of SloodleLayoutEntry with the default config for an object with the specified name
+        function ForConfig( $name ) {
+            if ( !$obj = SloodleObjectConfig::ForObjectName( $name ) ) {
+                return null;
+            }
+            $le = new SloodleLayoutEntry();
+            $le->name = $name;        
+            foreach( $obj->field_sets as $grp ) {
+                 foreach($grp as $n => $op) {
+                     $le->set_config($n, $op->default);
+                 }
+            }
+            return $le;
+        }
+
+	function objectDefinition() {
+            return SloodleObjectConfig::ForObjectName( $this->name );
+	}
+
+// TODO: Fix this
+	function get_course_module_title() {
+return 'TODO';
+            $sloodlemoduleid = $this->get_config('sloodlemoduleid');
+            $defn = $this->objectDefinition();
+            $options = $defn->course_module_options( $this->courseid );
+            return $options[$sloodlemoduleid];
+	}
+
     }
 
     class SloodleLayoutEntryConfig

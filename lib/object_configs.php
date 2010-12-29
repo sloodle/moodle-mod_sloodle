@@ -172,6 +172,7 @@ class SloodleObjectConfig {
 
 		$modtype = $this->module;
 		if (!$modtype) {
+print "no modtype";
 			return false;
 		}
 
@@ -182,6 +183,7 @@ class SloodleObjectConfig {
 		// Get the ID of the chat type
 		$rec = get_record('modules', 'name', $modtype);
 		if (!$rec) {
+print "no modules";
 			return false;
 		}
 		$moduleid = $rec->id;
@@ -189,6 +191,7 @@ class SloodleObjectConfig {
 		// Get all visible quizzes in the current course
 		$recs = get_records_select('course_modules', "course = ".intval($courseid)." AND module = ".intval($moduleid)." AND visible = 1");
 		if (!$recs) {
+print "no coursemodules for course :$courseid:";
 			return false;
 		    //error(get_string('noquizzes','sloodle'));
 		}
@@ -300,7 +303,7 @@ class SloodleConfigurationOptionText extends SloodleConfigurationOption {
 // NB This could be presented as a set of radio buttons rather than a select
 class SloodleConfigurationOptionSelectOne extends SloodleConfigurationOption {
 
-	function SloodleConfigurationOptionSelectOne( $fieldname, $title, $description, $length, $default ) {
+	function SloodleConfigurationOptionSelectOne( $fieldname = null, $title = null, $description = null, $length = 8, $default = null) {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->description = $description;

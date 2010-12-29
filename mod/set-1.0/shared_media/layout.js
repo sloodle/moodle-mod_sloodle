@@ -318,6 +318,44 @@
 		});
 	}
 
+	function generate_standard_layout( buttonjq ) {
+
+		var frmjq = buttonjq.closest("form");
+		buttonjq.html( buttonjq.attr('data-generating-text') );
+		var layoutid = buttonjq.attr('data-layoutid');
+		$.getJSON(  
+			"generate_layout_entries.php",  
+			{
+				layoutid: layoutid
+			},
+			function(json) {  
+				var result = json.result;
+				if (result == 'generated') {
+					alert('generated');
+
+//					function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, addfrmjq ) {
+
+					//buttonjq.html( buttonjq.attr('data-generate-text') );
+					var addedentries = json.addedentries;
+					var entryi;
+					for (entryi = 0; entryi<addedentries.length; entryi++) {
+						thisentry = addedentries[entryi];
+alert('looking for class '+'.addobject_layout_'+layoutid+'_'+thisentry['objectcode']);
+						$('.addobject_layout_'+layoutid+'_'+thisentry['objectcode']).each( function() {
+							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], $(this) );
+						});
+					}
+					//eventLoop( $('.layout_container_'+layoutid) );
+					//history.back();
+					//history.go(-2);
+				} else if (result == 'failed') {
+					//alert('Adding layout entry failed');
+					//buttonjq.html( buttonjq.attr('data-add-text') );
+				}
+			}  
+		);  
+	}
+
 	function add_to_layout( buttonjq ) {
 
 		var frmjq = buttonjq.closest("form");
@@ -335,7 +373,7 @@
 				if (result == 'added') {
 					//alert('added');
 					buttonjq.html( buttonjq.attr('data-add-text') );
-					insert_layout_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, frmjq);
+					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, frmjq);
 					eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
 					history.go(-2);
@@ -459,7 +497,7 @@
 
 	}
 
-	function insert_layout_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, addfrmjq ) {
+	function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, addfrmjq ) {
 
 		regexPtn = '^layout_.+-.+-'+layoutid+'$';
 		var re = new RegExp(regexPtn,"");
@@ -487,7 +525,7 @@
 			// Make a copy of the add form and change it into an edit form
 			var editFrm = addfrmjq.clone(); 
 			editFrm.attr('id', 'configure_'+newElementID); 
-                        editFrm.children("input[name='layoutentryid']").val(layoutentryid);  // set the layoutentryid hidden field
+			editFrm.children("input[name='layoutentryid']").val(layoutentryid);  // set the layoutentryid hidden field
 			editFrm.attr('selected', ''); // Remove the selected property so that iui hides the form
 			editFrm.children('.add_to_layout_button').addClass('update_layout_entry_button').removeClass('add_to_layout_button');
 			editFrm.children('.update_layout_entry_button').html( editFrm.children('.update_layout_entry_button:first').attr('data-update-text') );
@@ -499,8 +537,7 @@
 				return delete_layout_configuration($(this));
 			});
 
-
-			$('#add_configuration_above_me_'+$(this).attr('id')).before(editFrm).html();
+			$('#add_configuration_above_me_'+$(this).attr('id')).before(editFrm);
 
 			editFrm.click(function() {
 				return update_layout_configuration($(this));
@@ -560,6 +597,9 @@
 		});
 		$('.delete_layout_button').click(function() {
 			return delete_layout( $(this) );
+		});
+		$('.generate_standard_layout').click(function() {
+			return generate_standard_layout( $(this) );
 		});
 	}
 
