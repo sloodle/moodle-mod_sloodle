@@ -47,14 +47,8 @@ if ( !$objectname ) {
 	error_output( 'Layout entry did not have a name');
 }
 
-// Sometimes objects will be saved in the set with alternative names, eg. 1.1 objects have 1.1 in the name.
-// TODO: Map back to their canonical names when we save the layouts.
-$possibleobjectnames = array($objectname);
-if ( isset($object_configs[$objectname]) ) {
-	if ( isset($object_configs[$objectname]['aliases']) ) {
-		$possibleobjectnames = array_merge( $possibleobjectnames, $object_configs[$objectname]['aliases'] );
-	}
-}
+$config = SloodleObjectConfig::ForObjectName( $objectname );
+$possibleobjectnames = $config->possibleObjectNames();
 
 $primpassword = sloodle_random_prim_password();
 

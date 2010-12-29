@@ -83,6 +83,16 @@ class SloodleObjectConfig {
 			
 	}
 
+	function possibleObjectNames() {
+		$names = array($this->primname);
+		if ( is_array($this->aliases) ) {
+			foreach($this->aliases as $al) {
+				array_push( $names, $al );
+			}
+		}
+		return $names;
+	}
+
 	// return an input widget for server access level
 	function access_level_server_option() {
 
