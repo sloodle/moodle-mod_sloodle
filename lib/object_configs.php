@@ -57,7 +57,7 @@ class SloodleObjectConfig {
 	// ultimately: loads all the object configs from their various tool directories
 	// for now, grabs them all from a single file
 	function AllAvailableAsArray() {
-		include(SLOODLE_DIRROOT.'/mod/object_configs_load_temporary.php');
+		require(SLOODLE_DIRROOT.'/mod/object_configs_load_temporary.php');
 		return $object_configs;
         }
 
@@ -172,7 +172,6 @@ class SloodleObjectConfig {
 
 		$modtype = $this->module;
 		if (!$modtype) {
-print "no modtype";
 			return false;
 		}
 
@@ -183,7 +182,6 @@ print "no modtype";
 		// Get the ID of the chat type
 		$rec = get_record('modules', 'name', $modtype);
 		if (!$rec) {
-print "no modules";
 			return false;
 		}
 		$moduleid = $rec->id;
@@ -191,7 +189,6 @@ print "no modules";
 		// Get all visible quizzes in the current course
 		$recs = get_records_select('course_modules', "course = ".intval($courseid)." AND module = ".intval($moduleid)." AND visible = 1");
 		if (!$recs) {
-print "no coursemodules for course :$courseid:";
 			return false;
 		    //error(get_string('noquizzes','sloodle'));
 		}

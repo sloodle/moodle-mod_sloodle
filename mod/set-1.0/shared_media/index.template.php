@@ -7,7 +7,7 @@ function print_html_top() {
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Avatar Classroom Configuration</title>
+<title>Avatar Classroom Setup</title>
 <link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
 <style type="text/css" media="screen">@import "iui/iui.css";</style>
 <style type="text/css" media="screen">@import "layout.css";</style>
@@ -162,7 +162,7 @@ function print_html_bottom() {
 }
 ?>
 <?php 
-function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries) {
+function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries, $rezzeruuid) {
 
 	foreach($courses as $course) {
 		$cid = $course->id; 
@@ -173,14 +173,18 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 		foreach($controllers[$cid] as $contid => $cont) {
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
+				$hasactiveobjects = $layout->has_active_objects_rezzed_by_rezzer( $rezzeruuid );
 				$entriesbygroup = $layoutentries[ $layout->id ];
+
+				$rezzed_entries = $layout->rezzed_active_objects_by_layout_entry_id( $rezzeruuid );
+
 ?>
-			    <ul class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>">
+			    <ul class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>" data-action-status="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-rezzer-connection-status="disconnected">
 				<li class="group"><?= htmlentities( $layout->name ) ?></li>
 				<span id="set_configuration_status_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="button_goes_here_zone set_configuration_status"><?=get_string('layoutmanager:connectingtorezzer','sloodle') ?></span>
 				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button rez_all_objects">Rez All Objects</span>
 
-				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout">Generate a scene for my course</span>
+				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout">Use The Recommended Objects For <?=htmlentities( $cn ) ?></span>
 <?php
 				foreach($entriesbygroup as $group => $entries) {
 ?>
@@ -191,7 +195,11 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 						$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
 
 						$modTitle = $e->get_course_module_title();
+
+						$isrezzed = isset( $rezzed_entries[ $e->id ]);
 				
+//print "rezzedentries";
+//var_dump($rezzed_entries);
 						/*
 						$firstletter = substr($entryname, 0, 1);
 						if ($lettergroup != $firstletter) { 
@@ -203,7 +211,7 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 					<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
 	*/ ?>
 					<?php /* NB If you change this, you also need to change layout.js, which creates some of these dynamically. */ ?>
-					<li id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= htmlentities($entryname) ?><span class="module_info"><?=htmlentities($modTitle)?></span><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
+					<li id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item <?= ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= htmlentities($entryname) ?><span class="module_info"><?=htmlentities($modTitle)?></span><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
 	<?php
 					}
 ?>
@@ -363,7 +371,7 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
 						$entryname = $e->name;	
 						$config = $object_configs[$entryname]; // TODO: Merge in the layout entries
 
-						print_config_form( $e, $config, $cid, $contid, $lid );
+						print_config_form( $e, $config, $cid, $contid, $lid, $group );
 						
 					}
 				}
@@ -378,7 +386,7 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
 <?php
 }
 
-function print_config_form( $e, $config, $cid, $contid, $lid ) {
+function print_config_form( $e, $config, $cid, $contid, $lid, $group ) {
 
 						$lconfig = $e->get_layout_entry_configs_as_name_value_hash();
 						$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
@@ -387,6 +395,7 @@ function print_config_form( $e, $config, $cid, $contid, $lid ) {
 ?>
 <form id="configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>-<?=intval( $e->id ) ?>" class="panel" title="<?= htmlentities($object_title) ?>">
 <span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" class="active_button update_layout_entry_button" target="_self" type="submit">Update <?= htmlentities( $object_title ) ?></span>
+<input type="hidden" name="layoutid" value="<?= intval($lid) ?>" />
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
 <input type="hidden" name="controllerid" value="<?= intval($contid) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities( get_string('objectgroup:'.$group, 'sloodle' ) ) ?>" />

@@ -24,8 +24,71 @@ class SloodleLayoutRecipe {
 	}
 
 	// Return an array with course module ids as keys and object names as values
-	function objectsByCourseModule( $moduleToObjectMappings ) {
-		return array();
+	function objectsByCourseModule( $objectnames = null ) {
+
+		$moduleObjectDefinitions = array();
+
+		foreach ($objectnames as $objn) {
+			$objdefn = SloodleObjectConfig::ForObjectName( $objn );
+			if (!$objdefn) { // object not found
+				continue;
+			}
+			if (!$module = $objdefn->module) { // no module needed for this object
+				continue;
+			}
+			if ( !isset( $moduleObjectDefinitions[ $module ] ) ) {
+				$moduleObjectDefinitions[ $module ] = array();
+			}
+			$moduleObjectDefinitions[ $module ][] = $objdefn;
+		}
+
+		$instr = '';
+		$delim = '';
+		foreach( $moduleObjectDefinitions as $module => $defns ) {
+			$instr .= $delim."'".addslashes( $module )."'"; 
+			$delim = ',';
+		}
+
+		global $CFG;
+		$sql = "select cm.id as id, cm.instance as instance, m.name as module_name from {$CFG->prefix}modules m inner join {$CFG->prefix}course_modules cm on m.id=cm.module where m.name in( $instr ) AND cm.visible = 1;";
+
+		$recs = get_records_sql( $sql );
+                if (!$recs) {
+                        return false;
+                }
+
+		$objectsByCourseModule = array();
+                foreach ($recs as $cm) {
+
+			$defns = $moduleObjectDefinitions[ $cm->module_name ];
+			$instance = null;
+
+			foreach($defns as $defn) {
+
+				$skip = false;
+				// Filter by instance if there are module_filters - otherwise we can add the object without bothering to fetch the module instance
+				if ( (is_array($defn->module_filters)) && (count($defn->module_filters) > 0) ) {
+					if (!$instance) {
+						$instance = get_record($cm->module_name, 'id', $cm->instance);
+					}
+					foreach($defn->module_filters as $n => $v) {
+						if ($instance->$n != $v) {
+							$skip = true;
+							break;
+						}
+					}
+				}
+				if (!$skip) {
+					$objectsByCourseModule[ $cm->id ][] = $defn;
+				}
+			}
+                        
+
+
+		}
+
+		return $objectsByCourseModule;
+
 	}
 	
 	function saveToLayoutWithID( $layoutid ) {
@@ -50,10 +113,12 @@ class SloodleLayoutRecipe {
 	}
 
 	function addObjectAtPoint( $name, $cmid = null, $params = null, $x = 0, $y = 0, $z = 0, $rotation = "<0,0,0,0>" ) {
-		$loginzonepoint = SloodleLayoutRowSet::Point( $x, $y, $z, $rotation );
-		if ( $loginzonepoint->addEntryByName( $name, $cmid, $params ) ) {
-			return $this->addRowSet( $loginzonepoint );
-		}
+		$objpoint = SloodleLayoutRowSet::Point( $x, $y, $z, $rotation );
+		if ( $objpoint->addEntryByName( $name, $cmid, $params ) ) {
+			return $this->addRowSet( $objpoint );
+		} else {
+print "add failed";
+}
 		return false;
 	}
 
@@ -75,16 +140,16 @@ class SloodleSimpleLayoutRecipe extends SloodleLayoutRecipe {
 		$rowset = new SloodleLayoutRowSet();	
 
 		$leftrow  = new SloodleLayoutRow();
-		$leftrow->setPosition( $x = -5, $y = 1, $z = 1 );
-		$leftrow->setDimensions( $x = 0, $y = 10, $z = 0 );
-		$leftrow->setSpacing( $x = 0, $y = 1, $z = 0 );
+		$leftrow->setPosition( $x = 1, $y = -5, $z = 1 );
+		$leftrow->setDimensions( $x = 10, $y = 0, $z = 0 );
+		$leftrow->setSpacing( $x = 2, $y = 0, $z = 0 );
 		$leftrow->setDefaultRotation( "<0,0,0,0>" );
 		$rowset->addRow( $leftrow  );
 
 		$rightrow  = new SloodleLayoutRow();
-		$rightrow->setPosition( $x = 5, $y = 1, $z = 1 );
-		$rightrow->setDimensions( $x = 0, $y = 10, $z = 0 );
-		$rightrow->setSpacing( $x = 0, $y = 1, $z = 0 );
+		$rightrow->setPosition( $x = 1, $y = 5, $z = 1 );
+		$rightrow->setDimensions( $x = 10, $y = 0, $z = 0 );
+		$rightrow->setSpacing( $x = 2, $y = 0, $z = 0 );
 		$rightrow->setDefaultRotation( "<0,0,0,0>" );
 		$rowset->addRow( $rightrow  );
 
@@ -96,13 +161,27 @@ class SloodleSimpleLayoutRecipe extends SloodleLayoutRecipe {
 		// eg. If we have one chatroom and two quizzes, we'll get one WebIntercom and two QuizChairs, one for each quiz.
 		$moduleObjects = $this->objectsByCourseModule( 
 			array(
-				'chat' => 'SLOODLE WebIntercom', 
-				'quiz' => 'SLOODLE QuizChair',
+				'SLOODLE WebIntercom', 
+				'SLOODLE QuizChair',
+				'SLOODLE MetaGloss',
+				'SLOODLE Choice (Horizontal)',
+				'SLOODLE Presenter',
+				'SLOODLE Distrutor',
+				'SLOODLE PrimDrop',
 			) 
 		);
 
-		foreach( $moduleObjects as $cmid => $objname ) {
-			$rowset->addEntryByName( $objname, $cmid );
+		foreach( $moduleObjects as $cmid => $objdefns) {
+			foreach($objdefns as $defn) {
+				if (!$defn) {
+					continue;
+				}
+				if (!$defn->primname) {
+					continue;
+				}
+				$objname = $defn->primname; 
+				$rowset->addEntryByName( $objname, $cmid );
+			}
 		}
 
 		$this->addRowSet( $rowset );
@@ -126,7 +205,7 @@ class SloodleLayoutRowSet {
 
 		$row = new SloodleLayoutRow();
 		$row->setPosition( $x, $y, $z );
-		$row->setDimensions( $x = 0, $y = 0, $z = 0 );
+		$row->setDimensions( $x = 1, $y = 1, $z = 1 );
 		$row->setSpacing( $x = 0, $y = 0, $z = 0 );
 		$row->setDefaultRotation( $rotation );
 
@@ -154,14 +233,14 @@ class SloodleLayoutRowSet {
 			return false;
 		}
 		if ($cmid) {
-			$entry->setConfig('sloodlemoduleid', $cmid);
+			$entry->set_config('sloodlemoduleid', $cmid);
 		}
 		if ($params) {
 			foreach($params as $n => $v) {
 				$entry->setConfig( $n, $v );
 			}
 		}
-		$this->addEntry( $entry );	
+		return $this->addEntry( $entry );	
 	}
 
 	// Adds the entry to the next space in the first available row if there's room for it, returns false if there isn't.

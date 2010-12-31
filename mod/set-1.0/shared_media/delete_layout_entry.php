@@ -29,9 +29,17 @@ if (!$layoutentryid) {
 	error_output( 'Layout entry ID missing');
 }
 
+$result = '';
 $layoutentry = new SloodleLayoutEntry();
-if (!$layoutentry->load($layoutentryid)) {
-	error_output( 'Could not load layout entry' );
+if ($layoutentry->load($layoutentryid)) {
+
+	if (!$layoutentry->delete()) {
+		error_output('Layout entry deletion failed');
+	}
+	$result = 'deleted';
+
+} else {
+	$result = 'notfound';
 }
 
 /*
@@ -48,15 +56,12 @@ if ($rezzeruuid) {
 }
 */
 
-if (!$layoutentry->delete()) {
-	error_output('Layout entry deletion failed');
-}
-
 
 
 $content = array(
-	'result' => 'deleted',
-	'layoutentryid' => $layoutentryid
+	'result' => $result,
+	'layoutentryid' => $layoutentryid,
+	'layoutid' => $_REQUEST['layoutid']
 );
 
 $rand = rand(0,10);

@@ -64,6 +64,64 @@
            return $ok;
 	}
 
+	function has_active_objects_rezzed_by_rezzer( $rezzeruuid ) {
+
+		global $CFG;
+		$rezzeruuid = addslashes($rezzeruuid);
+		$layoutid = intval($this->id);
+		$select = "select count(*) as cnt from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_layout_entry le on a.layoutentryid=le.id where a.rezzeruuid='$rezzeruuid' and le.layout=$layoutid";
+		$recs = get_records_sql( $select );
+		if (!$recs) {
+			return false;
+		}
+		$rec = array_pop($recs);
+		$cnt = $rec->cnt;
+		return ( $cnt > 0 );
+
+        }
+
+	function rezzed_active_objects( $rezzeruuid = null ) {
+
+		global $CFG;
+
+		$layoutid = intval($this->id);
+		$select = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_layout_entry le on a.layoutentryid=le.id where le.layout=$layoutid";
+		if ($rezzeruuid) {
+			$rezzeruuid = addslashes($rezzeruuid);
+			$select .= " and rezzeruuid='$rezzeruuid'";
+		}
+		$recs = get_records_sql( $select );
+		if (!$recs) {
+			return false;
+		}
+
+		$aos = array();
+		foreach($recs as $rec) {
+			$ao = new SloodleActiveObject();
+			$ao->loadFromRecord($rec);
+			$aos[] = $ao;
+		}
+	
+		return $aos;
+
+	}
+
+	// return a has of rezzed objects with the layout entry id as the key
+	function rezzed_active_objects_by_layout_entry_id( $rezzeruuid = null ) {
+
+		$aos = $this->rezzed_active_objects( $rezzeruuid );
+		$aohash = array();
+		foreach($aos as $ao) {
+			$leid = $ao->layoutentryid;
+			if (!isset($aohash[ $leid ])) {
+				$aohash[ $leid ] = array();
+			} 
+			$aohash[ $leid ][] = $ao;
+		}
+		return $aohash;
+
+	}
+
         function get_sloodle_course() {
 
             $course = new SloodleCourse();

@@ -11,7 +11,7 @@
     * This will include an http-in channel, it will use to send instructions to the set.
     * 
     * It will allow the user to browse their courses, layouts and objects.
-    * They will then be able to rez layouts by creating AJAX requests which sill 
+    * They will then be able to rez layouts by creating AJAX requests which the server will then pass on to the rezzer object.
     *
     * When used for regular Sloodle, it will have the user login before showing them anything.
     * With Avatar Classroom the user will instead login to the Avatar Classroom site.
@@ -172,7 +172,7 @@
 	print_add_layout_form( $cid );
 	print_html_bottom();
 
-	print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries);
+	print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries, $object_uuid);
 	print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup );
 	print_add_object_forms($courses, $controllers, $courselayouts, $object_configs ); 
 	print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries); 

@@ -67,6 +67,7 @@ $content = array(
 	'objectgroup' => $objectgroup, // TODO: Get this from the object_configs
 	'objectgrouptext' => get_string('objectgroup:'.$objectgroup, 'sloodle'), // TODO: Get this from the object_configs
 	'objectname' => preg_replace('/SLOODLE\s/', '', $objectname),
+	'objectcode' => $layoutentry->objectDefinition()->object_code,
 	'layoutid' => $layoutid,
 	'layoutentryid' => $layoutentry->id
 );
