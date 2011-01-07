@@ -535,13 +535,29 @@
             return SloodleObjectConfig::ForObjectName( $this->name );
 	}
 
-// TODO: Fix this
+        function get_course_module_instance() {
+	    if (!$defn = $this->objectDefinition() ) {
+                return null;
+            }
+            if (!$modtype = $defn->module) {
+                return null;
+            }
+            if (!$sloodlemoduleid = intval($this->get_config('sloodlemoduleid'))){
+                return null;
+            }
+            if (!$cm = get_record('course_modules', 'id', $sloodlemoduleid)) {
+                return null;
+            }
+            if (!$inst = get_record($modtype, 'id', $cm->instance)) {
+	        return null;
+            }
+            return $inst;
+        }
 	function get_course_module_title() {
-return 'TODO';
-            $sloodlemoduleid = $this->get_config('sloodlemoduleid');
-            $defn = $this->objectDefinition();
-            $options = $defn->course_module_options( $this->courseid );
-            return $options[$sloodlemoduleid];
+            if (!$inst = $this->get_course_module_instance()) {
+                return null;
+            }
+            return $inst->name;
 	}
 
     }

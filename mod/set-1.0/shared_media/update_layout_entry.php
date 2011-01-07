@@ -78,10 +78,14 @@ foreach($active_objects as $ao) {
 */
 }
 
+if (!$moduletitle = $layoutentry->get_course_module_title()) {
+	$moduletitle = '';
+}
 
 $content = array(
 	'result' => 'updated',
 	'objectname' => preg_replace('/SLOODLE\s/', '', $layoutentry->name),
+	'moduletitle' => $moduletitle,
 	'layoutid' => $layoutentry->layout,
 	'layoutentryid' => $layoutentry->id
 );

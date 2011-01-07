@@ -62,12 +62,16 @@ if (!$layoutentryid = $layoutentry->insert()) {
 	error_output( 'Layout entry creation failed');
 }
 
+if (!$moduletitle = $layoutentry->get_course_module_title()) {
+	$moduletitle = '';
+}
 $content = array(
 	'result' => 'added',
 	'objectgroup' => $objectgroup, // TODO: Get this from the object_configs
 	'objectgrouptext' => get_string('objectgroup:'.$objectgroup, 'sloodle'), // TODO: Get this from the object_configs
 	'objectname' => preg_replace('/SLOODLE\s/', '', $objectname),
 	'objectcode' => $layoutentry->objectDefinition()->object_code,
+        'moduletitle' => $moduletitle,
 	'layoutid' => $layoutid,
 	'layoutentryid' => $layoutentry->id
 );

@@ -396,7 +396,7 @@
 						thisentry = addedentries[entryi];
 						//$('.layout_container_'+layoutid).each( function() {
 						$('.addobject_layout_'+layoutid+'_'+thisentry['objectcode']).each( function() {
-							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objectcode'], $(this) );
+							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objectcode'], thisentry['moduletitle'], $(this) );
 						});
 					}
 					eventLoop( $('.layout_container_'+layoutid) );
@@ -422,10 +422,11 @@
 				var objectname = json.objectname;
 				var layoutid = json.layoutid;
 				var objectcode = json.objectcode;
+				var moduletitle = json.moduletitle;
 				var layoutentryid = json.layoutentryid;
 				if (result == 'added') {
 					buttonjq.html( buttonjq.attr('data-add-text') );
-					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, frmjq);
+					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, frmjq);
 					eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
 					history.go(-2);
@@ -535,10 +536,10 @@
 				var objectgroup = json.objectgroup;
 				var objectgrouptext = json.objectgrouptext;
 				var layoutentryid = json.layoutentryid;
+				var moduletitle= json.moduletitle;
 				if (result == 'updated') {
-					//alert('updated');
 					buttonjq.html( buttonjq.attr('data-update-text') );
-					//update_layout_div( layoutid, layoutentryid );
+					$('li[data-layoutentryid*="'+layoutentryid+'"]').find('.module_info').html(moduletitle);
 					history.back();
 					//history.go(-2);
 				} else { //if (result == 'failed') {
@@ -551,7 +552,7 @@
 
 	}
 
-	function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, addfrmjq ) {
+	function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, addfrmjq ) {
 
 		regexPtn = '^layout_.+-.+-'+layoutid+'$';
 		var re = new RegExp(regexPtn,"");
@@ -573,7 +574,7 @@
 			}
 
 			// make a list item for the layout screen, and insert it at the bottom of its group.
-			var newItem = '<li id="'+newElementID+'" class="rezzable_item' + actionClass + '"><a href="#configure_'+newElementID+'">'+objectname+'<span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>'
+			var newItem = '<li data-layoutentryid="'+layoutentryid+'" id="'+newElementID+'" class="rezzable_item' + actionClass + '"><a href="#configure_'+newElementID+'">'+objectname+'<span class="module_info">'+moduletitle+'</span>'+'<span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>'
 
 			// If we don't yet have a group to put this item in, create it
 			if ( $(this).children(".after_group_"+objectgroup).size() == 0 ) {
