@@ -58,6 +58,10 @@ foreach($active_objects as $ao) {
 		$layoutentry->position = $matches[1];
 		$layoutentry->rotation = $matches[2];
 		$saved = $layoutentry->update();
+
+		$ao->position = $matches[1];
+		$ao->rotation = $matches[2];
+		$saved = $ao->save();
 	}
 	//$rezzed_object_uuid = $reply['result'];
 }
