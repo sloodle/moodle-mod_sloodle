@@ -44,7 +44,7 @@ if (!$layoutid) {
 $layoutentry = new SloodleLayoutEntry();
 $layoutentry->name = $objectname;
 $layoutentry->layout = $layoutid;
-$layoutentry->position = "<2.0,0.0,1.0>"; // default: behind and above the set where it's easy to see
+$layoutentry->position = "<2.0,0.0,2.0>"; // default: behind and above the set where it's easy to see
 $layoutentry->rotation = "<0.0,0.0,0.0,0.0>";
 
 foreach($configVars as $n=>$v) {
