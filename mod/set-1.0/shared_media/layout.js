@@ -541,7 +541,7 @@
 
 					buttonjq.html( buttonjq.attr('data-cloned-text') ); 
 
-					layoutid = json.courseid;
+					layoutid = json.layoutid;
 					var layoutname = json.layoutname;
 					var courseid = json.courseid;
 
@@ -697,44 +697,44 @@
 		return true;
 	}
 
-	function attach_event_handlers(parentjq) {
-		parentjq.find('.create_layout_button').click(function() {
+	function attach_event_handlers() {
+		$().find('.create_layout_button').unbind('click').click(function() {
 			return create_layout($(this));
 		});
-		parentjq.find('.layout_link').click(function() {
+		$().find('.layout_link').unbind('click').click(function() {
 			return configure_set($(this));
 		});
-		parentjq.find('.rez_all_objects').hide();
-		parentjq.find('.rez_all_objects').click(function() {
+		$().find('.rez_all_objects').hide();
+		$().find('.rez_all_objects').unbind('click').click(function() {
 			start_rez_all($(this).closest('.layout_container'));
 		});
-		parentjq.find('.add_to_layout_button').click(function() {
+		$().find('.add_to_layout_button').unbind('click').click(function() {
 			return add_to_layout($(this));
 		});
-		parentjq.find('.update_layout_entry_button').click(function() {
+		$().find('.update_layout_entry_button').unbind('click').click(function() {
 			return update_layout_configuration($(this));
 		});
-		parentjq.find('.delete_layout_entry_button').click(function() {
+		$().find('.delete_layout_entry_button').unbind('click').click(function() {
 			return delete_layout_configuration($(this));
 		});
-		parentjq.find('.sync_object_positions').click(function() {
+		$().find('.sync_object_positions').unbind('click').click(function() {
 			start_sync_all( $(this).closest('.layout_container') );
 		});
-		parentjq.find('.delete_layout_button').click(function() {
+		$().find('.delete_layout_button').unbind('click').click(function() {
 			return delete_layout( $(this) );
 		});
-		parentjq.find('.clone_layout_button').click(function() {
+		$().find('.clone_layout_button').unbind('click').click(function() {
 			return clone_layout( $(this) );
 		});
-		parentjq.find('.generate_standard_layout').click(function() {
+		$().find('.generate_standard_layout').unbind('click').click(function() {
 			return generate_standard_layout( $(this) );
 		});
-		parentjq.find('.layout_container').each(function() {
+		$().find('.layout_container').each(function() {
 			update_buttons($(this));
 			update_labels($(this));
 		});
 	}
 
 	$(document).ready(function () {
-		attach_event_handlers($());
+		attach_event_handlers();
 	});
