@@ -147,12 +147,15 @@
 	}
 
 	function update_buttons(parentjq) {
-		// If there are no objects rezzed, show the generated button
+		// If there are no objects to rez, show the generated button
 		if ( parentjq.children('.rezzable_item').length == 0 ) {
 			parentjq.children('.generate_standard_layout').show();
 			parentjq.children('.set_configuration_status').hide();
 			parentjq.children('.rez_all_objects').hide();
 			parentjq.children('.sync_object_positions').hide();
+
+			// allow layout deletion
+			parentjq.children('.delete_layout_button').show();
 		} else {
 			parentjq.children('.generate_standard_layout').hide(); // can't generate a layout if we already have entries
 			if (parentjq.attr('data-connection-status') == 'connected') {
@@ -167,6 +170,9 @@
 					});
 					parentjq.children('.rez_all_objects').show();
 
+					// allow layout deletion
+					parentjq.children('.delete_layout_button').show();
+
 				} else if (parentjq.attr('data-action-status') == 'syncing') {
 					parentjq.children('.sync_object_positions').show();
 
@@ -177,6 +183,8 @@
 					});
 					parentjq.children('.rez_all_objects').show();
 
+					// allow layout deletion
+					parentjq.children('.delete_layout_button').hide();
 
 				} else {
 					parentjq.children('.sync_object_positions').hide();
@@ -188,12 +196,15 @@
 					});
 					parentjq.children('.rez_all_objects').show();
 
+					// allow layout deletion
+					parentjq.children('.delete_layout_button').show();
 
 				}
 			} else {
 				parentjq.children('.rez_all_objects').hide();
 				parentjq.children('.set_configuration_status').show();
 				parentjq.children('.sync_object_positions').hide();
+				parentjq.children('.delete_layout_button').show();
 			}
 		}
 	}
@@ -267,7 +278,7 @@
 						itemjq.remove(); // TODO: Remove the config form too
 					}
 				} else if (result == 'failed') {
-					itemjq.removeClass('rezzing').addClass('derezzing_failed');;
+					itemjq.removeClass('derezzing').addClass('derezzing_failed');;
 				}
 				if (pendingRequests[""+entryid]) {
 					delete pendingRequests[""+entryid];
@@ -281,6 +292,7 @@
 
 	function start_derez_all(parentjq) {
 		parentjq.attr('data-action-status', 'derezzing');
+		parentjq.attr('data-rez-mode', 'derezzed');
 
 		parentjq.children('li.rezzed').addClass( 'waiting_to_derez' );
 		parentjq.children('li.waiting_to_derez').removeClass('rezzed');
@@ -294,6 +306,8 @@
 
 	function start_rez_all(parentjq) {
 		parentjq.attr('data-action-status', 'rezzing');
+		parentjq.attr('data-rez-mode', 'rezzed');
+
 		parentjq.children('li.derezzed').removeClass('derezzed');
 		parentjq.children('li.rezzable_item').not('li.rezzed').addClass( 'waiting_to_rez' );
 		parentjq.children('.rez_all_objects').html('Stop rezzing objects');
@@ -334,7 +348,7 @@
 	function create_layout( buttonjq ) {
 
 		var frmjq = buttonjq.closest("form");
-		buttonjq.html( buttonjq.attr('data-adding-text') );
+		buttonjq.html( buttonjq.attr('data-creating-text') );
 		$.getJSON(  
 			"add_layout.php",  
 			frmjq.serialize(),
@@ -345,7 +359,7 @@
 				var layoutname = json.layoutname;
 				if (result == 'added') {
 					//alert('added');
-					buttonjq.html( buttonjq.attr('data-add-text') );
+					buttonjq.html( buttonjq.attr('data-create-text') );
 					insert_layout_into_course_divs( layoutid, courseid, layoutname, frmjq);
 
 					$('#add_layout_lists_above_me').before(json.add_layout_lists);
@@ -360,7 +374,7 @@
 					history.go(-1);
 				} else if (result == 'failed') {
 					//alert('Adding layout entry failed');
-					buttonjq.html( buttonjq.attr('data-add-text') );
+					buttonjq.html( buttonjq.attr('data-create-text') );
 				}
 			}  
 		);  
@@ -484,24 +498,26 @@
 	}
 
 	// NB This just removes the layout from the server and marks it for deletion.
-	// If rezzed, we'll derez the objects seperately, and only remove the layout from view when they're done
+	// If rezzed, we'll derez the objects separately, and only remove the layout from view when they're done
 	function delete_layout( buttonjq ) {
 
 		buttonjq.html( buttonjq.attr('data-deleting-text') );
-		getJSON(  
+		var layoutid = buttonjq.attr('data-layoutid');
+		$.getJSON(  
 			"delete_layout.php",  
 			{
-				layoutid: buttonjq.attr('data-layoutid')
+				layoutid: layoutid
 			},
 			function(json) {  
 				var result = json.result;
 				if (result == 'deleted') {
 					//alert('deleted');
+					$('[data-layout-link-li-id*="'+layoutid+'"]').remove();
 					buttonjq.html( buttonjq.attr('data-deleted-text') ); 
-					alert('TODO: Object derezzing, removal from screens');
 					history.back();
 				} else { //if (result == 'failed') 
-					alert('Deleting layout entry failed');
+					// For now we'll just live with the failure - it's probably that it's already gone
+					//alert('Deleting layout entry failed');
 					buttonjq.html( buttonjq.attr('data-delete-text') );
 				} 
 			}  
@@ -509,6 +525,51 @@
 		return false;
 
 	}
+
+	function clone_layout( buttonjq ) {
+
+		buttonjq.html( buttonjq.attr('data-cloning-text') );
+		var layoutid = buttonjq.attr('data-layoutid');
+		$.getJSON(  
+			"clone_layout.php",  
+			{
+				layoutid: layoutid
+			},
+			function(json) {  
+				var result = json.result;
+				if (result == 'cloned') {
+
+					buttonjq.html( buttonjq.attr('data-cloned-text') ); 
+
+					layoutid = json.courseid;
+					var layoutname = json.layoutname;
+					var courseid = json.courseid;
+
+					insert_layout_into_course_divs( layoutid, courseid, layoutname, null);
+
+					$('#add_layout_lists_above_me').before(json.add_layout_lists);
+					$('#add_edit_object_forms_above_me').before(json.edit_object_forms);
+					$('#add_add_object_forms_above_me').before(json.add_object_forms);
+					$('#add_add_object_groups_above_me').before(json.add_object_groups);
+
+					attach_event_handlers();
+
+					//eventLoop( $('.layout_container_'+layoutid) );
+					//history.back();
+					history.go(-1);
+
+				} else { //if (result == 'failed') 
+					// For now we'll just live with the failure - it's probably that it's already gone
+					alert('Cloning layout entry failed');
+					buttonjq.html( buttonjq.attr('data-clone-text') );
+				} 
+			}  
+		);  
+		return false;
+
+	}
+
+
 
 	function update_layout_position( buttonjq ) {
 
@@ -543,7 +604,7 @@
 					history.back();
 					//history.go(-2);
 				} else { //if (result == 'failed') {
-					alert('Adding layout entry failed');
+					alert('Updating layout entry failed');
 					buttonjq.html( buttonjq.attr('data-update-text') );
 				} 
 			}  
@@ -562,9 +623,9 @@
 			// make an id for the new element	
 			var newElementID = $(this).attr('id').replace('layout_','layoutentryid_')+'-'+layoutentryid;
 
-			var actionStatus = $(this).attr('data-action-status');
+			var rezMode = $(this).attr('data-rez-mode');
 			var actionClass = '';
-			if ( (actionStatus == 'rezzed') || (actionStatus == 'rezzing') ) {
+			if (rezMode == 'rezzed') {
 				actionClass =' waiting_to_rez';
 			}
 
@@ -636,41 +697,44 @@
 		return true;
 	}
 
-	function attach_event_handlers() {
-		$('.create_layout_button').click(function() {
+	function attach_event_handlers(parentjq) {
+		parentjq.find('.create_layout_button').click(function() {
 			return create_layout($(this));
 		});
-		$('.layout_link').click(function() {
+		parentjq.find('.layout_link').click(function() {
 			return configure_set($(this));
 		});
-		$('.rez_all_objects').hide();
-		$('.rez_all_objects').click(function() {
+		parentjq.find('.rez_all_objects').hide();
+		parentjq.find('.rez_all_objects').click(function() {
 			start_rez_all($(this).closest('.layout_container'));
 		});
-		$('.add_to_layout_button').click(function() {
+		parentjq.find('.add_to_layout_button').click(function() {
 			return add_to_layout($(this));
 		});
-		$('.update_layout_entry_button').click(function() {
+		parentjq.find('.update_layout_entry_button').click(function() {
 			return update_layout_configuration($(this));
 		});
-		$('.delete_layout_entry_button').click(function() {
+		parentjq.find('.delete_layout_entry_button').click(function() {
 			return delete_layout_configuration($(this));
 		});
-		$('.sync_object_positions').click(function() {
+		parentjq.find('.sync_object_positions').click(function() {
 			start_sync_all( $(this).closest('.layout_container') );
 		});
-		$('.delete_layout_button').click(function() {
+		parentjq.find('.delete_layout_button').click(function() {
 			return delete_layout( $(this) );
 		});
-		$('.generate_standard_layout').click(function() {
+		parentjq.find('.clone_layout_button').click(function() {
+			return clone_layout( $(this) );
+		});
+		parentjq.find('.generate_standard_layout').click(function() {
 			return generate_standard_layout( $(this) );
 		});
-		$('.layout_container').each(function() {
+		parentjq.find('.layout_container').each(function() {
 			update_buttons($(this));
 			update_labels($(this));
 		});
 	}
 
 	$(document).ready(function () {
-		attach_event_handlers();
+		attach_event_handlers($());
 	});

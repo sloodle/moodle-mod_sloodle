@@ -81,7 +81,7 @@ if (!$layoutid = $layout->insert()) {
 
         include(SLOODLE_LIBROOT.'/object_configs.php');
         $object_configs = SloodleObjectConfig::AllAvailableAsArray();
-
+        $objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();
 
         // Construct the list of course names
         $coursenames = array();

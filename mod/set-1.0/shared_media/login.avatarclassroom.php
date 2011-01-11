@@ -14,7 +14,7 @@ if (!$USER || !$USER->id) {
 			header('Location: index.php?'.$_SERVER['QUERY_STRING']);
 		}
 	}
-	header('Location: '.'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?'.$_SERVER['QUERY_STRING']);
+	header('Location: '.'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?'.$_SERVER['QUERY_STRING'].'&bounced');
 	exit;
 
 }

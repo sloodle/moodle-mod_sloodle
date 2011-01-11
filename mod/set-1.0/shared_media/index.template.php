@@ -124,7 +124,7 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 			$layouts = $courselayouts[ $cid ];
 			foreach($layouts as $layout) {
 ?>
-        <li><a class="layout_link" href="#layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities($layout->name) ?></a></li>
+        <li data-layout-link-li-id="<?= intval($layout->id) ?>" ><a class="layout_link" href="#layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities($layout->name) ?></a></li>
 <?php
 			}
 ?>
@@ -139,9 +139,11 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 }
 
 
-function print_add_layout_form( $cid ) {
+function print_add_layout_forms( $courses ) {
+	foreach($courses as $course) {
+		$cid = $course->id;
 ?>
-    <form id="addlayout_<?= intval($cid)?>" class="panel" title="Add a Scene">
+    <form id="addlayout_<?= intval($cid)?>" class="panel" title="Add a Scene to <?= htmlentities($course->fullname) ?>">
 	<input type="hidden" name="courseid" value="<?= intval($cid)?>" />
 	<fieldset>
 	<div class="row" >
@@ -149,9 +151,10 @@ function print_add_layout_form( $cid ) {
 		<input id="layoutname" name="layoutname" class="panel" style="width:80%; height:40px; margin:10px;">
 	</div>
 	</fieldset>
-	<span class="active_button create_layout_button" type="submit" href="#">Create Scene</span>
+	<span data-creating-text="Creating Scene" data-created-text="Create Scene" class="active_button create_layout_button" type="submit" href="#">Create Scene</span>
     </form>
 <?php
+	}
 }
 
 function print_html_bottom() {
@@ -179,12 +182,12 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				$rezzed_entries = $layout->rezzed_active_objects_by_layout_entry_id( $rezzeruuid );
 
 ?>
-			    <ul class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>" data-action-status="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-rezzer-connection-status="disconnected">
+			    <ul class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>" data-rez-mode="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-action-status="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-connection-status="disconnected">
 				<li class="group"><?= htmlentities( $layout->name ) ?></li>
 				<span id="set_configuration_status_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="button_goes_here_zone set_configuration_status"><?=get_string('layoutmanager:connectingtorezzer','sloodle') ?></span>
 				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button rez_all_objects">Rez All Objects</span>
 
-				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout">Use The Recommended Objects For <?=htmlentities( $cn ) ?></span>
+				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-generate-text="Use The Recommended Objects For <?=htmlentities( $cn ) ?>" data-generating-text="Adding The Recommended Objects" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout">Use The Recommended Objects For <?=htmlentities( $cn ) ?></span>
 <?php
 				foreach($entriesbygroup as $group => $entries) {
 ?>
@@ -223,9 +226,9 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 
 				<span class="active_button sync_object_positions" style="width:98%" type="submit" href="#clonelayout">Save current positions</span>
 				<br />
-				<span class="active_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="Deleted, derezzing objects" data-delete-text="Delete Layout" data-deleting-text="Deleting Layout" style="float:right; width:40%" type="submit">Delete this layout</span>
-				<span class="active_button" style="width:40%" type="submit" >Clone this layout (TODO)</span>
-				<span class="active_button" style="width:40%" type="submit" >Edit this layout (TODO)</span>
+				<span class="active_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="Deleted, derezzing objects" data-delete-text="Delete this Scene" data-deleting-text="Deleting Scene" style="float:right; width:40%" type="submit">Delete this scene</span>
+				<span class="active_button clone_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-cloned-text="Clone this scene" data-cloning-text="Cloning scene" data-clone-text="Clone this scene" style="width:40%" type="submit" >Clone this scene</span>
+				<span class="active_button rename_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-renamed-text="Rename this scene" data-rename-text="Rename scene" data-renaming-text="Renaming Scene" class="active_button" style="width:40%" type="submit" >Rename this scene (TODO)</span>
 
 			    </ul>
 
@@ -389,7 +392,7 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
 function print_config_form( $e, $config, $cid, $contid, $lid, $group ) {
 
 						$lconfig = $e->get_layout_entry_configs_as_name_value_hash();
-						$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
+						$entryname = preg_replace('/SLOODLE\s/', '', $e->name);
 						$object_title = $entryname;
 
 ?>

@@ -169,7 +169,7 @@
 
 	print_controller_list( $courses, $controllers, $hasSites = false); 
 	print_layout_list( $courses, $controllers, $courselayouts );
-	print_add_layout_form( $cid );
+	print_add_layout_forms( $courses );
 	print_html_bottom();
 
 	print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries, $object_uuid);
