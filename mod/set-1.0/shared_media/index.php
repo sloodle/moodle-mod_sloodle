@@ -133,6 +133,7 @@
 			continue;
 		}
 		$moodle_course = $sloodle_course->get_course_object();
+		$sloodle_course->ensure_at_least_one_layout('Scene ');
 		$layouts = $sloodle_course->get_layouts();
 		foreach($layouts as $l) {
 			$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);

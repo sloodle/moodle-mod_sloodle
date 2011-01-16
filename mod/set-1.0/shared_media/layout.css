@@ -59,3 +59,7 @@ span.module_info {
     font-style: italic;
     color: grey;
 }
+
+input.rename_layout_input {
+  border: 1px solid black; font-size:28px;
+}

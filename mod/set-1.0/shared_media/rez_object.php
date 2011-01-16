@@ -16,6 +16,10 @@ require_once(SLOODLE_LIBROOT.'/layout_profile.php');
 require_once(SLOODLE_LIBROOT.'/active_object.php');
 require_once(SLOODLE_LIBROOT.'/user.php');
 
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+
+
 require_once(SLOODLE_LIBROOT.'/object_configs.php');
 $object_configs = SloodleObjectConfig::AllAvailableAsArray();
 
@@ -92,6 +96,7 @@ if (!$controller->configure_object_from_layout_entry($authid, $layoutentryid, $r
 }
 
 $result = 'rezzed';
+$error = '';
 
 $content = array(
 	'result' => $result,

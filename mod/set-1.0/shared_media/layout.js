@@ -517,12 +517,49 @@
 					history.back();
 				} else { //if (result == 'failed') 
 					// For now we'll just live with the failure - it's probably that it's already gone
-					//alert('Deleting layout entry failed');
+					alert('Deleting layout entry failed');
 					buttonjq.html( buttonjq.attr('data-delete-text') );
 				} 
 			}  
 		);  
 		return false;
+
+	}
+
+	function rename_layout( spanjq ) {
+
+		var inputjq = spanjq.find('.rename_layout_input');
+		var newname = inputjq.val();
+		var layoutid = inputjq.attr('data-rename-input-layoutid');
+
+		$.getJSON(
+			"rename_layout.php",
+			{
+				layoutid: layoutid,
+				layoutname: newname
+			},
+			function(json) {
+				if (json.result == 'renamed') {
+                                        var orig_title = $('.layout_container_'+layoutid).attr('title');
+                                        $('li[data-layout-link-li-id*="'+layoutid+'"]').find('.layout_link').html(newname);
+                                        $('.layout_container_'+layoutid).attr('title', newname);
+                                        $('.layout_container_'+layoutid).find('.group:first').html(newname);
+
+					// The page title is managed by IUI. 
+					// It may have changed while we were waiting for a response, in which case we leave it alone.
+					// It'll be fixed next time we click on it.
+					if ( $('h1#pageTitle').html() == orig_title ) {
+						$('h1#pageTitle').html(newname);
+					}
+
+					spanjq.find('.rename_label').show();
+					spanjq.find('.rename_input').hide();
+
+				} else {
+					alert('Rename failed');
+				}
+			}
+		);
 
 	}
 
@@ -658,13 +695,13 @@
 			// We keep a button hidden on the add form to use for deletion when it turns into an edit form
 			editFrm.children('.delete_layout_entry_button').removeClass('hiddenButton');
 			// Seems like the original click handler doesn't get created initially - maybe because it's hidden?
-			editFrm.children('.delete_layout_entry_button').click(function() {
+			editFrm.children('.delete_layout_entry_button').unbind('click').click(function() {
 				return delete_layout_configuration($(this));
 			});
 
 			$('#add_configuration_above_me_'+$(this).attr('id')).before(editFrm);
 
-			editFrm.click(function() {
+			editFrm.unbind('click').click(function() {
 				return update_layout_configuration($(this));
 			});
 
@@ -737,4 +774,23 @@
 
 	$(document).ready(function () {
 		attach_event_handlers();
+		$('.rename_layout_button').find('.rename_input').hide();
+
+		//$('.rename_layout_button').children('.rename_label').click( function() {
+		/*
+		$('.rename_layout_button').click( function() {
+			$(this).find('.rename_label').hide();
+			$(this).find('.rename_layout_input').show();
+		});
+		*/
+		$('.rename_layout_button').each( function(){
+			var btn = $(this);
+			$(this).children('.rename_label').click( function() {
+				$(this).hide();
+				btn.find('.rename_input_save_button').click( function() {
+					rename_layout( btn );
+				});
+				btn.find('.rename_input').show();
+			});
+		});
 	});

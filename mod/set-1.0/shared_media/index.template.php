@@ -228,7 +228,8 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				<br />
 				<span class="active_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="Deleted, derezzing objects" data-delete-text="Delete this Scene" data-deleting-text="Deleting Scene" style="float:right; width:40%" type="submit">Delete this scene</span>
 				<span class="active_button clone_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-cloned-text="Clone this scene" data-cloning-text="Cloning scene" data-clone-text="Clone this scene" style="width:40%" type="submit" >Clone this scene</span>
-				<span class="active_button rename_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-renamed-text="Rename this scene" data-rename-text="Rename scene" data-renaming-text="Renaming Scene" class="active_button" style="width:40%" type="submit" >Rename this scene (TODO)</span>
+					
+				<span class="active_button rename_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-renamed-text="Rename this scene" data-rename-text="Rename scene" data-renaming-text="Renaming Scene" class="active_button" style="width:40%" type="submit" ><span class="rename_label">Rename this scene</span> <span class="rename_input"><input class="rename_layout_input" data-rename-input-layoutid="<?= intval($layout->id) ?>" value="<?= htmlentities( $layout->name ) ?>" /> <span class="rename_input_save_button">Rename</span></span></span>
 
 			    </ul>
 

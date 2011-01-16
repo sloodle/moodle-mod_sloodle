@@ -39,7 +39,7 @@ if (!$courseid = $layout->course) {
 	error_output('Could not get courseid from layout');
 }
 
-$layoutname = $layout->name.date('Y-m-d H:i:s');
+$layoutname = $layout->name.' Copied '.date('Y-m-d H:i:s');
 if (!$cloneid = $layout->save_clone( $layoutname )) {
 	error_output('Could not clone layout');
 }
