@@ -166,7 +166,7 @@ class SloodleSimpleLayoutRecipe extends SloodleLayoutRecipe {
 				'SLOODLE MetaGloss',
 				'SLOODLE Choice (Horizontal)',
 				'SLOODLE Presenter',
-				'SLOODLE Distrutor',
+				'SLOODLE Vending Machine',
 				'SLOODLE PrimDrop',
 			) 
 		);
