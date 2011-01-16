@@ -726,6 +726,26 @@
 
         }
 
+        // Make sure the course has at least one layout, creating one if necessary using the prefix $nameprefix
+        // Returns true on success, false on failure
+	function ensure_at_least_one_layout($nameprefix) {
+
+            if ( count($this->get_layouts()) > 0 ) {
+                return true;
+            }
+
+            if (!$layoutname = SloodleLayout::UniqueName($nameprefix)) {
+                return false;
+            }
+
+            $l = new SloodleLayout();
+            $l->name = $layoutname;
+            $l->course = $this->course_object->id;
+            return $l->insert();
+
+
+	}
+
         /**
         * Checks whether or not the CURRENTLY LOGGED-IN user can authorise objects on this course.
         * @return bool True if the user has object authorisation permission, or false otherwise.
