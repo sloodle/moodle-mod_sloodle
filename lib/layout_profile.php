@@ -5,17 +5,18 @@
     * This file defines structures for managing Sloodle layout profiles.
     *
     * @package sloodle
-    * @copyright Copyright (c) 2008 Sloodle (various contributors)
+    * @copyright Copyright (c) 2007-2010 various contributors
     * @license http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
     *
     * @contributor Peter R. Bloomfield
+    * @contributor Edmund Edgar
     */
     
     class SloodleLayout
     {
         var $name;
         var $id;
-        var $courseid;
+        var $course; // NB This is an ID of the course, not an object representing the course
 
         var $entries = array();
         var $originalentries = array();
@@ -29,13 +30,26 @@
 
         }
 
+	// return a name for the layout, numbering based on the prefix
+	function UniqueName($prefix) {
+
+    	    for ($i=1; $i<100000; $i++) {
+                 $candidate = $prefix.$i;
+                 if (!$rec = get_record('sloodle_layout','name',$candidate)) {
+                     return $candidate;
+                 }
+	    }
+            return false;
+	
+	}
+
         function load_from_row($r) {
 
             if (!$r) return null;
 
             $this->name = $r->name;
             $this->id = $r->id;
-            $this->courseid = $r->course;
+            $this->course = $r->course;
 
             $this->originalentries = $this->get_entries($store = false);
 
@@ -125,7 +139,7 @@
         function get_sloodle_course() {
 
             $course = new SloodleCourse();
-            if ($course->load($this->courseid)) {
+            if ($course->load($this->course)) {
                 return $course;
             }
             return null;
@@ -134,7 +148,7 @@
 
         function get_course() {
 
-            return get_record('course','id',$this->courseid);
+            return get_record('course','id',$this->course);
 
         }
 
@@ -200,6 +214,25 @@
             $this->entries = array();
             $this->save_entries();
 
+	}
+
+	function save_clone( $name ) {
+
+            $clone = new SloodleLayout();
+            $clone->name = $name;
+            $clone->course = $this->course;
+            if (!$cloneid = insert_record('sloodle_layout', $clone)) {
+                return false;
+            }
+            $clone->entries = array();
+            foreach($this->entries as $entry) {
+	        $cloneentry =  ( version_compare(phpversion(), '5.0') ) ? clone($entry) : $entry;
+                $cloneentry->id = null; 
+                $clone->entries[] = $cloneentry;
+            }
+            $clone->save_entries();
+            return $cloneid; 
+	
 	}
 
         function save_entries() {
