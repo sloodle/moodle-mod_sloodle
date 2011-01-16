@@ -62,6 +62,7 @@
 
         /**
         * The httpin for this object
+	* For SL, this will look like: http://sim5395.agni.lindenlab.com:12046/cap/e93d6ad8-b75d-83ff-dac2-979ec82633a1
         * @var string
         * @access public
         */
@@ -98,20 +99,45 @@
         var $response = null;
 
 
+
+	// The following functions are used to allow the Moodle server to connect to an OpenSim server through a tunnel or proxy.
+
+	// For example, if your Moodle server is on the public internet, but your OpenSim server is behind a firewall...
+	// ...your Moodle server will not usually be able to send HTTP-In messages to your OpenSim server.
+
+	// You can work around this with a reverse SSH tunnel from your OpenSim server to your Moodle server...
+	// ...so your Moodle server will send messages to a local port
+	// ...which will then be forwarded through your SSH tunnel to your OpenSim server.
+
+	// For now, we'll turn this on by define()ing a constant in sl_config. 
+	// Ultimately, we may want to make this configurable for a particular controller or rezzer
+	// ...as you may need different values for different OpenSim servers.
+	function httpProxyURL() {
+		if ( defined( SLOODLE_HTTP_IN_PROXY_OR_TUNNEL ) ) {
+			return SLOODLE_HTTP_IN_PROXY_OR_TUNNEL;
+		}
+		return null;
+	}
+
         //sends a curl message to our objects httpinurl
         public function sendMessage($msg){
                 $ch = curl_init();    // initialize curl handle
-                curl_setopt($ch, CURLOPT_URL,$this->httpinurl); // set url to post to
+                curl_setopt($ch, CURLOPT_URL, $this->httpinurl ); // set url to post to
                 curl_setopt($ch, CURLOPT_FAILONERROR,0);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
                 curl_setopt($ch, CURLOPT_TIMEOUT, 10); // times out after 4s
                 curl_setopt($ch, CURLOPT_POST, 1); // set POST method
                 curl_setopt($ch, CURLOPT_POSTFIELDS,$msg); // add POST fields
+		if ($proxy = $this->httpProxyURL()) {
+			curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
+			curl_setopt($ch, CURLOPT_PROXY, $this->httpProxyURL() ); 
+		}
+
                 $result = curl_exec($ch); // run the whole process
                 $info = curl_getinfo($ch);
                 curl_close($ch);
                 return array('info'=>$info,'result'=>$result);
-            }
+	}
 
 	// Sends a message to the object telling it to derez itself.
 	// Deletes the active_object record if successful.
@@ -186,18 +212,6 @@
             // Output each setting
             foreach ($settings as $s) {
                 $response->add_data_line(array('set:'.$s->name, $s->value));
-	/*
-                if ($s->name == 'sloodlelayoutentryid') {
-                    $layoutentryid = $s->value;
-                    //get position and rotation
-                    $layoutentry = get_record('sloodle_layout_entry','id',$layoutentryid);
-                    //   sloodle_layout_entry id,layout,name,position,rotation
-                    if ($layoutentry){
-			$rezzeruuid = ( isset( $extraParameters['sloodlerezzeruuid'] ) ? $extraParameters['sloodlerezzeruuid'] : '' );
-			$response->add_data_line("set:position|{$layoutentry->position}|{$layoutentry->rotation}|$rezzeruuid");
-                    } //endif
-                }//endif
-	*/
             }//end foreach
             foreach( $extraParameters as $n => $v) {
                 $response->add_data_line( 'set:'.$n.'|'.$v );
@@ -218,6 +232,7 @@
 	// NB If you need to get rid of the record from world as well, use deRez(). 
 	// deRez will call this function in turn.
 	public function delete() {
+
  	    if (!$this->id) {
 	        return false;
 	    } 
@@ -273,7 +288,6 @@
            return $success;
         }//end function
 
-
         // Load data for the specified id
         // Return true on success, false on fail
         public function load( $id) {
@@ -289,7 +303,6 @@
 
         }
 
-
         // Load data for the specified UUID
         // Return true on success, false on fail
         public function loadByUUID( $uuid ) {
@@ -304,6 +317,7 @@
             return false;
 
         }
+
         public function loadFromRecord($rec) {
            $this->id = $rec->id;
            $this->controllerid = $rec->controllerid;
