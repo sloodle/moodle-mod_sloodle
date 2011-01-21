@@ -134,7 +134,7 @@ if (!$layoutid = $layout->insert()) {
 	$add_object_forms = ob_get_clean();
 
 	ob_start();
-        print_edit_object_forms($courses, $controllers, $courselayouts, $layoutentries);
+        print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries);
 	$edit_object_forms = ob_get_clean();
 
 $content = array(

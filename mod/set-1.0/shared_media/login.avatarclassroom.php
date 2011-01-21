@@ -12,6 +12,7 @@ if (!$USER || !$USER->id) {
 			add_to_log(SITEID, 'user', 'login', "", $user->id, 0, $user->id);
 			$USER = complete_user_login($user);
 			header('Location: index.php?'.$_SERVER['QUERY_STRING']);
+			exit;
 		}
 	}
 	header('Location: '.'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?'.$_SERVER['QUERY_STRING'].'&bounced');

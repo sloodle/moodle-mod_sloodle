@@ -32,7 +32,7 @@ $layout = new SloodleLayout();
 if (!$layout->load($layoutid)) {
 	error_output( 'Could not load layout');
 }
-if (!$layoutid = $layout->delete()) {
+if (!$deleted = $layout->delete()) {
 	error_output( 'Layout deletion failed');
 }
 

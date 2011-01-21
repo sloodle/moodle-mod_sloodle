@@ -13,6 +13,10 @@ require_once(SLOODLE_LIBROOT.'/user.php');
 
 require_once '../../../lib/json/json_encoding.inc.php';
 
+
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+
         // TODO: What should this be? Probably not 1...
         $course_context = get_context_instance( CONTEXT_COURSE, 1);
         $can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
@@ -118,8 +122,8 @@ $layoutid = $cloneid;
 			foreach($entries as $e) {
 				$objectname = $e->name;
 				$grp = 'other';
-				if (isset($object_configs[$objectname]['group'])) {
-					$grp = $object_configs[$objectname]['group'];
+				if (isset($object_configs[$objectname]->group)) {
+					$grp = $object_configs[$objectname]->group;
 				}
 				if (!isset($entriesbygroup[ $grp ] )) {
 					$entriesbygroup[ $grp ] = array();
@@ -132,11 +136,10 @@ $layoutid = $cloneid;
                 $coursenames[$cid] = $moodle_course->fullname;
         }
 
-
 	include('index.template.php');
 
 	ob_start();
-        print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries);
+        print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries, null);
 	$add_layout_lists = ob_get_clean();
 
 	ob_start();
@@ -148,7 +151,7 @@ $layoutid = $cloneid;
 	$add_object_forms = ob_get_clean();
 
 	ob_start();
-        print_edit_object_forms($courses, $controllers, $courselayouts, $layoutentries);
+        print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries);
 	$edit_object_forms = ob_get_clean();
 
 $content = array(

@@ -171,7 +171,7 @@
 					parentjq.children('.rez_all_objects').show();
 
 					// allow layout deletion
-					parentjq.children('.delete_layout_button').show();
+					parentjq.children('.delete_layout_button').hide();
 
 				} else if (parentjq.attr('data-action-status') == 'syncing') {
 					parentjq.children('.sync_object_positions').show();
@@ -385,7 +385,7 @@
 	function insert_layout_into_course_divs( layoutid, courseid, layoutname, frmjq ) {
 		$('.controllercourselayouts_'+courseid).each( function() {
 			var newformid = $(this).attr('data-id-prefix') + layoutid;
-			var newli = '<li><a class="layout_link" href="#' + newformid + '">'+layoutname+'</a></li>';
+			var newli = '<li data-layout-link-li-id="'+layoutid+'"><a class="layout_link" href="#' + newformid + '">'+layoutname+'</a></li>';
 			$(this).children('.add_layout_above_me').before( newli );
 		});
 	}
@@ -770,10 +770,7 @@
 			update_buttons($(this));
 			update_labels($(this));
 		});
-	}
 
-	$(document).ready(function () {
-		attach_event_handlers();
 		$('.rename_layout_button').find('.rename_input').hide();
 
 		//$('.rename_layout_button').children('.rename_label').click( function() {
@@ -785,12 +782,16 @@
 		*/
 		$('.rename_layout_button').each( function(){
 			var btn = $(this);
-			$(this).children('.rename_label').click( function() {
+			$(this).children('.rename_label').unbind('click').click( function() {
 				$(this).hide();
-				btn.find('.rename_input_save_button').click( function() {
+				btn.find('.rename_input_save_button').unbind('click').click( function() {
 					rename_layout( btn );
 				});
 				btn.find('.rename_input').show();
 			});
 		});
+	}
+
+	$(document).ready(function () {
+		attach_event_handlers();
 	});
