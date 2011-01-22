@@ -215,7 +215,8 @@
 			{
 				layoutentryid: entryid,
 				rezzeruuid: rezzer_uuid,
-				controllerid: controllerid
+				controllerid: controllerid,
+				ts: new Date().getTime()
 			},  
 			function(json) {  
 				var result = json.result;
@@ -794,4 +795,5 @@
 
 	$(document).ready(function () {
 		attach_event_handlers();
+		iui.animOn = true;
 	});

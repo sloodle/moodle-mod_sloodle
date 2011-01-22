@@ -244,6 +244,7 @@ addEventListener("click", function(event)
 
 addEventListener("click", function(event)
 {
+alert('clicked');
 	var div = findParent(event.target, "div");
 	if (div && hasClass(div, "toggle"))
 	{

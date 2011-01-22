@@ -63,3 +63,6 @@ span.module_info {
 input.rename_layout_input {
   border: 1px solid black; font-size:28px;
 }
+
+.logininput { border: 1px solid black; font-size:28px;}
+

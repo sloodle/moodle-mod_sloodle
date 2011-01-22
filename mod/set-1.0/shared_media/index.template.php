@@ -9,15 +9,14 @@ function print_html_top($loadfrom = '') {
 <head>
 <title>Avatar Classroom Setup</title>
 <link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
-<style type="text/css" media="screen">@import "iui/iui.css";</style>
-<style type="text/css" media="screen">@import "layout.css";</style>
-<script type="application/x-javascript" src="iui/iui_avatarclassroom.js"></script>
+<style type="text/css" media="screen">@import "<?=$loadfrom?>iui/iui_avatarclassroom.css";</style>
+<style type="text/css" media="screen">@import "<?=$loadfrom?>layout.css";</style>
+<script type="application/x-javascript" src="<?=$loadfrom?>iui/iui_avatarclassroom.js"></script>
 <script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
 <script type="application/x-javascript" src="layout.js"></script>
 <!--
 -->
 <script type="text/javascript">
-	iui.animOn = true;
 	var rezzer_uuid = '<?= htmlentities($_REQUEST['sloodleobjuuid']) ?>';
 </script>
 </head>

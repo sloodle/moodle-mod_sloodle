@@ -6,7 +6,7 @@
 
 (function() {
 
-var slideSpeed = 20;
+var slideSpeed = 2;
 var slideInterval = 0;
 
 var currentPage = null;
@@ -54,7 +54,7 @@ window.iui =
 
 	showPageById: function(pageId)
 	{
-		var page = $(pageId);
+		var page = iui_gid(pageId);
 		if (page)
 		{
 			var index = pageHistory.indexOf(pageId);
@@ -117,7 +117,7 @@ window.iui =
 				if (!child.id)
 					child.id = "__" + (++newPageCount) + "__";
 
-				var clone = $(child.id);
+				var clone = iui_gid(child.id);
 				if (clone)
 					clone.parentNode.replaceChild(child, clone);
 				else
@@ -200,10 +200,10 @@ addEventListener("click", function(event)
 		if (link.href && link.hash && link.hash != "#" && !link.target)
 		{
 			link.setAttribute("selected", "true");
-			iui.showPage($(link.hash.substr(1)));
+			iui.showPage(iui_gid(link.hash.substr(1)));
 			setTimeout(unselect, 500);
 		}
-		else if (link == $("backButton"))
+		else if (link == iui_gid("backButton"))
 			history.back();
 		else if (link.getAttribute("type") == "submit")
 		{
@@ -259,7 +259,7 @@ function getPageFromLoc()
 	if (result)
 		page = result[1];
 	if (page)
-		page = $(page);
+		page = iui_gid(page);
 	return page;
 }
 
@@ -342,17 +342,17 @@ function updatePage(page, fromPage)
 	location.hash = currentHash = hashPrefix + page.id;
 	pageHistory.push(page.id);
 
-	var pageTitle = $("pageTitle");
+	var pageTitle = iui_gid("pageTitle");
 	if (page.title)
 		pageTitle.innerHTML = page.title;
 
 	if (page.localName.toLowerCase() == "form" && !page.target)
 		showForm(page);
 		
-	var backButton = $("backButton");
+	var backButton = iui_gid("backButton");
 	if (backButton)
 	{
-		var prevPage = $(pageHistory[pageHistory.length-2]);
+		var prevPage = iui_gid(pageHistory[pageHistory.length-2]);
 		if (prevPage && !page.getAttribute("hideBackButton"))
 		{
 			backButton.style.display = "inline";
@@ -491,7 +491,7 @@ function findParent(node, localName)
 
 function hasClass(self, name)
 {
-	var re = new RegExp("(^|\\s)"+name+"($|\\s)");
+	var re = new RegExp("(^|\\s)"+name+"(iui_gid|\\s)");
 	return re.exec(self.getAttribute("class")) != null;
 }
 
@@ -514,7 +514,7 @@ function replaceElementWithSource(replace, source)
 		page.appendChild(frag.firstChild);
 }
 
-function $(id) { return document.getElementById(id); }
+function iui_gid(id) { return document.getElementById(id); }
 function ddd() { console.log.apply(console, arguments); }
 
 })();

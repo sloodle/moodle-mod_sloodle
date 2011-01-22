@@ -118,7 +118,8 @@ $layoutid = $cloneid;
 				continue;
 			}
 			$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);
-			$entriesbygroup = array('communication'=>array(), 'inventory'=>array(), 'registration'=>array(), 'activity'=>array());
+                        $entriesbygroup = array('communication'=>array(), 'activity'=>array(), 'registration'=>array() );
+
 			foreach($entries as $e) {
 				$objectname = $e->name;
 				$grp = 'other';
