@@ -62,6 +62,10 @@ foreach($active_objects as $ao) {
 // TODO: Handle failures properly...
 
 $result = 'derezzed';
+if (count($failures) > 0) {
+	$result = 'failed';
+	$error = 'derez_failed';
+}
 
 $content = array(
 	'result' => $result,

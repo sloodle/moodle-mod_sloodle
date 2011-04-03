@@ -54,6 +54,7 @@ window.iui =
 
 	showPageById: function(pageId)
 	{
+alert('showpagebyid'+pageId);
 		var page = iui_gid(pageId);
 		if (page)
 		{
@@ -68,6 +69,7 @@ window.iui =
 
 	showPageByHref: function(href, args, method, replace, cb)
 	{
+alert('showpagebyhref'+href);
 		var req = new XMLHttpRequest();
 		req.onerror = function()
 		{

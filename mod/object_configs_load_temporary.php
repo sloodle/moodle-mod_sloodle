@@ -114,7 +114,7 @@ $sloodleconfig->module     = 'sloodle';
 $sloodleconfig->module_choice_message = 'selectdistributor';
 $sloodleconfig->module_no_choices_message= 'nodistributorinterface';
 $sloodleconfig->module_filters = array( 'type' => SLOODLE_TYPE_DISTRIB );
-$sloodleconfig->group      = 'inventory';
+$sloodleconfig->group      = 'communication';
 $sloodleconfig->show       = true;
 $sloodleconfig->aliases    = array('SLOODLE 1.1 Vending Machine');
 $sloodleconfig->field_sets = array( 
@@ -130,6 +130,7 @@ $object_configs[$sloodleconfig->primname] = $sloodleconfig;
 
 
 
+/*
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Enrolment Booth';
 $sloodleconfig->object_code= 'enrolbooth';
@@ -143,6 +144,7 @@ $sloodleconfig->field_sets = array(
 	),
 );
 $object_configs[$sloodleconfig->primname] = $sloodleconfig;
+*/
 
 
 
@@ -209,9 +211,9 @@ $sloodleconfig->module     = 'assignment';
 $sloodleconfig->module_choice_message = 'selectassignment';
 $sloodleconfig->module_no_choices_message = 'noassignments'; 
 $sloodleconfig->module_filters = array( 'assignmenttype' => 'sloodleobject');
-$sloodleconfig->group      = 'inventory';
+$sloodleconfig->group      = 'communication';
 $sloodleconfig->show       = true;
-$sloodleconfig->aliases    = array('SLOODLE 1.1 Quiz Chair');
+$sloodleconfig->aliases    = array('SLOODLE 1.1 PrimDrop');
 $sloodleconfig->field_sets = array( 
 	'access' => array(
 		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(), 
@@ -264,11 +266,32 @@ $sloodleconfig->field_sets = array(
 		'sloodlepartialmatches' => new SloodleConfigurationOptionYesNo( 'sloodlepartialmatches', 'showpartialmatches', 0 ),
 		'sloodlerandomize' => new SloodleConfigurationOptionYesNo( 'sloodlesearchaliases', 'searchaliases', 0 ),
 		'sloodledialog' => new SloodleConfigurationOptionYesNo( 'sloodlesearchdefinitions', 'searchdefinitions', 0 ),
-		'sloodleplaysound' => new SloodleConfigurationOptionText( 'sloodleidletimeout', 'idletimeoutseconds', '', 3600, 8 ),
+		'sloodleplaysound' => new SloodleConfigurationOptionYesNo( 'sloodleplaysound', 'playsound', 0 ),
 	)
 );
 $object_configs[$sloodleconfig->primname] = $sloodleconfig;
 
+
+
+$sloodleconfig = new SloodleObjectConfig();
+$sloodleconfig->primname   = 'SLOODLE Presenter (Shared Media)';
+$sloodleconfig->object_code= 'presenter';
+$sloodleconfig->modname    = 'presenter-1.0';
+$sloodleconfig->module     = 'sloodle';
+$sloodleconfig->module_choice_message = 'selectpresenter';
+$sloodleconfig->module_no_choices_message = 'nopresenters'; 
+$sloodleconfig->module_filters = array( 'type' => SLOODLE_TYPE_PRESENTER); 
+$sloodleconfig->group      = 'communication';
+$sloodleconfig->show       = true;
+$sloodleconfig->aliases    = array('SLOODLE 1.1 Presenter Shared Media');
+$sloodleconfig->field_sets = array( 
+	'access' => array(
+		'sloodleobjectaccessleveluse'   => $sloodleconfig->access_level_object_use_option(),
+		'sloodleobjectaccesslevelctrl'  => $sloodleconfig->access_level_object_use_option(),
+		'sloodleserveraccesslevel'      => $sloodleconfig->access_level_server_option(),
+	),
+);
+$object_configs[$sloodleconfig->primname] = $sloodleconfig;
 
 
 $sloodleconfig = new SloodleObjectConfig();
@@ -309,6 +332,19 @@ $sloodleconfig->field_sets = array(
 $object_configs[$sloodleconfig->primname] = $sloodleconfig;
 
 
+$sloodleconfig = new SloodleObjectConfig();
+$sloodleconfig->primname   = 'SLOODLE Broken Thing';
+$sloodleconfig->object_code= 'brokenthing';
+$sloodleconfig->modname    = 'loginzone-1.0';
+$sloodleconfig->group      = 'registration';
+$sloodleconfig->show       = true;
+$sloodleconfig->aliases    = array('SLOODLE 1.1 Broken Thing');
+$sloodleconfig->field_sets = array( 
+	'general' => array(
+		'sloodlerefreshtime'   => new SloodleConfigurationOptionText( 'sloodleidletimeout', 'idletimeoutseconds', '', 600, 8),
+	),
+);
+$object_configs[$sloodleconfig->primname] = $sloodleconfig;
 
 
 $sloodleconfig = new SloodleObjectConfig();
@@ -319,10 +355,21 @@ $sloodleconfig->group      = 'registration';
 $sloodleconfig->show       = true;
 $sloodleconfig->aliases    = array('SLOODLE 1.1 LoginZone');
 $sloodleconfig->field_sets = array( 
-	'access' => array(
+	'general' => array(
 		'sloodlerefreshtime'   => new SloodleConfigurationOptionText( 'sloodleidletimeout', 'idletimeoutseconds', '', 600, 8),
 	),
 );
 $object_configs[$sloodleconfig->primname] = $sloodleconfig;
+
+
+$sloodleconfig = new SloodleObjectConfig();
+$sloodleconfig->primname   = 'Avatar Classroom building';
+$sloodleconfig->object_code= 'avatarclassroombuilding';
+$sloodleconfig->group      = 'communication';
+$sloodleconfig->show       = true;
+$sloodleconfig->aliases    = array();
+$sloodleconfig->field_sets = array( );
+$object_configs[$sloodleconfig->primname] = $sloodleconfig;
+
 
 ?>

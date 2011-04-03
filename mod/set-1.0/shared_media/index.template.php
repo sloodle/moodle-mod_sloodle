@@ -11,9 +11,8 @@ function print_html_top($loadfrom = '') {
 <link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
 <style type="text/css" media="screen">@import "<?=$loadfrom?>iui/iui_avatarclassroom.css";</style>
 <style type="text/css" media="screen">@import "<?=$loadfrom?>layout.css";</style>
-<script type="application/x-javascript" src="<?=$loadfrom?>iui/iui_avatarclassroom.js"></script>
 <script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
-<script type="application/x-javascript" src="layout.js"></script>
+<script type="application/x-javascript" src="layout.js?<?= time() ?>"></script>
 <!--
 -->
 <script type="text/javascript">
@@ -30,16 +29,24 @@ function print_toolbar( $baseurl ) {
 ?>
     <div class="toolbar">
         <h1 id="pageTitle"></h1>
-        <a id="backButton" class="button" href="#"></a>
+        <a id="backButton" class="button" href="#sitelist">Avatar Classroom</a>
         <a class="button" onclick="document.location.href = '<?= $baseurl.'&logout=1&ts='.time()?>'" href="<?= $baseurl.'&logout=1&ts='.time()?>">Logout</a>
     </div>
+<?php
+}
+
+// A placeholder div 
+// Never actually loaded - we intercept "sitelist" and use it to redirect to the api. site.
+function print_site_placeholder( $sitesURL ) {
+?>
+	<div id="sitelist" data-parent-url="<?= $sitesURL ?>" title="Avatar Classroom"></div>
 <?php
 }
 
 function print_site_list( $sites ) {
 ?>
      
-    <ul id="home" title="Avatar Classroom Site" selected="true">
+    <ul id="sitelist" title="Avatar Classroom" selected="true">
         <li class="group">Sites</li>
 	<?php foreach($sites as $site) { ?>
 	<?php if ('http://'.$_SERVER["SERVER_NAME"] == $site) { ?>
@@ -57,12 +64,12 @@ function print_site_list( $sites ) {
 <?php 
 }
 
-function print_controller_list( $courses, $controllers, $hasSites ) {
+function print_controller_list( $courses, $controllers, $hasSites, $sitesURL ) {
 $hasSites = false;
 $full = false;
 ?>
 
-    <ul id="site_1" title="<?= "http://".$_SERVER["SERVER_NAME"]?>" <?= $hasSites ? '' : ' selected="true"' ?> >
+    <ul id="site_1" data-parent="sitelist" title="<?= "http://".$_SERVER["SERVER_NAME"]?>" <?= $hasSites ? '' : ' selected="true"' ?> >
         <li class="group">Courses enabled for Sloodle</li>
 	<?php 
 	foreach($courses as $course) { 
@@ -87,7 +94,7 @@ $full = false;
 
 <?php if ($full) { ?>
      
-    <form id="addcontroller" class="panel" title="Add a Course">
+    <form data-parent="site_1" id="addcontroller" class="panel" title="Add a Course">
     <fieldset>
        <div class="row" style="height:60px;">
           <label for="course_name" name="course_name">Name</label>
@@ -117,7 +124,7 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 		}
 		foreach($controllers[$cid] as $contid => $cont) {
 ?>
-    <ul id="controller_<?= intval($cid)?>-<?= intval($contid) ?>" title="<?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?>" class="controllercourselayouts_<?= intval($cid)?>" data-id-prefix="layout_<?= intval($cid)?>-<?= intval($contid) ?>-">
+    <ul data-parent="site_1" id="controller_<?= intval($cid)?>-<?= intval($contid) ?>" title="<?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?>" class="controllercourselayouts_<?= intval($cid)?>" data-id-prefix="layout_<?= intval($cid)?>-<?= intval($contid) ?>-">
         <li class="group">Scenes</li>
 <?php
 			$layouts = $courselayouts[ $cid ];
@@ -129,7 +136,7 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 ?>
 	<li class="add_layout_above_me"></li>
         <li class="group">Add a scene</li>
-        <li><a href="#addlayout_<?= intval($cid) ?>">Add a scene</a></li>
+        <li><a href="#addlayout_<?= intval($cid) ?>-<?= intval($contid) ?>">Add a scene</a></li>
     </ul>
 <?php 
 		}
@@ -138,11 +145,12 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 }
 
 
-function print_add_layout_forms( $courses ) {
+function print_add_layout_forms( $courses, $controllers ) {
 	foreach($courses as $course) {
 		$cid = $course->id;
+		foreach($controllers[$cid] as $contid => $cont) {
 ?>
-    <form id="addlayout_<?= intval($cid)?>" class="panel" title="Add a Scene to <?= htmlentities($course->fullname) ?>">
+    <form data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" id="addlayout_<?= intval($cid)?>-<?= intval($contid) ?>" class="panel" title="Add a Scene to <?= htmlentities($course->fullname) ?>">
 	<input type="hidden" name="courseid" value="<?= intval($cid)?>" />
 	<fieldset>
 	<div class="row" >
@@ -153,6 +161,7 @@ function print_add_layout_forms( $courses ) {
 	<span data-creating-text="Creating Scene" data-created-text="Create Scene" class="active_button create_layout_button" type="submit" href="#">Create Scene</span>
     </form>
 <?php
+		}
 	}
 }
 
@@ -181,7 +190,7 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				$rezzed_entries = $layout->rezzed_active_objects_by_layout_entry_id( $rezzeruuid );
 
 ?>
-			    <ul class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>" data-rez-mode="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-action-status="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-connection-status="disconnected">
+			    <ul data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>" data-rez-mode="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-action-status="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-connection-status="disconnected">
 				<li class="group"><?= htmlentities( $layout->name ) ?></li>
 				<span id="set_configuration_status_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="button_goes_here_zone set_configuration_status"><?=get_string('layoutmanager:connectingtorezzer','sloodle') ?></span>
 				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button rez_all_objects">Rez All Objects</span>
@@ -256,7 +265,7 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
 <?php 
 				foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
 ?>
-    <ul id="addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?>">
+    <ul data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" id="addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?>">
         <li class="group">Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?></li>
 <?php
 	foreach($groupobjectconfigs as $object_title => $config) {
@@ -300,7 +309,7 @@ The following form is used for adding the object.
 But once it's been added, it will be clone()d to make a form to update the object we added.
 */
 ?>
-<form class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>" title="<?= htmlentities($object_title) ?>">
+<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>" title="<?= htmlentities($object_title) ?>">
 <span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" data-adding-text="Adding <?= htmlentities( $object_title ) ?>" data-add-text="Add <?= htmlentities( $object_title ) ?>" class="active_button add_to_layout_button" target="_self" type="submit">Add <?= htmlentities( $object_title ) ?></span>
 <input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities($config->group) ?>" />
@@ -396,7 +405,7 @@ function print_config_form( $e, $config, $cid, $contid, $lid, $group ) {
 						$object_title = $entryname;
 
 ?>
-<form id="configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>-<?=intval( $e->id ) ?>" class="panel" title="<?= htmlentities($object_title) ?>">
+<form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>-<?=intval( $e->id ) ?>" class="panel" title="<?= htmlentities($object_title) ?>">
 <span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" class="active_button update_layout_entry_button" target="_self" type="submit">Update <?= htmlentities( $object_title ) ?></span>
 <input type="hidden" name="layoutid" value="<?= intval($lid) ?>" />
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />

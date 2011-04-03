@@ -241,7 +241,8 @@
 			{
 				layoutentryid: entryid,
 				rezzeruuid: rezzer_uuid,
-				controllerid: controllerid
+				controllerid: controllerid,
+				ts: new Date().getTime()
 			},  
 			function(json) {  
 				var result = json.result;
@@ -260,15 +261,18 @@
 	}
 
 	function derez_layout_item(itemjq, entryid, controllerid, parentjq) {
+//alert('sending derez request with rezzeruuid '+rezzer_uuid);
 		$.getJSON(  
 			"derez_object.php",  
 			{
 				layoutentryid: entryid,
 				rezzeruuid: rezzer_uuid,
-				controllerid: controllerid
+				controllerid: controllerid,
+				ts: new Date().getTime()
 			},  
 			function(json) {  
 				var result = json.result;
+//alert('derez result:'+result);
 				if (result == 'derezzed') {
 					itemjq.removeClass('derezzing').addClass('derezzed');;
 					itemjq.removeClass('syncing');
@@ -370,9 +374,10 @@
 
 					attach_event_handlers();
 
+					backLevels( frmjq.attr('id'), 1 );
 					//eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
-					history.go(-1);
+					//history.go(-1);
 				} else if (result == 'failed') {
 					//alert('Adding layout entry failed');
 					buttonjq.html( buttonjq.attr('data-create-text') );
@@ -399,7 +404,8 @@
 		$.getJSON(  
 			"generate_layout_entries.php",  
 			{
-				layoutid: layoutid
+				layoutid: layoutid,
+				ts: new Date().getTime()
 			},
 			function(json) {  
 				var result = json.result;
@@ -444,7 +450,8 @@
 					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, frmjq);
 					eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
-					history.go(-2);
+					backLevels( frmjq.attr('id'), 2 );
+					//history.go(-2);
 				} else if (result == 'failed') {
 					//alert('Adding layout entry failed');
 					buttonjq.html( buttonjq.attr('data-add-text') );
@@ -487,7 +494,7 @@
 						}
 					});
 					eventLoop( $('.layout_container_'+layoutid) );
-					history.back();
+					backLevels( frmjq.attr('id'), 1 );
 				} else { //if (result == 'failed') 
 					alert('Deleting layout entry failed');
 					buttonjq.html( buttonjq.attr('data-delete-text') );
@@ -502,12 +509,14 @@
 	// If rezzed, we'll derez the objects separately, and only remove the layout from view when they're done
 	function delete_layout( buttonjq ) {
 
+		frmjq = buttonjq.closest('ul');
 		buttonjq.html( buttonjq.attr('data-deleting-text') );
 		var layoutid = buttonjq.attr('data-layoutid');
 		$.getJSON(  
 			"delete_layout.php",  
 			{
-				layoutid: layoutid
+				layoutid: layoutid,
+				ts: new Date().getTime()
 			},
 			function(json) {  
 				var result = json.result;
@@ -515,7 +524,8 @@
 					//alert('deleted');
 					$('[data-layout-link-li-id*="'+layoutid+'"]').remove();
 					buttonjq.html( buttonjq.attr('data-deleted-text') ); 
-					history.back();
+					backLevels(frmjq.attr('id'), 1);
+					//history.back();
 				} else { //if (result == 'failed') 
 					// For now we'll just live with the failure - it's probably that it's already gone
 					alert('Deleting layout entry failed');
@@ -537,7 +547,8 @@
 			"rename_layout.php",
 			{
 				layoutid: layoutid,
-				layoutname: newname
+				layoutname: newname,
+				ts: new Date().getTime()
 			},
 			function(json) {
 				if (json.result == 'renamed') {
@@ -568,10 +579,12 @@
 
 		buttonjq.html( buttonjq.attr('data-cloning-text') );
 		var layoutid = buttonjq.attr('data-layoutid');
+		var frmjq = buttonjq.closest('ul');
 		$.getJSON(  
 			"clone_layout.php",  
 			{
-				layoutid: layoutid
+				layoutid: layoutid,
+				ts: new Date().getTime()
 			},
 			function(json) {  
 				var result = json.result;
@@ -594,7 +607,8 @@
 
 					//eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
-					history.go(-1);
+					//history.go(-1);
+					backLevels( frmjq.attr('id'), 1 );
 
 				} else { //if (result == 'failed') 
 					// For now we'll just live with the failure - it's probably that it's already gone
@@ -639,7 +653,8 @@
 				if (result == 'updated') {
 					buttonjq.html( buttonjq.attr('data-update-text') );
 					$('li[data-layoutentryid*="'+layoutentryid+'"]').find('.module_info').html(moduletitle);
-					history.back();
+					backLevels( frmjq.attr('id'), 1 );
+					//history.back();
 					//history.go(-2);
 				} else { //if (result == 'failed') {
 					alert('Updating layout entry failed');
@@ -686,6 +701,7 @@
 			// Make a copy of the add form and change it into an edit form
 			var editFrm = addfrmjq.clone(); 
 			editFrm.attr('id', 'configure_'+newElementID); 
+			editFrm.attr('data-parent', $(this).attr('id')); 
 			editFrm.children("input[name='layoutentryid']").val(layoutentryid);  // set the layoutentryid hidden field
 			editFrm.attr('selected', ''); // Remove the selected property so that iui hides the form
 			editFrm.children('.add_to_layout_button').addClass('update_layout_entry_button').removeClass('add_to_layout_button');
@@ -720,7 +736,8 @@
 			"configure_rezzer.php",  
 			{
 				controllerid: controllerid,
-				rezzeruuid: rezzer_uuid
+				rezzeruuid: rezzer_uuid,
+				ts: new Date().getTime()
 			},
 			function(json) {  
 				var result = json.result;
@@ -795,5 +812,266 @@
 
 	$(document).ready(function () {
 		attach_event_handlers();
-		iui.animOn = true;
+		enable_slide_navigation();
+		$('#backButton').show();
+	//	iui.animOn = true;
 	});
+
+	function backLevels(fromPageID, num) {
+		if (num < 1) {
+			return false;
+		}
+		// Already moved on? Leave the navigation alone
+		if ( $('#'+fromPageID).attr('selected') != 'true' ) {
+			alert(fromPageID + ' not currently selected, not going back levels - attr is '+$('#'+fromPageID).attr('id'));
+			return false;
+		}
+
+		var nextPageID = $('#'+fromPageID).attr('data-parent');
+		if (nextPageID == null) {
+			alert('no next page to go to, giving up');
+			return false;
+		}
+
+		fromPage = document.getElementById( fromPageID );
+		toPage   = document.getElementById( nextPageID );
+		//targetjq.attr('selected','true'); // Select the target
+
+		targetjq = $('#'+nextPageID);
+
+		// Something went wrong - do the best we can, using jquery
+		if ( (fromPage == null) || (toPage == null) ) {
+			targetjq.attr('selected','true'); // Select the target
+			$('[selected*="true"]').attr('selected','');
+		} else {
+			slidePages(fromPage, toPage, true);
+		}
+
+		var parentid = targetjq.attr('data-parent');
+		/*
+		if ( (parentid == '') || (parentid == null) ){
+			alert('Error: parent id not set in link to '+clickedid);
+			return false;
+		}
+		*/
+		$('#backButton').attr('href', '#'+parentid);
+		$('#backButton').html( $('#'+parentid).attr('title') );
+		$('#backButton').show();
+		$('#pageTitle').html( targetjq.attr('title') );
+			
+		fromPageID = nextPageID;
+		num--;
+
+		setTimeout( "backLevels('"+fromPageID+"', "+num+")", 1000 );
+	}
+
+	// More-or-less duplicates the IUI functionality
+	// ...but does it without messing with the URL
+	// ...as the on-prim browser loses the pending javascript events when it changes the URL #hash
+	// Also, uses the 
+	function enable_slide_navigation() {
+		$('a').live('click', function() {
+
+			var clickedid=this.hash;
+			if ( clickedid == null ) {
+				alert('Error: no hash found');
+				return false;
+			}
+
+			if (clickedid == "#sitelist") {
+				window.location = $('#sitelist').attr('data-parent-url');
+				return false;
+			}
+
+			var targetjq = $(clickedid); // already begins with #
+			if (targetjq.size() == 0) {
+				alert('Error: no target found');
+				return false;
+			}
+
+			var backwards = ($(this).attr('id') == 'backButton');
+
+			fromPage = document.getElementById( $('[selected*="true"]').attr('id') );
+			toPage   = document.getElementById( targetjq.attr('id') );
+			//targetjq.attr('selected','true'); // Select the target
+
+			// Something went wrong - do the best we can, using jquery
+			if ( (fromPage == null) || (toPage == null) ) {
+				targetjq.attr('selected','true'); // Select the target
+				$('[selected*="true"]').attr('selected','');
+			} else {
+				slidePages(fromPage, toPage, backwards);
+			}
+
+			var parentid = targetjq.attr('data-parent');
+			if ( (parentid == '') || (parentid == null) ){
+				alert('Error: parent id not set in link to '+clickedid);
+				return false;
+			}
+			$('#backButton').attr('href', '#'+parentid);
+			$('#backButton').html( $('#'+parentid).attr('title') );
+			$('#backButton').show();
+			$('#pageTitle').html( targetjq.attr('title') );
+ 
+			return false;
+		});
+	}
+
+var slideSpeed = 2;
+var slideInterval = 0;
+
+var currentPage = null;
+var currentDialog = null;
+var currentWidth = 0;
+var currentHash = location.hash;
+var hashPrefix = "#_";
+var pageHistory = [];
+var newPageCount = 0;
+var checkTimer;
+var hasOrientationEvent = false;
+var portraitVal = "portrait";
+var landscapeVal = "landscape";
+
+
+// The following comes from iui
+function slide1(fromPage, toPage, backwards, axis, cb)
+{
+	if (axis == "y")
+		(backwards ? fromPage : toPage).style.top = "100%";
+	else
+		toPage.style.left = "100%";
+
+	scrollTo(0, 1);
+	toPage.setAttribute("selected", "true");
+	var percent = 100;
+	slide();
+	var timer = setInterval(slide, slideInterval);
+
+	function slide()
+	{
+		percent -= slideSpeed;
+		if (percent <= 0)
+		{
+			percent = 0;
+			clearInterval(timer);
+			cb();
+		}
+	
+		if (axis == "y")
+		{
+			backwards
+				? fromPage.style.top = (100-percent) + "%"
+				: toPage.style.top = percent + "%";
+		}
+		else
+		{
+			fromPage.style.left = (backwards ? (100-percent) : (percent-100)) + "%"; 
+			toPage.style.left = (backwards ? -percent : percent) + "%"; 
+		}
+	}
+}
+
+function slide2(fromPage, toPage, backwards, cb)
+{
+	toPage.style.webkitTransitionDuration = '0ms'; // Turn off transitions to set toPage start offset
+	// fromStart is always 0% and toEnd is always 0%
+	// iPhone won't take % width on toPage
+	var toStart = 'translateX(' + (backwards ? '-' : '') + window.innerWidth +	'px)';
+	var fromEnd = 'translateX(' + (backwards ? '100%' : '-100%') + ')';
+	toPage.style.webkitTransform = toStart;
+	toPage.setAttribute("selected", "true");
+	toPage.style.webkitTransitionDuration = '';	  // Turn transitions back on
+	function startTrans()
+	{
+		fromPage.style.webkitTransform = fromEnd;
+		toPage.style.webkitTransform = 'translateX(0%)'; //toEnd
+	}
+	fromPage.addEventListener('webkitTransitionEnd', cb, false);
+	setTimeout(startTrans, 0);
+}
+
+function slidePages(fromPage, toPage, backwards)
+{		 
+	var axis = (backwards ? fromPage : toPage).getAttribute("axis");
+
+	clearInterval(checkTimer);
+	
+	if (canDoSlideAnim() && axis != 'y')
+	{
+	  slide2(fromPage, toPage, backwards, slideDone);
+	}
+	else
+	{
+	  slide1(fromPage, toPage, backwards, axis, slideDone);
+	}
+
+	function slideDone()
+	{
+	  if (!hasClass(toPage, "dialog"))
+		  fromPage.removeAttribute("selected");
+	  checkTimer = setInterval(checkOrientAndLocation, 300);
+	  //setTimeout(updatePage, 0, toPage, fromPage);
+	  fromPage.removeEventListener('webkitTransitionEnd', slideDone, false);
+	}
+}
+
+function canDoSlideAnim()
+{
+  return (typeof WebKitCSSMatrix == "object");
+}
+
+function findParent(node, localName)
+{
+        while (node && (node.nodeType != 1 || node.localName.toLowerCase() != localName))
+                node = node.parentNode;
+        return node;
+}
+
+function hasClass(self, name)
+{
+        var re = new RegExp("(^|\\s)"+name+"(iui_gid|\\s)");
+        return re.exec(self.getAttribute("class")) != null;
+}
+
+
+function orientChangeHandler()
+{
+	var orientation=window.orientation;
+	switch(orientation)
+	{
+	case 0:
+		setOrientation(portraitVal);
+		break;	
+		
+	case 90:
+	case -90: 
+		setOrientation(landscapeVal);
+		break;
+	}
+}
+
+
+function checkOrientAndLocation()
+{
+	if (!hasOrientationEvent)
+	{
+	  if (window.innerWidth != currentWidth)
+	  {	  
+		  currentWidth = window.innerWidth;
+		  var orient = currentWidth == 320 ? portraitVal : landscapeVal;
+		  setOrientation(orient);
+	  }
+	}
+
+	if (location.hash != currentHash)
+	{
+		var pageId = location.hash.substr(hashPrefix.length);
+		//iui.showPageById(pageId);
+	}
+}
+
+function setOrientation(orient)
+{
+	document.body.setAttribute("orient", orient);
+	setTimeout(scrollTo, 100, 0, 1);
+}
