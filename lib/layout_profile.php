@@ -224,8 +224,9 @@
             if (!$cloneid = insert_record('sloodle_layout', $clone)) {
                 return false;
             }
+	    $clone->id = $cloneid;
             $clone->entries = array();
-            foreach($this->entries as $entry) {
+            foreach($this->originalentries as $entry) {
 	        $cloneentry =  ( version_compare(phpversion(), '5.0') ) ? clone($entry) : $entry;
                 $cloneentry->id = null; 
                 $clone->entries[] = $cloneentry;
@@ -486,7 +487,9 @@
             if (!$this->id) {
                return false;
             }
-            return $this->save_configs();
+            if ( $this->save_configs() ) {
+		return $this->id;
+	    }
 
         }
 
@@ -519,6 +522,10 @@
         }
 
         function save_configs() {
+
+ 	    if (count($this->configs) == 0) {
+ 	       return true;
+	    }
 
             foreach($this->configs as $config) {
                $config->layout_entry = $this->id; 

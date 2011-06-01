@@ -42,7 +42,7 @@
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
 
-        $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'&sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&sloodleobjname='.htmlentities($_REQUEST['sloodleobjname']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
+        $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'&sloodleavname='.htmlentities($_REQUEST['sloodleavname']).'&sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&sloodleobjname='.htmlentities($_REQUEST['sloodleobjname']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
 	$sitesURL = 'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/'.$baseurl.'&ts='.time();
 
 	if (isset($_GET['logout'])) {
@@ -120,6 +120,7 @@
 	$courselayouts = array();
 
 	include(SLOODLE_LIBROOT.'/object_configs.php');
+
 	//$object_configs = SloodleObjectConfig::AllAvailableAsArrayByGroup();
 	$object_configs = SloodleObjectConfig::AllAvailableAsArray();
 	$objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();

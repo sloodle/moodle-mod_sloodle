@@ -313,6 +313,8 @@
 		parentjq.attr('data-action-status', 'rezzing');
 		parentjq.attr('data-rez-mode', 'rezzed');
 
+		parentjq.children('li.derezzing_failed').removeClass('derezzing_failed');
+		parentjq.children('li.rezzing_failed').removeClass('rezzing_failed');
 		parentjq.children('li.derezzed').removeClass('derezzed');
 		parentjq.children('li.rezzable_item').not('li.rezzed').addClass( 'waiting_to_rez' );
 		parentjq.children('.rez_all_objects').html('Stop rezzing objects');

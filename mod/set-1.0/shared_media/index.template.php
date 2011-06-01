@@ -195,7 +195,7 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				<span id="set_configuration_status_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="button_goes_here_zone set_configuration_status"><?=get_string('layoutmanager:connectingtorezzer','sloodle') ?></span>
 				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button rez_all_objects">Rez All Objects</span>
 
-				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-generate-text="Use The Recommended Objects For <?=htmlentities( $cn ) ?>" data-generating-text="Adding The Recommended Objects" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout">Use The Recommended Objects For <?=htmlentities( $cn ) ?></span>
+				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-generate-text="Import Moodle Activities for <?=htmlentities( $cn ) ?>" data-generating-text="Importing Moodle Activities" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout">Import Moodle Activities for <?=htmlentities( $cn ) ?></span>
 <?php
 				foreach($entriesbygroup as $group => $entries) {
 ?>

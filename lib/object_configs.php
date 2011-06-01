@@ -162,6 +162,12 @@ class SloodleObjectConfig {
 			$str .= '<option '.$selectedattr.'value="'.htmlentities( $n ).'">'.htmlentities( $v ).'</option>'."\n";
 		}
 		$str .= '</select>';
+		/*
+		foreach($options as $n => $v) {
+			$selectedattr = ($val == $n) ? ' checked="checked"' : '';
+			$str .= '<input type="radio" name="sloodlemoduleid" '.$selectedattr.'" value="'.htmlentities( $n ).'">'.htmlentities( $v ).''."<br />\n";
+		}
+		*/
 		return $str;	
 		
 	}
@@ -306,7 +312,7 @@ class SloodleConfigurationOptionSelectOne extends SloodleConfigurationOption {
 		$this->description = $description;
 		$this->options = array(0 => 'Yes', 1 => 'No');
 		$this->default = $default;
-		$this->type = 'select';
+		$this->type = 'radio';
 	}
 
 }
