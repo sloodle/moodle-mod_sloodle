@@ -93,7 +93,7 @@ $string['configerror'] = 'Configuration Error';
 $string['confirmobjectauth'] = 'Do you want to authorize this object?';
 $string['confirmdelete'] = 'Are you sure?';
 $string['confirmdeleteuserobjects'] = 'Are you sure you want to delete all these user objects?';
-$string['controlaccess'] = 'You can control access to your courses by enabling or disabling the SLOODLE Classroom';
+$string['controlaccess'] = 'You can control access to your courses by enabling or disabling the SLOODLE Controller';
 
 //$string['controllerinfo'] = 'This page represents a SLOODLE Classroom. These are used to control communications between Second Life and Moodle, keeping the site secure. This page is primarily for use by teachers and administrators.';
 
@@ -191,7 +191,7 @@ $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';
 
 $string['moduletype'] = 'Module Type';
-$string['moduletype:controller'] = 'SLOODLE Classroom';
+$string['moduletype:controller'] = 'SLOODLE Controller';
 $string['moduletype:distributor'] = 'Distributor';
 $string['moduletype:presenter'] = 'Presenter';
 $string['moduletype:map'] = 'Second Life Map';
@@ -266,8 +266,8 @@ $string['object:mapmarker'] = 'Map Marker';
 $string['object:picturegloss'] = 'Picture Gloss';
 
 $string['objectgroup:registration'] = 'Registration and Enrolment';
-$string['objectgroup:communication'] = 'Communication';
-$string['objectgroup:inventory'] = 'Inventory and Assignments';
+$string['objectgroup:communication'] = 'Communication, Assignments and Inventory';
+//$string['objectgroup:inventory'] = 'Inventory and Assignments';
 $string['objectgroup:activity'] = 'Quizzes and Activities';
 
 
@@ -278,15 +278,15 @@ $string['objectconfig:header'] = 'SLOODLE Object Configuration';
 $string['objectconfig:body'] = 'You can choose to configure some SLOODLE objects with a notecard instead of using the common web-based authorisation. It is less secure, as it involves the use of a single prim password for all objects, but it makes it quicker and easier to rez pre-configured objects from your inventory.';
 $string['objectconfig:select'] = 'Select which object you would like to create a configuration notecard for from the list below. If multiple versions are available, then they are shown in the brackets -- only use the older versions if the main version does not work.';
 $string['objectconfig:noobjects'] = 'There are no object configurations available.';
-$string['objectconfig:noprimpassword'] = 'ERROR: The Prim Password has been disabled for this Classroom. Please specify a Prim Password if you would like to use notecard configuration.';
+$string['objectconfig:noprimpassword'] = 'ERROR: The Prim Password has been disabled for this Controller. Please specify a Prim Password if you would like to use notecard configuration.';
 $string['objectconfig:backtoform'] = 'Go back to the configuration form.';
 
 $string['objectauth'] = 'SLOODLE Object Authorization';
-$string['objectauthalready'] = 'This object has already been authorized. If you want to re-authorize it, then please delete its authorization entry from your SLOODLE Classroom.';
+$string['objectauthalready'] = 'This object has already been authorized. If you want to re-authorize it, then please delete its authorization entry from your SLOODLE Contrller.';
 $string['objectauthcancelled'] = 'You have cancelled the object authorization.';
 $string['objectauthfailed'] = 'Object authorization has failed.';
-$string['objectauthnocontrollers'] = 'There are no SLOODLE Classrooms on the site. Please create one on a course in order to authorise objects.';
-$string['objectauthnopermission'] = 'You do not have the permission to authorise any objects. You may need to create a SLOODLE Classroom on your course(s).';
+$string['objectauthnocontrollers'] = 'There are no SLOODLE Controllers on the site. Please create one on a course in order to authorise objects.';
+$string['objectauthnopermission'] = 'You do not have the permission to authorise any objects. You may need to create a SLOODLE Controller on your course(s).';
 $string['objectauthnotfound'] = 'Object not found for authorization.';
 $string['objectauthsuccessful'] = 'Object authorization has been successful.';
 $string['objectconfiguration'] = 'Object Configuration';
@@ -390,7 +390,7 @@ $string['selectassignment'] = 'Select Assignment';
 $string['selectquiz'] = 'Select Quiz';
 $string['selectobject'] = 'Select Object';
 $string['selectuser'] = 'Select User';
-$string['selectcontroller'] = 'Select Classroom';
+$string['selectcontroller'] = 'Select Controller';
 $string['selectpresenter'] = 'Select Presenter';
 
 $string['sendobject'] = 'Send Object';
