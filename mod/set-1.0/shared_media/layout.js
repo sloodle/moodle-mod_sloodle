@@ -273,7 +273,7 @@
 			function(json) {  
 				var result = json.result;
 //alert('derez result:'+result);
-				if (result == 'derezzed') {
+				if (true || result == 'derezzed') {
 					itemjq.removeClass('derezzing').addClass('derezzed');;
 					itemjq.removeClass('syncing');
 					itemjq.removeClass('synced');
@@ -746,11 +746,17 @@
 				if (result == 'configured') {
 					parentjq.attr('data-connection-status', 'connected');
 					update_buttons( parentjq );
+					load_miscellaneous_objects( parentjq );
 				} else if (result == 'failed') {
 					parentjq.children('.rez_all_objects').hide();	
 				}
 			}  
 		);  
+		return true;
+	}
+
+	function load_miscellaneous_objects( layoutjq ) {
+		//alert('todo: load misc objects');
 		return true;
 	}
 

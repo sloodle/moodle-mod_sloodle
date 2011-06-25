@@ -372,4 +372,14 @@ $sloodleconfig->field_sets = array( );
 $object_configs[$sloodleconfig->primname] = $sloodleconfig;
 
 
+$sloodleconfig = new SloodleObjectConfig();
+$sloodleconfig->primname   = 'Dummy Object';
+$sloodleconfig->object_code= 'dummyobject';
+$sloodleconfig->group      = 'misc';
+$sloodleconfig->show       = true;
+$sloodleconfig->aliases    = array();
+$sloodleconfig->field_sets = array( );
+$object_configs[$sloodleconfig->primname] = $sloodleconfig;
+
+
 ?>

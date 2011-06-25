@@ -139,7 +139,7 @@
 		$layouts = $sloodle_course->get_layouts();
 		foreach($layouts as $l) {
 			$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);
-                        $entriesbygroup = array('communication'=>array(), 'activity'=>array(), 'registration'=>array() );
+                        $entriesbygroup = array('communication'=>array(), 'activity'=>array(), 'registration'=>array(), 'misc'=>array() );
 
 			foreach($entries as $e) {
 				$objectname = $e->name;

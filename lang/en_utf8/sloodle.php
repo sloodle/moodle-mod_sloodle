@@ -269,6 +269,7 @@ $string['objectgroup:registration'] = 'Registration and Enrolment';
 $string['objectgroup:communication'] = 'Communication, Assignments and Inventory';
 //$string['objectgroup:inventory'] = 'Inventory and Assignments';
 $string['objectgroup:activity'] = 'Quizzes and Activities';
+$string['objectgroup:misc'] = 'Other';
 
 
 $string['Object'] = 'Object';
