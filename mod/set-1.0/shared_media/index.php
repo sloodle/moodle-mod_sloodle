@@ -124,6 +124,9 @@
 	//$object_configs = SloodleObjectConfig::AllAvailableAsArrayByGroup();
 	$object_configs = SloodleObjectConfig::AllAvailableAsArray();
 	$objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();
+	if (!isset($objectconfigsbygroup['misc'])) {
+		$objectconfigsbygroup['misc'] = array(); // always make sure we have this group so that we can add misc objects added to the rezzer.
+	}
 //	include('object_configs.array.php');
 
         // Construct the list of course names
@@ -143,7 +146,7 @@
 
 			foreach($entries as $e) {
 				$objectname = $e->name;
-				$grp = 'other';
+				$grp = 'misc';
 				if (isset($object_configs[$objectname])) {
 					$grp = $object_configs[$objectname]->group;
 				}

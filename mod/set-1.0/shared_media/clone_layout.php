@@ -122,7 +122,7 @@ $layoutid = $cloneid;
 
 			foreach($entries as $e) {
 				$objectname = $e->name;
-				$grp = 'other';
+				$grp = 'misc';
 				if (isset($object_configs[$objectname]->group)) {
 					$grp = $object_configs[$objectname]->group;
 				}

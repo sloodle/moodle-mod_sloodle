@@ -202,10 +202,6 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 					<li class="group"><?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?></li>
 <?php
 					foreach($entries as $e) {
-						$entryname = $e->name;	
-						$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
-
-						$modTitle = $e->get_course_module_title();
 
 						$isrezzed = isset( $rezzed_entries[ $e->id ]);
 				
@@ -217,13 +213,11 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 							$lettergroup = $firstletter;
 						}
 						*/
-	?>
-	<?php /*
-					<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
-	*/ ?>
-					<?php /* NB If you change this, you also need to change layout.js, which creates some of these dynamically. */ ?>
-					<li data-layoutentryid="<?= $e->id?>" id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item <?= ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= htmlentities($entryname) ?><span class="module_info"><?=htmlentities($modTitle)?></span><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
-	<?php
+
+						print_rezzable_item_li( $e, $cid, $contid, $layout, $isrezzed);
+						
+
+
 					}
 ?>
 					<li class="after_group_<?=$group?>"><a href="#addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>">Add objects<!--: <?= get_string('objectgroup:'.$group,'sloodle') ?>--></a></li>
@@ -250,6 +244,31 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 <?php
 }
 
+function print_rezzable_item_li( $e, $cid, $contid, $layout, $isrezzed) {
+
+	$entryname = $e->name;	
+	$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
+
+	$modTitle = $e->get_course_module_title();
+	?>
+<?php /*
+					<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
+	*/ ?>
+							<?php /* NB If you change this, you also need to change layout.js, which creates some of these dynamically. */ ?>
+							<li data-layoutentryid="<?= $e->id?>" id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item <?= ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= htmlentities($entryname) ?><span class="module_info"><?=htmlentities($modTitle)?></span><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
+<?php
+}
+
+function print_add_object_item_li( $object_title, $config, $cid, $contid, $layout) {
+	$object_title = preg_replace('/^SLOODLE /', '', $object_title);
+	$id = "linkto_addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
+?>
+        <li id="<?=$id?>"><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>"><?= htmlentities($object_title) ?></a></li>
+<?php 
+	return $id;
+
+}
+
 function print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup) {
 
 	foreach($courses as $course) {
@@ -265,14 +284,11 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
 <?php 
 				foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
 ?>
-    <ul data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" id="addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?>">
+    <ul <?= $group == 'misc' ? 'class="object_group_misc"' : '' ?> data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" id="addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?>">
         <li class="group">Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?></li>
 <?php
 	foreach($groupobjectconfigs as $object_title => $config) {
-		$object_title = preg_replace('/^SLOODLE /', '', $object_title);
-?>
-        <li><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>"><?= htmlentities($object_title) ?></a></li>
-<?php 
+		print_add_object_item_li( $object_title, $config, $cid, $contid, $layout );
 	}
 
 ?>
@@ -308,8 +324,23 @@ function print_add_object_forms($courses, $controllers, $courselayouts, $object_
 The following form is used for adding the object.
 But once it's been added, it will be clone()d to make a form to update the object we added.
 */
+					print_add_object_form( $config, $cid, $contid, $layout, $object_title );
 ?>
-<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>" title="<?= htmlentities($object_title) ?>">
+
+<?php 
+				}
+			}
+		}
+	}
+?>
+<span id="add_add_object_forms_above_me"></span>
+<?php
+}
+
+function print_add_object_form( $config, $cid, $contid, $layout, $object_title ) {
+	$id = "addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
+?>
+<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="<?=$id?>" title="<?= htmlentities($object_title) ?>">
 <span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" data-adding-text="Adding <?= htmlentities( $object_title ) ?>" data-add-text="Add <?= htmlentities( $object_title ) ?>" class="active_button add_to_layout_button" target="_self" type="submit">Add <?= htmlentities( $object_title ) ?></span>
 <input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities($config->group) ?>" />
@@ -355,14 +386,9 @@ not radio: <?=$ctrl->type?>
 </form>
 
 <br />
-<?php 
-				}
-			}
-		}
-	}
-?>
-<span id="add_add_object_forms_above_me"></span>
+
 <?php
+	return $id;
 }
 
 /*
@@ -404,8 +430,10 @@ function print_config_form( $e, $config, $cid, $contid, $lid, $group ) {
 						$entryname = preg_replace('/SLOODLE\s/', '', $e->name);
 						$object_title = $entryname;
 
+	$id = "configure_layoutentryid_{$cid}-{$contid}-{$lid}-{$e->id}";
+
 ?>
-<form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>-<?=intval( $e->id ) ?>" class="panel" title="<?= htmlentities($object_title) ?>">
+<form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="<?=$id?>" class="panel" title="<?= htmlentities($object_title) ?>">
 <span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" class="active_button update_layout_entry_button" target="_self" type="submit">Update <?= htmlentities( $object_title ) ?></span>
 <input type="hidden" name="layoutid" value="<?= intval($lid) ?>" />
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
@@ -453,5 +481,7 @@ not radio: <?=$ctrl->type?>
 
 <br />
 <?php 
+
+	return $id;
 }
 ?>

@@ -209,6 +209,36 @@
 		}
 	}
 
+	function refresh_misc_object_group( parentjq) {
+		var item_list_jq = $('ul[data-parent*="'+parentjq.attr('id')+'"]');
+		var bits = item_list_jq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
+		var layoutid = bits.pop(); 
+		var controllerid = bits.pop();
+		var courseid = bits.pop();
+		$.getJSON(  
+			"update_rezzer_contents.php",  
+			{
+				layoutid: layoutid,
+				rezzeruuid: rezzer_uuid,
+				controllerid: controllerid,
+				courseid: courseid,
+				ts: new Date().getTime()
+			},  
+			function(json) {  
+				var result = json.result;
+				if (result == 'refreshed') {
+					insert_additional_object_html_items( item_list_jq, json.html_list_items, json.add_object_forms, json.edit_object_forms );
+					//itemjq.removeClass('syncing').addClass("synced");
+				} else if (result == 'failed') {
+					alert('failed');
+				} else {
+					alert('refresh returned unknown status');
+				}
+			}  
+		);  
+	}
+
+
 	function sync_layout_item(itemjq, entryid, controllerid) {
 		$.getJSON(  
 			"sync_layout_position.php",  
@@ -668,6 +698,26 @@
 
 	}
 
+	function insert_additional_object_html_items( objectlistjq, new_object_html_items, add_object_forms, edit_object_forms ) {
+		for( var id in add_object_forms) {
+			if ($("#"+id).length == 0){
+				$('#add_add_object_forms_above_me').before(add_object_forms[id]);
+			}
+		}
+		for( var id in edit_object_forms) {
+			if ($("#"+id).length == 0){
+				$('#add_edit_object_forms_above_me').before(edit_object_forms[id]);
+			}
+		}
+		for( var id in new_object_html_items) {
+			if ($("#"+id).length == 0){
+				objectlistjq.append(new_object_html_items[id]);
+			}
+		}
+
+		attach_event_handlers();
+	}
+
 	function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, addfrmjq ) {
 
 		regexPtn = '^layout_.+-.+-'+layoutid+'$';
@@ -746,17 +796,12 @@
 				if (result == 'configured') {
 					parentjq.attr('data-connection-status', 'connected');
 					update_buttons( parentjq );
-					load_miscellaneous_objects( parentjq );
+					refresh_misc_object_group( parentjq );
 				} else if (result == 'failed') {
 					parentjq.children('.rez_all_objects').hide();	
 				}
 			}  
 		);  
-		return true;
-	}
-
-	function load_miscellaneous_objects( layoutjq ) {
-		//alert('todo: load misc objects');
 		return true;
 	}
 
@@ -815,6 +860,10 @@
 				});
 				btn.find('.rename_input').show();
 			});
+		});
+
+		$().find('.populate_object_group').unbind('click').click( function() {
+			return refresh_misc_object_group( $(this).closest('ul') );
 		});
 	}
 
@@ -893,7 +942,7 @@
 
 			var targetjq = $(clickedid); // already begins with #
 			if (targetjq.size() == 0) {
-				alert('Error: no target found');
+				alert('Error: no target found for id '+clickedid);
 				return false;
 			}
 
