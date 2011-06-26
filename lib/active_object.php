@@ -113,7 +113,7 @@
 	// Ultimately, we may want to make this configurable for a particular controller or rezzer
 	// ...as you may need different values for different OpenSim servers.
 	function httpProxyURL() {
-		if ( defined( SLOODLE_HTTP_IN_PROXY_OR_TUNNEL ) ) {
+		if ( defined( 'SLOODLE_HTTP_IN_PROXY_OR_TUNNEL' ) ) {
 			return SLOODLE_HTTP_IN_PROXY_OR_TUNNEL;
 		}
 		return null;
@@ -139,7 +139,49 @@
                 return array('info'=>$info,'result'=>$result);
 	}
 
-	// Sends a message to the object telling it to derez itself.
+	/*
+	Request a list of inventory from the rezzer.
+	NB The format is slightly different to the one used by the vending machine.
+	$include_sloodle can be set to false to ignore things beginning with SLOODLE.
+	Hopefully this will give us a list of third-party objects that we don't already know about.
+	*/
+	public function listInventory( $include_sloodle = true ) {
+
+		$response = new SloodleResponse();
+                $response->set_status_code(1);
+                $response->set_status_descriptor('SYSTEM');
+                $response->set_request_descriptor('LIST_INVENTORY');
+                $response->add_data_line('do:list_inventory');
+
+                //create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
+                $renderStr="";
+                $response->render_to_string($renderStr);
+                //send message to httpinurl
+                $reply = $this->sendMessage($renderStr);
+
+		if ( !( $reply['info']['http_code'] == 200 ) ) {
+			return false;
+		}
+
+		$result = $reply['result'];
+
+		$ret = array();
+
+		$lines = explode("\n", $result);
+		array_shift($lines);
+		foreach($lines as $l) {
+			if (!$include_sloodle) {
+				if (preg_match('/^SLOODLE/', $l)) {
+					continue;
+				}
+			}
+			$ret[] = $l;
+		}	
+
+		return $ret;
+
+	}
+        	// Sends a message to the object telling it to derez itself.
 	// Deletes the active_object record if successful.
 	// NB the object can't report back whether it successfully derezzed itself, because it no longer exists.	
 	// We'll go by whether it acknowledged the derez command, which is as close as we can get.
