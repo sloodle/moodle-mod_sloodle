@@ -875,6 +875,9 @@
 	});
 
 	function backLevels(fromPageID, num) {
+		if (isBusy) {
+			return;
+		}
 		if (num < 1) {
 			return false;
 		}
@@ -928,6 +931,10 @@
 	// Also, uses the 
 	function enable_slide_navigation() {
 		$('a').live('click', function() {
+
+			if (isBusy) {
+				return;
+			}
 
 			var clickedid=this.hash;
 			if ( clickedid == null ) {
@@ -989,10 +996,12 @@ var hasOrientationEvent = false;
 var portraitVal = "portrait";
 var landscapeVal = "landscape";
 
+var isBusy = false;
 
 // The following comes from iui
 function slide1(fromPage, toPage, backwards, axis, cb)
 {
+
 	if (axis == "y")
 		(backwards ? fromPage : toPage).style.top = "100%";
 	else
@@ -1049,6 +1058,12 @@ function slide2(fromPage, toPage, backwards, cb)
 
 function slidePages(fromPage, toPage, backwards)
 {		 
+
+	if (isBusy) {
+		return;
+	}
+	isBusy = true;
+
 	var axis = (backwards ? fromPage : toPage).getAttribute("axis");
 
 	clearInterval(checkTimer);
@@ -1069,6 +1084,7 @@ function slidePages(fromPage, toPage, backwards)
 	  checkTimer = setInterval(checkOrientAndLocation, 300);
 	  //setTimeout(updatePage, 0, toPage, fromPage);
 	  fromPage.removeEventListener('webkitTransitionEnd', slideDone, false);
+	  isBusy = false;
 	}
 }
 
