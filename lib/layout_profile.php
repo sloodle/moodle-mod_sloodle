@@ -557,10 +557,17 @@
 	}
 
         // returns an instance of SloodleLayoutEntry with the default config for an object with the specified name
-        function ForConfig( $name ) {
-            if ( !$obj = SloodleObjectConfig::ForObjectName( $name ) ) {
-                return null;
-            }
+	// is_dummy means we have a non-sloodle object with no particular fields.
+        function ForConfig( $name, $is_dummy = false ) {
+            if ($is_dummy) {
+		    if ( !$obj = SloodleObjectConfig::ForNonSloodleObjectWithName( $name ) ) {
+			return null;
+		    }
+	    } else {
+		    if ( !$obj = SloodleObjectConfig::ForObjectName( $name ) ) {
+			return null;
+		    }
+	    }
             $le = new SloodleLayoutEntry();
             $le->name = $name;        
             foreach( $obj->field_sets as $grp ) {
