@@ -54,11 +54,62 @@ class SloodleObjectConfig {
 		return null;
 	}
 
-	// ultimately: loads all the object configs from their various tool directories
-	// for now, grabs them all from a single file
+	/*
+	Load an associative array of object definitions called object_configs, with the prim name as the key
+	...and a SloodleObjectConfig object as the value.
+
+	There should be a directory called object_definitions in each mod/ directory, containing .php files with the definitions..
+	Each definition will define an object called $sloodleconfig.
+
+	An object_definitions directory may contain multiple object definitions.
+	Previously, we dealt with multiple object definitions by creating a mod/ directory for each object.
+	Let's deprecate that approach and have each directory under mod/ represent a set of linker functionality.
+
+	As of 2011-06-26, the old folders are still there, eg. there is a mod/quiz-1.0 and a mod/quiz_pile_on-1.0.
+	This doesn't make much sense, as quiz_pile_on scripts end up calling linkers under quiz-1.0 anyhow.
+	But we'll leave them for backwards compatibility until we can kill of the old HTML configuration forms.
+	*/
 	function AllAvailableAsArray() {
-		require(SLOODLE_DIRROOT.'/mod/object_configs_load_temporary.php');
+
+		$currentdir = dirname(__FILE__);
+
+		$modtopdir = SLOODLE_DIRROOT.'/mod/';
+
+		$object_configs = array();
+
+		if (!is_dir($modtopdir)) {
+			return false;
+		}
+		if (!$dh = opendir($modtopdir)) {
+			return false;
+		}
+		while (($file = readdir($dh)) !== false) {
+			if ($file == '.') { 
+				continue;
+			}
+			if ($file == '..') { 
+				continue;
+			}
+			$object_definition_dir = $modtopdir.'/'.$file.'/object_definitions';
+			if ( !file_exists( $object_definition_dir ) || !is_dir($object_definition_dir) ) {
+				continue;
+			}
+			if (!$dh2 = opendir($object_definition_dir)) {
+				continue;
+			}
+			while (($def_include = readdir($dh2)) !== false) {
+				if (!preg_match('/\.php$/', $def_include)) {
+					continue;
+				}
+				include($object_definition_dir.'/'.$def_include);
+				$object_configs[$sloodleconfig->primname] = $sloodleconfig;
+			}
+			closedir($dh2);
+		}
+		closedir($dh);
+
 		return $object_configs;
+
         }
 
 	function AllAvailableAsArrayByGroup() {
@@ -72,6 +123,29 @@ class SloodleObjectConfig {
 			$objectconfigsbygroup[$group][$objname] = $objconfig;
 		}
 		return $objectconfigsbygroup;
+
+	}
+
+	// This creates a config element for a non-sloodle object, allowing us to rez and derez it.
+	// It is still assumed that it will have a sloodle_rezzer object script in it.
+	function ForNonSloodleObjectWithName( $name ) {
+
+		// We need a url-safe version of the name
+		// J-query seems to choke on something, even if it's url-encoded.
+		$encoded_name = ereg_replace("[^A-Za-z0-9]", "", $name); // Strip non-alphanumeric characters to give us a human-readable name
+  		$encoded_name .= '_'.md5($name); // Append an md5sum of the original name to avoid collisions in case someone has "My Object" and "MyObject".
+
+		$sloodleconfig = new SloodleObjectConfig();
+		$sloodleconfig->name       = $encoded_name;
+		$sloodleconfig->primname   = $name;
+		$sloodleconfig->object_code= $encoded_name;
+		$sloodleconfig->modname    = null;
+		$sloodleconfig->group      = 'misc';
+		$sloodleconfig->show       = false;
+		$sloodleconfig->aliases    = array();
+		$sloodleconfig->field_sets = array();
+
+		return $sloodleconfig;
 
 	}
 
@@ -156,12 +230,21 @@ class SloodleObjectConfig {
 		if (!$options = $this->course_module_options( $courseid )) {
 			return false;
 		}
-		$str = '<select name="sloodlemoduleid">'."\n";
+		$str = '<div>';
+		$divider = '';
+		$isfirst = true;
 		foreach($options as $n => $v) {
-			$selectedattr = ($val == $n) ? ' selected ' : '';
-			$str .= '<option '.$selectedattr.'value="'.htmlentities( $n ).'">'.htmlentities( $v ).'</option>'."\n";
+			$isselected = ($val == $n);
+			// If there's nothing selected and only one option, select that.
+			if ( ($val == null) && $isfirst ) {
+				$isselected = true;	
+			}
+			$selectedattr = $isselected ? ' checked="checked"' : '';
+			$str .= '<input type="radio" name="sloodlemoduleid" '.$selectedattr.' value="'.htmlentities( $n ).'">'.htmlentities( $v ).$divider."\n";
+			$divider = '<br />';
+			$isfirst = false;
 		}
-		$str .= '</select>';
+		$str .= '</div>';
 		/*
 		foreach($options as $n => $v) {
 			$selectedattr = ($val == $n) ? ' checked="checked"' : '';
@@ -171,6 +254,22 @@ class SloodleObjectConfig {
 		return $str;	
 		
 	}
+	/*
+	function course_module_select( $courseid, $val = null ) {
+
+		if (!$options = $this->course_module_options( $courseid )) {
+			return false;
+		}
+		$str = '<select name="sloodlemoduleid">'."\n";
+		foreach($options as $n => $v) {
+			$selectedattr = ($val == $n) ? ' selected ' : '';
+			$str .= '<option '.$selectedattr.'value="'.htmlentities( $n ).'">'.htmlentities( $v ).'</option>'."\n";
+		}
+		$str .= '</select>';
+		return $str;	
+		
+	}
+	*/
 
 	function course_module_options( $courseid )  {
 
