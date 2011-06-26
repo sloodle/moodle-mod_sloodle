@@ -1,11 +1,11 @@
 /*********************************************
-*  Copyrght (c) 2009 various contributors (see below)
+*  Copyrght (c) 2009 -2012 various contributors (see below)
 *  Released under the GNU GPL 3.0
 *  This script can be used in your scripts, but you must include this copyright header as per the GPL Licence
 *  For more information about GPL 3.0 - see: http://www.gnu.org/copyleft/gpl.html
 *  This script is part of the SLOODLE Project see http://sloodle.org
 *
-*  http_in_config_requester
+*  
 *  Copyright:
 *  Paul G. Preibisch (Fire Centaur in SL) fire@b3dMultiTech.com  
 *
@@ -49,8 +49,8 @@ update_inventory()
         itemname = llGetInventoryName(INVENTORY_OBJECT, i);
         // Make sure it's copyable, not a script, and not on the ignore list
         if((llGetInventoryPermMask(itemname, MASK_OWNER) & PERM_COPY) && llGetInventoryType(itemname) != INVENTORY_SCRIPT ) {
-            if (numavailable > 0) inventorystr += "|";
-            inventorystr += llEscapeURL(itemname);
+            if (numavailable > 0) inventorystr += "\n";
+            inventorystr += itemname;
             numavailable++;
         }
     }
@@ -98,6 +98,7 @@ default {
                 //llOwnerSay("got url URL_REQUEST_GRANTED"+"http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr);
                 llClearPrimMedia(4);
                 llSetPrimMediaParams( 4, [ PRIM_MEDIA_CURRENT_URL, "http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_GROUP ] );
+                
                 state ready;
                 
           }
@@ -139,7 +140,7 @@ state ready {
                //this is where we receive data from from our server
                 list lines;
                 lines = llParseStringKeepNulls( body, ["\n"], [] );
-               // llOwnerSay(body);
+              // llOwnerSay(body);
                // llOwnerSay("Got a request - need to check what it is and probably rez something");
 
                 list statusbits =  llParseStringKeepNulls( llList2String(lines,0), ["|"], []);
@@ -151,8 +152,8 @@ state ready {
                     rez_rot = (rotation)llList2String(lines, 3);
                     state rezz_and_reply;
                     
-                } else if (requestType == "REQUEST_INVENTORY_LIST") {
-                    llOwnerSay("got REQUEST_INVENTORY_LIST request");                    
+                } else if (requestType == "LIST_INVENTORY") {
+                  //  llOwnerSay("got LIST_INVENTORY request");                    
                         
                     update_inventory();
                     //numPages = numItems/
@@ -160,7 +161,7 @@ state ready {
                     llHTTPResponse(id, 200, resp);                                     
                     
                 } else { // I don't know how to handle this - throw it to someone else...
-                llOwnerSay("misc config message received");
+              //  llOwnerSay("misc config message received");
                 // Currently used for configuration of the rezzer
                     llHTTPResponse(id, 200, "OK");                       
                // llOwnerSay(body);                
