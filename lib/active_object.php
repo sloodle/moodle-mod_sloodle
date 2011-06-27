@@ -386,7 +386,7 @@
 		return false;
 	   }
             $this->timeupdated = time();
-            return update_record('sloodle_active_object', $entry);
+            return update_record('sloodle_active_object', $this);
 	}
 
 

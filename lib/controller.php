@@ -501,7 +501,7 @@
         
         /**
         * Checks if the specified object is authorised for this controller with the given password.
-        * @param SloodleActiveObject $active_object The active object representing the prim that is talking to us.
+        * @param object SloodleActiveObject $active_object The active object representing the prim that is talking to us.
         * @param string $password The password to check
         * @return bool True if object is authorised, or false if not
         */

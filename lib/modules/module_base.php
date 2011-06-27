@@ -104,7 +104,7 @@
 	* param array $relevant_configs - config params and values that this module handles.
 	* param int $controllerid: ID of controller that called us
 	* param int $multiplier A number telling us the scale of the thing that happened.
-	* param int $multiplier ID of the user involved.
+	* param int $userid ID of the user involved.
 	* @ return false
 	*
 	*/

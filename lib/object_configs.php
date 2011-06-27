@@ -368,13 +368,6 @@ class SloodleObjectConfig {
 
 	}
 
-        
-// TODO: Write code in lib/active_object so that:
-// linker script can do something like:
-// $active_object->process_awards_interactions( array('default'), $USER );
-// ...or
-// $active_object->process_awards_interactions( array('answer_correct' ), $USER );
-
 }
 
 // Represents a single entry or potential entry in an object configuration.
