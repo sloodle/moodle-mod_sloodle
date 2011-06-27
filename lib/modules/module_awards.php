@@ -336,6 +336,86 @@
             return true;
         }
 
+
+	function ProcessInteractions( $relevant_configs, $controllerid, $multiplier, $userid ) {
+
+		// Find the active round for the controller, or make one if there isn't one.
+		$timets = time();
+		$roundrecs = get_records_select('sloodle_award_rounds', "controllerid = $controllerid AND ( (timestarted <= $timets ) OR (timestarted = 0) ) AND ( (timeended >= $timets ) OR (timeended = 0) ) ");
+
+		$round = null;
+		if ( $roundrecs || ( count($roundrecs) > 0 ) ) {
+			$round = array_pop($roundrecs);
+		} else {
+			$round = new stdClass();
+			$round->controllerid = $controllerid;
+			$round->timestarted = time();
+			$round->timeended = 0;
+			$round->name = '';
+			if ( !insert_record('sloodle_award_rounds', $round) ) {
+				return false;
+			}
+		}
+
+		if (!$roundid = $round->id) {
+			return false;
+		}
+
+		if ( isset($relevant_configs['sloodleawardsdeposit_numpoints']) && isset($relevant_configs['sloodleawardsdeposit_currency']) ) {
+
+			$numpoints  = intval($relevant_configs['sloodleawardsdeposit_numpoints']);
+			$currencyid = intval($relevant_configs['sloodleawardsdeposit_currency']);
+
+			if (!$currencyid) {
+				return false;
+			}
+
+			$award = new stdClass();	
+			$award->userid = $userid;
+			$award->currencyid = $currencyid;
+			$award->amount = $numpoints * $multiplier;
+			$award->timeawarded = time();
+			$award->roundid = $roundid;
+
+			if ( !insert_record('sloodle_award_points', $award) ) {
+				return false;
+			}
+		}
+
+		if ( isset($relevant_configs['sloodleawardswithdraw_numpoints']) && isset($relevant_configs['sloodleawardswithdraw_currency']) ) {
+
+			$numpoints  = intval($relevant_configs['sloodleawardswithdraw_numpoints']) + 1;
+			$currencyid = intval($relevant_configs['sloodleawardswithdraw_currency']);
+
+			if (!$currencyid) {
+				return false;
+			}
+
+			$award = new stdClass();	
+			$award->userid = $userid;
+			$award->currencyid = $currencyid;
+			$award->amount = $numpoints * $multiplier;
+			$award->timeawarded = time();
+			$award->roundid = $roundid;
+			if ( !insert_record('sloodle_award_points') ) {
+				return false;
+			}
+		}
+
+
+		return true;
+
+	}
+	
+	function InteractionConfigNames() {
+		return array(
+                        'sloodleawardsdeposit_numpoints',
+                        'sloodleawardsdeposit_currency',
+                        'sloodleawardswithdraw_numpoints',
+                        'sloodleawardswithdraw_currency'
+		);
+	}
+
     }
 
     /**

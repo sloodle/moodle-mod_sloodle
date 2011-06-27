@@ -185,6 +185,12 @@
             $result = insert_record('chat_messages', $rec);
             if (!$result) return false;
             
+            if (!is_null($this->_session->active_object)) {
+                 $this->_session->active_object->process_interactions( 'SloodleModuleAwards', 'default', 1, $userid ); 
+                 // TODO: Maybe we should set a side effect code here?
+            }
+
+
             // We successfully added a chat message
             // If possible, add an appropriate side effect code to our response
             if (isset($this->_session->response)) {

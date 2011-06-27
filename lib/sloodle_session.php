@@ -26,6 +26,9 @@
     /** Plugin management. */
     require_once(SLOODLE_LIBROOT.'/plugins.php');
     require_once(SLOODLE_LIBROOT.'/api_plugins.php');
+
+    /** Active Object. */
+    require_once(SLOODLE_LIBROOT.'/active_object.php');
     
     /**
     * The primary API class, which manages all other parts.
@@ -83,7 +86,20 @@
         * @access public
         */
         var $api_plugins = null;
+
+         /**
+        * A SloodleActiveObject object representing the in-world object making the request.
+        * @var $active_object
+        * @access public
+	* In case of notecard configuration, this may be null. 
+	* (This should change in the future so that the server knows about all the objects it works with.)
+	* TODO: The relationship between this and the controller could do with some work - 
+	*  ... and some of the functionality in the controller should probably move to the active object.
+	*  ... but we can't fix that until we've made all objects be represented by and active object, even notecard ones.
+        */
+        var $active_object = null;
         
+
     // FUNCTIONS //
     
         /**
@@ -102,6 +118,12 @@
             
             // Process the basic request data
             if ($process) $this->request->process_request_data();
+
+            // Active Object loading is happening right before check_authorization.
+            // It should probably be happening earlier...
+            // This whole thing should probably be happening backwards: 
+            // Load up the active object, check it's OK, load it's controller, check it's active, load the course, etc.
+
         }
         
         
@@ -240,10 +262,16 @@
                     return false;
                 }
                 
-                // Verify the object's authorisation
-                if ($this->course->controller->check_authorisation($objuuid, $objpwd)) {
+                // Load up the active object, if there is one.
+	        // TODO: This should probably have happened earlier.
+		$ao = new SloodleActiveObject();
+		if ($ao->loadByUUID( $objuuid )) {
+			$this->active_object = $ao;
+		}
+
+                if ($this->course->controller->check_authorisation($this->active_object, $objpwd)) {
                     // Passed authorisation - make sure the object is registered as being still active
-                    $this->course->controller->ping_object($objuuid);
+                    $this->active_object->recordAccess();
                     return true;
                 }
                 if ($require) {

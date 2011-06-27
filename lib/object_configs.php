@@ -328,6 +328,53 @@ class SloodleObjectConfig {
 		return $options;
 	
 	}
+
+	/*
+	Return an array of configuration options related to giving someone points for interacting with the object.
+	By default, this produces a single configuration option for interacting with the object.
+
+	If your object specifies multiple kinds of interaction, you can pass them in as an array.
+	By default, this will replace the default interaction, so if you want that too, put it in your array.
+
+	The result will be something like (with the default interaction):
+	Using the object gives you [   ] of the currency [               ]
+	Using the object costs you [   ] of the currency [               ]
+
+	...or with customized interactions:
+	Getting an answer right gives you [   ] of the currency [               ]
+	Getting an answer right costs you [   ] of the currency [               ]
+	Getting an answer wrong gives you [   ] of the currency [               ]
+	Getting an answer wrong costs you [   ] of the currency [               ]
+	*/
+	function awards_setting_options( $interactions = null ) {
+
+		if ($interactions == null) {
+			$interactions = array('default' => array('interactwithobjectplus', 'interactwithobjectminus') );
+		}
+		$configs = array();
+		
+		foreach($interactions as $interactionname => $interactionlabels) {
+			$deposit_points_fieldname      = 'sloodleawardsdeposit_numpoints_'.$interactionname;
+			$deposit_currency_fieldname    = 'sloodleawardsdeposit_currency_'.$interactionname;
+			$withdraw_points_fieldname   = 'sloodleawardswithdraw_numpoints_'.$interactionname;
+			$withdraw_currency_fieldname = 'sloodleawardswithdraw_currency_'.$interactionname;
+			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabels[0], '', 0, 8);
+			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, 'currency', '', '', 8);
+			$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
+			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'currency', '', '', 8);
+		}
+
+		return $configs;
+
+	}
+
+        
+// TODO: Write code in lib/active_object so that:
+// linker script can do something like:
+// $active_object->process_awards_interactions( array('default'), $USER );
+// ...or
+// $active_object->process_awards_interactions( array('answer_correct' ), $USER );
+
 }
 
 // Represents a single entry or potential entry in an object configuration.
@@ -393,7 +440,6 @@ class SloodleConfigurationOptionText extends SloodleConfigurationOption {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->description = $description;
-		$this->options = array(0 => 'Yes', 1 => 'No');
 		$this->size = $length;
 		$this->max_length = $length;
 		$this->default= $default;
@@ -434,6 +480,31 @@ class SloodleConfigurationOptionCourseModuleChoice extends SloodleConfigurationO
 
 
 
+
+}
+
+class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOption {
+
+	function SloodleConfigurationOptionCurrencyChoice( $fieldname, $title, $description, $default = '', $length = 8 ) {
+
+		if (!$currencies = get_records('sloodle_currency_types') ) {
+			return false;
+		}
+
+		$options = array();
+		foreach($currencies as $c) {
+			$options[$c->id] = $c->name;
+		}
+
+		$this->fieldname = $fieldname;
+		$this->title = $title;
+		$this->description = $description;
+		$this->size = $length;
+		$this->options = $options;
+		$this->max_length = $length;
+		$this->default= $default;
+		$this->type = 'radio';
+	}
 
 }
 ?>

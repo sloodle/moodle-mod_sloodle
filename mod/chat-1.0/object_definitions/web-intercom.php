@@ -20,5 +20,6 @@ $sloodleconfig->field_sets = array(
 		'sloodleautodeactivate'  => new SloodleConfigurationOptionYesNo( 'sloodleautodeactivate', 'allowautodeactivation', '', 1 ),
 		'sloodlerefreshtime'     => new SloodleConfigurationOptionText( 'sloodlerefreshtime', 'refreshtimeseconds', '', 600, 8 ),
 	),
+        'awards' => $sloodleconfig->awards_setting_options() // Allows you to award points for taking part in a discussion. Not sure if we want to display this or not...
 );
 ?>

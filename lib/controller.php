@@ -501,17 +501,20 @@
         
         /**
         * Checks if the specified object is authorised for this controller with the given password.
-        * @param string $uuid The UUID of the object to check
+        * @param SloodleActiveObject $active_object The active object representing the prim that is talking to us.
         * @param string $password The password to check
         * @return bool True if object is authorised, or false if not
         */
-        function check_authorisation($uuid, $password)
+        function check_authorisation($active_object, $password)
         {
-            // Attempt to find an entry for the object
-            $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $uuid);
-            if (!$entry) return false;
-            // Make sure we have the type data
+            if (is_null($active_object)) {
+                return false;
+            }
+            if ($active_object->controllerid != $this->get_id()) {
+                return false;
+            }
 
+            // Make sure we have the type data
             // Edmund Edgar, 2009-01-31: 
             // The type-checking is breaking the auto-configuration based on a profile.
             // It should probably already have been filled in somewhere, so this is probably an auto-configuration bug.
@@ -520,7 +523,7 @@
             //if (empty($entry->type)) return false;
             
             // Verify the password
-            return ($password == $entry->password);
+            return ($password == $active_object->password);
         }
         
         /**
@@ -561,6 +564,7 @@
         * Gets data about an active object.
         * @param mixed $id If an integer, it is the ID of an active object. If it is a string it is the object's UUID.
         * @return SloodleActiveObject|bool Returns false on failure
+	* TODO: Refactor this if anything's using it - it's got nothing to do with the controller, and shouldn't be in here.
         */
         function get_object($id)
         {
@@ -596,6 +600,7 @@
         * (Can be called statically).
         * @param mixed $id If an integer, it is the ID of an active object. If it is a string it is the object's UUID.
         * @return array Associative array of setting names to values. (Returns an empty array if unsuccessful.)
+	* TODO: Move this to the SloodleActiveObject class...
         */
         function get_object_configuration($id)
         {
@@ -618,24 +623,6 @@
             return $config;
         }
         
-        /**
-        * Updates the last active timer on an object.
-        * (Cannot be called statically... object must be authorised for this controller).
-        * @param mixed $id If an integer, it is the ID of an active object. If it is a string it is the object's UUID.
-        * @return bool True if successful, or false if not.
-        */
-        function ping_object($id)
-        {
-            // Check what type the ID is and fetch the object
-            if (is_string($id)) $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $id);
-            else $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'id', (int)$id);
-            if (!$entry) return false;
-            
-            // Update the record
-            $entry->timeupdated = time();
-            return update_record('sloodle_active_object', $entry);
-        }
-
         /**
         * Returns an array of active object records, or false if something went wrong.
         * (Cannot be called statically... object must be authorised for this controller).

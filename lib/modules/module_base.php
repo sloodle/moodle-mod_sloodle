@@ -83,6 +83,36 @@
             return true;
         }
         
+
+    // Interaction handlers //
+    // The following can be extended if your module wants to be notified when another module handles something.
+    // ...based on configuration options set on the object in question.
+    // Developed for Awards: eg. You want the quiz to tell you that somebody has got a quiz question right
+    // ...so that you can give them a prize.
+    // This infrastructure isn't used anywhere else as of 2011-06-27, but it may have other applications.
+
+	/**
+	* Returns an array of names of configuration parameters which trigger some kind of action on our part.
+	* See SloodleModuleAwards for an example of how this is used.
+	* @return array
+	*/
+	function InteractionConfigNames() {
+	    return array();
+	}
+
+	/**
+	* param array $relevant_configs - config params and values that this module handles.
+	* param int $controllerid: ID of controller that called us
+	* param int $multiplier A number telling us the scale of the thing that happened.
+	* param int $multiplier ID of the user involved.
+	* @ return false
+	*
+	*/
+        function ProcessInteractions( $relevant_configs, $controllerid, $multiplier, $userid ) {
+	    return true;
+	}
+
+
         
         /**
         * Gets the name of the user data required by this type, or an empty string if none is required.
@@ -170,6 +200,8 @@
         {
             return '';
         }
+
     }
+
 
 ?>

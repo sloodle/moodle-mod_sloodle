@@ -375,8 +375,75 @@
            $this->rotation = $rec->rotation;
            $this->rezzeruuid = $rec->rezzeruuid;
         }
+
+        /**
+        * Updates the last active timer on an object.
+        * @return bool True if successful, or false if not.
+	* Replaces controller->ping_object().
+        */
+	public function recordAccess() {
+	   if (!$this->id) {
+		return false;
+	   }
+            $this->timeupdated = time();
+            return update_record('sloodle_active_object', $entry);
+	}
+
+
+	public function process_interactions( $plugin_class, $interaction, $multiplier, $userid ) {
+
+		if ( !$userid = intval($userid) ) {
+			return false;
+		}
+
+		if ( $multiplier == 0 ) {
+			return false;
+		}
+
+		if (!class_exists($plugin_class)) {
+			return false;
+		}
+
+		// Find each of the tasks we have to handle for the interaction.
+		// This information is stored in the object config
+		$relevant_configs = array();
+
+		$relevant_config_names = call_user_func(array($plugin_class, 'InteractionConfigNames'));
+
+		/*
+		$relevant_config_names = array( 
+			'sloodleawardsdeposit_numpoints', 
+			'sloodleawardsdeposit_currency', 
+			'sloodleawardswithdraw_numpoints', 
+			'sloodleawardswithdraw_currency'
+		);
+		*/
+
+		// TODO: It might be (marginally) more efficient to filter this for things we're interested in in the query.
+		$all_configs = get_records('sloodle_object_config', 'object', $this->id);
+		foreach($relevant_config_names as $configname) {
+			$fieldname = $configname.'_'.$interaction;
+			foreach($all_configs as $c) {
+				if ($c->name == $fieldname) {
+					$relevant_configs[ $configname] = $c->value;
+				}				
+			}
+		}
+
+
+		if (count($relevant_configs) == 0) {
+			// Nothing to do here
+			return true;
+		}
+
+		if (!$controllerid = intval($this->controllerid) ) {
+			return false;
+		}
+
+		return call_user_func_array( array($plugin_class, 'ProcessInteractions'), array( $relevant_configs, $controllerid, $multiplier, $userid ));
+
+	}
+
     }
-
-
 
 ?>
