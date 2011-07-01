@@ -20,6 +20,9 @@
     /** Include our email functionality. */
     require_once(SLOODLE_LIBROOT.'/mail.php');
 
+    require_once(SLOODLE_LIBROOT.'/object_configs.php');
+    require_once(SLOODLE_LIBROOT.'/active_object.php');
+
 
     /**
     * Force the user to login, but reject guest logins.
@@ -921,24 +924,6 @@
         return $output;
     }
     
-    /**
-    * Extracts the object name and version number from an object identifier.
-    * @param string $objid An object identifier, such as "chat-1.0"
-    * @return array A numeric array of name then version number.
-    */
-    function sloodle_parse_object_identifier($objid)
-    {
-        // Find the last dash character, and split the string around it.
-        $lastpos = strrpos($objid, '-');
-        // Check for common problems
-        if ($lastpos === false) return array($objid, ''); // No dash
-        if ($lastpos == 0) return array('', substr($objid, 1)); // Dash at start
-        if ($lastpos == (strlen($objid) - 1)) return array(substr($objid, 0, -1), ''); // Dash at end
-        // Split up the values
-        $name = substr($objid, 0, $lastpos);
-        $version = substr($objid, $lastpos + 1, strlen($objid) - $lastpos - 1);
-        return array($name, $version);
-    }
     
     /**
     * Gets all object types and versions available in this installation.
@@ -951,37 +936,14 @@
     function sloodle_get_installed_object_types()
     {
         // Fetch all sub-directories of the "mod" directory
-        $MODPATH = SLOODLE_DIRROOT.'/mod';
-        $dirs = sloodle_get_subdirectories($MODPATH, true);
-        if (!$dirs) return false;
         
         // Go through each object to parse names and version numbers.
         // Object names should have format "name-version" (e.g. "chat-1.0").
         // We will skip anything that does not match this format.
         // We will also skip anything with a "noshow" file in the folder.
-        $mods = array();
-        foreach ($dirs as $d) {
-            if (empty($d)) continue;
-            
-            // Parse the object identifier
-            list($name, $version) = sloodle_parse_object_identifier($d);
-            if (empty($name) || empty($version)) continue;
 
-            // Check if there's a noshow file
-            if (file_exists("{$MODPATH}/{$d}/noshow")) continue;
-            
-            // Check if this object has a configuration script
-            $cfgscript = "$MODPATH/$d/object_config.php";
-            if (file_exists($cfgscript)) {
-                $mods[$name][$version] = $cfgscript;
-            } else {
-                $mods[$name][$version] = false;
-            }
-        }
-        
-        // Sort the array by name of the object
-        ksort($mods);        
-        return $mods;
+	return SloodleObjectConfig::AllAvailableAsNameVersionHash();
+
     }
    
 

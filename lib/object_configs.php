@@ -170,6 +170,50 @@ class SloodleObjectConfig {
 
 	}
 
+
+	/**
+	* Extracts the object name and version number from an object identifier.
+	* @param string $objid An object identifier, such as "chat-1.0"
+	* @return array A numeric array of name then version number.
+	*/
+	function ParseModIdentifier($modname)
+	{
+		// Find the last dash character, and split the string around it.
+		$lastpos = strrpos($modname, '-');
+		// Check for common problems
+		if ($lastpos === false) return array($modname, ''); // No dash
+		if ($lastpos == 0) return array('', substr($modname, 1)); // Dash at start
+		if ($lastpos == (strlen($modname) - 1)) return array(substr($modname, 0, -1), ''); // Dash at end
+		// Split up the values
+		$name = substr($modname, 0, $lastpos);
+		$version = substr($modname, $lastpos + 1, strlen($modname) - $lastpos - 1);
+		return array($name, $version);
+	}
+
+	function AllAvailableAsNameVersionHash() {
+
+		$objs = array();
+		$all_available = SloodleObjectConfig::AllAvailableAsArray();
+
+		foreach ($all_available as $obj_def) {
+		    if (empty($obj_def)) continue;
+		    
+		    $modname = $obj_def->modname;
+		    if (!$obj_def->show) {
+			continue;
+		    }
+		    // Parse the object identifier
+		    list($name, $version) = SloodleObjectConfig::ParseModIdentifier($modname);
+		    if (empty($name) || empty($version)) continue;
+		    
+		    $objs[$name][$version] = $obj;
+		}
+		
+		// Sort the array by name of the object
+		ksort($objs);        
+		return $objs;
+	}
+
 	// This creates a config element for a non-sloodle object, allowing us to rez and derez it.
 	// It is still assumed that it will have a sloodle_rezzer object script in it.
 	function ForNonSloodleObjectWithName( $name ) {

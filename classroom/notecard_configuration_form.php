@@ -76,7 +76,8 @@
     // Determine if we have a custom configuration page
     
     // Split up the object identifier into name and version number, then get the translated name
-    list($objectname, $objectversion) = sloodle_parse_object_identifier($sloodleobjtype);
+    list($objectname, $objectversion) = SloodleObjectConfig::ParseModIdentifier($sloodleobjtype);
+
     $strobjectname = get_string("object:$objectname", 'sloodle');
     
 //---------------------------------------------------------------------------------

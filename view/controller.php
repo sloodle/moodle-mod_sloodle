@@ -95,7 +95,7 @@ class sloodle_view_controller extends sloodle_base_view_module
                 // Go through each installed type to produce our own array of objects.
                 // (Our array will associate translated names and version numbers with complete object ID's).
                 $objects = array();
-                $mods = sloodle_get_installed_object_types();
+                $mods = SloodleObjectConfig::AllAvailableAsNameVersionHash();
                 if (!$mods) error('Error fetching installed object types.');
                 
                 foreach ($mods as $name => $versions) {
