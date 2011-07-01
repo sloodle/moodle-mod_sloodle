@@ -1,0 +1,91 @@
+.hiddenButton { visibility:hidden }
+.waiting_to_rez { font-color:red }
+/*.sloodle_config{ width:50%; margin-left:200px }a*/
+/*.sloodle_config_label{ width:40%; margin-right:60% }*/
+.add_to_layout_button{ margin-top:10px; margin-bottom:10px; }
+
+
+.active_button {
+    width: 97%;
+    display: block;
+    border-width: 0 12px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: inherit;
+    color: inherit;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-right: 40px;
+}
+
+.active_button{
+    -webkit-border-image: url(iui/whiteButton.png) 0 12 0 12;
+    text-shadow: rgba(255, 255, 255, 0.7) 0 1px 0;
+}
+
+.button_goes_here_zone {
+    display: block;
+    border-width: 0 12px;
+    border: dashed 1px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: inherit;
+    color: inherit;
+    margin-top: 4px;
+    margin-bottom: 4px;
+
+}
+
+span.score_info{
+    float:right; 
+    margin-right:10px; 
+    color:grey; 
+    font-style:italic
+}
+
+span.score_change_section{
+    float:right;
+    margin-left: 20px;
+    margin-right: 20px;
+    color:grey; 
+}
+
+span.score_info{
+    float:right; 
+    margin-right:10px; 
+    color:grey; 
+    font-style:italic
+}
+
+
+
+span.rezzable_item_status {
+    float:right; 
+    margin-right:10px; 
+    color:grey; 
+    font-style:italic
+}
+
+span.rezzable_item_positioning {
+    float:right; 
+    margin-right:10px; 
+    color:grey; 
+    font-style:italic
+}
+
+span.module_info {
+    margin-left:30px;
+    font-style: italic;
+    color: grey;
+}
+
+input.rename_layout_input {
+  border: 1px solid black; font-size:28px;
+}
+
+.logininput { border: 1px solid black; font-size:28px;}
+
