@@ -1,3 +1,0 @@
-Put this file in an object's folder to prevent it being displayed on lists of installed objects. This is useful for removing old objects from the list, or hiding debug objects.
-
-The content of this file does not matter. Only the name, "noshow".
