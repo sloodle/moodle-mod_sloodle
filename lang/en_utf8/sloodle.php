@@ -264,6 +264,8 @@ $string['object:hq'] = 'SLOODLE API HQ';
 $string['object:presenter'] = 'Presenter';
 $string['object:mapmarker'] = 'Map Marker';
 $string['object:picturegloss'] = 'Picture Gloss';
+$string['object:scoreboard'] = 'Scoreboard';
+$string['object:moodlescreen'] = 'Moodle Screen';
 
 $string['objectgroup:registration'] = 'Registration and Enrolment';
 $string['objectgroup:communication'] = 'Communication, Assignments and Inventory';

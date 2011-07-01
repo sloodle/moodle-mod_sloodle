@@ -202,8 +202,10 @@ class SloodleObjectConfig {
 		    if (!$obj_def->show) {
 			continue;
 		    }
+
 		    // Parse the object identifier
 		    list($name, $version) = SloodleObjectConfig::ParseModIdentifier($modname);
+print "<br>:$modname:$name:$version:";
 		    if (empty($name) || empty($version)) continue;
 		    
 		    $objs[$name][$version] = $obj;

@@ -1,7 +1,8 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Moodle Screen';
-$sloodleconfig->object_code= 'moodle-screen';
+$sloodleconfig->modname   = 'moodlescreen-1.0';
+$sloodleconfig->object_code= 'moodlescreen';
 $sloodleconfig->group      = 'misc';
 $sloodleconfig->show       = true;
 $sloodleconfig->aliases    = array('SLOODLE 1.1 Moodle Screen');
