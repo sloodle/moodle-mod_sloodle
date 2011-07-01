@@ -218,6 +218,7 @@
         */
         public function sendConfig( $extraParameters = NULL ){//inside active_object.php
 		global $CFG;
+get_records('sendingmessage');
             //construct the body
            if ($extraParameters === NULL) {
                $extraParameters = array();
@@ -442,6 +443,46 @@
 
 		return call_user_func_array( array($plugin_class, 'ProcessInteractions'), array( $relevant_configs, $controllerid, $multiplier, $userid ));
 
+	}
+
+	/*
+	Notify any active objects that are interested in the action $action.
+	...so that an object can tell us what it's interested in hearing about.
+	*/
+	function NotifySubscriberObjects( $notification_action, $success_code, $controllerid, $userid, $params ) {
+
+		global $CFG;
+
+		$interested_object_names = SloodleObjectConfig::NamesOfObjectsRequiringNotification( $notification_action );
+		//$interested_object_names = array('SLOODLE Scoreboard');
+		if (count($interested_object_names) == 0) {
+			// nobody cares, we're done..
+			return true;
+		}
+		$instr = '';
+		$delim = '';
+		foreach($interested_object_names as $on) {
+			$instr .= $delim."'".$on."'";
+			$delim = ',';
+		}
+		$controllerid = intval($controllerid);
+		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=$controllerid and a.httpinurl IS NOT NULL and a.name in ($instr);";
+		$recs = get_records_sql($sql);
+
+		$msg = "$success_code\n"; 
+		foreach($params as $n=>$v) {
+			$msg .= $n.'|'.$v."\n"; // TODO: Is there some code we should be reusing somewhere for this? SloodleResponse?
+		}
+
+		foreach($recs as $rec) {
+			$ao = new SloodleActiveObject();
+			$ao->loadFromRecord( $rec );
+			// If this stuff fails, tough. We did out best.
+			$ao->sendMessage($msg);
+		}
+
+		return true;
+		
 	}
 
     }

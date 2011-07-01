@@ -339,9 +339,13 @@
 
 	function ProcessInteractions( $relevant_configs, $controllerid, $multiplier, $userid ) {
 
+		global $CFG;
+
 		// Find the active round for the controller, or make one if there isn't one.
 		$timets = time();
 		$roundrecs = get_records_select('sloodle_award_rounds', "controllerid = $controllerid AND ( (timestarted <= $timets ) OR (timestarted = 0) ) AND ( (timeended >= $timets ) OR (timeended = 0) ) ");
+
+		$need_notify = false;
 
 		$round = null;
 		if ( $roundrecs || ( count($roundrecs) > 0 ) ) {
@@ -361,6 +365,8 @@
 			return false;
 		}
 
+		$time = time();
+
 		if ( isset($relevant_configs['sloodleawardsdeposit_numpoints']) && isset($relevant_configs['sloodleawardsdeposit_currency']) ) {
 
 			$numpoints  = intval($relevant_configs['sloodleawardsdeposit_numpoints']);
@@ -374,17 +380,20 @@
 			$award->userid = $userid;
 			$award->currencyid = $currencyid;
 			$award->amount = $numpoints * $multiplier;
-			$award->timeawarded = time();
+			$award->timeawarded = $time;
 			$award->roundid = $roundid;
 
 			if ( !insert_record('sloodle_award_points', $award) ) {
 				return false;
 			}
+
+			$need_notify = true;
+
 		}
 
 		if ( isset($relevant_configs['sloodleawardswithdraw_numpoints']) && isset($relevant_configs['sloodleawardswithdraw_currency']) ) {
 
-			$numpoints  = intval($relevant_configs['sloodleawardswithdraw_numpoints']) + 1;
+			$numpoints  = intval($relevant_configs['sloodleawardswithdraw_numpoints']) * -1;
 			$currencyid = intval($relevant_configs['sloodleawardswithdraw_currency']);
 
 			if (!$currencyid) {
@@ -395,14 +404,32 @@
 			$award->userid = $userid;
 			$award->currencyid = $currencyid;
 			$award->amount = $numpoints * $multiplier;
-			$award->timeawarded = time();
+			$award->timeawarded = $time;
 			$award->roundid = $roundid;
-			if ( !insert_record('sloodle_award_points') ) {
+			if ( !insert_record('sloodle_award_points', $award) ) {
 				return false;
 			}
+
+			$need_notify = true;
 		}
 
+		if ($need_notify) {
+			// Notify any active objects that care about changes to scores
+			// We'll check this in the object definition.
+			// TODO: We should probably do this with a notification_request table, 
+			// ...where the scoreboard etc will register with Sloodle that it's interested in certain events.
 
+			// TODO: Figure out the round/controller filters
+			$user_point_total_recs = get_records_sql( "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where currencyid=$currencyid and roundid=$roundid and userid=$userid;");
+			if (!$user_point_total_recs && (count($user_point_total_recs) == 0 ) ) {
+				return false;
+			}
+			$first_rec = array_shift($user_point_total_recs);
+			$balance = $first_rec->balance;
+
+			SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );
+		}
+		
 		return true;
 
 	}

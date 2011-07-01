@@ -27,7 +27,8 @@
     require_once(SLOODLE_LIBROOT.'/plugins.php');
     require_once(SLOODLE_LIBROOT.'/api_plugins.php');
 
-    /** Active Object. */
+    /** Active Objects and their definitions. */
+    require_once(SLOODLE_LIBROOT.'/object_configs.php');
     require_once(SLOODLE_LIBROOT.'/active_object.php');
     
     /**

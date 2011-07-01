@@ -112,6 +112,32 @@ class SloodleObjectConfig {
 
         }
 
+	/*
+	Static function returning a list of names of objects that want to be notified about something happening on the server.
+	You can say your object wants to be notified about something happening by putting the name of that something in the notify array in the object definition.
+	@param string $notification_action The thing you want to be notified about.
+	*/
+	function NamesOfObjectsRequiringNotification($notification_action) {
+
+		$defs = SloodleObjectConfig::AllAvailableAsArray();
+		$names = array();
+		foreach($defs as $def) {
+			if ( is_null($def->notify) || !is_array($def->notify) || count($def->notify) == 0 ) {
+				continue;
+			}
+			if ( !in_array( $notification_action, $def->notify) ) {
+				continue;
+			}
+			$names[] = $def->primname;
+			if (is_null($def->aliases) || !is_array($def->aliases)) {
+				continue;
+			}
+			$names = array_merge( $names, $def->aliases );
+		}
+		return $names;
+
+	}
+
 	function AllAvailableAsArrayByGroup() {
 
 		$objectconfigsbygroup = array();
