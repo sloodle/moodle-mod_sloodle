@@ -535,6 +535,11 @@ get_records('sendingmessage');
 
 	}
 
+	function has_custom_config() {
+
+		return ( $this->objectDefinition() != null );
+		
+	}
     }
 
 ?>

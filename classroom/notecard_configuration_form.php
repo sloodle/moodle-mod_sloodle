@@ -74,8 +74,6 @@
     $objectpath = SLOODLE_DIRROOT."/mod/$sloodleobjtype";
     if (!file_exists($objectpath)) error("ERROR: object \"$sloodleobjtype\" is not installed.");
     // Determine if we have a custom configuration page
-    $customconfig = $objectpath.'/object_config.php';
-    $hascustomconfig = file_exists($customconfig);
     
     // Split up the object identifier into name and version number, then get the translated name
     list($objectname, $objectversion) = sloodle_parse_object_identifier($sloodleobjtype);
@@ -94,21 +92,25 @@
     echo '<form action="'.SLOODLE_WWWROOT.'/classroom/notecard_configuration_view.php" method="POST">';
     echo '<input type="hidden" name="formsubmitted" value="true">';
     
+    
+    // We need to create some dummy data for the form
+    // (basically pretend we have an authorised object, and hope nobody tries to use the missing data anywhere!)
+    // (not the best idea, I know, but the notecard stuff was added late... :-\)
+    $sloodleauthid = 0;
+    $auth_obj = new SloodleActiveObject();
+    $auth_obj->course = $sloodle_course;
+    $auth_obj->type = $sloodleobjtype;
+    $hascustomconfig = $auth_obj->has_custom_config();
+       
     // Are there any custom configuration options?
     if ($hascustomconfig) {
-    
-        // We need to create some dummy data for the form
-        // (basically pretend we have an authorised object, and hope nobody tries to use the missing data anywhere!)
-        // (not the best idea, I know, but the notecard stuff was added late... :-\)
-        $sloodleauthid = 0;
-        $auth_obj = new SloodleActiveObject();
-        $auth_obj->course = $sloodle_course;
-        $auth_obj->type = $sloodleobjtype;
+
+	// TODO: Do I really need all this?
         $dummysession = new SloodleSession(false);
         $dummysession->user->load_user($USER->id);
         $dummysession->user->load_linked_avatar();
         $auth_obj->user = $dummysession->user;
-        
+ 
 	include('object_configuration_form_template.php');
         // Include the form elements
         //require($customconfig);

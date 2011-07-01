@@ -274,8 +274,7 @@
         $objectpath = SLOODLE_DIRROOT."/mod/$usetype";
         if (!file_exists($objectpath)) error(get_string('objectnotinstalled','sloodle'));
         // Determine if we have a custom configuration page
-        $customconfig = $objectpath.'/object_config.php';
-        $hascustomconfig = file_exists($customconfig);
+        $hascustomconfig = $auth_obj->has_custom_config();
         
         // Display the configuration section
         print_box_start('generalbox boxwidthnormal boxaligncenter');
@@ -290,7 +289,8 @@
             
             
             // Include the form elements
-            require($customconfig);
+            include('object_configuration_form_template.php');
+
             
             
             // Add this object's authorisation ID, and a submit button
