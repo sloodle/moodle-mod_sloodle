@@ -7,7 +7,7 @@ $sloodleconfig->group      = 'registration';
 $sloodleconfig->show       = true;
 $sloodleconfig->aliases    = array('SLOODLE 1.1 RegEnrol Booth');
 $sloodleconfig->field_sets = array( 
-	'access' => array(
+	'accesslevel' => array(
 		'sloodleobjectaccessleveluse'   => $sloodleconfig->access_level_object_use_option(),
 	),
 );

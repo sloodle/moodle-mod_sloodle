@@ -26,6 +26,13 @@
         var $uuid = '';
 
         /**
+        * The ID of this object.
+        * @var integer 
+        * @access public
+        */
+        var $id = 0;
+
+        /**
         * The name of this object.
         * @var string
         * @access public
@@ -40,11 +47,24 @@
         var $password = '';
 
         /**
-        * The type of this object.
+        * The type of this object. This corresponds to the mod/ directory its linker lives in.
         * @var string
         * @access public
         */
         var $type = '';
+
+        /**
+        * The code of this object. 
+	* If we have multiple objects sharing the same linked, they will have different codes.	
+	* Corresponds to the files inside object_definitions/
+	* eg. Two quiz chairs, one of which was a rocket would both have the type of quiz-1.0
+	* ...and be distinguished as 'quiz-chair' and 'quiz-rocket'.
+	* NB For backwards compatibility, this can be undefined
+	* ...in which case we'll expect a definition called 'default'.
+        * @var string
+        * @access public
+        */
+        var $object_code = null;
 
         /**
         * The course/controller which this object is authorised for.
@@ -117,6 +137,16 @@
 			return SLOODLE_HTTP_IN_PROXY_OR_TUNNEL;
 		}
 		return null;
+	}
+
+	function objectDefinition() {
+
+		if ($this->type == '') {
+			return null;
+		}
+		
+		return SloodleObjectConfig::ForObjectType( $this->type, $this->object_code );
+
 	}
 
         //sends a curl message to our objects httpinurl
@@ -483,6 +513,26 @@ get_records('sendingmessage');
 
 		return true;
 		
+	}
+
+	// Moved here from the controller, where it was called get_object_configuration.
+	// TODO: Check if anyone is still using the version in the controller, and kill that.
+        function configNameValueHash() {
+	
+		$id = $this->id;	
+
+		// If the ID is empty, then we have no configuration settings to get
+		if (empty($id)) return array();
+
+		$recs = get_records('sloodle_object_config', 'object', $entry->id);
+		if (!$recs) return false;
+
+		$config = array();
+		foreach ($recs as $r) {
+			$config[$r->name] = $r->value;
+		}
+		return $config;
+
 	}
 
     }

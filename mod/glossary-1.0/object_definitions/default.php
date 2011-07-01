@@ -11,15 +11,17 @@ $sloodleconfig->group      = 'communication';
 $sloodleconfig->show       = true;
 $sloodleconfig->aliases    = array('SLOODLE 1.1 MetaGloss');
 $sloodleconfig->field_sets = array( 
-	'access' => array(
+	'generalconfiguration' => array( //TODO: Check defaults
+		'sloodlepartialmatches' => new SloodleConfigurationOptionYesNo( 'sloodlepartialmatches', 'showpartialmatches', null, 1 ),
+		'sloodlerandomize' => new SloodleConfigurationOptionYesNo( 'sloodlesearchaliases', 'searchaliases', null, 0 ),
+		'sloodledialog' => new SloodleConfigurationOptionYesNo( 'sloodlesearchdefinitions', 'searchdefinitions', null, 0 ),
+		'sloodleplaysound' => new SloodleConfigurationOptionYesNo( 'sloodleplaysound', 'playsounds', null, 0 ),
+	),
+	'accesslevel' => array(
 		'sloodleobjectaccessleveluse'   => $sloodleconfig->access_level_object_use_option(),
 		'sloodleserveraccesslevel'      => $sloodleconfig->access_level_server_option(),
-	),
-	'generalconfiguration' => array( //TODO: Check defaults
-		'sloodlepartialmatches' => new SloodleConfigurationOptionYesNo( 'sloodlepartialmatches', 'showpartialmatches', 0 ),
-		'sloodlerandomize' => new SloodleConfigurationOptionYesNo( 'sloodlesearchaliases', 'searchaliases', 0 ),
-		'sloodledialog' => new SloodleConfigurationOptionYesNo( 'sloodlesearchdefinitions', 'searchdefinitions', 0 ),
-		'sloodleplaysound' => new SloodleConfigurationOptionYesNo( 'sloodleplaysound', 'playsounds', 0 ),
+		'sloodleobjectaccesslevelctrl'  => $sloodleconfig->access_level_object_control_option()
+
 	)
 );
 ?>

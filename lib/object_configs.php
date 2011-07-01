@@ -54,6 +54,24 @@ class SloodleObjectConfig {
 		return null;
 	}
 
+	// Return a SloodleObjectDefinition object for the given mod directory
+	// The optional objcode not used yet as of 2011-07-01
+	// In future it will allow the same linker to be shared by multiple objects
+	// ...but the objects will have to know how to report their own codes.
+	function ForObjectType($modname, $objcode = 'default') {
+
+		if ($objcode == '') {
+			$objcode = 'default';
+		}
+                $definition_file = SLOODLE_DIRROOT.'/mod/'.$modname.'/object_definitions/'.$objcode.'.php';
+		if (!file_exists($definition_file)) {
+			return null;
+		}
+		include($definition_file); // Will define a variable called $sloodleconfig
+		return $sloodleconfig;
+
+	}
+
 	/*
 	Load an associative array of object definitions called object_configs, with the prim name as the key
 	...and a SloodleObjectConfig object as the value.
@@ -69,7 +87,7 @@ class SloodleObjectConfig {
 	This doesn't make much sense, as quiz_pile_on scripts end up calling linkers under quiz-1.0 anyhow.
 	But we'll leave them for backwards compatibility until we can kill of the old HTML configuration forms.
 	*/
-	function AllAvailableAsArray() {
+	function AllAvailableAsArray($key = 'primname') {
 
 		$currentdir = dirname(__FILE__);
 
@@ -102,7 +120,7 @@ class SloodleObjectConfig {
 					continue;
 				}
 				include($object_definition_dir.'/'.$def_include);
-				$object_configs[$sloodleconfig->primname] = $sloodleconfig;
+				$object_configs[$sloodleconfig->$key] = $sloodleconfig;
 			}
 			closedir($dh2);
 		}
@@ -244,7 +262,7 @@ class SloodleObjectConfig {
 			SLOODLE_OBJECT_ACCESS_LEVEL_GROUP  => 'accesslevel:group',
 			SLOODLE_OBJECT_ACCESS_LEVEL_OWNER  => 'accesslevel:owner'
 		);
-		$ctrl->default = SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC;
+		$ctrl->default = SLOODLE_OBJECT_ACCESS_LEVEL_OWNER;
 		$ctrl->type = 'radio'; // This is the recommended display type for the object.
 
 		return $ctrl;
@@ -388,12 +406,41 @@ class SloodleObjectConfig {
 			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, 'currency', '', '', 8);
 			$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
 			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'currency', '', '', 8);
+			$configs[ $deposit_currency_fieldname ]->is_value_translatable = false;
+			$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
 		}
 
 		return $configs;
 
 	}
 
+	function module_choice( $courseid ) {
+
+		if (!$this->module) {
+			return null;
+		}
+
+		$options = $this->course_module_options( $courseid );
+        	$op = new SloodleConfigurationOptionSelectOne( 'sloodlemoduleid', $this->module_choice_message, $this->module_no_choices_message, null, $options ); 
+
+		$op->is_value_translatable = false;
+		return $op;
+
+	}
+
+	// Over-write in the default values of the fields 
+	// ...with the ones specified in the $settings name=>value hash.
+	function populateDefaults( $settings ) {
+		
+		foreach($this->field_sets as $n=>$fs) {
+			foreach($fs as $f) {
+				if ( isset($settings[ $f->field_name ] ) ) {
+					$this->field_sets[$n][$fs]->default = $settings[ $f->field_name ];
+				}
+			}
+		}
+
+	}
 }
 
 // Represents a single entry or potential entry in an object configuration.
@@ -412,6 +459,9 @@ class SloodleConfigurationOption {
 
 	// a set of name-value pairs of keys and their display values
 	var $options = array(); 
+	
+	// whether the value (options or text) can be translated.
+	var $is_value_translatable = true;
 
 	// the size of the display element, if applicable
 	var $size = 255;
@@ -429,6 +479,23 @@ class SloodleConfigurationOption {
 	// the type of the object, eg. yesno, select etc.
 	// TODO: It would be better if these objects could render their own html, then we wouldn't need to tell anyone the type
 	var $type;
+
+	// Return an array of translated options.
+	// Usually we'd keep our options untranslated, and translate them at the last minute.
+	// But sometimes, eg with things from the database, there are no translations.
+	function translatedOptions() {
+		if (!$this->is_value_translatable) {
+			return $this->options;
+		}
+		if ( (!is_array($this->options)) || ( count($this->options) == 0) ) {
+			return $this->options;
+		}
+		$to = array();
+		foreach($this->options as $n=>$v) {
+			$to[$n] = get_string($v, 'sloodle');	
+		}
+		return $to;
+	}
 
 	function renderForMoodleForm() {
 
@@ -470,13 +537,17 @@ class SloodleConfigurationOptionText extends SloodleConfigurationOption {
 // NB This could be presented as a set of radio buttons rather than a select
 class SloodleConfigurationOptionSelectOne extends SloodleConfigurationOption {
 
-	function SloodleConfigurationOptionSelectOne( $fieldname = null, $title = null, $description = null, $length = 8, $default = null) {
+	function SloodleConfigurationOptionSelectOne( $fieldname = null, $title = null, $no_option_text = null, $description = null, $options = array(), $default = null) {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
+		$this->no_option_text = $no_option_text;
 		$this->description = $description;
-		$this->options = array(0 => 'Yes', 1 => 'No');
+		$this->options = $options;
 		$this->default = $default;
-		$this->type = 'radio';
+		$this->type = 'select_one';
+	}
+
+	function renderForMoodleForm($selectedoption) {
 	}
 
 }
@@ -490,11 +561,12 @@ class SloodleConfigurationOptionCourseModuleChoice extends SloodleConfigurationO
 	// An array of key-value pairs for filtering the instance modules
 	var $instancefilters = array();
 
-	function SloodleConfigurationOptionText( $fieldname, $title, $description, $noneavailablemessage, $instancefilters ) {
+	function SloodleConfigurationOptionCourseModuleChoice( $fieldname, $title, $description, $noneavailablemessage, $instancefilters ) {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->description = $description;
-		$this->options = $this->course_module_options_for_config();
+		$this->options = $this->course_module_options();
+		$this->instancefilters = $instancefilters;
 	}
 
 

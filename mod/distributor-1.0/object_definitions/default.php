@@ -11,12 +11,12 @@ $sloodleconfig->group      = 'communication';
 $sloodleconfig->show       = true;
 $sloodleconfig->aliases    = array('SLOODLE 1.1 Vending Machine');
 $sloodleconfig->field_sets = array( 
-	'access' => array(
-		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(),
-		'sloodleserveraccesslevel'     => $sloodleconfig->access_level_server_option(),
-	),
 	'generalconfiguration' => array(
 		'sloodlerefreshtime' => new SloodleConfigurationOptionText( 'sloodlerefreshtime', 'refreshtimeseconds', '', 3600, 8),
 	),
+	'accesslevel' => array(
+		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(),
+		'sloodleobjectaccesslevelctrl' => $sloodleconfig->access_level_object_control_option()
+	)
 );
 ?>

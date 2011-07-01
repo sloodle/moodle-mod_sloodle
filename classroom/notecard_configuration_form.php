@@ -20,6 +20,8 @@
     require_once(SLOODLE_DIRROOT.'/lib.php');
     /** Sloodle API. */
     require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
+    require_once(SLOODLE_LIBROOT.'/active_object.php');
+    require_once(SLOODLE_LIBROOT.'/object_configs.php');
 
     // Fetch our required parameters
     $sloodlecontrollerid = required_param('sloodlecontrollerid', PARAM_INT);
@@ -107,8 +109,9 @@
         $dummysession->user->load_linked_avatar();
         $auth_obj->user = $dummysession->user;
         
+	include('object_configuration_form_template.php');
         // Include the form elements
-        require($customconfig);
+        //require($customconfig);
         
     } else {
         // No configuration settings for this object
