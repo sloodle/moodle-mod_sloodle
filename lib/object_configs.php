@@ -203,6 +203,9 @@ class SloodleObjectConfig {
 			continue;
 		    }
 
+if ($modname == 'accesschecker-1.0') {
+continue;
+}
 		    // Parse the object identifier
 		    list($name, $version) = SloodleObjectConfig::ParseModIdentifier($modname);
 		    if (empty($name) || empty($version)) continue;
