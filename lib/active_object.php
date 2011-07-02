@@ -420,6 +420,16 @@ get_records('sendingmessage');
             return update_record('sloodle_active_object', $this);
 	}
 
+	public function config_value( $name ) {
+		if ($config = get_record('sloodle_object_config', 'object', $this->id, 'name', $name)) {
+var_dump($config);
+			return $config->value;
+		}
+		$config = get_record('sloodle_object_config', 'object', $this->id);
+
+var_dump($config);
+		return null;
+	}
 
 	public function process_interactions( $plugin_class, $interaction, $multiplier, $userid ) {
 
@@ -517,14 +527,14 @@ get_records('sendingmessage');
 
 	// Moved here from the controller, where it was called get_object_configuration.
 	// TODO: Check if anyone is still using the version in the controller, and kill that.
-        function configNameValueHash() {
+        function config_name_value_hash() {
 	
 		$id = $this->id;	
 
 		// If the ID is empty, then we have no configuration settings to get
 		if (empty($id)) return array();
 
-		$recs = get_records('sloodle_object_config', 'object', $entry->id);
+		$recs = get_records('sloodle_object_config', 'object', $id);
 		if (!$recs) return false;
 
 		$config = array();

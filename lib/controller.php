@@ -594,34 +594,7 @@
             
             return $obj;
         }
-        
-        /**
-        * Gets an array of object configuration settings.
-        * (Can be called statically).
-        * @param mixed $id If an integer, it is the ID of an active object. If it is a string it is the object's UUID.
-        * @return array Associative array of setting names to values. (Returns an empty array if unsuccessful.)
-	* TODO: Move this to the SloodleActiveObject class...
-        */
-        function get_object_configuration($id)
-        {
-            // If the ID is empty, then we have no configuration settings to get
-            if (empty($id)) return array();
-        
-            // Check what type the ID is and fetch the object
-            if (is_string($id)) $entry = get_record('sloodle_active_object', 'uuid', $id);
-            else $entry = get_record('sloodle_active_object', 'id', (int)$id);
-            if (!$entry) return array();
-            
-            // Fetch the values
-            $recs = get_records('sloodle_object_config', 'object', $entry->id);
-            if (!$recs) return false;
-            // Construct our associative array
-            $config = array();
-            foreach ($recs as $r) {
-                $config[$r->name] = $r->value;
-            }
-            return $config;
-        }
+       
         
         /**
         * Returns an array of active object records, or false if something went wrong.

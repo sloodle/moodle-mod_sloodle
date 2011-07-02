@@ -35,7 +35,7 @@
 	$def = $auth_obj->objectDefinition();
 	$fieldsets = $def->field_sets;
 
-        $settings = $auth_obj->configNameValueHash();
+        $settings = $auth_obj->config_name_value_hash();
 	if ($auth_obj->id > 0) {
 		$def->populateDefaults( $settings );
 	}
