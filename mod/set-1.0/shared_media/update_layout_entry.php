@@ -22,9 +22,12 @@ require_once '../../../lib/json/json_encoding.inc.php';
 $configVars = array();
 
 $layoutentryid = null;
+$rezzeruuid = null;
 foreach($_GET as $n => $v) {
 	if ($n == 'layoutentryid') {
 		$layoutentryid = intval($v);
+	} else if ($n == 'rezzeruuid') {
+		$rezzeruuid = $v;
 	} else {
 		$configVars[$n] = $v;
 	}
@@ -62,12 +65,16 @@ if (!$controller->load( $configVars['controllerid'] )) {
 }
 
 $failures = array();
-$active_objects = $controller->get_active_objects( $layoutentryid );
+$active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
 
 foreach($active_objects as $ao) {
-        $response = $ao->sendMessage('do:reset');
-	sleep(1);
-	$response2 = $ao->sendConfig();
+	if ($ao->configure_for_layout()) {
+		$response = $ao->sendMessage('do:reset');
+		sleep(1);
+		$response2 = $ao->sendConfig();
+	} 
+	// No error handling here - if it breaks, just carry on.
+
         //var_dump($response['result']);
 /*
         if (preg_match('/^(<.*?>)\|(<.*?>)\|(.*?)$/', $response['result'], $matches)) {

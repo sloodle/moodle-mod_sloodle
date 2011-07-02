@@ -119,7 +119,6 @@
 
 	$courselayouts = array();
 
-	include(SLOODLE_LIBROOT.'/object_configs.php');
 
 	//$object_configs = SloodleObjectConfig::AllAvailableAsArrayByGroup();
 	$object_configs = SloodleObjectConfig::AllAvailableAsArray();
@@ -177,13 +176,13 @@
 
 	print_controller_list( $courses, $controllers, $hasSites = false, $sitesURL); 
 	print_layout_list( $courses, $controllers, $courselayouts );
-	print_add_layout_forms( $courses, $controllers );
+	print_add_layout_forms( $courses, $controllers, $object_uuid );
 	print_html_bottom();
 
 	print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries, $object_uuid);
 	print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup );
-	print_add_object_forms($courses, $controllers, $courselayouts, $object_configs ); 
-	print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries); 
+	print_add_object_forms($courses, $controllers, $courselayouts, $object_configs, $object_uuid); 
+	print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries, $object_uuid); 
 
 	print_html_bottom();
 

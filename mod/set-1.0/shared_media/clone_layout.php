@@ -29,6 +29,7 @@ require_once '../../../lib/json/json_encoding.inc.php';
 $configVars = array();
 
 $layoutid = optional_param('layoutid', 0, PARAM_INT);
+$rezzeruuid = optional_param('layoutid', 0, PARAM_RAW);
 
 if (!$layoutid) {
 	error_output( 'Layout ID missing');
@@ -148,11 +149,11 @@ $layoutid = $cloneid;
 	$add_object_groups = ob_get_clean();
 
 	ob_start();
-        print_add_object_forms($courses, $controllers, $courselayouts, $object_configs );
+        print_add_object_forms($courses, $controllers, $courselayouts, $object_configs, $rezzeruuid );
 	$add_object_forms = ob_get_clean();
 
 	ob_start();
-        print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries);
+        print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries, $rezzeruuid);
 	$edit_object_forms = ob_get_clean();
 
 $content = array(

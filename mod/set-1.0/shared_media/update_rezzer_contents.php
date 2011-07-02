@@ -82,11 +82,11 @@ foreach($objects_in_rezzer as $objname) {
 	$html_list_items[$element_id] = ob_get_clean();
 
 	ob_start();
-	$element_id = print_add_object_form( $config, $courseid, $controllerid, $layout, $objname);
+	$element_id = print_add_object_form( $config, $courseid, $controllerid, $layout, $objname, $rezzeruuid);
 	$add_object_forms[$element_id] = ob_get_clean();
 
 	ob_start();
-	$element_id = print_config_form( $e, $config, $courseid, $controllerid, $layout->id, 'misc');
+	$element_id = print_config_form( $e, $config, $courseid, $controllerid, $layout->id, 'misc', $rezzeruuid);
 	$edit_object_forms[$element_id] = ob_get_clean();
 
 

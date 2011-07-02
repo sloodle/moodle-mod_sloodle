@@ -12,10 +12,11 @@ $sloodleconfig->field_sets = array(
 		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(), 
 	),
 	'general' => array(
-		'sloodlegroupid' => new SloodleConfigurationOptionText( 'sloodlegroupid', 'groupid', '', 0, 4 ),
-		'sloodleroundid' => new SloodleConfigurationOptionText( 'sloodleroundid', 'roundid', '', 1, 4 ),
+		'sloodlegroupid' => new SloodleConfigurationOptionText( 'sloodlegroupid', 'awards:group', '', 0, 4 ),
+		'sloodleroundid' => new SloodleConfigurationOptionText( 'sloodleroundid', 'awards:round', '', 1, 4 ),
+		'sloodlecurrencyid' => new SloodleConfigurationOptionText( 'sloodlecurrencyid', 'awards:currency', '', 1, 4 ),
                 'sloodlerefreshtime' => new SloodleConfigurationOptionText( 'sloodlerefreshtime', 'refreshtimeseconds', '', 600, 8 ),
-		'sloodleshowallcontrollers' => new SloodleConfigurationOptionYesNo( 'sloodleshowallcontrollers', 'showallcontrollers', 0 ),
+		'sloodleshowallcontrollers' => new SloodleConfigurationOptionYesNo( 'sloodleshowallcontrollers', 'awards:showallcontrollers', 0 ),
 	)
 );
 ?>

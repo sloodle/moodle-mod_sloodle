@@ -26,6 +26,7 @@ $configVars = array();
 
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $layoutname = optional_param('layoutname', '', PARAM_TEXT);
+$rezzeruuid = optional_param('rezzeruuid', '', PARAM_RAW);
 
 if (!$courseid) {
 	error_output( 'Course ID missing');
@@ -130,11 +131,11 @@ if (!$layoutid = $layout->insert()) {
 	$add_object_groups = ob_get_clean();
 
 	ob_start();
-        print_add_object_forms($courses, $controllers, $courselayouts, $object_configs );
+        print_add_object_forms($courses, $controllers, $courselayouts, $object_configs, $rezzeruuid );
 	$add_object_forms = ob_get_clean();
 
 	ob_start();
-        print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries);
+        print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries, $rezzeruuid);
 	$edit_object_forms = ob_get_clean();
 
 $content = array(

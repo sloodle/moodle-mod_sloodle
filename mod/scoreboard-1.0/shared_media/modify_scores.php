@@ -55,12 +55,42 @@
 		exit;
 	}
 
+sleep(10);
+
+	$controllerid = intval($ao->controllerid);
+	$currencyid = intval($ao->config_value('sloodlecurrencyid'));
+	$roundid = intval($ao->config_value('sloodleroundid'));
+	
+
+
 	// TODO: Check if they're a teacher, if so give them the teacher view.
 	$is_admin = false;
 	$is_logged_in = isset($USER) && ($USER->id > 0);
 $is_logged_in = false;
 
+	$userids = required_param('userids');
+	$userscores = required_param('userscores');
 	
+	$i=0;
+	foreach($userids as $userid) {
+		if (!$userid = intval($userid)) {
+			continue;
+		}
+		if (!$userscore = intval($userscores[$i])) {
+			continue;
+		}
+
+		$award = new stdClass();
+		$award->userid = $userid;
+		$award->currencyid = $currencyid;
+		$award->amount = $userscore;
+		$award->timeawarded = time();
+		$award->roundid = $roundid;
+
+		insert_record( 'sloodle_award_points', $award);
+		$i++;
+	}
+
 	// TODO: Add round filter etc
 	$sql = "select max(u.userid) as userid, sum(p.amount) as balance, u.avname as avname from {$CFG->prefix}sloodle_award_points p left outer join {$CFG->prefix}sloodle_users u on p.userid=u.userid group by u.userid order by balance desc, avname asc;";
 	$updated_score_recs = get_records_sql( $sql );
@@ -79,7 +109,7 @@ $updated_scores[ 7 ]->balance = 500;
 */
 
 
-	$result = 'refreshed';
+	$result = 'updated';
 
 	$content = array(
 		'result' => $result,

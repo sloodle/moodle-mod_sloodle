@@ -545,6 +545,10 @@ $string['awards:gamescoreboard']='Game: ';
 $string['awards:gameslist']=' Games List';  
 $string['awards:gobackgameslist']='Go back to Games List';  
 
+$string['awards:group']='Group';  
+$string['awards:round']='Round';  
+$string['awards:showallcontrollers']='Show points for whole site, not just this controller.';  
+
 $string['awards:help:icurrency']='If you select Lindens, then your students can withdraw money using a stipend giver. On the otherhand, iPoints are non monetary points you can award your students!'; 
 $string['help:maxpoints']='-->If you choose 1000 as the maximum points then students must accumulate 1000 points or higher in Second Life to acheive 100 percent grade  If however they only get 300 points in Second Life and the maximum points are set to 1000, then the grade achieved would be 300/1000  (30 percent)';                                    
 $string['awards:balanceUpdate']='Update';                   

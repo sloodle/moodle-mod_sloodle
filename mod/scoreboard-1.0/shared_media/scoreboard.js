@@ -73,8 +73,74 @@
 			//Insert event to be triggered on has change.
 			update_score_for_hash_change( window.location.hash );
 		})
+		$().find('.score_change').unbind('click').click( function() {
+			return change_score($(this));
+		});
+		$('#save_dirty_link').unbind('click').click( function() {
+			return save_dirty_scores();
+		});
 		 //enable_slide_navigation();
 
+	}
+
+	function change_score(changespanjq) {
+		var changeby = parseInt( changespanjq.attr('data-score-change') );	
+		var parentlijq = changespanjq.closest('li');
+		parentlijq.addClass('has_dirty_scores');
+		parentlijq.attr('data-dirty-change', parseInt(parentlijq.attr('data-dirty-change')) + changeby);
+		parentlijq.find('.score_info').html( parseInt(parentlijq.find('.score_info').html()) + changeby );
+		update_position(parentlijq);
+
+		// TODO: Might be better to wait a few seconds then do this on a timer.
+		save_dirty_scores(); // NB This will only do something if there's no pending score save request.
+		
+	}
+
+	// 
+	function save_dirty_scores() {
+		var useridarg = '';
+		var userscorearg = '';
+		// Sometimes this will have nothing to do, if the dirty scores are in the process of being saved.
+		if ($('li.has_dirty_scores').not('saving_scores').length == 0) {
+			return true;
+		}
+
+		alert($('li.has_dirty_scores').not('saving_scores').length); 
+		$('li.has_dirty_scores').not('saving_scores').each( function() {
+			useridarg = useridarg + $(this).attr('data-userid') + '&';
+			userscorearg = userscorearg + $(this).attr('data-dirty-change') + '&';
+			$(this).removeClass('has_dirty_scores');
+			$(this).attr('data-dirty-change', 0);
+			$(this).addClass('saving_scores');
+		} );
+		$.getJSON(  
+			"modify_scores.php",  
+			{
+				sloodleobjuuid: active_object_uuid,
+				'userids[]': useridarg,
+				'userscores[]': userscorearg,
+				last_update: last_update
+			},  
+			function(json) {  
+				var result = json.result;
+				if (result == 'updated') {
+					for(var userid in json.updated_scores) {
+						var changedscorejq = $('#student_score_'+userid);
+						var score = json.updated_scores[userid] + changedscorejq.attr('data-dirty-change');
+						changedscorejq.find('.score_info').html( score.balance );
+						changedscorejq.removeClass('saving_scores');
+						update_position(changedscorejq);
+					}
+					//itemjq.removeClass('syncing').addClass("synced");
+				// TODO: On failure, remove the scores that couldn't be saved.
+				} else if (result == 'failed') {
+					alert('failed');
+					
+				} else {
+					alert('refresh returned unknown status');
+				}
+			}  
+		);  
 	}
 
 	$(document).ready(function () {

@@ -145,13 +145,14 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 }
 
 
-function print_add_layout_forms( $courses, $controllers ) {
+function print_add_layout_forms( $courses, $controllers, $rezzeruuid ) {
 	foreach($courses as $course) {
 		$cid = $course->id;
 		foreach($controllers[$cid] as $contid => $cont) {
 ?>
     <form data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" id="addlayout_<?= intval($cid)?>-<?= intval($contid) ?>" class="panel" title="Add a Scene to <?= htmlentities($course->fullname) ?>">
 	<input type="hidden" name="courseid" value="<?= intval($cid)?>" />
+	<input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid)?>" />
 	<fieldset>
 	<div class="row" >
 		<label for="layoutname">Name</label>
@@ -305,7 +306,7 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
 <?php
 }
 
-function print_add_object_forms($courses, $controllers, $courselayouts, $object_configs ) {
+function print_add_object_forms($courses, $controllers, $courselayouts, $object_configs, $rezzeruuid ) {
 
 	foreach($courses as $course) {
 		$cid = $course->id; 
@@ -324,7 +325,7 @@ function print_add_object_forms($courses, $controllers, $courselayouts, $object_
 The following form is used for adding the object.
 But once it's been added, it will be clone()d to make a form to update the object we added.
 */
-					print_add_object_form( $config, $cid, $contid, $layout, $object_title );
+					print_add_object_form( $config, $cid, $contid, $layout, $object_title, $rezzeruuid );
 ?>
 
 <?php 
@@ -337,11 +338,12 @@ But once it's been added, it will be clone()d to make a form to update the objec
 <?php
 }
 
-function print_add_object_form( $config, $cid, $contid, $layout, $object_title ) {
+function print_add_object_form( $config, $cid, $contid, $layout, $object_title, $rezzeruuid ) {
 	$id = "addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
 ?>
 <form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="<?=$id?>" title="<?= htmlentities($object_title) ?>">
 <span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" data-adding-text="Adding <?= htmlentities( $object_title ) ?>" data-add-text="Add <?= htmlentities( $object_title ) ?>" class="active_button add_to_layout_button" target="_self" type="submit">Add <?= htmlentities( $object_title ) ?></span>
+<input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid) ?>" />
 <input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities($config->group) ?>" />
 <input type="hidden" name="layoutid" value="<?= intval($layout->id) ?>" />
@@ -394,7 +396,7 @@ not radio: <?=$ctrl->type?>
 /*
 Configuration form for each 
 */
-function print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries) {
+function print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries, $rezzeruuid) {
 
 	foreach($courses as $course) {
 		$cid = $course->id; 
@@ -409,7 +411,7 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
 						$entryname = $e->name;	
 						$config = $object_configs[$entryname]; // TODO: Merge in the layout entries
 
-						print_config_form( $e, $config, $cid, $contid, $lid, $group );
+						print_config_form( $e, $config, $cid, $contid, $lid, $group, $rezzeruuid );
 						
 					}
 				}
@@ -424,7 +426,7 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
 <?php
 }
 
-function print_config_form( $e, $config, $cid, $contid, $lid, $group ) {
+function print_config_form( $e, $config, $cid, $contid, $lid, $group, $rezzeruuid ) {
 
 						$lconfig = $e->get_layout_entry_configs_as_name_value_hash();
 						$entryname = preg_replace('/SLOODLE\s/', '', $e->name);
@@ -436,6 +438,7 @@ function print_config_form( $e, $config, $cid, $contid, $lid, $group ) {
 <form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="<?=$id?>" class="panel" title="<?= htmlentities($object_title) ?>">
 <span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" class="active_button update_layout_entry_button" target="_self" type="submit">Update <?= htmlentities( $object_title ) ?></span>
 <input type="hidden" name="layoutid" value="<?= intval($lid) ?>" />
+<input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid) ?>" />
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
 <input type="hidden" name="controllerid" value="<?= intval($contid) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities( get_string('objectgroup:'.$group, 'sloodle' ) ) ?>" />

@@ -248,7 +248,6 @@
         */
         public function sendConfig( $extraParameters = NULL ){//inside active_object.php
 		global $CFG;
-get_records('sendingmessage');
             //construct the body
            if ($extraParameters === NULL) {
                $extraParameters = array();
@@ -369,7 +368,9 @@ get_records('sendingmessage');
 
             if ($rec) {
                 $this->loadFromRecord($rec);
+
                 return true;
+
             }
 
             return false;
@@ -405,8 +406,75 @@ get_records('sendingmessage');
            $this->position = $rec->position;
            $this->rotation = $rec->rotation;
            $this->rezzeruuid = $rec->rezzeruuid;
+
+	   // TODO: This is probably mostly not needed.
+           // We should fetch this lazily when we need the course name or whatever it is we want here.
+           $this->course = new SloodleCourse();
+           $this->course->load_by_controller($this->controllerid);
+
+ 	   return true;
+
         }
 
+	// Configures an activeobject for its layoutentryid, which should already have been set, if there is one.
+        // TODO: This functionality is partially duplicated in controller->configure_object_from_layout_entry($authid, $layout_entry_id, $rezzeruuid = null) 
+	// Remove it from there, and do it all here.
+	// NB This doesn't actually send the config to the object - you need to call sendConfig separately to do that.
+	public function configure_for_layout() {
+
+		// We should already have been inserted when this gets called.
+		if (!$id = $this->id) {
+			return false;
+		}
+
+		if (!$layoutentryid = $this->layoutentryid) {
+			return false;
+		}
+
+		$existingconfigs = $this->config_name_config_hash();
+		$done_configs = array();
+
+		$configs = get_records('sloodle_layout_entry_config','layout_entry', $layoutentryid);
+		$ok = true;
+		if (count($configs) > 0) {
+			foreach($configs as $config) {
+				$name = $config->name;
+				if ( isset($existingconfigs[ $name ])) {
+					// No change
+					if ($existingconfigs[ $name ]->value == $config->value) {
+						$done_configs[ $name ] = true;
+						continue;
+					} else {
+						$updated_config = $existingconfigs[ $name ];
+						$updated_config->value = $config->value;
+						update_record( 'sloodle_object_config', $updated_config);
+						$done_configs[ $name ] = true;
+					}
+				} else {
+					$config->id = null;
+					$config->object = $this->id;
+					if (!insert_record('sloodle_object_config',$config)) {
+						$ok = false;
+					}
+				}
+			}
+		}
+
+		// Original configs that are no longer in the layout, so we'll kill them.
+		if (count($existingconfigs) > 0) {
+			foreach($existingconfigs as $config) {
+				if (!isset($done_configs[ $config->name ] )) {
+					if (!delete_record('sloodle_object_config', $config)) {
+						$ok = false;
+					}
+				}
+			}	
+		}
+
+		return $ok;
+            
+	}
+           
         /**
         * Updates the last active timer on an object.
         * @return bool True if successful, or false if not.
@@ -422,12 +490,10 @@ get_records('sendingmessage');
 
 	public function config_value( $name ) {
 		if ($config = get_record('sloodle_object_config', 'object', $this->id, 'name', $name)) {
-var_dump($config);
 			return $config->value;
 		}
 		$config = get_record('sloodle_object_config', 'object', $this->id);
 
-var_dump($config);
 		return null;
 	}
 
@@ -525,9 +591,8 @@ var_dump($config);
 		
 	}
 
-	// Moved here from the controller, where it was called get_object_configuration.
-	// TODO: Check if anyone is still using the version in the controller, and kill that.
-        function config_name_value_hash() {
+	// An array of config objects, keyed by config name
+        function config_name_config_hash() {
 	
 		$id = $this->id;	
 
@@ -539,8 +604,28 @@ var_dump($config);
 
 		$config = array();
 		foreach ($recs as $r) {
+			$config[$r->name] = $r;
+		}
+		return $config;
+
+	}
+
+	// An array of config values, keyed by config name
+        function config_name_value_hash() {
+	
+		if (!$config_hash = $this->config_name_config_hash()) {
+			return false;
+		}
+
+		if (count($config_hash) == 0) {
+			return array();
+		}
+
+		$config = array();
+		foreach ($config_hash as $r) {
 			$config[$r->name] = $r->value;
 		}
+
 		return $config;
 
 	}

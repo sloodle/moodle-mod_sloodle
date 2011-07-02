@@ -66,7 +66,7 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
     <ul id="scorelist" data-parent="roundlist" title="Scores" selected="true">
         <li class="group">All Students</li>
 	<?php foreach($student_scores as $score) { ?>
-        <li id="student_score_<?= intval($score->userid) ?>">
+        <li id="student_score_<?= intval($score->userid) ?>" data-userid="<?= intval($score->userid) ?>" data-dirty-change="0" data-last-clean-ts="0" >
 	<?php if (false &&$is_logged_in) { ?>
 		<a data-userid="<?= $score->userid?>" href="#edit_student" class="student_edit_link" >
 	<?php } ?>
@@ -78,7 +78,7 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 	<?php
 		foreach( array("+1","+5","+10","+25","+100","-100","-25","-10","-5","-1") as $score_change ) {
 	?>
-			<span class="score_change"><?=$score_change ?></span>
+			<span class="score_change" data-score-change="<?=intval($score_change) ?>"><?=$score_change ?></span>
 	<?php
 		}
 	?>
@@ -93,6 +93,7 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 	<?php } ?>
 	<li></li>
 	<li><span id="update_score_list_link">Update</span></li>
+	<li><span id="save_dirty_link">Save Dirty</span></li>
     </ul>
 
 <?php 

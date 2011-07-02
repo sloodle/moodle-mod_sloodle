@@ -210,7 +210,7 @@
 	}
 
 	function refresh_misc_object_group( parentjq) {
-		var item_list_jq = $('ul[data-parent*="'+parentjq.attr('id')+'"]');
+		var item_list_jq = $('ul[data-parent*="'+parentjq.attr('id')+'"].object_group_misc');
 		var bits = item_list_jq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
 		var layoutid = bits.pop(); 
 		var controllerid = bits.pop();
@@ -616,6 +616,7 @@
 			"clone_layout.php",  
 			{
 				layoutid: layoutid,
+				rezzeruuid: rezzeruuid,
 				ts: new Date().getTime()
 			},
 			function(json) {  
@@ -675,7 +676,7 @@
 		buttonjq.html( buttonjq.attr('data-updating-text') );
 		$.getJSON(  
 			"update_layout_entry.php",  
-			frmjq.serialize(),
+			frmjq.serialize(),	
 			function(json) {  
 				var result = json.result;
 				var objectgroup = json.objectgroup;

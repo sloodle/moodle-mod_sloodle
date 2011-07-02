@@ -604,6 +604,7 @@
         * @return array() active object objects, or false on failure
         */
 	function get_active_objects( $rezzeruuid = null, $layoutentryid = null ) {
+
             $id = $this->get_id();
             $aos = array();
             if (!$id) {
