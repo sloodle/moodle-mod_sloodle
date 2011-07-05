@@ -84,6 +84,7 @@
 	}
 
 	function change_score(changespanjq) {
+
 		var changeby = parseInt( changespanjq.attr('data-score-change') );	
 		var parentlijq = changespanjq.closest('li');
 		parentlijq.addClass('has_dirty_scores');
@@ -98,21 +99,30 @@
 
 	// 
 	function save_dirty_scores() {
+
 		var useridarg = '';
 		var userscorearg = '';
+		var useridscorehash = new Array();
 		// Sometimes this will have nothing to do, if the dirty scores are in the process of being saved.
-		if ($('li.has_dirty_scores').not('saving_scores').length == 0) {
+		if ($('li.has_dirty_scores').not('.saving_scores').size() == 0) {
 			return true;
 		}
-
-		alert($('li.has_dirty_scores').not('saving_scores').length); 
 		$('li.has_dirty_scores').not('saving_scores').each( function() {
-			useridarg = useridarg + $(this).attr('data-userid') + '&';
-			userscorearg = userscorearg + $(this).attr('data-dirty-change') + '&';
+			var changeduserid = $(this).attr('data-userid');
+			var changeduserscore = $(this).attr('data-dirty-change');
+			useridscorehash[ changeduserid ] = changeduserscore; // Store this in case the request fails and we have to revert the change.
+			useridarg = useridarg + changeduserid + '&';
+			userscorearg = userscorearg + changeduserscore + '&';
 			$(this).removeClass('has_dirty_scores');
 			$(this).attr('data-dirty-change', 0);
 			$(this).addClass('saving_scores');
 		} );
+
+		// Make sure we get errors, even if it's a timeout or a non-parseable response
+		$.ajaxSetup({"error":function(XMLHttpRequest,textStatus, errorThrown) {   
+			handle_save_error( useridscorehash );
+		}});
+
 		$.getJSON(  
 			"modify_scores.php",  
 			{
@@ -130,17 +140,28 @@
 						changedscorejq.find('.score_info').html( score.balance );
 						changedscorejq.removeClass('saving_scores');
 						update_position(changedscorejq);
+						// There may be some scores that queued up waiting for us to finish, so save them.
+						save_dirty_scores();
 					}
-					//itemjq.removeClass('syncing').addClass("synced");
 				// TODO: On failure, remove the scores that couldn't be saved.
-				} else if (result == 'failed') {
-					alert('failed');
-					
 				} else {
-					alert('refresh returned unknown status');
+					handle_save_error( useridscorehash );
 				}
-			}  
-		);  
+			}
+		); 
+
+	}
+
+	function handle_save_error(useridscorehash) {
+		for(var userid in useridscorehash) {
+			var revertscorechange = useridscorehash[ userid ];
+			var changedscorejq = $('#student_score_'+userid);
+			var displayedscore = changedscorejq.find('.score_info').html() - revertscorechange;
+			changedscorejq.find('.score_info').html(displayedscore); 
+			changedscorejq.removeClass('saving_scores');
+			update_position(changedscorejq);
+		}
+		save_dirty_scores();
 	}
 
 	$(document).ready(function () {
