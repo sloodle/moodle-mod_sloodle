@@ -1057,9 +1057,65 @@ if ($result && $oldversion < 2010091200) {
     /// Launch create table for sloodle_award_points
         $result = $result && create_table($table);
     }
+    if ($result && $oldversion < 2011070500 ) {
+
+    /// Define field description to be added to sloodle_award_points
+        $table = new XMLDBTable('sloodle_award_points');
+        $field = new XMLDBField('description');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'roundid');
+
+    /// Launch add field description
+        $result = $result && add_field($table, $field);
+/// Define key poiroufk (foreign) to be added to sloodle_award_points
+        $table = new XMLDBTable('sloodle_award_points');
+        $key = new XMLDBKey('poiroufk');
+        $key->setAttributes(XMLDB_KEY_FOREIGN, array('roundid'), 'sloodle_award_rounds', array('id'));
+
+    /// Launch add key poiroufk
+        $result = $result && add_key($table, $key);
+ /// Define key poiusefk (foreign) to be added to sloodle_award_points
+        $table = new XMLDBTable('sloodle_award_points');
+        $key = new XMLDBKey('poiusefk');
+        $key->setAttributes(XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+    /// Launch add key poiusefk
+        $result = $result && add_key($table, $key);
+/// Define key poicurfk (foreign) to be added to sloodle_award_points
+        $table = new XMLDBTable('sloodle_award_points');
+        $key = new XMLDBKey('poicurfk');
+        $key->setAttributes(XMLDB_KEY_FOREIGN, array('currencyid'), 'sloodle_award_currency', array('id'));
+
+    /// Launch add key poicurfk
+        $result = $result && add_key($table, $key);
+ /// Define field courseid to be added to sloodle_award_rounds
+        $table = new XMLDBTable('sloodle_award_rounds');
+        $field = new XMLDBField('courseid');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null, 'controllerid');
+
+    /// Launch add field courseid
+        $result = $result && add_field($table, $field);
+
+    }
 
 
-  return $result; 
+ if ($result && $oldversion < 2011070501) {
+
+    /// Define field imageurl to be added to sloodle_currency_types
+        $table = new XMLDBTable('sloodle_currency_types');
+        $field = new XMLDBField('imageurl');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'timemodified');
+
+    /// Launch add field imageurl
+        $result = $result && add_field($table, $field);
+/// Define field displayorder to be added to sloodle_currency_types
+        $table = new XMLDBTable('sloodle_currency_types');
+        $field = new XMLDBField('displayorder');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, null, null, 'imageurl');
+
+    /// Launch add field displayorder
+        $result = $result && add_field($table, $field);    
+}
+return $result; 
 }
 
 ?>

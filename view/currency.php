@@ -9,13 +9,18 @@
 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
 *
 * @contributor Peter R. Bloomfield
+* @contributor Paul Preibisch
 *
 */ 
+define('SLOODLE_ALL_CURRENCIES_VIEW', 1);
+
+
 
 /** The base view class */
 require_once(SLOODLE_DIRROOT.'/view/base/base_view.php');
 /** SLOODLE logs data structure */
 require_once(SLOODLE_LIBROOT.'/course.php');
+require_once(SLOODLE_LIBROOT.'/currency.php');    
 
 /**
 * Class for rendering a view of SLOODLE course information.
@@ -29,18 +34,21 @@ class sloodle_view_currency extends sloodle_base_view
     * @access private
     */
     var $course = 0;
-
+     var $can_edit=false;
     /**
     * SLOODLE course object, retrieved directly from database.
     * @var object
     * @access private
     */
     var $sloodle_course = null;
+    var $sloodle_currency = null;
     /**
     * Constructor.
     */
     function sloodle_view_currency()
     {
+        
+        
     }
 
     /**
@@ -48,12 +56,72 @@ class sloodle_view_currency extends sloodle_base_view
     */
     function process_request()
     {
+        
         $id = required_param('id', PARAM_INT);
+        $mode= optional_param('mode', PARAM_INT);
         if (!$this->course = get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
-        if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
+        if (!$this->sloodle_course->load($this->course)) error(s(get_string('failedcourseload', 'sloodle')));
+        switch($mode){
+            case "modify":
+                //get vars
+                $currencyid= required_param('currencyid', PARAM_INT);        
+                $currencyname= required_param('currencyname', PARAM_TEXT);        
+                $imageurl= required_param('imageurl', PARAM_URL);        
+                $displayorder= required_param('displayorder', PARAM_INT);        
+                //create update object
+                $currency=new stdClass();
+                $currency->id=$currencyid;
+                $currency->name=$currencyname;
+                $currency->displayorder=$displayorder;                
+                if ($imageurl!="")$currency->imageurl=$imageurl;
+                //update
+                $result = update_record('sloodle_currency_types',$currency);
+                if (!$result) {
+                    $errorlink = $CFG->wwwroot."/mod/sloodle/view.php?_type=currency&id={$id}";
+                    print_error(get_string('general:fail','sloodle'),$errorlink);
+                }
+            break;
+            case "add":
+                //get vars
+                
+                $currencyname= required_param('currencyname', PARAM_TEXT);        
+                $imageurl="";
+                $imageurl= optional_param('imageurl', PARAM_URL);        
+                $displayorder= optional_param('displayorder', PARAM_INT);        
+                //create update object
+                $currency=new stdClass();
+                $currency->name=$currencyname;
+                if (isset($displayorder)) $currency->displayorder=$displayorder;                
+                if (isset($imageurl))if ($imageurl!="")$currency->imageurl=$imageurl;
+                //update
+                $result = insert_record('sloodle_currency_types',$currency);
+                if (!$result) {
+                    $errorlink = $CFG->wwwroot."/mod/sloodle/view.php?_type=currency&id={$id}";
+                    print_error(get_string('general:fail','sloodle'),$errorlink);
+                }
+            break;
+            
+            case "confirmdelete":
+                 //get vars
+                 $this->check_permission();
+                 if ($this->can_edit){
+                     
+                    $currencyid= required_param('currencyid', PARAM_INT);        
+                    $result = delete_records('sloodle_currency_types','id',$currencyid);
+                    
+                    if (!$result) {
+                        $errorlink = $CFG->wwwroot."/mod/sloodle/view.php?_type=currency&id={$id}";
+                        print_error(get_string('general:fail','sloodle'),$errorlink);
+                    }
+                }
+               
+            break;
+            
+            default:
+                break;
+        }
     }
-
     /**
     * Check that the user is logged-in and has permission to alter course settings.
     */
@@ -66,17 +134,19 @@ class sloodle_view_currency extends sloodle_base_view
 
         // Ensure the user is allowed to update information on this course
         $this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
-        require_capability('moodle/course:update', $this->course_context);
+        if (has_capability('moodle/course:update', $this->course_context)) $this->can_edit = true;
     }
 
     /**
     * Print the course settings page header.
     */
-    function print_header()
-    {
+    function print_header() {
+    
         global $CFG;
-        $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view_logs.php?id={$this->course->id}\">".get_string('logs:view', 'sloodle')."</a>";
-        print_header_simple(get_string('logs','sloodle'), "", $navigation, "", "", true, '', navmenu($this->course));
+        $id = required_param('id', PARAM_INT);
+        $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?&_type=currency&mode=allcurrencies&id={$id}\">".get_string('currencies:view', 'sloodle')."</a>";
+        print_header_simple(get_string('backpack','sloodle'), "", $navigation, "", "", true, '', navmenu($this->course));
+        
     }
 
 
@@ -85,59 +155,244 @@ class sloodle_view_currency extends sloodle_base_view
     * This MUST be overridden to provide functionality.
     */
     function render()
-    {
-        
-        global $CFG;
-        global $sloodle;
-        // Display info about Sloodle course configuration
-        echo "<h1 style=\"text-align:center;\">".get_string('logs:sloodlelogs','sloodle')."</h1>\n"; 
-        echo "<h2 style=\"text-align:center;\">(".get_string('course').": \"<a href=\"{$CFG->wwwroot}/course/view.php?id={$this->course->id}\">".$this->sloodle_course->get_full_name()."</a>\")</h2>";
-        
-
-      // print_box(get_string('logs:info','sloodle'), 'generalbox boxaligncenter boxwidthnormal');
-        $sloodletable = new stdClass(); 
-         $sloodletable->head = array(                         
-             '<h4><div style="color:red;text-align:left;">'.get_string('logs:avname', 'sloodle').'</h4>',
-             '<h4><div style="color:red;text-align:left;">'.get_string('logs:username', 'sloodle').'</h4>',
-             '<h4><div style="color:green;text-align:left;">'.get_string('logs:action', 'sloodle').'</h4>',             
-             '<h4><div style="color:green;text-align:left;">'.get_string('logs:slurl', 'sloodle').'</h4>',
-             '<h4><div style="color:black;text-align:center;">'.get_string('logs:time', 'sloodle').'</h4>');             
-              //set alignment of table cells                                        
-            $sloodletable->align = array('left','left','left','left','left');
-            $sloodletable->width="95%";
-            //set size of table cells
-            $sloodletable->size = array('15%','10%', '50%','5%','20%');
-
-         $logData = get_records('sloodle_logs','course',$this->sloodle_course->get_course_id(), 'timemodified DESC');
-          
-        
-        if (count($logData)>0){
-                foreach ($logData as $ld){
-                    $trowData= Array();        
-                         $link_url=' <a href="'.$CFG->wwwroot.'/user/view.php?id='.$ld->userid."&course=";
-                         $link_url.=$this->sloodle_course->get_course_id().'">'.$ld->avname."</a>";
-                         $trowData[]=$link_url;    
-                         $userData = get_record('user','id',$ld->userid);
-                         $username= $userData->username;                         
-                         $trowData[]=$username;    
-                         $trowData[]=$ld->action;    
-                         $trowData[]='<a href="'.$ld->slurl.'">'.get_string('logs:slurl', 'sloodle').'</a>';    
-                         $trowData[]=date("F j, Y, g:i a",$ld->timemodified);             
-                         $sloodletable->data[] = $trowData;                     
-                }//for
-             
-            }else
-            {
-                    $trowData[]=get_string('logs:nologs', 'sloodle');
-                    $sloodletable->data[] = $trowData;                     
-             
-            }
-        
-        print_table($sloodletable); 
-        
- 
- 
+    {                                      
+        $view = optional_param('view', "");
+        $mode= optional_param('mode', "allcurrencies");
+        switch ($mode){
+            case "allcurrencies": 
+                $this->render_all_currencies();
+            break;
+            case "editcurrency":$this->render_edit_currency();
+            break;
+            case "deletecurrency":$this->delete_currency();
+            break;
+            default:
+             $this->render_all_currencies();
+            break;
+        }
     }
+    
+      function render_all_currencies(){
+          
+           global $CFG;      
+           global $COURSE;
+           $id = required_param('id', PARAM_INT);
+            // Display instrutions for this page        
+           echo "<br>";
+           print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');
+           
+           print("<h1 style=\"color:orange\">"."<img align=\"center\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ");
+           print(get_string('currency:currencies', 'sloodle')."</h1>");
+        
+          
+            //create an html table to display the users      
+            $sloodletable = new stdClass(); 
+            echo '<h4>';
+            if ($this->can_edit) {                 
+                $sloodletable->head = array(                         
+                get_string('currencies:displayorder', 'sloodle'),
+                get_string('currencies:icon', 'sloodle'),
+                get_string('currencies:name', 'sloodle'),
+                "");
+                
+                //set alignment of table cells                                        
+                $sloodletable->align = array('left','left','left');
+                $sloodletable->width="95%";
+                //set size of table cells
+                $sloodletable->size = array('10%','5%','50%','45%','25%');            
+                //get currencies 
+                $currencyTypes= get_records_sql("select id, name, imageurl FROM {$CFG->prefix}sloodle_currency_types ORDER BY 'name' ASC ");         
+                
+                foreach ($currencyTypes as $c){
+                  $rowData=array();
+                  //cell 1 - display order
+                  $rowData[]= $c->displayorder;
+                  //cell 2 - image icon
+                  if (isset($c->imageurl)){
+                    $rowData[]= '<img src="'.$c->imageurl.'" width ="20px" height="20px">'; 
+                  }
+                  else {
+                      $rowData[]="";
+                  }
+                  //cell 3 - currency name
+                  $rowData[]= $c->name;
+                  //cell 4 - image url
+                 // $rowData[]= $c->imageurl;
+                  //cell 5 - edit action
+                      $editText= "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?&";
+                      $editText.= "_type=currency";
+                      $editText.= "&currencyid=".$c->id;
+                      $editText.= "&currencyname=".urlencode($c->name);
+                      $editText.= "&mode=editcurrency";
+                      $editText.= "&id={$COURSE->id}";
+                      $editText.= "\">";
+                      
+                      $editText.="<img src=\"{$CFG->SLOODLE_LIBROOT}lib/media/settings.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".get_string('currencies:edit', 'sloodle')."\"/> ";
+                      $editText.= "</a>";
+                    
+                           $editText.= "&nbsp&nbsp<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?&";
+                          $editText.= "_type=currency";
+                          $editText.= "&currencyid=".$c->id;
+                          $editText.= "&currencyname=".urlencode($c->name);
+                          $editText.= "&mode=deletecurrency";
+                          $editText.= "&id={$COURSE->id}";
+                          $editText.= "\">";
+                          $editText.="<img src=\"{$CFG->SLOODLE_LIBROOT}lib/media/garbage.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".get_string('currencies:delete', 'sloodle')."\"/> ";
+                          $editText.= "</a>";
+                        if ($c->name=="Credits") {
+                            
+                        $rowData[]="<img src=\"{$CFG->SLOODLE_LIBROOT}lib/media/lock.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".get_string('currencies:locked', 'sloodle')."\"/> ";
+                        }else{
+                  $rowData[]=$editText;
+                  }
+                    
+                  
+                  $sloodletable->data[]=$rowData;
+                  
+                }
+                 print_table($sloodletable);
+                 
+                  print_box_end();
+                //create an html table to display the users      
+            $sloodletable = new stdClass(); 
+            echo '<h4>';
+            
+                $sloodletable->head = array(                         
+                get_string('currencies:displayorder', 'sloodle'),
+                get_string('currencies:icon', 'sloodle'),
+                get_string('currencies:name', 'sloodle'),
+                get_string('currencies:imageurl', 'sloodle'),
+                "");
+                
+                //set alignment of table cells                                        
+                $sloodletable->align = array('left','left','left');
+                $sloodletable->width="55%";
+                //set size of table cells
+                $sloodletable->size = array('10%','5%','50%','45%','25%');       
+                print('<form action="" method="POST">');
+                  //create cells for add row
+                   $cells = array();
+                   //cell 1 -display order
+                   $cells[]='<input type="hidden" name="currencyid" value="null">           
+                   <input type="hidden" name="mode" value="add">
+                   <input type="hidden" name="id" value="'.$id.'">
+                   <input type="text" name="displayorder" size="2" value="0">';
+                   //cell 2 - icon - blank
+                   $cells[]="";
+                   //cell 3 - name
+                   $cells[]='<input type="text" name="currencyname" size="30" value="">';
+                   //cell 4 - imageurl
+                   $cells[]='<input type="text" size="100" name="imageurl" value="">';
+                   //cell 5- add
+                   $cells[]='<input type="submit" name="add" value="Add New Currency">';
+                   $sloodletable->data[]=$cells;
+                    
+           print_box_start('generalbox boxaligncenter center boxheightnarrow leftpara');
+           echo "<h2 style=\"color:green\"><img align=\"left\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/addnew.png\" width=\"48\"/> ";
+           print(get_string('currency:add new','sloodle')."</h2>");
+        
+         
+                   
+                   print_table($sloodletable);
+                   print("</form>");
+   print_box_end();
+          }
+      }
+      function delete_currency(){
+        global $CFG;      
+        global $COURSE;
+        $id = required_param('id', PARAM_INT);
+        $currencyname= optional_param('currencyname');                          
+        $currencyid= required_param('currencyid');                          
+        echo "<br>";            
+        //print header box
+        print_box_start('generalbox boxaligncenter right boxwidthnarrow boxheightnarrow rightpara');
+        echo "<h1 style=\"color:red\"><img align=\"left\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
+        echo get_string('currency:confirm delete', 'sloodle')."</h1>";
+        print_box_end();
+        //display all currencies
+        print_box_start('generalbox boxaligncenter boxwidthfull leftpara');
+        print('<form action="" method="POST">');
+        if ($this->can_edit) {  
+           $c= get_record('sloodle_currency_types','id',$currencyid);
+           $sloodletable = new stdClass(); 
+           //set up column headers table data
+           $sloodletable->head = array(                         
+           get_string('currencies:icon', 'sloodle'),
+           get_string('currencies:name', 'sloodle'),           
+           "");
+           $sloodletable->align = array('left','left','left');
+           $sloodletable->width="95%";
+           $sloodletable->size = array('10%','50%','30%');     
+           //create cells for row
+           $row = array();
+           //cell 1 -icon
+            if (isset($c->imageurl)&&!empty($c->imageurl)){
+                    $row[]= '<img src="'.$c->imageurl.'" width ="20px" height="20px">'; 
+                  }
+                  else {
+                      $row[]= " ";
+                  }
+          
+           //cell 2 - name
+            $row[]='<input type="hidden" name="mode" value="confirmdelete">
+            <input type="hidden" name="currencyid" value="'.$c->id.'">
+            <input type="hidden" name="id" value="'.$id.'">'.s($c->name);
+           //cell 4 - submit
+           $row[]='<input type="submit" name="sumbit" value="'
+            .s(get_string('currency:deletethiscurrency', 'sloodle')).'">';
+           $sloodletable->data[]=$row;
+           print_table($sloodletable);
+        }
+        print("</form>");
+          
+          
+      }
+      function  render_edit_currency(){
+        global $CFG;      
+        global $COURSE;
+        $id = required_param('id', PARAM_INT);
+        $currencyname= required_param('currencyname');                          
+        $currencyid= required_param('currencyid');                          
+        echo "<br>";            
+        //print header box
+        print_box_start('generalbox boxaligncenter center boxwidthnarrow boxheightnarrow leftpara');
+        echo "<h1 color=\"Red\"><img align=\"center\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
+        echo get_string('currency:Edit Currency', 'sloodle')."</h1>";
+        print_box_end();
+        //display all currencies
+        print_box_start('generalbox boxaligncenter boxwidthfull leftpara');
+        print('<form action="" method="POST"><h4>');
+        if ($this->can_edit) {  
+           $c= get_record('sloodle_currency_types','id',$currencyid);
+           $sloodletable = new stdClass(); 
+           //set up column headers table data
+           $sloodletable->head = array(                         
+           get_string('currencies:displayorder', 'sloodle'),
+           get_string('currencies:imageurl', 'sloodle'),
+           get_string('currencies:name', 'sloodle'),
+           "");
+           $sloodletable->align = array('left','left','left');
+           $sloodletable->width="95%";
+           $sloodletable->size = array('10%','50%','30%','15%');     
+           //create cells for row
+           $row = array();
+           //cell 1 -display order
+           $row[]='<input type="hidden" name="currencyid" value="'.$c->id.'">           
+           <input type="text" name="displayorder" size="2" value="'.$c->displayorder.'">';
+           //cell 2 - imageurl
+           $row[]='<input type="text" size="100" name="imageurl" value="'.$c->imageurl.'">
+           <input type="hidden" name="mode" value="modify">
+           <input type="hidden" name="id" value="'.$id.'">';
+           //cell 3 - name
+           $row[]='<input type="text" name="currencyname" size="30" value="'.$c->name.'">';
+           //cell 4 - submit
+           $row[]='<input type="submit" name="sumbit" value="submit">';
+           $sloodletable->data[]=$row;
+           print_table($sloodletable);
+        }
+        print("</form>");
+      }
 
     /**
     * Print the footer for this course.
