@@ -51,19 +51,60 @@
 		exit;
 	}
 
-	// TODO: Check if they're a teacher, if so give them the teacher view.
-	$is_admin = false;
-	$is_logged_in = isset($USER) && ($USER->id > 0);
-$is_logged_in = false;
+	$configs = $ao->config_name_value_hash();
 
-	$is_admin = true;
-	
-	// TODO: Add round filter etc
-	$sql = "select max(u.userid) as userid, sum(p.amount) as balance, u.avname as avname from {$CFG->prefix}sloodle_award_points p left outer join {$CFG->prefix}sloodle_users u on p.userid=u.userid group by u.userid order by balance desc, avname asc;";
+	$roundid = 1;
+	$currencyid = 0;
+
+	$refreshtime = isset($configs['sloodlerefreshtime']) ? $configs['sloodlerefreshtime'] : 60;
+
+	$context = get_context_instance(CONTEXT_COURSE,$ao->course->course_object->id);
+	$contextid = $context->id;
+	$courseid = $ao->course->course_object->id;
+
+	$is_logged_in = isset($USER) && ($USER->id > 0);
+
+        $is_admin = $is_logged_in && has_capability('moodle/course:manageactivities', $context); 
+
+	$scoresql = "select userid as userid, sum(amount) as balance from mdl_sloodle_award_points p where p.roundid = {$roundid} and p.currencyid = {$currencyid} group by p.userid order by balance desc;";
+	//$scoresql = "select userid as userid, sum(amount) as balance from mdl_sloodle_award_points p inner join mdl_sloodle_award_rounds ro on p.roundid=ro.id where p.roundid = {$roundid} and ro.courseid = {$courseid} and p.currencyid = {$currencyid} group by p.userid order by balance desc;";
+
+ 	$usersql = "select max(u.id) as userid, u.firstname as firstname, u.lastname as lastname, su.avname as avname from mdl_user u inner join mdl_role_assignments ra on u.id left outer join mdl_sloodle_users su on u.id=su.userid where ra.contextid={$contextid} group by u.id order by avname asc;";
 
 //select max(u.userid) as userid, sum(p.amount) as balance from mdl_sloodle_award_points p left outer join mdl_sloodle_users u on p.userid=u.userid inner join mdl_groups_members m on u.userid=m.userid where m.groupid=2 group by u.userid;
 
-	$student_scores = get_records_sql( $sql );
+	$scores = get_records_sql( $scoresql );
+	$students = get_records_sql( $usersql);
+
+	$students_by_userid = array();
+	foreach($students as $student) {
+		$students_by_userid[ $student->userid ] = $student;
+	}
+
+	// students with scores, in score order
+	$student_scores = array();
+	foreach($scores as $score) {
+		$userid = $score->userid;
+		if (!isset($students_by_userid[ $userid ])) { // student deleted but their score is still there.
+			continue;
+		}
+		$student = $students_by_userid[ $userid ];
+		$student->has_scores = true;
+		$student->balance = $score->balance;
+		$student_scores[$userid] = $student;
+	}
+
+	// students without scores
+	if ($is_admin) {
+		foreach($students_by_userid as $userid => $student) {
+			if (isset($student_scores[ $userid ] )) {
+				continue; // already done
+			}
+			$student->has_scores = false;
+			$student->balance = 0;
+			$student_scores[ $userid ] = $student;
+		}
+	}
 
 	$roundrecs = get_records( 'sloodle_awards_rounds', 'id', $roundid );
 
@@ -79,12 +120,12 @@ header('Pragma: public');
 */
 
 
-	print_html_top();
+	print_html_top('', $is_logged_in);
 	print_toolbar( $baseurl, $is_logged_in );
 
 	print_site_placeholder( $sitesURL );
-	print_round_list( $roundrecs );
-	print_score_list( "All groups", $student_scores, $object_uuid, $currency, $roundid, $is_logged_in); 
+//	print_round_list( $roundrecs );
+	print_score_list( "All groups", $student_scores, $object_uuid, $currency, $roundid, $refreshtime, $is_logged_in, $is_admin); 
 	print_user_points_change_form( ); 
 
 

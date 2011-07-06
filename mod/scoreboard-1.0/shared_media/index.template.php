@@ -1,6 +1,6 @@
 <?php 
 
-function print_html_top($loadfrom = '') { 
+function print_html_top($loadfrom = '', $is_logged_in) { 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -17,7 +17,8 @@ function print_html_top($loadfrom = '') {
 <!--
 -->
 <script type="text/javascript">
-	var rezzer_uuid = '<?= htmlentities($_REQUEST['sloodleobjuuid']) ?>';
+	var rezzer_uuid  = '<?= htmlentities($_REQUEST['sloodleobjuuid']) ?>';
+	var do_full_updates = <?= $is_logged_in ? 'true' : 'false' ?>; 
 </script>
 </head>
 
@@ -56,47 +57,73 @@ function print_round_list($rounds) {
 <?php
 }
 
-function print_score_list( $group_name, $student_scores, $active_object_uuid, $currencyid, $roundid, $is_logged_in ) {
-$is_logged_in = true;
+function print_score_list( $group_name, $student_scores, $active_object_uuid, $currencyid, $roundid, $refreshtime, $is_logged_in, $is_admin ) {
 ?>
 <script>
 var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 </script>
+
      
-    <ul id="scorelist" data-parent="roundlist" title="Scores" selected="true">
+    <ul id="scorelist" class="<?= $is_admin ? 'admin_view' : 'student_view' ?>" data-refresh-seconds="<?=intval($refreshtime) ?>" data-parent="roundlist" title="Scores" selected="true">
         <li class="group">All Students</li>
-	<?php foreach($student_scores as $score) { ?>
-        <li id="student_score_<?= intval($score->userid) ?>" data-userid="<?= intval($score->userid) ?>" data-dirty-change="0" data-last-clean-ts="0" >
+	<?php
+	foreach($student_scores as $score) { 
+		render_score_li($score, $is_admin); 
+	}
+	?>
+	<li></li>
+<?php /*
+	<li><span id="update_score_list_link">Update</span></li>
+	<li><span id="save_dirty_link">Save Dirty</span></li>
+*/ ?>
+    </ul>
+
+    <?php
+	$dummy_score = new stdClass();
+	$dummy_score->avname = '';
+	$dummy_score->firstname = '';
+	$dummy_score->lastname = '';
+	$dummy_score->userid = 0;
+	$dummy_score->has_scores = true;
+    ?>
+    <ul class="dummy_item_template" id="dummy_score_ul"> 
+	<?php render_score_li( $dummy_score, $is_admin ); ?>
+    </ul>
+
+<?php 
+}
+
+function render_score_li($score, $is_admin) { 
+?>
+        <li class="<?= $score->has_scores ? 'has_scores' : 'no_scores' ?>" id="student_score_<?= intval($score->userid) ?>" data-userid="<?= intval($score->userid) ?>" data-dirty-change="0" data-last-clean-ts="0" >
 	<?php if (false &&$is_logged_in) { ?>
 		<a data-userid="<?= $score->userid?>" href="#edit_student" class="student_edit_link" >
 	<?php } ?>
-		<span class="avatar_name"><?= ( $score->avname != '' ) ? htmlentities( $score->avname ) : 'Unregistered' ?></span>
+		<span class="avatar_name"><?= ( $score->avname != '' ) ? htmlentities( $score->avname ) : htmlentities($score->firstname.' '.$score->lastname) ?></span>
 	<?php 
-	if ($is_logged_in) { 
+	if ($is_admin) { 
 	?>
 		<span class="score_change_section">
+		<span class="show_link score_change" data-score-change="0">Show </span>
+		<span class="user_score_delete_link" >Delete </span>
+		&nbsp; 
+		&nbsp; 
 	<?php
 		foreach( array("+1","+5","+10","+25","+100","-100","-25","-10","-5","-1") as $score_change ) {
 	?>
-			<span class="score_change" data-score-change="<?=intval($score_change) ?>"><?=$score_change ?></span>
+			<span class="score_change" data-score-change="<?=intval($score_change) ?>"><?=intval($score_change) ?></span>
 	<?php
 		}
 	?>
 		</span>
 	<?php
 	} ?>
-		<span class="score_info"><?= $score->balance ?></span>
+		<span class="score_info"><?= intval($score->balance) ?></span>
 	<?php if ($is_logged_in) { ?>
 		</a>
 	<?php } ?>
 	</li>
-	<?php } ?>
-	<li></li>
-	<li><span id="update_score_list_link">Update</span></li>
-	<li><span id="save_dirty_link">Save Dirty</span></li>
-    </ul>
-
-<?php 
+	<?php
 }
 
 function print_user_points_change_form( ) {

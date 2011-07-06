@@ -48,6 +48,7 @@
 
 	$content = array();
 
+	// Register the set using URL parameters
 	$ao = new SloodleActiveObject();
 	$object_uuid = required_param('sloodleobjuuid');
 	if (!$ao->loadByUUID($object_uuid)) {
@@ -55,36 +56,66 @@
 		exit;
 	}
 
-	// TODO: Check if they're a teacher, if so give them the teacher view.
-	$is_admin = false;
+	$configs = $ao->config_name_value_hash();
+
+	$roundid = 1;
+	$currencyid = 0;
+
+	$context = get_context_instance(CONTEXT_COURSE,$ao->course->course_object->id);
+	$contextid = $context->id;
+	$courseid = $ao->course->course_object->id;
+
 	$is_logged_in = isset($USER) && ($USER->id > 0);
-$is_logged_in = false;
+        $is_admin = $is_logged_in && has_capability('moodle/course:manageactivities', $context); 
 
-	
-	// TODO: Add round filter etc
-	$sql = "select max(u.userid) as userid, sum(p.amount) as balance, u.avname as avname from {$CFG->prefix}sloodle_award_points p left outer join {$CFG->prefix}sloodle_users u on p.userid=u.userid group by u.userid order by balance desc, avname asc;";
-	$updated_score_recs = get_records_sql( $sql );
-	$updated_scores = array();
-	foreach($updated_scores_recs as $score) {
-		$updated_scores[ $score->userid ] = $score;
+	$scoresql = "select userid as userid, sum(amount) as balance from mdl_sloodle_award_points p where p.roundid = {$roundid} and p.currencyid = {$currencyid} group by p.userid order by balance desc;";
+	//$scoresql = "select userid as userid, sum(amount) as balance from mdl_sloodle_award_points p inner join mdl_sloodle_award_rounds ro on p.roundid=ro.id where p.roundid = {$roundid} and ro.courseid = {$courseid} and p.currencyid = {$currencyid} group by p.userid order by balance desc;";
+
+ 	$usersql = "select max(u.id) as userid, u.firstname as firstname, u.lastname as lastname, su.avname as avname from mdl_user u inner join mdl_role_assignments ra on u.id left outer join mdl_sloodle_users su on u.id=su.userid where ra.contextid={$contextid} group by u.id order by avname asc;";
+
+//select max(u.userid) as userid, sum(p.amount) as balance from mdl_sloodle_award_points p left outer join mdl_sloodle_users u on p.userid=u.userid inner join mdl_groups_members m on u.userid=m.userid where m.groupid=2 group by u.userid;
+
+	$scores = get_records_sql( $scoresql );
+	$students = get_records_sql( $usersql);
+
+	$students_by_userid = array();
+	foreach($students as $student) {
+		$students_by_userid[ $student->userid ] = $student;
 	}
-	
-/*
-$updated_scores[ 2 ]->balance = 1000;
-if (time() % 2 == 0) {
-$updated_scores[ 7 ]->balance = 2000;
-} else {
-$updated_scores[ 7 ]->balance = 500;
-}
-*/
 
+	// students with scores, in score order
+	$student_scores = array();
+	foreach($scores as $score) {
+		$userid = $score->userid;
+		if (!isset($students_by_userid[ $userid ])) { // student deleted but their score is still there.
+			continue;
+		}
+		$student = $students_by_userid[ $userid ];
+		$student->has_scores = true;
+		$student->balance = $score->balance;
+		$student->name_html = s( $student->avname ? $student->avname : $student->firstname.' '.$student->lastname );
+		$student_scores[$userid] = $student;
+	}
+
+	if (true || $is_admin) {
+		// students without scores
+		foreach($students_by_userid as $userid => $student) {
+			if (isset($student_scores[ $userid ] )) {
+				continue; // already done
+			}
+			$student->has_scores = false;
+			$student->balance = 0;
+			$student->name_html = s( $student->avname );
+			$student_scores[ $userid ] = $student;
+		}
+	}
 
 	$result = 'refreshed';
 
 	$content = array(
 		'result' => $result,
 		'error' => $error,
-		'updated_scores' => $updated_scores
+		'updated_scores' => $student_scores
 	);
 
 	print json_encode($content);

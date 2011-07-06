@@ -89,3 +89,11 @@ input.rename_layout_input {
 
 .logininput { border: 1px solid black; font-size:28px;}
 
+
+
+li.just_edited { background-color:yellow }
+li.deleting_scores { background-color:red }
+li.no_scores { background-color: #c0c0c0}
+li.no_scores .user_score_delete_link{ visibility:hidden}
+li.has_scores .show_link{ visibility:hidden}
+.dummy_item_template{ visibility: hidden }

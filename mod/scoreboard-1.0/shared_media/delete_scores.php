@@ -50,30 +50,13 @@
 	$is_logged_in = isset($USER) && ($USER->id > 0);
 $is_logged_in = false;
 
-	$userids = required_param('userids');
-	$userscores = required_param('userscores');
+	$userid = required_param('userid');
 	
-	$i=0;
-	foreach($userids as $userid) {
-		if (!$userid = intval($userid)) {
-			continue;
-		}
-		$userscore = intval($userscores[$i]);
-
-		$award = new stdClass();
-		$award->userid = $userid;
-		$award->currencyid = $currencyid;
-		$award->amount = $userscore;
-		$award->timeawarded = time();
-		$award->roundid = $roundid;
-
-		insert_record( 'sloodle_award_points', $award);
-
-		SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $userscore, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => time() ) );
-
-		$i++;
+	if (!$userid = intval($userid)) {
+		continue;
 	}
 
+	$deleted = delete_records( 'sloodle_award_points', 'roundid', $roundid, 'userid', $userid );
 
 	// TODO: Add round filter etc
 	$sql = "select max(u.userid) as userid, sum(p.amount) as balance, u.avname as avname from {$CFG->prefix}sloodle_award_points p left outer join {$CFG->prefix}sloodle_users u on p.userid=u.userid group by u.userid order by balance desc, avname asc;";
@@ -93,7 +76,7 @@ $updated_scores[ 7 ]->balance = 500;
 */
 
 
-	$result = 'updated';
+	$result = 'deleted';
 
 	$content = array(
 		'result' => $result,
