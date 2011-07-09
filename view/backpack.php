@@ -59,7 +59,7 @@ class sloodle_view_backpack extends sloodle_base_view
     {
         global $USER;
 
-        $userIds = optional_param('userIds', array(), PARAM_INT);
+        $userIds = optional_param('userIds', PARAM_INT);
         $id = required_param('id', PARAM_INT);
 
         //has itemAdd forum been submitted?
@@ -275,8 +275,11 @@ class sloodle_view_backpack extends sloodle_base_view
 	foreach($student_scores_by_currency_id as $userid => $currencybalancearray) {
 		$student = $students_by_userid[ $userid ];
 		$row = array();
-		$row[] = s($student->avname);
-		$row[] = s($student->firstname).' '.s($student->lastname);
+        $url_moodleprofile = $CFG->wwwroot."/user/view.php?id={$userid}&amp;course={$COURSE->id}";
+        $url_sloodleprofile = SLOODLE_WWWROOT."/view.php?_type=user&amp;id={$userid}&amp;course={$COURSE->id}";
+		$row[] = "<a href=\"{$url_sloodleprofile}\">".s($student->avname)."</a>";
+        
+		$row[] = "<a href=\"{$url_moodleprofile}\">".s($student->firstname).' '.s($student->lastname)."</a>";
 		foreach(array_keys($all_currencies) as $currencyid) {
 			if ( isset($currencybalancearray[ $currencyid ] ) ) {
 				$row[] = s($currencybalancearray[ $currencyid ]);

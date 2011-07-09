@@ -269,11 +269,8 @@ class sloodle_view_currency extends sloodle_base_view
                           $editText.= "\">";
                           $editText.="<img src=\"{$CFG->SLOODLE_LIBROOT}lib/media/garbage.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".s(get_string('currencies:delete', 'sloodle'))."\"/> ";
                           $editText.= "</a>";
-                        if ($c->name=="Credits") {
-                             $rowData[]="<img src=\"{$CFG->SLOODLE_LIBROOT}lib/media/lock.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".get_string('currencies:locked', 'sloodle')."\"/> ";
-                        }else{
-                             $rowData[]=$editText;
-                        }
+                          $rowData[]=$editText;
+                        
                   
                   $sloodletable->data[]=$rowData;
                   
