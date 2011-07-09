@@ -59,7 +59,7 @@ class sloodle_view_backpack extends sloodle_base_view
     {
         global $USER;
 
-        $userIds = optional_param('userIds', PARAM_INT);
+        $userIds = optional_param('userIds', array(), PARAM_INT);
         $id = required_param('id', PARAM_INT);
 
         //has itemAdd forum been submitted?
