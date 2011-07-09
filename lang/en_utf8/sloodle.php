@@ -697,3 +697,7 @@ $string['currency:checkall'] = 'Select All';
 $string['currency:addcurrency'] = 'Add Currency';
 $string['currency:View Currencies'] = 'View Currencies';
 $string['awards:username'] = 'User Name';
+$string['backpacks:backpackversion'] = 'Version:';
+$string['backpacks:sloodle version'] = 'SLOODLE Version:';
+$string['backpacks:nameunknown'] = 'Unknown';
+

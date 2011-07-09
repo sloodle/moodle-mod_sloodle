@@ -25,7 +25,6 @@
     require_once(SLOODLE_LIBROOT.'/modules.php');
     /** Plugin management. */
     require_once(SLOODLE_LIBROOT.'/plugins.php');
-    require_once(SLOODLE_LIBROOT.'/api_plugins.php');
 
     /** Active Objects and their definitions. */
     require_once(SLOODLE_LIBROOT.'/object_configs.php');
@@ -81,12 +80,6 @@
         * @access public
         */
         var $plugins = null;
-        /**
-        * An api plugin manager to help give access to api plugins for various features.
-        * @var $api_plugins
-        * @access public
-        */
-        var $api_plugins = null;
 
          /**
         * A SloodleActiveObject object representing the in-world object making the request.
@@ -115,7 +108,6 @@
             $this->request = new SloodleRequest($this);
             $this->course = new SloodleCourse();
             $this->plugins = new SloodlePluginManager($this);
-            $this->api_plugins = new SloodleApiPluginManager($this);
             
             // Process the basic request data
             if ($process) $this->request->process_request_data();
