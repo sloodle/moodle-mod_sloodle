@@ -65,13 +65,28 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 
      
     <ul id="scorelist" class="<?= $is_admin ? 'admin_view' : 'student_view' ?>" data-refresh-seconds="<?=intval($refreshtime) ?>" data-parent="roundlist" title="Scores" selected="true">
-        <li class="group">All Students</li>
+        <li class="group"><?= $is_admin ? 'Students Displayed On Scoreboard' : 'All Students' ?> </li>
 	<?php
 	foreach($student_scores as $score) { 
-		render_score_li($score, $is_admin); 
+		if ($score->has_scores) {
+			render_score_li($score, $is_admin); 
+		}
 	}
 	?>
 	<li></li>
+	<?php if ($is_admin) { ?>
+        <li class="group">Students Not Displayed On Scoreboard</li>
+	<?php
+	foreach($student_scores as $score) { 
+		if (!$score->has_scores) {
+			render_score_li($score, $is_admin); 
+		}
+	}
+	?>
+	<li></li>
+	<li class="lower_control_pane">hello</li>
+	<?php } ?>
+
 <?php /*
 	<li><span id="update_score_list_link">Update</span></li>
 	<li><span id="save_dirty_link">Save Dirty</span></li>
@@ -90,12 +105,13 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 	<?php render_score_li( $dummy_score, $is_admin ); ?>
     </ul>
 
+
 <?php 
 }
 
 function render_score_li($score, $is_admin) { 
 ?>
-        <li class="<?= $score->has_scores ? 'has_scores' : 'no_scores' ?>" id="student_score_<?= intval($score->userid) ?>" data-userid="<?= intval($score->userid) ?>" data-dirty-change="0" data-last-clean-ts="0" >
+        <li class="<?= $score->has_scores ? 'has_scores' : 'no_scores' ?> score_entry" id="student_score_<?= intval($score->userid) ?>" data-userid="<?= intval($score->userid) ?>" data-dirty-change="0" data-last-clean-ts="0" >
 	<?php if (false &&$is_logged_in) { ?>
 		<a data-userid="<?= $score->userid?>" href="#edit_student" class="student_edit_link" >
 	<?php } ?>

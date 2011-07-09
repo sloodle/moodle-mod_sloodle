@@ -91,9 +91,9 @@
 
 	function update_score_for_hash_change( hashval ) {
 		// If we're on the admin view, we'll pull all the scores to make absolutely sure we've got the latest data.
-		if (view_type == 'admin_view') { 
+		//if (view_type == 'admin_view') { 
 			return refresh_changed_scores();
-		}
+		//}
 		// For everyone else, we'll just add whatever the hash says.
 		var bits = hashval.split("_");
 		var useridstr = bits[0];
