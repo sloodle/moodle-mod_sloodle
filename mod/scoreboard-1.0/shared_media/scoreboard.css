@@ -19,6 +19,11 @@ li.no_scores .user_score_delete_link{ visibility:hidden}
 li.has_scores .show_link{ visibility:hidden}
 .dummy_item_template{ visibility: hidden }
 
-li.lower_control_pane {
-	position:absolute; float:bottom; 
+div.lower_control_pane {
+border:2px solid blue;
+    position:absolute;
+    clear:both;
+    bottom:10px;
+    width:60%;
+    height:80px;
 }

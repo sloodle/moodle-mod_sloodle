@@ -65,7 +65,7 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 
      
     <ul id="scorelist" class="<?= $is_admin ? 'admin_view' : 'student_view' ?>" data-refresh-seconds="<?=intval($refreshtime) ?>" data-parent="roundlist" title="Scores" selected="true">
-        <li class="group"><?= $is_admin ? 'Students Displayed On Scoreboard' : 'All Students' ?> </li>
+        <li class="group divider"><?= $is_admin ? 'Students Displayed On Scoreboard' : 'All Students' ?> </li>
 	<?php
 	foreach($student_scores as $score) { 
 		if ($score->has_scores) {
@@ -73,9 +73,9 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 		}
 	}
 	?>
-	<li></li>
+	<li class="divider"></li>
 	<?php if ($is_admin) { ?>
-        <li class="group">Students Not Displayed On Scoreboard</li>
+        <li class="group divider">Students Not Displayed On Scoreboard</li>
 	<?php
 	foreach($student_scores as $score) { 
 		if (!$score->has_scores) {
@@ -83,8 +83,8 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 		}
 	}
 	?>
-	<li></li>
-	<li class="lower_control_pane">hello</li>
+	<li class="group divider end"></li>
+	<li class="new_round_link">New round</li>
 	<?php } ?>
 
 <?php /*
@@ -104,6 +104,7 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
     <ul class="dummy_item_template" id="dummy_score_ul"> 
 	<?php render_score_li( $dummy_score, $is_admin ); ?>
     </ul>
+
 
 
 <?php 

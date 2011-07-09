@@ -555,7 +555,7 @@
 	Notify any active objects that are interested in the action $action.
 	...so that an object can tell us what it's interested in hearing about.
 	*/
-	function NotifySubscriberObjects( $notification_action, $success_code, $controllerid, $userid, $params ) {
+	function NotifySubscriberObjects( $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) {
 
 		global $CFG;
 
@@ -583,8 +583,23 @@
 		foreach($recs as $rec) {
 			$ao = new SloodleActiveObject();
 			$ao->loadFromRecord( $rec );
-			// If this stuff fails, tough. We did out best.
-			$ao->sendMessage($msg);
+
+			$msgtosend = $msg;
+
+			// We can set extra fields to allow the object to keep track of messages being sent.
+			// That way if a message fails to get delivered, the lastmessagesendtimestamp won't match what the object remembers
+			// ...and the object will know it needs to do something to catch up, like polling the server.
+			$ts = time();
+			if ($addtimestampparams) {
+				$msg .= "thismessagesendtimestamp|".$ts."\n";
+				$msg .= "lastmessagesendtimestamp|".$ao->lastmessagesendtimestamp."\n";
+			}
+
+			// If this stuff fails, tough. We did our best.
+			if ($ao->sendMessage($msgtosend)) {
+				$ao->lastmessagetimestamp = time();
+				$ao->update();
+			}
 		}
 
 		return true;

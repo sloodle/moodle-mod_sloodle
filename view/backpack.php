@@ -8,7 +8,7 @@
 * @copyright Copyright (c) 2008 Sloodle (various contributors)
 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
 *
-* @contributor Peter R. Bloomfield
+* @contributor Edmund Edgar
 * @contributor Paul Preibisch
 *
 */ 
@@ -19,6 +19,10 @@ require_once(SLOODLE_DIRROOT.'/view/base/base_view.php');
 require_once(SLOODLE_LIBROOT.'/course.php');
 require_once(SLOODLE_LIBROOT.'/currency.php');    
 
+// Javascript for checking and unchecking checkboxes
+require_js($CFG->wwwroot . '/mod/sloodle/lib/jquery/jquery-1.3.2.min.js');
+require_js($CFG->wwwroot . '/mod/sloodle/lib/js/backpack.js');
+
 /**
 * Class for rendering a view of SLOODLE course information.
 * @package sloodle
@@ -26,11 +30,12 @@ require_once(SLOODLE_LIBROOT.'/currency.php');
 class sloodle_view_backpack extends sloodle_base_view
 {
    /**
-    * The VLE course object, retrieved directly from database.
+    * The Moodle course object, retrieved directly from database.
     * @var object
     * @access private
     */
     var $course = 0;
+
     /**
     * SLOODLE course object, retrieved directly from database.
     * @var object
@@ -52,14 +57,64 @@ class sloodle_view_backpack extends sloodle_base_view
     */
     function process_request()
     {
-        
+        global $USER;
+
+        $userIds = optional_param('userIds', PARAM_INT);
         $id = required_param('id', PARAM_INT);
-        
+
+        //has itemAdd forum been submitted?
+        $isItemAdd= optional_param('isItemAdd',0, PARAM_INT);
+
+        //check if valid course
         if (!$this->course = get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
-        
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
-       
+
+        //itemAdd form has been submitted
+        if ($isItemAdd) {
+
+            $controllerid = required_param('controllerid', PARAM_INT);
+
+            //fetch all currencies
+            $all_currencies = SloodleCurrency::FetchIDNameHash();
+
+            //create controller so we can fetch active round
+            $controller = new SloodleController();
+            $controller->load($controllerid);
+            $roundid = $controller->get_active_roundid(true);
+
+            //go through each currency and see if it has been set, if it has, we have to update each user who
+            //has been checked
+            foreach($all_currencies as $currencyid => $currencyname) {
+
+                //check if a currency update is necessary for this currency
+                //build the currencyname field  for this currency
+                $fieldname="currency_".$currencyid;
+
+                //now see if it was submitted
+                $fieldvalue= optional_param($fieldname,0,PARAM_INT);
+
+                //if no value has been submitted for this currency, we can skip adding this currency to the users!
+                if ($fieldvalue==0) {
+			continue;
+		}
+
+                foreach ($userIds as $u) {
+                    //go through each user which was checked and give them the selected currency and amount
+                    //create backpack item
+                    $backpack_item = new stdClass();
+                    $backpack_item->currencyid=intval($currencyid);
+                    $backpack_item->userid=intval($u);
+                    $backpack_item->amount=intval($fieldvalue);
+                    $backpack_item->timeawarded=time();
+                    $backpack_item->roundid=$roundid;
+                    $backpack_item->description="moodle add by ". $USER->username;
+
+                    //add it to the users backpack                    
+                    insert_record('sloodle_award_points',$backpack_item);
+                } 
+            } 
+        } 
     }
 
     /**
@@ -71,7 +126,6 @@ class sloodle_view_backpack extends sloodle_base_view
         require_login($this->course->id);
         if (isguestuser()) error(get_string('noguestaccess', 'sloodle'));
         add_to_log($this->course->id, 'course', 'view sloodle data', '', "{$this->course->id}");
-
         // Ensure the user is allowed to update information on this course
         $this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
         if (has_capability('moodle/course:update', $this->course_context)) $this->can_edit = true;
@@ -83,12 +137,15 @@ class sloodle_view_backpack extends sloodle_base_view
     function print_header()
     {
         global $CFG;
-        $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view_backpack.php?id={$this->course->id}\">".get_string('backpack:view', 'sloodle')."</a>";
-        print_header_simple(get_string('backpack','sloodle'), "", $navigation, "", "", true, '', navmenu($this->course));
         
+        //print breadcrumbs
+        $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?_type=backpack&id={$this->course->id}\">";
+        $navigation .= get_string('backpack:view', 'sloodle');
+        $navigation .= "</a>";
+        //print the header
+        print_header_simple(get_string('backpack','sloodle'), "", $navigation, "", "", true, '', navmenu($this->course));
     }
-
-
+    
     /**
     * Render the view of the module or feature.
     * This MUST be overridden to provide functionality.
@@ -96,114 +153,189 @@ class sloodle_view_backpack extends sloodle_base_view
     function render()
     {                                      
         global $CFG;      
-
+        global $COURSE;
         $view = optional_param('view', "");
+        
         // Setup our list of tabs
         // We will always have a view option
-        
-        echo "<div style=\"text-align:center;\">\n";
-
-		$action = optional_param('action', "");                 
-
-		$contextid = get_context_instance(CONTEXT_COURSE,$this->course->id);
-
-		//$sloodle_currency= new SloodleCurrency();
-		//$cTypes=    $sloodle_currency->get_currency_types();
-        
+	$action = optional_param('action', "");                 
+	$contextid = get_context_instance(CONTEXT_COURSE,$this->course->id);
         echo "<br>";
-		print_box_start('generalbox boxaligncenter left boxwidthnarrow boxheightnarrow leftpara');
-        echo "<h1 color=\"Red\"><img align=\"center\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/backpack64.png\" /> ";
-		echo get_string('backpacks:backpacks', 'sloodle');
-        echo "&nbsp<img align=\"center\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/backpack64.png\" /></h1>";        
-		print_box_end();
+        
+        //print titles
+        print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');                  
 
-		//display the select box for the user select box
+	echo '<div style="position:relative ">';
+	echo '<span style="position:relative;font-size:36px;font-weight:bold;">';
+        
+        //print return to backpack icon
+        echo '<img align="center" src="'.$CFG->SLOODLE_WWWROOT.'lib/media/backpack64.png" width="48"/>';
+        
+        //print return to backpack title text
+        echo s(get_string('backpacks:backpacks', 'sloodle'));
+        echo '</span>';
+        echo '<span style="float:right;">';
+        echo '<a  style="text-decoration:none" href="'.$CFG->wwwroot.'/mod/sloodle/view.php?_type=currency&id='.$COURSE->id.'">';
+        echo s(get_string('currency:View Currencies', 'sloodle')).'<br>';
+        
+        //print return to currencies icon
+        echo '<img src="'.$CFG->SLOODLE_WWWROOT.'lib/media/returntocurrencies.png"/></a>';
+        echo '</span>';
+	echo '</div>';
+        echo '<br>';
+        echo '<span style="position:relative;float:right;">';
+        echo '</span>';
+        
+        //get all currency names
+	$all_currencies = SloodleCurrency::FetchIDNameHash();
+	$active_currency_ids = array();
 
-		$contextid = get_context_instance(CONTEXT_COURSE,$this->course->id);
-		$courseid = $this->course->id;
+	$contextid = get_context_instance(CONTEXT_COURSE,$this->course->id)->id;
+	$courseid = $this->course->id;
 
-		// Fetch the balance for each user, for each course. 
-		// Should include people who are in the course, but do not yet have any points.
-		$sql = "select u.id as userid, u.firstname as firstname, u.lastname as lastname, su.avname as avname, sum(p.amount) as balance, c.id as currencyid, c.name as currencyname from {$CFG->prefix}user u left outer join {$CFG->prefix}sloodle_users su on u.id=su.userid inner join {$CFG->prefix}role_assignments ra on u.id  inner join {$CFG->prefix}sloodle_award_points p on u.id=p.userid inner join {$CFG->prefix}sloodle_award_rounds ro on p.roundid=ro.id inner join {$CFG->prefix}sloodle_currency_types c on c.id=p.currencyid where ra.contextid=".intval($contextid)." and ro.courseid=".intval($courseid)." group by u.id, p.currencyid order by lastname asc, firstname asc, avname asc;";
-//print $sql;
-
-		$currencynames = array();
-		$userdetail = array();	
-
-		//Moodle userid, then currency id, then balance of points
-		// eg. $usercurrencybalance[2][10] = 123;
-		$usercurrencybalance = array();
-
-		$recs = get_records_sql($sql);
-
-		foreach($recs as $rec) {
-			$userid = $rec->userid;
-			$currencyid = $rec->currencyid;	
-			if (!isset($currencynames[ $currencyid ] )) {
-				$currencynames[ $currencyid ] = $rec->currencyname;
-			}
-			if (!isset($userdetail[ $userid ] ) ){
-				$userdetail[ $userid ] = array(
-					'firstname' => $rec->firstname,
-					'lastname' => $rec->lastname,
-					'avname' => $rec->avname
-				);
-			}
-			if (!isset($usercurrencybalance[ $userid ] )) {
-				$usercurrencybalance[ $userid ] = array();
-			}
-			$usercurrencybalance[ $userid ][ $currencyid ] = $rec->balance;
-		}
-
-		$sloodletable = new stdClass(); 
-              
-		$headerrow = array();
-
-		$headerrow[] = s(get_string('awards:avname', 'sloodle'));
-		$headerrow[] = s(get_string('awards:firstname', 'sloodle'));
-		$headerrow[] = s(get_string('awards:lastname', 'sloodle'));
-		foreach($currencynames as $currencyname) {
-			$headerrow[] = s($currencyname);
-		}
+	$prefix = $CFG->prefix;
 		
-		$sloodletable->head = $headerrow;
+        //build scoresql 
+        $scoresql = "select max(p.id) as id, p.userid as userid, p.currencyid as currencyid, sum(amount) as balance
+		 from {$prefix}sloodle_award_points p inner join {$prefix}sloodle_award_rounds ro on ro.id=p.roundid 
+		 where ro.courseid = {$courseid} group by p.userid, p.currencyid order by balance desc;
+	";
+        $scores = get_records_sql( $scoresql );
+        
+        //build usersql
+        $usersql = "select max(u.id) as userid, u.firstname as firstname, u.lastname as lastname, 
+		su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id 
+		left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid={$contextid} 
+		group by u.id order by avname asc;
+	";
+        $students = get_records_sql( $usersql);
+        
+        //create an array by userid
+	$students_by_userid = array();
+        foreach($students as $student) {
+                $students_by_userid[ $student->userid ] = $student;
+        }
+        
+        // students with scores, in score order
+        $student_scores_by_currency_id = array();
+        
+        //creating a two dimensional array keyed by user id, then by currency for our display table
+        foreach($scores as $score) {
+		$userid = $score->userid;
+		$currencyid = $score->currencyid;
+		$active_currency_ids[ $currencyid ] = true;
 
-		//set alignment of table cells                                        
-		$aligns = array('left', 'left', 'left');
-		foreach($currencynames as $cn) {
-			$aligns[] = 'right';
+		// if student is deleted from course but their score is still there, dont display their score
+		if (!isset($students_by_userid[ $userid ])) { 
+			continue;
 		}
+			
+		//makes sure every student has an array entry 
+		if ( !isset( $student_scores_by_currency_id[$userid] ) ) {
+			$student_scores_by_currency_id[$userid] = array();
+		}
+        
+		//put the students balance in the currency into the array
+		$student_scores_by_currency_id[$userid][$currencyid] = $score->balance;
+        }
+        
+        // students without scores to the end of the array, in scored order
+	foreach($students_by_userid as $userid => $student) {
+        	if (isset($student_scores_by_currency_id[ $userid ] )) {
+				continue; // already done
+		}
+		$student_scores_by_currency_id[ $userid ] = array();
+	}
 
-		$sloodletable->align = $aligns;
-		$sloodletable->width="95%";
-		//set size of table cells
-		//$sloodletable->size = array('10%','10%', '15%','*','*');            
-
-		foreach($usercurrencybalance as $userid => $currencybalancearray) {
-
-			$row = array();
-			$row[] = s($userdetail[ $userid ]['avname']);
-			$row[] = s($userdetail[ $userid ]['firstname']);
-			$row[] = s($userdetail[ $userid ]['lastname']);
-			foreach($currencynames as $currencyid=>$currencyname) {
-				if ( isset($currencybalancearray[ $currencyid ] ) ) {
-					$row[] = s($currencybalancearray[ $currencyid ]);
-				} else {
-					$row[] = ' 0 ';
-				}
+        //now build display table
+	$sloodletable = new stdClass(); 
+        
+        //create header
+	$headerrow = array();
+	$headerrow[] = s(get_string('awards:avname', 'sloodle'));
+	$headerrow[] = s(get_string('awards:username', 'sloodle'));
+	foreach($all_currencies as $currencyid => $currencyname) {
+		$headerrow[] = s($currencyname);
+	}
+        $headerrow[] = '<input type="checkbox" id="checkall" checked>';
+	    
+        //now add the header we just built
+    	$sloodletable->head = $headerrow;
+        
+	//set alignment of table cells 
+	$aligns = array('center','center'); // name columns
+	foreach($all_currencies as $curr) {
+		$aligns[] = 'right'; // each currency
+	}
+	$aligns[] = 'center'; // checkboxes
+	$sloodletable->align = $aligns;
+	$sloodletable->width="95%";
+   
+        //now display scores
+	foreach($student_scores_by_currency_id as $userid => $currencybalancearray) {
+		$student = $students_by_userid[ $userid ];
+		$row = array();
+		$row[] = s($student->avname);
+		$row[] = s($student->firstname).' '.s($student->lastname);
+		foreach(array_keys($all_currencies) as $currencyid) {
+			if ( isset($currencybalancearray[ $currencyid ] ) ) {
+				$row[] = s($currencybalancearray[ $currencyid ]);
+			} else {
+				$row[] = ' 0 ';
 			}
-
-			$sloodletable->data[] = $row;
-
 		}
+		$row[] = '<input type="checkbox" checked name="userIds[]" value="'.intval($userid).'">';
+		$sloodletable->data[] = $row;
+	}
 
-                $sloodletable->data[] = $trowData; 
+        $sloodletable->data[] = $trowData; 
+        //create an extra row for the modify currency fields
+        $row = array();
+        $row[] = ' &nbsp; ';
+        $row[] = ' &nbsp; ';
+        foreach($all_currencies as $currencyid => $currencynames) {
+		$row[] = ' &nbsp; ';
+        }     
 
-		print_table($sloodletable); 
+        //build select drop down for the controllers in the course that any point updates will be linked too
+        $rowText='<select style="left:20px;text-align:left;" name="controllerid">';
+
+        //get all controllers
+        $recs = get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
         
-        
-        echo "</div>\n";
- 
+        // Make sure we have at least one controller
+        if ($recs == false || count($recs) == 0) {
+		error(get_string('objectauthnocontrollers','sloodle'));
+		exit();
+        }
+
+        foreach ($recs as $controller){
+                $rowText.='<option name="controllerid" value="'.intval($controller->id).'">'.s($controller->name).'</option>';
+	}
+	$rowText.='</select>';
+
+	//add controller select cell to row       
+	$row[] =$rowText; 
+
+	//now add the row to the table
+	$sloodletable->data[] = $row; 
+
+	//create another row for the submit button 
+	$row = array();
+	$row[] = '&nbsp;';
+	$row[] = '&nbsp;';
+	foreach($all_currencies as $currencyid => $currencynames) {
+		$row[] = '<input type="text" name="currency_'.$currencyid.'">';
+	} 
+	$row[]='<input type="submit" value="Update Backpacks">';
+	$sloodletable->data[] = $row;  
+
+        print('<form action="" method="POST">');
+        echo '<input type="hidden" name="isItemAdd" value="1">';
+	print_table($sloodletable); 
+	print '</form>';
+
+	print_box_end(); 
     }
   
     /**

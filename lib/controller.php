@@ -634,6 +634,109 @@
             return $aos; 
 	}
 
+	/*
+	* Return the ID of the currently active round for the controller.
+        * @return int $roundid or null if there isn't one
+	*/
+	function get_active_roundid($force_create = false) {
+ 
+	    $open_rounds = get_records( 'sloodle_award_rounds', 'controllerid', $this->get_id() );
+	    foreach($open_rounds as $or ) {
+	        if ($or->timeended > 0) { // closed
+		    continue;
+	        }
+                return $or->id;
+	    }
+
+	    if ($force_create) {
+		$created_round = $this->make_new_round();
+	        return $created_round->id;
+	    }
+
+	    return 0;
+ 
+	}
+
+	function clone_round_participation($fromroundid, $toroundid) {
+	    
+	    global $CFG;
+	    $prefix = $CFG->prefix;
+	
+	    $user_curr = array();
+	    $scores = get_records('sloodle_award_points', 'roundid', $fromroundid);
+	    if ($scores) {
+	        foreach($scores as $score) {
+		    $userid = $score->userid;
+		    $currencyid = $score->currencyid;
+		    if (isset($user_curr[ $userid ][$currencyid] )) {
+		        continue;
+		    }
+		    $score->amount = 0;
+		    $score->id = null;
+	            $score->description = null;
+	            $score->roundid = $toroundid;
+	            insert_record( 'sloodle_award_points', $score );
+		    $user_curr[ $userid ] = array();
+ 	            $user_curr[ $userid ][$currencyid] = true;
+	        }
+	    }
+
+	    return true;
+
+	}
+
+	function make_new_round( $clone_active_round_participation = false ) {
+
+	    if (!$courseid = intval($this->get_course_id())) {
+	        return false;
+	    }
+
+	    $previous_round_id = 0;
+            if ($clone_active_round_participation) {
+	        $previous_round_id = $this->get_active_roundid();
+	    }
+	   
+	    $round = new stdClass();
+	    $round->timestarted = time();
+	    $round->timeended = 0;
+	    $round->name = '';
+	    $round->controllerid = $this->get_id();
+	    $round->courseid = $courseid; // We specify this too so that you can delete the controller but keep the scores.
+
+	    if (!$roundid = insert_record('sloodle_award_rounds', $round)) {
+	        return false;
+	    }
+
+	    if ($clone_active_round_participation) {
+	        $this->clone_round_participation( $previous_round_id, $roundid );
+	    }
+
+	    $round->id = $roundid;
+
+	    $this->close_rounds_except( $roundid );
+
+	    return $round;
+
+	}
+
+	function close_rounds_except( $roundid ) {
+
+	    $open_rounds = get_records( 'sloodle_award_rounds', 'controllerid', $this->get_id() );
+	    foreach($open_rounds as $or ) {
+	        if ($or->id == $roundid) {
+	           continue;
+	        }
+	        if ($or->timeended > 0) {
+		    continue;
+	        }
+	        $or->timeended = time();
+	        update_record( 'sloodle_award_rounds', $or );
+	    }
+
+	    return true;
+
+	}
+
     }
 
 ?>

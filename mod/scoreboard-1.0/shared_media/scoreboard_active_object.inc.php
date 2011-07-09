@@ -102,7 +102,7 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
                 insert_record( 'sloodle_award_points', $award);
 
-                SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ) );
+                SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
 
 		return true;	
 
@@ -110,8 +110,18 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
 	function delete_scores( $userid ) {
 
+                SloodleActiveObject::NotifySubscriberObjects( 'awards_points_deletion', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
+
 		return delete_records( 'sloodle_award_points', 'roundid', $this->roundid, 'userid', $userid );
 		
+	}
+
+	function make_new_round() {
+		
+                SloodleActiveObject::NotifySubscriberObjects( 'awards_points_round_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
+
+		return $this->course->controller->make_new_round( $clone_active_participation = true);
+
 	}
 
 }

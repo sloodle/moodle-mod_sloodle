@@ -1114,7 +1114,34 @@ if ($result && $oldversion < 2010091200) {
 
     /// Launch add field displayorder
         $result = $result && add_field($table, $field);    
+
 }
+
+if ($result && $oldversion < 2011070900) {
+
+    /// Define field mediakey to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $field = new XMLDBField('mediakey');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'httpinurl');
+
+    /// Launch add field mediakey
+        $result = $result && add_field($table, $field);
+ /// Define field lastmessagetimestamp to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $field = new XMLDBField('lastmessagetimestamp');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, null, null, 'mediakey');
+
+    /// Launch add field lastmessagetimestamp
+        $result = $result && add_field($table, $field);
+/// Define field httpinpassword to be added to sloodle_active_object
+        $table = new XMLDBTable('sloodle_active_object');
+        $field = new XMLDBField('httpinpassword');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'lastmessagetimestamp');
+
+    /// Launch add field httpinpassword
+        $result = $result && add_field($table, $field);    
+}
+
 return $result; 
 }
 

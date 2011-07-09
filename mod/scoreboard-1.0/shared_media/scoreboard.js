@@ -113,6 +113,28 @@
 		update_position(changedscorejq);
 	}
 
+	function switch_to_new_round() {
+
+		$.getJSON(  
+			"new_round.php",  
+			{
+				sloodleobjuuid: active_object_uuid,
+			},  
+			function(json) {  
+				var result = json.result;
+				if (result == 'started') {
+//TODO: Get a response with all the latest scores, use that
+					refresh_changed_scores();
+				// TODO: On failure, remove the scores that couldn't be saved.
+				} else {
+					alert('new round start failed');
+					//handle_save_error( useridscorehash );
+				}
+			}
+		); 
+
+	}
+
 	function attach_event_handlers() {
 		if ($('#scorelist').hasClass('admin_view')) {
 			view_type = 'admin_view';
@@ -134,6 +156,9 @@
 		});
 		$('#save_dirty_link').unbind('click').click( function() {
 			return save_dirty_scores();
+		});
+		$('.new_round_link').unbind('click').click( function() {
+			return switch_to_new_round();
 		});
 		 //enable_slide_navigation();
 
@@ -268,7 +293,7 @@
 
 	$(document).ready(function () {
 		attach_event_handlers();
-		$('#backButton').show();
+		//$('#backButton').show();
 	//	iui.animOn = true;
 		initialize_refresh_heartbeat();
 	});
@@ -290,249 +315,6 @@
 		refresh_changed_scores();
 		setTimeout( 'refresh_heartbeat()', refreshtime * 1000);
 	}
-
-	function backLevels(fromPageID, num) {
-		if (isBusy) {
-			return;
-		}
-		if (num < 1) {
-			return false;
-		}
-		// Already moved on? Leave the navigation alone
-		if ( $('#'+fromPageID).attr('selected') != 'true' ) {
-			alert(fromPageID + ' not currently selected, not going back levels - attr is '+$('#'+fromPageID).attr('id'));
-			return false;
-		}
-
-		var nextPageID = $('#'+fromPageID).attr('data-parent');
-		if (nextPageID == null) {
-			alert('no next page to go to, giving up');
-			return false;
-		}
-
-		fromPage = document.getElementById( fromPageID );
-		toPage   = document.getElementById( nextPageID );
-		//targetjq.attr('selected','true'); // Select the target
-
-		targetjq = $('#'+nextPageID);
-
-		// Something went wrong - do the best we can, using jquery
-		if ( (fromPage == null) || (toPage == null) ) {
-			targetjq.attr('selected','true'); // Select the target
-			$('[selected*="true"]').attr('selected','');
-		} else {
-			slidePages(fromPage, toPage, true);
-		}
-
-		var parentid = targetjq.attr('data-parent');
-		/*
-		if ( (parentid == '') || (parentid == null) ){
-			alert('Error: parent id not set in link to '+clickedid);
-			return false;
-		}
-		*/
-		$('#backButton').attr('href', '#'+parentid);
-		$('#backButton').html( $('#'+parentid).attr('title') );
-		$('#backButton').show();
-		$('#pageTitle').html( targetjq.attr('title') );
-			
-		fromPageID = nextPageID;
-		num--;
-
-		setTimeout( "backLevels('"+fromPageID+"', "+num+")", 1000 );
-	}
-
-	function populate_student_edit_form( linkjq ) {
-
-		editformjq = $('#edit_student');
-		avname = linkjq.find('.avatar_name').html();
-		editformjq.find('#student_name_span').html(avname);
-
-	}
-
-	// More-or-less duplicates the IUI functionality
-	// ...but does it without messing with the URL
-	// ...as the on-prim browser loses the pending javascript events when it changes the URL #hash
-	// Also, uses the 
-	function enable_slide_navigation() {
-		$('a').live('click', function() {
-
-			if (isBusy) {
-				return;
-			}
-
-			if ($(this).hasClass('student_edit_link')) {
-				populate_student_edit_form( $(this) );
-			}
-
-			var clickedid=this.hash;
-			if ( clickedid == null ) {
-				alert('Error: no hash found');
-				return false;
-			}
-
-			if (clickedid == "#sitelist") {
-				window.location = $('#sitelist').attr('data-parent-url');
-				return false;
-			}
-
-			var targetjq = $(clickedid); // already begins with #
-			if (targetjq.size() == 0) {
-				alert('Error: no target found for id '+clickedid);
-				return false;
-			}
-
-			var backwards = ($(this).attr('id') == 'backButton');
-
-			fromPage = document.getElementById( $('[selected*="true"]').attr('id') );
-			toPage   = document.getElementById( targetjq.attr('id') );
-			//targetjq.attr('selected','true'); // Select the target
-
-			// Something went wrong - do the best we can, using jquery
-			if ( (fromPage == null) || (toPage == null) ) {
-				targetjq.attr('selected','true'); // Select the target
-				$('[selected*="true"]').attr('selected','');
-			} else {
-				slidePages(fromPage, toPage, backwards);
-			}
-
-			var parentid = targetjq.attr('data-parent');
-			if ( (parentid == '') || (parentid == null) ){
-				//alert('Error: parent id not set in link to '+clickedid);
-				return false;
-			}
-			$('#backButton').attr('href', '#'+parentid);
-			$('#backButton').html( $('#'+parentid).attr('title') );
-			$('#backButton').show();
-			$('#pageTitle').html( targetjq.attr('title') );
- 
-			return false;
-		});
-	}
-
-var slideSpeed = 2;
-var slideInterval = 0;
-
-var currentPage = null;
-var currentDialog = null;
-var currentWidth = 0;
-var currentHash = location.hash;
-var hashPrefix = "#_";
-var pageHistory = [];
-var newPageCount = 0;
-var checkTimer;
-var hasOrientationEvent = false;
-var portraitVal = "portrait";
-var landscapeVal = "landscape";
-
-var isBusy = false;
-
-// The following comes from iui
-function slide1(fromPage, toPage, backwards, axis, cb)
-{
-
-	if (axis == "y")
-		(backwards ? fromPage : toPage).style.top = "100%";
-	else
-		toPage.style.left = "100%";
-
-	scrollTo(0, 1);
-	toPage.setAttribute("selected", "true");
-	var percent = 100;
-	slide();
-	var timer = setInterval(slide, slideInterval);
-
-	function slide()
-	{
-		percent -= slideSpeed;
-		if (percent <= 0)
-		{
-			percent = 0;
-			clearInterval(timer);
-			cb();
-		}
-	
-		if (axis == "y")
-		{
-			backwards
-				? fromPage.style.top = (100-percent) + "%"
-				: toPage.style.top = percent + "%";
-		}
-		else
-		{
-			fromPage.style.left = (backwards ? (100-percent) : (percent-100)) + "%"; 
-			toPage.style.left = (backwards ? -percent : percent) + "%"; 
-		}
-	}
-}
-
-function slide2(fromPage, toPage, backwards, cb)
-{
-	toPage.style.webkitTransitionDuration = '0ms'; // Turn off transitions to set toPage start offset
-	// fromStart is always 0% and toEnd is always 0%
-	// iPhone won't take % width on toPage
-	var toStart = 'translateX(' + (backwards ? '-' : '') + window.innerWidth +	'px)';
-	var fromEnd = 'translateX(' + (backwards ? '100%' : '-100%') + ')';
-	toPage.style.webkitTransform = toStart;
-	toPage.setAttribute("selected", "true");
-	toPage.style.webkitTransitionDuration = '';	  // Turn transitions back on
-	function startTrans()
-	{
-		fromPage.style.webkitTransform = fromEnd;
-		toPage.style.webkitTransform = 'translateX(0%)'; //toEnd
-	}
-	fromPage.addEventListener('webkitTransitionEnd', cb, false);
-	setTimeout(startTrans, 0);
-}
-
-function slidePages(fromPage, toPage, backwards)
-{		 
-
-	if (isBusy) {
-		return;
-	}
-	isBusy = true;
-
-	var axis = (backwards ? fromPage : toPage).getAttribute("axis");
-
-	clearInterval(checkTimer);
-	
-	if (canDoSlideAnim() && axis != 'y')
-	{
-	  slide2(fromPage, toPage, backwards, slideDone);
-	}
-	else
-	{
-	  slide1(fromPage, toPage, backwards, axis, slideDone);
-	}
-
-	function slideDone()
-	{
-	  if (!hasClass(toPage, "dialog"))
-		  fromPage.removeAttribute("selected");
-	  //setTimeout(updatePage, 0, toPage, fromPage);
-	  fromPage.removeEventListener('webkitTransitionEnd', slideDone, false);
-	  isBusy = false;
-	}
-}
-
-function canDoSlideAnim()
-{
-  return (typeof WebKitCSSMatrix == "object");
-}
-
-function findParent(node, localName)
-{
-        while (node && (node.nodeType != 1 || node.localName.toLowerCase() != localName))
-                node = node.parentNode;
-        return node;
-}
-
-function hasClass(self, name)
-{
-        var re = new RegExp("(^|\\s)"+name+"(iui_gid|\\s)");
-        return re.exec(self.getAttribute("class")) != null;
-}
 
 
 

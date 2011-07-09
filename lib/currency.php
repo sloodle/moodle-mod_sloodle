@@ -35,6 +35,43 @@
         {
             
         }
+
+	function loadFromRow($row) {
+		$this->id = $row->id;
+		$this->name = $row->name;
+		$this->timemodified = $row->timemodified;
+		$this->displayorder = $row->displayorder;
+	}
+
+	function FetchAll() {
+		$recs = get_records('sloodle_currency_types', null, null, 'displayorder asc, name asc');
+		if (!$recs) {
+			return false;
+		}
+		$currencies = array();
+		foreach($recs as $rec) {
+			$c = new SloodleCurrency();	
+			$c->loadFromRow($rec);
+			$currencies[] = $c;
+		}
+		return $currencies;
+	}
+
+	function FetchIDNameHash() {
+
+		if (!$currencies = SloodleCurrency::FetchAll()) {
+			return false;
+		}
+		$curbyid = array();
+		foreach($currencies as $cur) {
+			$id = $cur->id;
+			$name = $cur->name;
+			$curbyid[ $id ] = $name;
+		}
+		return $curbyid;
+
+	}
+
         function sendUrl($url,$post){         
              $ch = curl_init(); 
              //curl_setopt($ch, CURLOPT_URL, 'http://sim5468.agni.lindenlab.com:12046/cap/48c6c5fc-f19d-4dc2-6a50-fc3566186508'); 

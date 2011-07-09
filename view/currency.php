@@ -69,6 +69,8 @@ class sloodle_view_currency extends sloodle_base_view
                 $currencyname= required_param('currencyname', PARAM_TEXT);        
                 $imageurl= required_param('imageurl', PARAM_URL);        
                 $displayorder= required_param('displayorder', PARAM_INT);        
+                
+                //required_param('displayorder', PARAM_INT);        
                 //create update object
                 $currency=new stdClass();
                 $currency->id=$currencyid;
@@ -175,15 +177,27 @@ class sloodle_view_currency extends sloodle_base_view
       function render_all_currencies(){
           
            global $CFG;      
-           global $COURSE;
+           global $COURSE;                          
            $id = required_param('id', PARAM_INT);
             // Display instrutions for this page        
            echo "<br>";
            print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');
+          
+          echo '<div style="position:relative ">';                                                                    
+                                         
+           echo '<span style="position:relative;font-size:36px;font-weight:bold;">';
+           echo '<img align="center" src="'.$CFG->SLOODLE_WWWROOT.'lib/media/vault48.png" width="48"/>';
+           echo get_string('currency:currencies', 'sloodle');
+           echo '</span>';
            
-           print("<h1 style=\"color:orange\">"."<img align=\"center\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ");
-           print(get_string('currency:currencies', 'sloodle')."</h1>");
-        
+               echo '<span style="float:right;">';
+               echo '<a  style="text-decoration:none" href="'.$CFG->wwwroot.'/mod/sloodle/view.php?_type=backpack&id='.$COURSE->id.'">';
+               echo get_string('backpacks:View Backpacks', 'sloodle').'<br>';
+               echo '<img  src="'.$CFG->SLOODLE_WWWROOT.'lib/media/returnbackpacks.png"/></a>';
+               echo '</span>';                                                                                                         
+           
+           echo '</div>';
+           
           
             //create an html table to display the users      
             $sloodletable = new stdClass(); 
@@ -201,8 +215,8 @@ class sloodle_view_currency extends sloodle_base_view
                 //set size of table cells
                 $sloodletable->size = array('10%','5%','50%','45%','25%');            
                 //get currencies 
-                $currencyTypes= get_records_sql("select id, name, imageurl FROM {$CFG->prefix}sloodle_currency_types ORDER BY 'name' ASC ");         
-                
+                //get_records($table, $field='', $value='', $sort='', $fields='*', $limitfrom='', $limitnum='')
+                $currencyTypes= get_records('sloodle_currency_types', '', '','displayorder ASC, name DESC', '*', '','');
                 foreach ($currencyTypes as $c){
                   $rowData=array();
                   //cell 1 - display order
@@ -284,7 +298,7 @@ class sloodle_view_currency extends sloodle_base_view
                    //cell 4 - imageurl
                    $cells[]='<input type="text" size="100" name="imageurl" value="">';
                    //cell 5- add
-                   $cells[]='<input type="submit" name="add" value="Add New Currency">';
+                   $cells[]='<input type="submit" name="add" value="'.get_string('currency:addcurrency','sloodle').'">';
                    $sloodletable->data[]=$cells;
                     
            print_box_start('generalbox boxaligncenter center boxheightnarrow leftpara');
@@ -298,6 +312,7 @@ class sloodle_view_currency extends sloodle_base_view
    print_box_end();
           }
       }
+      
       function delete_currency(){
         global $CFG;      
         global $COURSE;

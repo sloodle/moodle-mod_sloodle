@@ -609,6 +609,7 @@ class SloodleConfigurationOptionCourseModuleChoice extends SloodleConfigurationO
 	function SloodleConfigurationOptionCourseModuleChoice( $fieldname, $title, $description, $noneavailablemessage, $instancefilters ) {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
+		$this->is_value_translatable = false;
 		$this->description = $description;
 		$this->options = $this->course_module_options();
 		$this->instancefilters = $instancefilters;
@@ -640,6 +641,7 @@ class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOptio
 		$this->max_length = $length;
 		$this->default= $default;
 		$this->type = 'radio';
+		$this->is_value_translatable = false;
 	}
 
 }
