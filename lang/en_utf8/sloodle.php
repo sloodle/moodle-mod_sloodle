@@ -700,4 +700,5 @@ $string['awards:username'] = 'User Name';
 $string['backpacks:backpackversion'] = 'Version:';
 $string['backpacks:sloodle version'] = 'SLOODLE Version:';
 $string['backpacks:nameunknown'] = 'Unknown';
+$string['backpacks:Backpack Contents'] = 'Backpack Contents';
 
