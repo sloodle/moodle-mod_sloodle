@@ -43,12 +43,12 @@
     
     // Attempt to ping the object
     if ($sloodle->course->controller->ping_object($sloodleobjuuid)) {
-        $sloodle->set_status_code(1);
-        $sloodle->set_status_descriptor('OK');
+        $sloodle->response->set_status_code(1);
+        $sloodle->response->set_status_descriptor('OK');
     } else {
-        $sloodle->set_status_code(-103);
-        $sloodle->set_status_descriptor('SYSTEM');
-        $sloodle->add_data_line('Failed to ping active object.');
+        $sloodle->response->set_status_code(-103);
+        $sloodle->response->set_status_descriptor('SYSTEM');
+        $sloodle->response->add_data_line('Failed to ping active object.');
     }
     
     // Output the response

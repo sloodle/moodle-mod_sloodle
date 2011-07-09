@@ -1,0 +1,21 @@
+The SLOODLE Tracker has 3 database tables:
+
+== sloodle_tracker ==
+
+This is the secondary module table which is required for all SLOODLE modules. It is the equivalent of "sloodle_presenter" etc.. The Tracker doesn't actually have any secondary data, so it contains no useful data.
+
+
+== sloodle_activity_tool ==
+
+Each time an in-world Tracker tool (such as a button or scanner) gets configured and setup, it will send off a request to "mod/tracker-1.0/auth_tool_linker.php". That script will register the tool in this table. Each tool counts as a single task within a Tracker activity module.
+
+Note that the "trackerid" field gives the course module id of the Tracker activity module to which this tool belongs. It should be the "sloodleid" -- this could be fixed in a future release.
+
+The UUID field stores the UUID of the tool itself.
+
+
+== sloodle_activity_tracker ==
+
+Each record logs an avatar completing a particular task (i.e. their actions have been logged by a tool).
+
+The activity is identified by the "objuuid" field, which corresponds to the "uuid" field of the sloodle_acitvity_tool table. This means we have an unfortunate caveat: if you replace the tracker tools in-world, then existing progress will not be carried over. This needs to be fixed.

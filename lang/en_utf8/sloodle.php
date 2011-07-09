@@ -106,6 +106,8 @@ $string['createnotecard'] = 'Create notecard';
 
 $string['databasequeryfailed'] = 'Database query failed.';
 $string['delete'] = 'Delete';
+$string['deletealltasks'] = 'Delete all tasks';
+$string['deletetask'] = 'Delete task';
 $string['deletecancelled'] = 'Deletion cancelled.';
 $string['deleteselected'] = 'Delete Selected';
 $string['deletionfailed'] = 'Deletion failed';
@@ -242,6 +244,7 @@ $string['noglossaries'] = 'There are no glossaries available in this course.';
 $string['nodistributors'] = 'There are no distributors available in this course.';
 $string['nosloodleassignments'] = 'There are no SLOODLE-compatible assignments available in this course.';
 $string['nopresenters'] = 'There are no SLOODLE Presenters available in this course.';
+$string['notrackers'] = 'There are no SLOODLE Tracker activities in this course.';
 
 $string['object:accesschecker'] = 'Access Checker';
 $string['object:accesscheckerdoor'] = 'Access Checker Door';
@@ -300,6 +303,7 @@ $string['objecttype'] = 'Object Type';
 $string['of'] = 'of';
 $string['or'] = 'or';
 
+$string['pagecount'] = 'Page {$a->num} of {$a->total}';
 $string['postedfromsl'] = 'Posted from Second Life';
 $string['pendingavatarnotfound'] = 'Could not locate a pending entry for your avatar. Perhaps you are already registered?';
 $string['pendingallocations'] = 'Pending Allocations';
@@ -376,6 +380,8 @@ $string['refreshtimeseconds'] = 'Refresh time (seconds)';
 $string['repeatquiz'] = 'Automatically repeat the quiz?';
 $string['relativeresults'] = 'Show relative results?';
 $string['runningcompatibilitycheck'] = 'Running compatibility check...';
+$string['resettasks'] = 'Reset selected tasks';
+$string['resetallprogress'] = 'Reset all progress';
 
 $string['save'] = 'Save';
 $string['second'] = 'second';
@@ -395,6 +401,7 @@ $string['selectobject'] = 'Select Object';
 $string['selectuser'] = 'Select User';
 $string['selectcontroller'] = 'Select Controller';
 $string['selectpresenter'] = 'Select Presenter';
+$string['selecttracker'] = 'Select Tracker';
 
 $string['sendobject'] = 'Send Object';
 $string['setting'] = 'Settings';
@@ -441,6 +448,9 @@ $string['submit'] = 'Submit';
 $string['timeago'] = '$a ago'; // $a = period of time, e.g. "3 weeks"
 $string['type'] = 'Type';
 $string['trydirectlink'] = 'If you cannot see the above entry, try this <a href=\"$a\">direct link</a> instead.';
+$string['tracker:settings'] = 'Tracker Settings';
+$string['tracker:nousers'] = 'No users found in course.';
+$string['trackeradmin'] = 'Administration';
 
 $string['unknown'] = 'unknown';
 $string['unknownuser'] = 'unknown user';

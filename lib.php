@@ -113,6 +113,15 @@
                 $result = TRUE;
             }
             break;
+            
+        case SLOODLE_TYPE_TRACKER:   
+            // Nothing to add to the secondary table just now - just stick it in the database
+            if (!insert_record('sloodle_tracker', $sec_table)) {
+                $errormsg = get_string('failedaddsecondarytable', 'sloodle');
+            } else {
+                $result = TRUE;
+            }
+            break;
 
         // ADD FURTHER MODULE TYPES HERE!
             
@@ -211,6 +220,18 @@
             update_record('sloodle_presenter', $presenter); 
 
             break;
+            
+            
+        case SLOODLE_TYPE_TRACKER:    
+            // Attempt to fetch the tracker record
+            $tracker = get_record('sloodle_tracker', 'sloodleid', $sloodle->id);
+            if (!$tracker) error(get_string('secondarytablenotfound', 'sloodle'));
+            
+            // Nothing else to do just now...
+            
+            // Update the database
+            //update_record('sloodle_tracker', $tracker);
+            break;
 
         case SLOODLE_TYPE_AWARDS:
             // Attempt to fetch the award record
@@ -250,6 +271,17 @@
 
         // Determine our success or otherwise
         $result = true;
+        
+        // Attempt to identify the course module instance ID
+        $cmid = 0; $moduletype = null; $cm = null;
+        
+        $moduletype = get_record('modules', 'name', 'sloodle');
+        if ($moduletype && $moduletype->id)
+        {
+            $moduletypeid = $moduletype->id;
+            $cm = get_record('course_modules', 'instance', $id, 'module', $moduletypeid);
+            if ($cm) $cmid = $cm->id;
+        }
 
         // Attempt to delete the main Sloodle instance
         if (!delete_records('sloodle', 'id', $id)) {
@@ -273,6 +305,14 @@
 
         // Delete any presenter entries
         delete_records('sloodle_presenter_entry', 'sloodleid', $id);
+        
+        // Delete any tracker instances, tools and activities
+        delete_records('sloodle_tracker', 'sloodleid', $id);
+        if ($cmid)
+        {
+            delete_records('sloodle_activity_tool', 'trackerid', $cmid);
+            delete_records('sloodle_activity_tracker', 'trackerid', $cmid);
+        }
 
         // Delete any awards and award transaction entries
         delete_records('sloodle_awards', 'sloodleid', $id);  
