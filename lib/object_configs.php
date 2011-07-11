@@ -207,7 +207,10 @@ class SloodleObjectConfig {
 		    list($name, $version) = SloodleObjectConfig::ParseModIdentifier($modname);
 		    if (empty($name) || empty($version)) continue;
 		    
-		    $objs[$name][$version] = $obj;
+		    if (!isset($objs[$name])) {
+		        $objs[$name] = array();
+		    }
+		    $objs[$name][$version] = $obj_def;
 		}
 		
 		// Sort the array by name of the object

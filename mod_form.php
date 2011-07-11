@@ -286,17 +286,6 @@ class mod_sloodle_mod_form extends moodleform_mod {
         
             break;
                 
-        case SLOODLE_TYPE_AWARDS:
-            // Fetch the awards record
-            $awards = sloodle_get_record('sloodle_awards', 'sloodleid', $this->_instance);
-            if (!$awards) error(get_string('secondarytablenotfound', 'sloodle'));
-            
-            $default_values['icurrency'] = $awards->icurrency;
-            $default_values['assignmentid'] = $awards->assignmentid;
-            $default_values['maxpoints'] =$awards->maxpoints;
-            
-            break;
-  
         case SLOODLE_TYPE_PRESENTER:
             // Fetch the Presenter record.
             $presenter = sloodle_get_record('sloodle_presenter', 'sloodleid', $this->_instance);

@@ -199,9 +199,7 @@ $string['moduletype:controller'] = 'Controller';
 $string['moduletype:distributor'] = 'Distributor';
 $string['moduletype:presenter'] = 'Presenter';
 $string['moduletype:map'] = 'Second Life Map';
-$string['moduletype:awards'] = 'Award System'; 
-
-$string['moduletype:tracker'] = 'tracker';
+$string['moduletype:tracker'] = 'Tracker';
 
 
 $string['modulename'] = 'SLOODLE Module';
@@ -271,6 +269,7 @@ $string['object:mapmarker'] = 'Map Marker';
 $string['object:picturegloss'] = 'Picture Gloss';
 $string['object:scoreboard'] = 'Scoreboard';
 $string['object:moodlescreen'] = 'Moodle Screen';
+$string['object:tracker'] = 'Tracker';
 
 $string['objectgroup:registration'] = 'Registration and Enrolment';
 $string['objectgroup:communication'] = 'Communication, Assignments and Inventory';
