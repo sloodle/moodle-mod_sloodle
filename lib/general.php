@@ -207,7 +207,7 @@
     function sloodle_is_installed()
     {
         // Is there a Sloodle entry in the modules table?
-        return record_exists('modules', 'name', 'sloodle');
+        return sloodle_record_exists('modules', 'name', 'sloodle');
     }
     
     /**
@@ -310,7 +310,7 @@
     */
     function sloodle_get_course_module_instance($id)
     {
-        return get_record('course_modules', 'id', $id);
+        return sloodle_get_record('course_modules', 'id', $id);
     }
     
     /**
@@ -325,13 +325,13 @@
         if (is_object($id)) {
             $course_module_instance = $id;
         } else if (is_int($id)) {
-            if (!($course_module_instance = get_record('course_modules', 'id', $id))) return FALSE;
+            if (!($course_module_instance = sloodle_get_record('course_modules', 'id', $id))) return FALSE;
         } else return FALSE;
         
         // Make sure the instance itself is visible
         if ((int)$course_module_instance->visible == 0) return FALSE;
         // Find out which section it is in, and if that section is valid
-        if (!($section = get_record('course_sections', 'id', $course_module_instance->section))) return FALSE;
+        if (!($section = sloodle_get_record('course_sections', 'id', $course_module_instance->section))) return FALSE;
         if ((int)$section->visible == 0) return FALSE;
         
         // Looks like the module is visible
@@ -348,13 +348,13 @@
     function sloodle_check_course_module_instance_type($id, $module_name)
     {
         // Get the record for the module type
-        if (!($module_record = get_record('modules', 'name', $module_name))) return FALSE;
+        if (!($module_record = sloodle_get_record('modules', 'name', $module_name))) return FALSE;
 
         // Get the course module instance record, whether directly from the parameter, or from the database
         if (is_object($id)) {
             $course_module_instance = $id;
         } else if (is_int($id)) {
-            if (!($course_module_instance = get_record('course_modules', 'id', $id))) return FALSE;
+            if (!($course_module_instance = sloodle_get_record('course_modules', 'id', $id))) return FALSE;
         } else return FALSE;
         
         // Check the type of the instance
@@ -371,7 +371,7 @@
         // Ensure the name is a non-empty string
         if (!is_string($name) || empty($name)) return FALSE;
         // Obtain the module record
-        if (!($module_record = get_record('modules', 'name', $module_name))) return FALSE;
+        if (!($module_record = sloodle_get_record('modules', 'name', $module_name))) return FALSE;
         
         return $module_record->id;
     }
@@ -600,7 +600,7 @@
     function sloodle_login_notification($destination, $avatar, $username, $password)
     {
         // If another pending notification already exists for the same username, then delete it
-        delete_records('sloodle_login_notifications', 'username', $username);
+        sloodle_delete_records('sloodle_login_notifications', 'username', $username);
         
         // Add the new details
         $notification = new stdClass();
@@ -609,7 +609,7 @@
         $notification->username = $username;
         $notification->password = $password;
 
-        return (bool)insert_record('sloodle_login_notifications', $notification);
+        return (bool)sloodle_insert_record('sloodle_login_notifications', $notification);
     }
     
     /**
@@ -644,14 +644,14 @@
         // Go through each one
         for ($i = 0; $i < $limit; $i++) {
             // Obtain the first record
-            $recs = get_records('sloodle_login_notifications', '', '', 'id', '*', 0, $limit);
+            $recs = sloodle_get_records('sloodle_login_notifications', '', '', 'id', '*', 0, $limit);
             if (!$recs) return false;
             reset($recs);
             $rec = current($recs);
             
             // Determine the user ID of the person who requested this
             $userid = 0;
-            if (!($sloodleuser = get_record('sloodle_users', 'uuid', $rec->avatar))) {
+            if (!($sloodleuser = sloodle_get_record('sloodle_users', 'uuid', $rec->avatar))) {
                 // Failed to the user - get the guest user instead
                 $guestdata = guest_user();
                 $userid = $guestdata->id;
@@ -670,7 +670,7 @@
             }
             
             // Delete the record from the data
-            delete_records('sloodle_login_notifications', 'id', $rec->id);
+            sloodle_delete_records('sloodle_login_notifications', 'id', $rec->id);
         }
     }
     
@@ -972,9 +972,9 @@
             // We should have an ID parameter, indicating which module has been requested
             $id = required_param('id', PARAM_INT);
             // Query the database for the SLOODLE module sub-type
-            $instanceid = get_field('course_modules', 'instance', 'id', $id);
+            $instanceid = sloodle_get_field('course_modules', 'instance', 'id', $id);
             if ($instanceid === false) error('Course module instance '.$id.' not found.');
-            $type = get_field('sloodle', 'type', 'id', $instanceid);
+            $type = sloodle_get_field('sloodle', 'type', 'id', $instanceid);
             if ($type === false) error('SLOODLE module instance '.$instanceid.' not found.');
             // We will just use the type as a feature name now.
             // This means the following words are unavailable as module sub-types: course, user, users

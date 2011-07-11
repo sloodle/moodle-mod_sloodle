@@ -92,7 +92,7 @@
     {
         // Get an instance record if necessary
         if (is_numeric($instance)) {
-            $instance = get_record('sloodle', 'id', (int)$instance);
+            $instance = sloodle_get_record('sloodle', 'id', (int)$instance);
             if ($instance === false) return false;
         }
         
@@ -121,7 +121,7 @@
         }
     
         // Get an instance record
-        $instance = get_record('sloodle', 'id', (int)$cm->instance);
+        $instance = sloodle_get_record('sloodle', 'id', (int)$cm->instance);
         if ($instance === false) return false;
         
         // Attempt to load the module

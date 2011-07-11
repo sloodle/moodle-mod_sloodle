@@ -136,7 +136,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
         // Slight hack to put this here. We need to have the permissions checked before we do this.
         // Default to view mode. Only allow other types if the user has sufficient permission
         if ($this->canedit) {
-            $this->presenter_mode = optional_param('mode', 'view');
+            $this->presenter_mode = optional_param('mode', 'view', PARAM_TEXT);
         } else {
             $this->presenter_mode = 'view';
         }

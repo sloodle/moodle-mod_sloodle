@@ -410,13 +410,13 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         // For sake of people who installed a test version of SLOODLE 0.4, we need to automatically create secondary Presenter instances.
         // These would normally be created when creating an instance of the module, but this table didn't exist during test versions.
         // Go through all SLOODLE modules with type "Presenter" and add an empty secondary entry on their behalf, with default values.
-        $sloodlerecords = get_records('sloodle', 'type', 'presenter');
+        $sloodlerecords = sloodle_get_records('sloodle', 'type', 'presenter');
         if (!$sloodlerecords) $sloodlerecords = array();
         foreach ($sloodlerecords as $sr) {
             // Construct a default presenter instance for it
             $presenterrecord = new stdClass();
             $presenterrecord->sloodleid = $sr->id;
-            insert_record('sloodle_presenter', $presenterrecord);
+            sloodle_insert_record('sloodle_presenter', $presenterrecord);
         }
 
     }
@@ -539,7 +539,7 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         // Standardize any Presenter slides to use type names "image", "web", and "video".
         // The slide plugins for 1.0 initially used class names, like SloodlePluginPresenterSlideImage.
         // That's laborious and necessary, so we're reverting back to the original type names.
-        $allslides = get_records('sloodle_presenter_entry');
+        $allslides = sloodle_get_records('sloodle_presenter_entry');
         $numupdated = 0;
         if ($allslides) {
             foreach ($allslides as $slide) {
@@ -566,7 +566,7 @@ function xmldb_sloodle_upgrade($oldversion=0) {
                 
                 // Update the database record
                 if ($updated) {
-                    update_record('sloodle_presenter_entry', $slide);
+                    sloodle_update_record('sloodle_presenter_entry', $slide);
                     $numupdated++;
                 }
             }

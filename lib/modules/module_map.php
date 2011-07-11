@@ -84,13 +84,13 @@
             }
             
             // Load from the primary table: sloodle instance
-            if (!($this->sloodle_instance = get_record('sloodle', 'id', $this->cm->instance))) {
+            if (!($this->sloodle_instance = sloodle_get_record('sloodle', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load Sloodle module with instance ID #{$cm->instance}.<br/>");
                 return false;
             }
             
             // Load from the secondary table: sloodle map
-            if (!($this->sloodle_map = get_record('sloodle_map', 'sloodleid', $this->sloodle_instance->id))) {
+            if (!($this->sloodle_map = sloodle_get_record('sloodle_map', 'sloodleid', $this->sloodle_instance->id))) {
                 sloodle_debug("Failed to load Sloodle map with sloodleid #{$this->sloodle_instance->id}.<br/>");
                 return false;
             }
@@ -121,7 +121,7 @@
             // Update the data
             $this->sloodle_map->initialx = $x;
             $this->sloodle_map->initialy = $y;
-            return update_record('sloodle_map', $this->sloodle_map);
+            return sloodle_update_record('sloodle_map', $this->sloodle_map);
         }
         
         /**
@@ -168,7 +168,7 @@
         */
         function get_locations()
         {
-            $results = get_records('sloodle_map_location', 'sloodleid', $this->sloodle_instance->id, 'name');
+            $results = sloodle_get_records('sloodle_map_location', 'sloodleid', $this->sloodle_instance->id, 'name');
             if (!$results) return array();
             return $results;
         }
@@ -200,7 +200,7 @@
             $rec->name = clean_text($name, FORMAT_PLAIN);
             $rec->description = clean_text($desc, FORMAT_PLAIN);
             
-            return insert_record('sloodle_map_location', $rec, false);
+            return sloodle_insert_record('sloodle_map_location', $rec, false);
         }
         
         

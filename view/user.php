@@ -143,7 +143,7 @@ class sloodle_view_user extends sloodle_base_view
         if (strcasecmp($this->moodleuserid, 'all') == 0) $this->courseid = SITEID;
     
         // Fetch our Moodle and SLOODLE course data
-        if (!$this->course = get_record('course', 'id', $this->courseid)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $this->courseid)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
         $this->start = optional_param('start', 0, PARAM_INT);
@@ -277,13 +277,13 @@ class sloodle_view_user extends sloodle_base_view
             
             // Has the deletion been confirmed?
             if ($this->userconfirmed == $form_yes) {
-                if (record_exists('sloodle_users', 'id', $this->deletesloodleentry)) {
+                if (sloodle_record_exists('sloodle_users', 'id', $this->deletesloodleentry)) {
                     // Is the user allowed to delete this?
                     if ($allowdelete) {
                         // Make sure it's a valid ID
                         if (is_int($this->deletesloodleentry) && $this->deletesloodleentry > 0) {
                             // Attempt to delete the entry
-                            $deleteresult = delete_records('sloodle_users', 'id', $this->deletesloodleentry);
+                            $deleteresult = sloodle_delete_records('sloodle_users', 'id', $this->deletesloodleentry);
                             if ($deleteresult === FALSE) {
                                 $deletemsg = get_string('deletionfailed', 'sloodle').': '.get_string('databasequeryfailed', 'sloodle');
                             } else {
@@ -327,12 +327,12 @@ class sloodle_view_user extends sloodle_base_view
             // All entries
             $moodleuserdata = null;
             // Fetch a list of all Sloodle user entries
-            $sloodleentries = get_records('sloodle_users');
+            $sloodleentries = sloodle_get_records('sloodle_users');
         } else if ($searchentries && !empty($this->searchstr)) {
             // Search entries
             $moodleuserdata = null;
-            $LIKE = sql_ilike();
-            $fullsloodleentries = get_records_select('sloodle_users', "avname $LIKE '%{$this->searchstr}%' OR uuid $LIKE '%{$this->searchstr}%'", 'avname');
+            $LIKE = sloodle_sql_ilike();
+            $fullsloodleentries = sloodle_get_records_select('sloodle_users', "avname $LIKE '%{$this->searchstr}%' OR uuid $LIKE '%{$this->searchstr}%'", 'avname');
             if (!$fullsloodleentries) $fullsloodleentries = array();
             $sloodleentries = array();
             // Eliminate entries belonging to avatars who are not in the current course
@@ -346,9 +346,9 @@ class sloodle_view_user extends sloodle_base_view
             
         } else {
             // Attempt to fetch the Moodle user data
-            $moodleuserdata = get_record('user', 'id', $this->moodleuserid);
+            $moodleuserdata = sloodle_get_record('user', 'id', $this->moodleuserid);
             // Fetch a list of all Sloodle user entries associated with this Moodle account
-            $sloodleentries = get_records('sloodle_users', 'userid', $this->moodleuserid);
+            $sloodleentries = sloodle_get_records('sloodle_users', 'userid', $this->moodleuserid);
         }
         // Post-process the query results
         if ($sloodleentries === FALSE) $sloodleentries = array();
@@ -674,7 +674,7 @@ class sloodle_view_user extends sloodle_base_view
                     // Delete each one
                     $numdeleted = 0;
                     foreach ($userobjects as $obj) {
-                        delete_records('sloodle_user_object', 'id', $obj->id);
+                        sloodle_delete_records('sloodle_user_object', 'id', $obj->id);
                         $numdeleted++;
                     }
                     $userobjects = array();

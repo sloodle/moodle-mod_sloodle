@@ -61,7 +61,7 @@
     $sloodlecourseid = optional_param('sloodlecourseid', NULL, PARAM_INT);
     
     // Attempt to find a pending avatar entry which matches the given details
-    $pa = get_record('sloodle_pending_avatars', 'uuid', $sloodleuuid, 'lst', $sloodlelst);
+    $pa = sloodle_get_record('sloodle_pending_avatars', 'uuid', $sloodleuuid, 'lst', $sloodlelst);
     if (!$pa) {
         ?>
         <div style="text-align:center;">
@@ -90,7 +90,7 @@
 
     // This is a slightly dirty hack, but is needed just now to prevent multiple avatar registrations.
     // Delete any avatar belonging to this user, which doesn't match the one just registered.
-    delete_records_select('sloodle_users', "userid = {$USER->id} AND uuid <> '{$sloodleuuid}'");
+    sloodle_delete_records_select('sloodle_users', "userid = {$USER->id} AND uuid <> '{$sloodleuuid}'");
 
 /// /// END MOODLE-SPECIFIC /// ///
     

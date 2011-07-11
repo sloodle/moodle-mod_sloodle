@@ -58,7 +58,7 @@
     $sloodle->response->add_data_line(array('sloodlecoursename_full', $auth_obj->course->get_short_name()));//$auth_obj->course->get_full_name())); // Shortened... was causing memory errors!
     
     // Fetch all the configuration settings
-    $settings = get_records('sloodle_object_config', 'object', $sloodleauthid);
+    $settings = sloodle_get_records('sloodle_object_config', 'object', $sloodleauthid);
     if (!$settings) {
         // Error: no configuration settings... there should be at least one indicating the type
         $sloodle->response->quick_output(-103, 'SYSTEM', 'Object not configured yet.', false);

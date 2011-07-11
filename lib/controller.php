@@ -335,25 +335,7 @@
     	* ...is in the SloodleLayoutEntry class.
 	* TODO: Would this be better there?
 	*/
-	function configure_object_from_layout_entry($authid, $layout_entry_id, $rezzeruuid = null) {
-
-            $ao = new SloodleActiveObject();
-            if (!$ao->load($authid)) {
-                return false;
-            }
- 
-            $entry = get_record('sloodle_layout_entry', 'id', $layout_entry_id);
-            if (!$entry) {
-                return false;
-            }
-
-            $ao->layoutentryid = $entry->id;
-            $ao->rotation = $entry->rotation;
-            $ao->position = $entry->position;
-            $ao->rezzeruuid = $rezzeruuid;
-            if (!$ao->save()) {
-               return false;
-            }
+	function configure_object_from_layout_entry($authid, $layout_entry_id) {
 
 	   $configs = get_records('sloodle_layout_entry_config','layout_entry',$layout_entry_id);
 	   $ok = true;
@@ -366,16 +348,6 @@
 	         }
 	      }
 	   }
-
-	/*
-         $lconfig = new stdClass();
-	 $lconfig->id = null;
-         $lconfig->object = $authid;
-	 $lconfig->name = 'sloodlelayoutentryid';
-	 $lconfig->value = $layout_entry_id;
-	 insert_record('sloodle_object_config',$lconfig);
-	*/
-
 	   return $ok;
 
 	}
@@ -501,20 +473,17 @@
         
         /**
         * Checks if the specified object is authorised for this controller with the given password.
-        * @param object SloodleActiveObject $active_object The active object representing the prim that is talking to us.
+        * @param string $uuid The UUID of the object to check
         * @param string $password The password to check
         * @return bool True if object is authorised, or false if not
         */
-        function check_authorisation($active_object, $password)
+        function check_authorisation($uuid, $password)
         {
-            if (is_null($active_object)) {
-                return false;
-            }
-            if ($active_object->controllerid != $this->get_id()) {
-                return false;
-            }
-
+            // Attempt to find an entry for the object
+            $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $uuid);
+            if (!$entry) return false;
             // Make sure we have the type data
+
             // Edmund Edgar, 2009-01-31: 
             // The type-checking is breaking the auto-configuration based on a profile.
             // It should probably already have been filled in somewhere, so this is probably an auto-configuration bug.
@@ -523,7 +492,7 @@
             //if (empty($entry->type)) return false;
             
             // Verify the password
-            return ($password == $active_object->password);
+            return ($password == $entry->password);
         }
         
         /**
@@ -544,10 +513,6 @@
         * @param mixed $id If it is an integer, then it is treated as the active object ID. If a string, it is treated as the object UUID.
         * @return void
         */
-	// TODO: This is now duplicated by delete() in the SloodleActiveObject class. 
-	// That seems like a better place to do this.
-	// We should either change whatever's calling this to use SloodleActiveObject instead 
-	// ...or change this function to call SloodleActiveObject->delete().
         function remove_object($id)
         {
             // Check what type the ID is
@@ -564,7 +529,6 @@
         * Gets data about an active object.
         * @param mixed $id If an integer, it is the ID of an active object. If it is a string it is the object's UUID.
         * @return SloodleActiveObject|bool Returns false on failure
-	* TODO: Refactor this if anything's using it - it's got nothing to do with the controller, and shouldn't be in here.
         */
         function get_object($id)
         {
@@ -594,149 +558,52 @@
             
             return $obj;
         }
-       
         
         /**
-        * Returns an array of active object records, or false if something went wrong.
-        * (Cannot be called statically... object must be authorised for this controller).
-        * @param string $rezzeruuid: The uuid of the rezzer which rezzed the object, or null for all active objects, regardless of rezzer.
-        * @param int $layoutentryid: The layout entry id object, or null for all active objects, regardless of layout entry.
-        * @return array() active object objects, or false on failure
+        * Gets an array of object configuration settings.
+        * (Can be called statically).
+        * @param mixed $id If an integer, it is the ID of an active object. If it is a string it is the object's UUID.
+        * @return array Associative array of setting names to values. (Returns an empty array if unsuccessful.)
         */
-	function get_active_objects( $rezzeruuid = null, $layoutentryid = null ) {
-
-            $id = $this->get_id();
-            $aos = array();
-            if (!$id) {
-               return false;
+        function get_object_configuration($id)
+        {
+            // If the ID is empty, then we have no configuration settings to get
+            if (empty($id)) return array();
+        
+            // Check what type the ID is and fetch the object
+            if (is_string($id)) $entry = get_record('sloodle_active_object', 'uuid', $id);
+            else $entry = get_record('sloodle_active_object', 'id', (int)$id);
+            if (!$entry) return array();
+            
+            // Fetch the values
+            $recs = get_records('sloodle_object_config', 'object', $entry->id);
+            if (!$recs) return false;
+            // Construct our associative array
+            $config = array();
+            foreach ($recs as $r) {
+                $config[$r->name] = $r->value;
             }
-	    $recs = array();
-
-            $select = 'controllerid = '.intval($id);
-            if ($rezzeruuid) {
-               $select .= " and rezzeruuid = '".$rezzeruuid."'";
-            }
-            if ($layoutentryid) {
-               $select .= " and layoutentryid = ".intval($layoutentryid);
-            }
-
-    	    $recs = get_records_select('sloodle_active_object', $select);
-            if (!$recs) {
-                return false;        
-            }
-            foreach($recs as $rec) {
-                if ($rec && $rec->id) {
-                    $ao = new SloodleActiveObject();
-                    $ao->loadFromRecord($rec);
-                    $aos[] = $ao;
-               }
-            }
-            return $aos; 
-	}
-
-	/*
-	* Return the ID of the currently active round for the controller.
-        * @return int $roundid or null if there isn't one
-	*/
-	function get_active_roundid($force_create = false) {
- 
-	    $open_rounds = get_records( 'sloodle_award_rounds', 'controllerid', $this->get_id() );
-	    foreach($open_rounds as $or ) {
-	        if ($or->timeended > 0) { // closed
-		    continue;
-	        }
-                return $or->id;
-	    }
-
-	    if ($force_create) {
-		$created_round = $this->make_new_round();
-	        return $created_round->id;
-	    }
-
-	    return 0;
- 
-	}
-
-	function clone_round_participation($fromroundid, $toroundid) {
-	    
-	    global $CFG;
-	    $prefix = $CFG->prefix;
-	
-	    $user_curr = array();
-	    $scores = get_records('sloodle_award_points', 'roundid', $fromroundid);
-	    if ($scores) {
-	        foreach($scores as $score) {
-		    $userid = $score->userid;
-		    $currencyid = $score->currencyid;
-		    if (isset($user_curr[ $userid ][$currencyid] )) {
-		        continue;
-		    }
-		    $score->amount = 0;
-		    $score->id = null;
-	            $score->description = null;
-	            $score->roundid = $toroundid;
-	            insert_record( 'sloodle_award_points', $score );
-		    $user_curr[ $userid ] = array();
- 	            $user_curr[ $userid ][$currencyid] = true;
-	        }
-	    }
-
-	    return true;
-
-	}
-
-	function make_new_round( $clone_active_round_participation = false ) {
-
-	    if (!$courseid = intval($this->get_course_id())) {
-	        return false;
-	    }
-
-	    $previous_round_id = 0;
-            if ($clone_active_round_participation) {
-	        $previous_round_id = $this->get_active_roundid();
-	    }
-	   
-	    $round = new stdClass();
-	    $round->timestarted = time();
-	    $round->timeended = 0;
-	    $round->name = '';
-	    $round->controllerid = $this->get_id();
-	    $round->courseid = $courseid; // We specify this too so that you can delete the controller but keep the scores.
-
-	    if (!$roundid = insert_record('sloodle_award_rounds', $round)) {
-	        return false;
-	    }
-
-	    if ($clone_active_round_participation) {
-	        $this->clone_round_participation( $previous_round_id, $roundid );
-	    }
-
-	    $round->id = $roundid;
-
-	    $this->close_rounds_except( $roundid );
-
-	    return $round;
-
-	}
-
-	function close_rounds_except( $roundid ) {
-
-	    $open_rounds = get_records( 'sloodle_award_rounds', 'controllerid', $this->get_id() );
-	    foreach($open_rounds as $or ) {
-	        if ($or->id == $roundid) {
-	           continue;
-	        }
-	        if ($or->timeended > 0) {
-		    continue;
-	        }
-	        $or->timeended = time();
-	        update_record( 'sloodle_award_rounds', $or );
-	    }
-
-	    return true;
-
-	}
-
+            return $config;
+        }
+        
+        /**
+        * Updates the last active timer on an object.
+        * (Cannot be called statically... object must be authorised for this controller).
+        * @param mixed $id If an integer, it is the ID of an active object. If it is a string it is the object's UUID.
+        * @return bool True if successful, or false if not.
+        */
+        function ping_object($id)
+        {
+            // Check what type the ID is and fetch the object
+            if (is_string($id)) $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $id);
+            else $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'id', (int)$id);
+            if (!$entry) return false;
+            
+            // Update the record
+            $entry->timeupdated = time();
+            return update_record('sloodle_active_object', $entry);
+        }
+        
     }
 
 ?>

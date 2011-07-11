@@ -72,7 +72,7 @@
         $sloodlelst = required_param('sloodlelst', PARAM_TEXT);
         
         // Attempt to find a pending avatar entry which matches the given details
-        $pa = get_record('sloodle_pending_avatars', 'uuid', $sloodleuuid, 'lst', $sloodlelst);
+        $pa = sloodle_get_record('sloodle_pending_avatars', 'uuid', $sloodleuuid, 'lst', $sloodlelst);
         if (!$pa) {
             ?>
             <div style="text-align:center;">

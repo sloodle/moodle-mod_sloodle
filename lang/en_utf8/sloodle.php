@@ -6,6 +6,8 @@
 * @package sloodlelang
 */
 
+$string['pluginname']   = 'SLOODLE';
+
 $string['accesslevel'] = 'Access Level';
 $string['fieldset:accesslevel'] = 'Access Level';
 $string['accesslevel:public'] = 'Public';
@@ -193,7 +195,7 @@ $string['minute'] = 'minute';
 $string['minutes'] = 'minutes';
 
 $string['moduletype'] = 'Module Type';
-$string['moduletype:controller'] = 'SLOODLE Controller';
+$string['moduletype:controller'] = 'Controller';
 $string['moduletype:distributor'] = 'Distributor';
 $string['moduletype:presenter'] = 'Presenter';
 $string['moduletype:map'] = 'Second Life Map';

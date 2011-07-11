@@ -59,7 +59,7 @@
 
         function load($id) {
 
-            $rec = get_record('sloodle_layout','id',$id); 
+            $rec = sloodle_get_record('sloodle_layout','id',$id); 
             if (!$rec) return null;
             $loaded = $this->load_from_row($rec);
             return true;
@@ -148,7 +148,7 @@
 
         function get_course() {
 
-            return get_record('course','id',$this->course);
+            return sloodle_get_record('course','id',$this->course);
 
         }
 
@@ -157,7 +157,7 @@
 	// set $store=false if you're planning to update the object entries and you're only reading them in so the object will know what is already there and what to insert and delete.
         function get_entries($store = true) {
 
-            $rows = get_records('sloodle_layout_entry','layout',$this->id);
+            $rows = sloodle_get_records('sloodle_layout_entry','layout',$this->id);
             $entries = array();
             if ($rows && ( count($rows) > 0) ) {
                foreach($rows as $row) {
@@ -184,7 +184,7 @@
 
         function insert() {
 
-            $this->id = insert_record('sloodle_layout', $this);
+            $this->id = sloodle_insert_record('sloodle_layout', $this);
             $this->save_entries();
             return $this->id;
 
@@ -192,7 +192,7 @@
 
         function update() {
 
-            if (!update_record('sloodle_layout', $this)) {
+            if (!sloodle_update_record('sloodle_layout', $this)) {
                return false;
             }
             return $this->save_entries();
@@ -342,7 +342,7 @@
 
         function load($id) {
 
-	    $rec = get_record('sloodle_layout_entry', 'id', $id);
+	    $rec = sloodle_get_record('sloodle_layout_entry', 'id', $id);
             if (!$rec) return null;
             return $this->load_from_row($rec);
             
@@ -354,11 +354,11 @@
               return false;
            }
 
-           $object = get_record('sloodle_active_object','uuid',$this->objectuuid); 
+           $object = sloodle_get_record('sloodle_active_object','uuid',$this->objectuuid); 
            $object_id = $object->id;
            if (!$object_id) return false;
 
-           $configs = get_records('sloodle_object_config','object',$object_id); 
+           $configs = sloodle_get_records('sloodle_object_config','object',$object_id); 
            foreach($configs as $config) {
               $this->set_config($config->name,$config->value);
            }
@@ -387,7 +387,7 @@
         */
 	function get_layout_entry_configs() {
             
-	    $recs = get_records('sloodle_layout_entry_config', 'layout_entry', $this->id);
+	    $recs = sloodle_get_records('sloodle_layout_entry_config', 'layout_entry', $this->id);
             if (!$recs) return null;
             
             // Construct the array of SloodleLayoutEntry objects
@@ -483,7 +483,7 @@
 
         function insert() {
 
-            $this->id = insert_record('sloodle_layout_entry', $this);
+            $this->id = sloodle_insert_record('sloodle_layout_entry', $this);
             if (!$this->id) {
                return false;
             }
@@ -495,7 +495,7 @@
 
         function update() {
 
-            if (!update_record('sloodle_layout_entry', $this)) {
+            if (!sloodle_update_record('sloodle_layout_entry', $this)) {
                return false;
             }
             return $this->save_configs();
@@ -510,14 +510,14 @@
               return false;
            }           
 
-           $result = delete_records('sloodle_layout_entry', 'id', $this->id);
+           $result = sloodle_delete_records('sloodle_layout_entry', 'id', $this->id);
            return $result;
 
         }
 
         function delete_configs() {
 
-            return delete_records('sloodle_layout_entry_config', 'layout_entry', $this->id);
+            return sloodle_delete_records('sloodle_layout_entry_config', 'layout_entry', $this->id);
 
         }
 
@@ -639,20 +639,20 @@
         }
 
         function load($id) {
-	    $rec = get_record('sloodle_layout_entry_config', 'id', $id);
+	    $rec = sloodle_get_record('sloodle_layout_entry_config', 'id', $id);
             if (!$rec) return null;
             return $this->load_from_row($rec);
         }
 
         function insert() {
 
-            return $this->id = insert_record('sloodle_layout_entry_config', $this);
+            return $this->id = sloodle_insert_record('sloodle_layout_entry_config', $this);
 
         }
 
         function update() {
 
-            return update_record('sloodle_layout_entry_config', $this);
+            return sloodle_update_record('sloodle_layout_entry_config', $this);
 
         }
 

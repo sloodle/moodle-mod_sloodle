@@ -90,7 +90,7 @@
             }
             
             // Load from the primary table: assignment instance
-            if (!($this->moodle_assignment_instance = get_record('assignment', 'id', $this->cm->instance))) {
+            if (!($this->moodle_assignment_instance = sloodle_get_record('assignment', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load assignment with instance ID #{$cm->instance}.<br/>");
                 return false;
             }
@@ -146,7 +146,7 @@
             // Make sure a user is loaded
             if (!$user->is_user_loaded()) return false;
             // Check for a submission by this user
-            if (record_exists('assignment_submissions', 'assignment', $this->moodle_assignment_instance->id, 'userid', $user->get_user_id())) return true;
+            if (sloodle_record_exists('assignment_submissions', 'assignment', $this->moodle_assignment_instance->id, 'userid', $user->get_user_id())) return true;
             return false;
         }
         

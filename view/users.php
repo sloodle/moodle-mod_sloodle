@@ -119,7 +119,7 @@ class sloodle_view_users extends sloodle_base_view
     
         // Fetch our Moodle and SLOODLE course data
         $this->courseid = optional_param('course', SITEID, PARAM_INT);
-        if (!$this->course = get_record('course', 'id', $this->courseid)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $this->courseid)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
         
@@ -344,7 +344,7 @@ class sloodle_view_users extends sloodle_base_view
                     $line[] = "<a href=\"{$url_moodleprofile}\">{$u->firstname} {$u->lastname}</a>";
                     
                     // Get the Sloodle data for this Moodle user
-                    $sloodledata = get_records('sloodle_users', 'userid', $u->id);
+                    $sloodledata = sloodle_get_records('sloodle_users', 'userid', $u->id);
                     if ($sloodledata) {
                         // Display all avatars names, if available
                         $avnames = '';

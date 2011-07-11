@@ -77,7 +77,7 @@
             }
             
             // Load from the primary table: glossary instance
-            if (!($this->moodle_glossary_instance = get_record('glossary', 'id', $this->cm->instance))) {
+            if (!($this->moodle_glossary_instance = sloodle_get_record('glossary', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load glossary with instance ID #{$cm->instance}.<br/>");
                 return false;
             }
@@ -102,12 +102,12 @@
             $glossaryid = (int)$this->moodle_glossary_instance->id;
             
             // Construct a query
-            $sql_like = sql_ilike();
+            $sql_like = sloodle_sql_ilike();
             $termquery = "$sql_like '$term'";
             if ($matchPartial) $termquery = "$sql_like '%$term%'";
             
             // Search concepts
-            $recs = get_records_select('glossary_entries', "glossaryid = $glossaryid AND concept $termquery", 'concept');
+            $recs = sloodle_get_records_select('glossary_entries', "glossaryid = $glossaryid AND concept $termquery", 'concept');
             if (is_array($recs)) {
                 foreach ($recs as $r) {
                     $entries[$r->id] = new SloodleGlossaryEntry($r->id, $r->concept, $r->definition);
@@ -116,14 +116,14 @@
             
             // Search aliases
             if ($searchAliases) {
-                $recs = get_records_select('glossary_alias', "alias $termquery");
+                $recs = sloodle_get_records_select('glossary_alias', "alias $termquery");
                 // Go through each alias found
                 if (is_array($recs)) {
                     foreach ($recs as $r) {
                         // First check if we already had this entry
                         if (isset($entries[$r->entryid])) continue;
                         // Check if this alias refers to an entry in our desired glossary
-                        $entry = get_record('glossary_entries', 'glossaryid', $glossaryid, 'entryid', $r->entryid);
+                        $entry = sloodle_get_record('glossary_entries', 'glossaryid', $glossaryid, 'entryid', $r->entryid);
                         if (!$entry) continue;
                         // Store the entry
                         $entries[$entry->id] = new SloodleGlossaryEntry($entry->id, $entry->concept, $entry->definition);
@@ -133,7 +133,7 @@
             
             // Search definitions
             if ($searchDefinitions) {
-                $recs = get_records_select('glossary_entries', "glossaryid = $glossaryid AND definition $sql_like '%$term%'", 'concept');
+                $recs = sloodle_get_records_select('glossary_entries', "glossaryid = $glossaryid AND definition $sql_like '%$term%'", 'concept');
                 if (is_array($recs)) {
                     foreach ($recs as $r) {
                         if (!isset($entries[$r->id])) $entries[$r->id] = new SloodleGlossaryEntry($r->id, $r->concept, $r->definition);

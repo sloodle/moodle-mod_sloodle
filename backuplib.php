@@ -37,7 +37,7 @@
         //...
         
         // Go through each SLOODLE module in the specified course.
-        $mods = get_records('sloodle', 'course', $preferences->backup_course, 'id');
+        $mods = sloodle_get_records('sloodle', 'course', $preferences->backup_course, 'id');
         if ($mods === false) return false;
         foreach ($mods as $mod) {
             // Is this module due for backup?
@@ -61,7 +61,7 @@
     {
         // Load a 'sloodle' record if necessary
         if (is_numeric($mod)) {
-            $mod = get_record('sloodle', 'id', $mod);
+            $mod = sloodle_get_record('sloodle', 'id', $mod);
             if ($mod === false) return false;
         }
         
@@ -225,7 +225,7 @@
     function sloodle_ids($course)
     {
         global $CFG;
-        return get_records_sql("
+        return sloodle_get_records_sql("
             SELECT s.id, s.course
             FROM {$CFG->prefix}sloodle s
             WHERE s.course = '{$course}'

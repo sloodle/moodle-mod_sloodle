@@ -77,7 +77,7 @@
             }
             
             // Load from the primary table: chat instance
-            if (!($this->moodle_chat_instance = get_record('chat', 'id', $this->cm->instance))) {
+            if (!($this->moodle_chat_instance = sloodle_get_record('chat', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load chatroom with instance ID #{$cm->instance}.<br/>");
                 return false;
             }
@@ -96,7 +96,7 @@
             // Calculate the earliest acceptable timestamp
             $earliest = time() - $time;
             // Get all message records for this chatroom
-            $recs = get_records_select('chat_messages', "chatid = {$this->moodle_chat_instance->id} AND timestamp >= $earliest", 'timestamp ASC');
+            $recs = sloodle_get_records_select('chat_messages', "chatid = {$this->moodle_chat_instance->id} AND timestamp >= $earliest", 'timestamp ASC');
             if (!$recs) return array();
             
             // We'll need to lookup all the user data.
@@ -182,7 +182,7 @@
             $rec->message = $message;
             $rec->timestamp = $timestamp;
             // Attempt to insert the chat message
-            $result = insert_record('chat_messages', $rec);
+            $result = sloodle_insert_record('chat_messages', $rec);
             if (!$result) return false;
             
             if (!is_null($this->_session->active_object)) {

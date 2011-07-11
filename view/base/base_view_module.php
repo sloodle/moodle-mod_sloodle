@@ -16,7 +16,6 @@ require_once(SLOODLE_DIRROOT.'/view/base/base_view.php');
 /** The SLOODLE course data structure */
 require_once(SLOODLE_LIBROOT.'/course.php');
 
-
 /**
 * The base class for viewing a SLOODLE module.
 * Should be inherited and overridden.
@@ -97,12 +96,12 @@ class sloodle_base_view_module extends sloodle_base_view
         $id = required_param('id', PARAM_INT);
         if (!$this->cm = get_coursemodule_from_id('sloodle', $id)) error('Course module ID was incorrect.');
         // Fetch the course data
-        if (!$this->course = get_record('course', 'id', $this->cm->course)) error('Failed to retrieve course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $this->cm->course)) error('Failed to retrieve course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
 
         // Fetch the SLOODLE instance itself
-        if (!$this->sloodle = get_record('sloodle', 'id', $this->cm->instance)) error('Failed to find SLOODLE module instance');
+        if (!$this->sloodle = sloodle_get_record('sloodle', 'id', $this->cm->instance)) error('Failed to find SLOODLE module instance');
     }
 
     /**

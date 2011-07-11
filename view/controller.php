@@ -42,7 +42,7 @@ class sloodle_view_controller extends sloodle_base_view_module
         // Process basic data first
         parent::process_request();
         // Obtain the Controller-specific data
-        if (!$this->controller = get_record('sloodle_controller', 'sloodleid', $this->sloodle->id)) error('Failed to locate Controller data');
+        if (!$this->controller = sloodle_get_record('sloodle_controller', 'sloodleid', $this->sloodle->id)) error('Failed to locate Controller data');
     }
 
     /**
@@ -60,7 +60,7 @@ class sloodle_view_controller extends sloodle_base_view_module
         global $CFG;
         
         // Fetch the controller data
-        $this->controller = get_record('sloodle_controller', 'sloodleid', $this->sloodle->id);
+        $this->controller = sloodle_get_record('sloodle_controller', 'sloodleid', $this->sloodle->id);
         if (!$this->controller) return false;
         
         // The name, type and description of the module should already be displayed by the main "view.php" script.
@@ -169,10 +169,10 @@ class sloodle_view_controller extends sloodle_base_view_module
                     $parts = explode('_', $name);
                     if (count($parts) == 2 && $parts[0] == 'sloodledeleteobj') {
                         // Only delete the object if it belongs to this controller
-                        if (delete_records('sloodle_active_object', 'controllerid', $this->cm->id, 'id', (int)$parts[1])) {
+                        if (sloodle_delete_records('sloodle_active_object', 'controllerid', $this->cm->id, 'id', (int)$parts[1])) {
                             $numdeleted++;
                             // Delete any associated configuration settings too
-                            delete_records('sloodle_object_config', 'object', (int)$parts[1]);
+                            sloodle_delete_records('sloodle_object_config', 'object', (int)$parts[1]);
                         }
                         
                     }
@@ -183,7 +183,7 @@ class sloodle_view_controller extends sloodle_base_view_module
             }
             
             // Get all objects authorised for this controller
-            $recs = get_records('sloodle_active_object', 'controllerid', $this->cm->id, 'timeupdated DESC');
+            $recs = sloodle_get_records('sloodle_active_object', 'controllerid', $this->cm->id, 'timeupdated DESC');
             if (is_array($recs) && count($recs) > 0) {
                 // Construct a table
                 //TODO: add authorising user link

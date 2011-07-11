@@ -11,6 +11,7 @@
 	// Pull in the main moodle config
 	// NB the following is necessary for when we pull in this config.php from a module under sloodle/mod
 	require_once (realpath(dirname(__FILE__) . "/" . "../../config.php"));
+	require_once (realpath(dirname(__FILE__) . "/" . "lib/db.php"));
     
     // Is this a linker script?
     if (defined('SLOODLE_LINKER_SCRIPT')) {
@@ -35,6 +36,9 @@
 	
     /** The Sloodle version number. */
     define('SLOODLE_VERSION', 2.0); // This is the release version, not the module version (which is in version.php)
+
+    define('SLOODLE_IS_ENVIRONMENT_IS_MOODLE_2', ($CFG->version >= 2010060800) );
+
     
 //---------------------------------------------------------------------
 
@@ -90,7 +94,6 @@
     define('SLOODLE_TYPE_DISTRIB', 'distributor');
     define('SLOODLE_TYPE_PRESENTER', 'presenter');
     define('SLOODLE_TYPE_MAP', 'map');
-    define('SLOODLE_TYPE_AWARDS', 'awards');
     
     // Store the types in an array (used in lists)
     global $SLOODLE_TYPES;   
@@ -99,7 +102,6 @@
     $SLOODLE_TYPES[] = SLOODLE_TYPE_CTRL;
     $SLOODLE_TYPES[] = SLOODLE_TYPE_DISTRIB;
     $SLOODLE_TYPES[] = SLOODLE_TYPE_PRESENTER;
-    $SLOODLE_TYPES[] = SLOODLE_TYPE_AWARDS; 
     
     
     
@@ -135,6 +137,6 @@
         It will contain all data sent to and from the server by LSL scripts, including sensitive data like prim passwords
         ...so if you turn this on, be careful about who has access to the file it creates.
     */
-    define('SLOODLE_DEBUG_REQUEST_LOG', '/var/log/dev_template.log');
+    define('SLOODLE_DEBUG_REQUEST_LOG', '/tmp/sloodle_debug.log');
 
 ?>

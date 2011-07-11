@@ -73,7 +73,7 @@ function choice_get_response_data($choice, $cm, $groupmode) {
     $allresponses[0] = get_users_by_capability($context, 'mod/choice:choose', 'u.id, u.picture, u.firstname, u.lastname, u.idnumber', 'u.firstname ASC', '', '', $currentgroup, '', false, true);
 
 /// Get all the recorded responses for this choice
-    $rawresponses = get_records('choice_answers', 'choiceid', $choice->id);
+    $rawresponses = sloodle_get_records('choice_answers', 'choiceid', $choice->id);
 
 /// Use the responses to move users into the correct column
 

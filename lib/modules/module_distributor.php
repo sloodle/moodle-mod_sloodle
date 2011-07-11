@@ -74,12 +74,12 @@
             // Fetch the course module data
             if (!($this->cm = get_coursemodule_from_id('sloodle', $id))) return false;
             // Load from the primary table: Sloodle instance
-            if (!($this->sloodle_module_instance = get_record('sloodle', 'id', $this->cm->instance))) return false;
+            if (!($this->sloodle_module_instance = sloodle_get_record('sloodle', 'id', $this->cm->instance))) return false;
             // Check that it is the correct type
             if ($this->sloodle_module_instance->type != SLOODLE_TYPE_DISTRIB) return false;
             
             // Load from the secondary table: Distributor instance
-            if (!($this->sloodle_distributor_instance = get_record('sloodle_distributor', 'sloodleid', $this->cm->instance))) return false;
+            if (!($this->sloodle_distributor_instance = sloodle_get_record('sloodle_distributor', 'sloodleid', $this->cm->instance))) return false;
             
             return true;
         }
@@ -92,7 +92,7 @@
         function get_objects()
         {
             // Get all distributor record entries for this distributor, sorted alphabetically
-            $recs = get_records('sloodle_distributor_entry', 'distributorid', $this->sloodle_distributor_instance->id, 'name');
+            $recs = sloodle_get_records('sloodle_distributor_entry', 'distributorid', $this->sloodle_distributor_instance->id, 'name');
             if (!$recs) return array();
             // Convert it to an array of strings
             $entries = array();
@@ -112,7 +112,7 @@
         function set_objects($objects)
         {
             // Delete all existing records for this Distributor
-            delete_records('sloodle_distributor_entry', 'distributorid', $this->sloodle_distributor_instance->id);
+            sloodle_delete_records('sloodle_distributor_entry', 'distributorid', $this->sloodle_distributor_instance->id);
             
             // Go through each new entry
             $result = true;
@@ -122,7 +122,7 @@
                 $rec->distributorid = $this->sloodle_distributor_instance->id;
                 $rec->name = sloodle_clean_for_db($o);
                 // Insert it
-                if (!insert_record('sloodle_distributor_entry', $rec)) $result = false;
+                if (!sloodle_insert_record('sloodle_distributor_entry', $rec)) $result = false;
             }
         
             return $result;
@@ -139,7 +139,7 @@
             $this->sloodle_distributor_instance->channel = $uuid;
             $this->sloodle_distributor_instance->timeupdated = time();
             // Update the database
-            return update_record('sloodle_distributor', $this->sloodle_distributor_instance);
+            return sloodle_update_record('sloodle_distributor', $this->sloodle_distributor_instance);
         }
         
         
@@ -152,7 +152,7 @@
         function send_object($objname, $uuid)
         {
             // Check that the object exists in this distributor
-            if (!record_exists('sloodle_distributor_entry', 'distributorid', $this->distrib_id, 'name', addslashes($objname))) return false;
+            if (!sloodle_record_exists('sloodle_distributor_entry', 'distributorid', $this->distrib_id, 'name', addslashes($objname))) return false;
             // Send the XMLRPC request
             return sloodle_send_xmlrpc_message($this->sloodle_distributor_instance->channel, 0, "1|OK\\nSENDOBJECT|$uuid|$objname");
         }
@@ -191,7 +191,7 @@
             $distributor->channel = '';
             $distributor->timeupdated = 0;            
             
-            $newid = insert_record('sloodle_distributor', $distributor);
+            $newid = sloodle_insert_record('sloodle_distributor', $distributor);
         
             return true;
         }

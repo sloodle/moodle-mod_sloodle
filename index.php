@@ -26,7 +26,7 @@
     // Fetch the course data
     $course = null;
     if ($id) {
-        if (! $course = get_record("course", "id", $id)) {
+        if (! $course = sloodle_get_record("course", "id", $id)) {
             error("Course ID is incorrect");
         }
     } else {
@@ -59,7 +59,7 @@
     $sloodle_tables = array();
     
     // Get all Sloodle modules for the current course
-    $sloodles = get_records('sloodle', 'course', $course->id, 'name');
+    $sloodles = sloodle_get_records('sloodle', 'course', $course->id, 'name');
     if (!$sloodles) $sloodles = array();
     // Go through each module    
     foreach ($sloodles as $s) {

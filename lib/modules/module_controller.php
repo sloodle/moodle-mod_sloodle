@@ -79,12 +79,12 @@
             // Fetch the course module data
             if (!($this->cm = get_coursemodule_from_id('sloodle', $id))) return false;
             // Load from the primary table: Sloodle instance
-            if (!($this->sloodle_module_instance = get_record('sloodle', 'id', $this->cm->instance))) return false;
+            if (!($this->sloodle_module_instance = sloodle_get_record('sloodle', 'id', $this->cm->instance))) return false;
             // Check that it is the correct type
             if ($this->sloodle_module_instance->type != SLOODLE_TYPE_CTRL) return false;
             
             // Load from the secondary table: Distributor instance
-            if (!($this->sloodle_controller_instance = get_record('sloodle_controller', 'sloodleid', $this->cm->instance))) return false;
+            if (!($this->sloodle_controller_instance = sloodle_get_record('sloodle_controller', 'sloodleid', $this->cm->instance))) return false;
             
             return true;
         }
@@ -132,7 +132,7 @@
             $controller->enabled = $info['ENABLED']['0']['#'];
             $controller->password = $info['PASSWORD']['0']['#'];
             
-            $newid = insert_record('sloodle_controller', $controller);
+            $newid = sloodle_insert_record('sloodle_controller', $controller);
         
             return true;
         }

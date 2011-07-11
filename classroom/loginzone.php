@@ -24,7 +24,7 @@
         
     // Attempt to fetch the course module instance
     if ($id) {
-        if (!$course = get_record('course', 'id', $id)) {
+        if (!$course = sloodle_get_record('course', 'id', $id)) {
             error('Could not find course');
         }
     } else {

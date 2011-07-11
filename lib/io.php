@@ -986,7 +986,7 @@
                 return null;
             }
             // Attempt to get the course data
-            $course_record = get_record('course', 'id', $this->course_id);
+            $course_record = sloodle_get_record('course', 'id', $this->course_id);
             if ($course_record === false) {
                 // Course not found
                 if ($require) {

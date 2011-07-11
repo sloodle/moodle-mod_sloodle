@@ -85,13 +85,13 @@
             }
             
             // Load from the primary table: sloodle instance
-            if (!($this->sloodle_instance = get_record('sloodle', 'id', $this->cm->instance))) {
+            if (!($this->sloodle_instance = sloodle_get_record('sloodle', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load Sloodle module with instance ID #{$cm->instance}.<br/>");
                 return false;
             }
 
             // Load from the secondary table: sloodle_presenter
-            if (!($this->presenter = get_record('sloodle_presenter', 'sloodleid', $this->cm->instance))) {
+            if (!($this->presenter = sloodle_get_record('sloodle_presenter', 'sloodleid', $this->cm->instance))) {
                 sloodle_debug("Failed to load secondary module table with instance ID #{$this->cm->instance}.<br/>");
                 return false;
             }
@@ -107,7 +107,7 @@
         function get_entry_urls()
         {
             // Search the database for entries
-            $recs = get_records_select('sloodle_presenter_entry', "sloodleid = {$this->sloodle_instance->id}", 'ordering');
+            $recs = sloodle_get_records_select('sloodle_presenter_entry', "sloodleid = {$this->sloodle_instance->id}", 'ordering');
             if (!$recs) return array();
             // Format it all nicely into a simple array
             $output = array();
@@ -136,7 +136,7 @@
             $id = (int)$id;
        
             // Fetch the requested slide
-            $rec = get_record('sloodle_presenter_entry', 'id', $id);
+            $rec = sloodle_get_record('sloodle_presenter_entry', 'id', $id);
             if (!$rec) return false;
             
             // Substitute the source data for the name if no name is given.
@@ -168,7 +168,7 @@
             // Make sure we have valid ordering
             $this->validate_ordering();
             // Fetch the database records
-            $recs = get_records_select('sloodle_presenter_entry', "sloodleid = {$this->sloodle_instance->id}", 'ordering');
+            $recs = sloodle_get_records_select('sloodle_presenter_entry', "sloodleid = {$this->sloodle_instance->id}", 'ordering');
             if (!$recs) return array();
             // Construct the array of objects
             $output = array();
@@ -218,12 +218,12 @@
             $rec->name = $name;
             $rec->type = $type;
             if ($position < 0) {
-                $num = count_records('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id);
+                $num = sloodle_count_records('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id);
                 $rec->ordering = ((int)$num + 1) * 10;
             } else {
                 $rec->ordering = ($position * 10) - 1; // Ordering works in multiples of 10, starting at 10.
             }
-            $result = (bool)insert_record('sloodle_presenter_entry', $rec, false);
+            $result = (bool)sloodle_insert_record('sloodle_presenter_entry', $rec, false);
             
             // Make sure our entry ordering is valid again now
             $this->validate_ordering();
@@ -247,7 +247,7 @@
 
             // Attempt to fetch the existing entry from the database
             $id = (int)$id;
-            $rec = get_record('sloodle_presenter_entry', 'id', $id, 'sloodleid', $this->sloodle_instance->id);
+            $rec = sloodle_get_record('sloodle_presenter_entry', 'id', $id, 'sloodleid', $this->sloodle_instance->id);
             if (!$rec) return false;
 
             // Apply the changes to the record
@@ -258,7 +258,7 @@
                 $rec->ordering = ($position * 10) - 1; // Ordering works in multiples of 10, starting at 10.
             }
             // Update the database
-            $result = (bool)update_record('sloodle_presenter_entry', $rec);
+            $result = (bool)sloodle_update_record('sloodle_presenter_entry', $rec);
 			
 			// Make sure our entry ordering is valid
             $this->validate_ordering();
@@ -273,7 +273,7 @@
         */
         function delete_entry($id)
         {
-           $result = delete_records('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id, 'id', $id);
+           $result = sloodle_delete_records('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id, 'id', $id);
            // Fix the ordering
            $this->validate_ordering();
            
@@ -293,7 +293,7 @@
             // Start by ensuring uniform ordering, starting at 10.
             $this->validate_ordering();
             // Attempt to move the specified entry in the appropriate direction
-            $entry = get_record('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id, 'id', $id);
+            $entry = sloodle_get_record('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id, 'id', $id);
             if (!$entry) return;
             if ($forward) {
                 // Avoid a negative ordering value.
@@ -301,7 +301,7 @@
             } else {
                 $entry->ordering += 15;
             }
-            update_record('sloodle_presenter_entry', $entry);
+            sloodle_update_record('sloodle_presenter_entry', $entry);
             // Re-validate the entry ordering
             $this->validate_ordering();
         }
@@ -323,10 +323,10 @@
 			$newordering = ($pos * 10) - 1;
 			
 			// Write the new ordering to the database, and re-validate the order
-			$entry = get_record('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id, 'id', $id);
+			$entry = sloodle_get_record('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id, 'id', $id);
             if (!$entry) return;
 			$entry->ordering = $newordering;
-			update_record('sloodle_presenter_entry', $entry);
+			sloodle_update_record('sloodle_presenter_entry', $entry);
             
             $this->validate_ordering();
 		}
@@ -339,14 +339,14 @@
         function validate_ordering()
         {
             // Get all entries in this presentation
-            $entries = get_records('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id, 'ordering');
+            $entries = sloodle_get_records('sloodle_presenter_entry', 'sloodleid', $this->sloodle_instance->id, 'ordering');
             if (!$entries || count($entries) <= 1) return;
 
             // Go through each entry in our array, and give it a valid ordering value.
             $ordering = 10;
             foreach ($entries as $entry) {
                 $entry->ordering = $ordering;
-                update_record('sloodle_presenter_entry', $entry);
+                sloodle_update_record('sloodle_presenter_entry', $entry);
                 $ordering += 10;
             }
         }
@@ -416,7 +416,7 @@
             $presenter->framewidth = $info['FRAMEWIDTH']['0']['#'];
             $presenter->frameheight = $info['FRAMEHEIGHT']['0']['#'];
             
-            $presenter->id = insert_record('sloodle_presenter', $presenter);
+            $presenter->id = sloodle_insert_record('sloodle_presenter', $presenter);
             
             // Go through each slide in the presenter backup
             $numslides = count($info['SLIDES']['0']['#']['SLIDE']);
@@ -432,7 +432,7 @@
                 $slide->type = $curslide['TYPE']['0']['#'];
                 $slide->ordering = $curslide['ORDERING']['0']['#'];
                 
-                $slide->id = insert_record('sloodle_presenter_entry', $slide);
+                $slide->id = sloodle_insert_record('sloodle_presenter_entry', $slide);
             }
         
             return true;

@@ -38,7 +38,7 @@
     $sloodle->authenticate_request();
     
     // Make sure Sloodle is actually installed
-    $moduleinfo = get_record('modules', 'name', 'sloodle');
+    $moduleinfo = sloodle_get_record('modules', 'name', 'sloodle');
     if (!$moduleinfo) {
         sloodle_debug('ERROR: Sloodle not installed<br/>');
         $sloodle->response->quick_output(-106, 'SYSTEM', 'The Sloodle module is not installed on this Moodle site.', false);

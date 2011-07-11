@@ -52,7 +52,7 @@
     require_capability('moodle/course:manageactivities', $course_context);
     
     // Delete all configuration options already associated with the object
-    delete_records('sloodle_object_config', 'object', $sloodleauthid);
+    sloodle_delete_records('sloodle_object_config', 'object', $sloodleauthid);
     
     // Define parameter names we will ignore
     $IGNORE_PARAMS = array('sloodleauthid', 'sloodledebug');
@@ -71,7 +71,7 @@
         // Store the setting
         $config_setting->name = addslashes($k);
         $config_setting->value = addslashes($v);
-        if (insert_record('sloodle_object_config', $config_setting)) {
+        if (sloodle_insert_record('sloodle_object_config', $config_setting)) {
             $numstored++;
         }
     }

@@ -93,14 +93,14 @@
             }
             
             // Load from the primary table: choice instance
-            if (!($this->moodle_choice_instance = get_record('choice', 'id', $this->cm->instance))) {
+            if (!($this->moodle_choice_instance = sloodle_get_record('choice', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load choice with instance ID #{$cm->instance}.<br/>");
                 return false;
             }
 
             // Fetch options
             $this->options = array();
-            if ($options = get_records('choice_options', 'choiceid', $this->moodle_choice_instance->id)) {
+            if ($options = sloodle_get_records('choice_options', 'choiceid', $this->moodle_choice_instance->id)) {
                 // Get response data (this uses the standard choice function, in "moodle/mod/choice/lib.php")
                 $allresponses = choice_get_response_data($this->moodle_choice_instance, $this->cm, 0);
 
@@ -119,11 +119,14 @@
                 }
             }
             
+            //$users = get_course_users($this->cm->course); // Deprecated since 1.7. Hope this works instead:
+            $context = get_context_instance(CONTEXT_COURSE, $this->cm->course);
+            $users = get_users_by_capability($context, 'moodle/course:view', 'u.id', '','','',array(), false);
+
             // Determine how many people on the course have not yet answered
-            $users = get_course_users($this->cm->course);
             if (!is_array($users)) $users = array();
             $num_users = count($users);
-            $numanswers = (int)count_records('choice_answers', 'choiceid', $this->moodle_choice_instance->id);
+            $numanswers = (int)sloodle_count_records('choice_answers', 'choiceid', $this->moodle_choice_instance->id);
             $this->numunanswered = max(0, $num_users - $numanswers);
             
             return true;
@@ -167,7 +170,7 @@
             
             // Has the user already made a selection for this choice?
             $update_selection = false;
-            $previous_selection = get_record('choice_answers', 'choiceid', $this->moodle_choice_instance->id, 'userid', $user->get_user_id());
+            $previous_selection = sloodle_get_record('choice_answers', 'choiceid', $this->moodle_choice_instance->id, 'userid', $user->get_user_id());
             if ($previous_selection) {
                 // Was it a selection of the same option?
                 if ($previous_selection->optionid == $optionid) {
@@ -183,18 +186,18 @@
             }
             
             // Fetch the option record
-            $option = get_record('choice_options', 'id', $optionid, 'choiceid', $this->moodle_choice_instance->id);
+            $option = sloodle_get_record('choice_options', 'id', $optionid, 'choiceid', $this->moodle_choice_instance->id);
             if (!$option) return false;
             
             // Make sure the maximum selections for the given option have not yet been made
             if (!empty($this->moodle_choice_instance->limitanswers)) {
-                $numselections = count_records('choice_answers', 'optionid', $optionid);
+                $numselections = sloodle_count_records('choice_answers', 'optionid', $optionid);
                 if (!$numselections) return false;
                 if ($numselections >= $option->maxanswers) return -10012;
             }
             
             // If necessary, delete the existing selection
-            if ($update_selection) delete_records('choice_answers', 'choiceid', $this->moodle_choice_instance->id, 'userid', $user->get_user_id());
+            if ($update_selection) sloodle_delete_records('choice_answers', 'choiceid', $this->moodle_choice_instance->id, 'userid', $user->get_user_id());
             
             // Select the new option
             $selection = new stdClass();
@@ -202,7 +205,7 @@
             $selection->userid = $user->get_user_id();
             $selection->optionid = $optionid;
             $selection->timemodified = time();
-            if (!insert_record('choice_answers', $selection)) return false;
+            if (!sloodle_insert_record('choice_answers', $selection)) return false;
             
             // Success!
             if ($update_selection) return 10012;

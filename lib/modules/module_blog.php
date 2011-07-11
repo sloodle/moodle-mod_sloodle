@@ -108,7 +108,7 @@
             $blogEntry->rating = 0;
             
             // Attempt to insert it into the database
-            $blogEntry->id = insert_record('post', $blogEntry);
+            $blogEntry->id = sloodle_insert_record('post', $blogEntry);
             if (!$blogEntry->id) return false;
             
             // Log the entry
@@ -125,7 +125,7 @@
         function get_post($id)
         {
             // Attempt to fetch the data from the database
-            $rec = get_record('post', id, $id);
+            $rec = sloodle_get_record('post', id, $id);
             if (!$rec) return false;
             $post = new SloodleBlogPost();
             $post->load_data($rec);
@@ -139,7 +139,7 @@
         function get_latest_public_post()
         {
             // Attempt to fetch the data from the database
-            $rec = get_records_select('post', "publishstate = 'public'", 'created DESC', '*', 0, 1);
+            $rec = sloodle_get_records_select('post', "publishstate = 'public'", 'created DESC', '*', 0, 1);
             if (!$rec) return false;
             $post = new SloodleBlogPost();
             $post->load_data($rec[0]);
@@ -153,7 +153,7 @@
         function get_latest_site_post()
         {
             // Attempt to fetch the data from the database
-            $rec = get_records_select('post', "publishstate = 'site' OR publishstate = 'public'", 'created DESC', '*', 0, 1);
+            $rec = sloodle_get_records_select('post', "publishstate = 'site' OR publishstate = 'public'", 'created DESC', '*', 0, 1);
             if (!$rec) return false;
             $post = new SloodleBlogPost();
             $post->load_data($rec[0]);
@@ -174,7 +174,7 @@
             }
             // Attempt to fetch the data from the database
             $userid = (int)$user->get_user_id();
-            $rec = get_records_select('post', "userid = $userid", 'created DESC', '*', 0, 1);
+            $rec = sloodle_get_records_select('post', "userid = $userid", 'created DESC', '*', 0, 1);
             if (!$rec) return false;
             $post = new SloodleBlogPost();
             $post->load_data($rec[0]);
