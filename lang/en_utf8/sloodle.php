@@ -7,6 +7,7 @@
 */
 
 $string['pluginname']   = 'SLOODLE';
+$string['pluginadministration']   = 'SLOODLE Administration';
 
 $string['accesslevel'] = 'Access Level';
 $string['fieldset:accesslevel'] = 'Access Level';
