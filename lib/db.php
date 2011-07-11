@@ -17,6 +17,9 @@ function sloodle_get_record($p1=null, $p2=null, $p3=null, $p4=null, $p5=null, $p
    if ( sloodle_do_use_db_object() ) {
       return $DB->get_record($p1, sloodle_conditions_to_array($p2,$p3,$p4,$p5,$p6,$p7) );
    } else {
+      $p3 = is_null($p3) ? $p3 : addslashes($p3);
+      $p5 = is_null($p5) ? $p5 : addslashes($p5);
+      $p7 = is_null($p7) ? $p7 : addslashes($p7);
       return get_record($p1, $p2, $p3, $p4, $p5, $p6, $p6, $p8);
    }
 }
@@ -26,6 +29,9 @@ function sloodle_record_exists($p1=null, $p2=null, $p3=null, $p4=null, $p5=null,
    if ( sloodle_do_use_db_object() ) {
       return $DB->record_exists($p1, sloodle_conditions_to_array($p2,$p3,$p4,$p5,$p6,$p7) );
    } else {
+      $p3 = is_null($p3) ? $p3 : addslashes($p3);
+      $p5 = is_null($p5) ? $p5 : addslashes($p5);
+      $p7 = is_null($p7) ? $p7 : addslashes($p7);
       return record_exists($p1, $p2, $p3, $p4, $p5, $p6, $p7);
    }
 }
@@ -35,16 +41,17 @@ function sloodle_get_records($p1=null, $p2=null, $p3=null, $p4=null, $p5='*', $p
       global $DB;
       return $DB->get_records($p1, sloodle_conditions_to_array( $p2, $p3), $p4, $p5, $p6, $p7 );
    } else {
+      $p3 = is_null($p3) ? $p3 : addslashes($p3);
       return get_records($p1, $p2, $p3, $p4, $p5, $p6, $p7);
    }
 }
 
-function sloodle_get_records_sql($p1=null, $p2=null) {
+function sloodle_get_records_sql($p1=null, $p2=null, $p3=null) {
    if ( sloodle_do_use_db_object() ) {
       global $DB;
-      return $DB->get_records_sql($p1, $p2);
+      return $DB->get_records_sql($p1, $p2, $p3);
    } else {
-      return get_records_sql($p1, $p2);
+      return get_records_sql($p1, $p2, $p3);
    }
 }
 
@@ -61,6 +68,7 @@ function sloodle_insert_record($p1=null, $p2=null, $returnid=true, $primarykey='
    if ( sloodle_do_use_db_object() ) {
       global $DB;
 //try {
+      $p2 = is_null($p2) ? $p2 : sloodle_sanitize_object( $p2 );
       return $DB->insert_record($p1, $p2, $returnid, false);  // if we need that primarykey field, I guess something will break
 //} catch (Exception $e) {
 //var_dump($p2);
@@ -72,21 +80,33 @@ function sloodle_insert_record($p1=null, $p2=null, $returnid=true, $primarykey='
    }
 }
 
+function sloodle_sanitize_object($obj) {
+   $props = get_object_vars( $obj );
+   foreach($props as $prop) {
+      $obj->$prop = addslashes($obj->$prop);
+   }
+   return $obj;
+}
+
 function sloodle_update_record($p1=null, $p2=null) {
    if ( sloodle_do_use_db_object() ) {
       global $DB;
       return $DB->update_record($p1, $p2);
    } else {
+      $p2 = is_null($p2) ? $p2 : sloodle_sanitize_object( $p2 );
       return update_record($p1, $p2);
    }
 }
 
-function sloodle_count_records($p1=null, $p2=null, $p3=null) {
+function sloodle_count_records($p1=null, $p2=null, $p3=null, $p4 = null, $p5 = null, $p6 = null, $p7 = null) {
    if ( sloodle_do_use_db_object() ) {
       global $DB;
-      return $DB->count_records($p1, array( $p2=>$p3 ) );
+      return $DB->count_records($p1, sloodle_conditions_to_array($p2, $p3, $p4, $p5, $p6, $p7) );
    } else {
-      return count_records($p1, $p2, $p3);
+      $p3 = is_null($p3) ? $p3 : addslashes($p3);
+      $p5 = is_null($p5) ? $p5 : addslashes($p5);
+      $p7 = is_null($p7) ? $p7 : addslashes($p7);
+      return count_records($p1, $p2, $p3, $p4, $p5, $p6, $p7);
    }
 }
 
@@ -106,6 +126,9 @@ function sloodle_delete_records($p1=null, $p2=null, $p3=null, $p4=null, $p5=null
       global $DB;
       return $DB->delete_records($p1, sloodle_conditions_to_array($p2, $p3, $p4, $p5, $p6, $p7) );
    } else {
+      $p3 = is_null($p3) ? $p3 : addslashes($p3);
+      $p5 = is_null($p5) ? $p5 : addslashes($p5);
+      $p7 = is_null($p7) ? $p7 : addslashes($p7);
       return delete_records($p1, $p2, $p3, $p4, $p5, $p6, $p7);
    }
 }
@@ -125,6 +148,9 @@ function sloodle_delete_record($p1=null, $p2=null, $p3=null, $p4=null, $p5=null,
       global $DB;
       return $DB->delete_record($p1, array($p2=>$p3, $p4=>$p5, $p6=>$p7) );
    } else {
+      $p3 = is_null($p3) ? $p3 : addslashes($p3);
+      $p5 = is_null($p5) ? $p5 : addslashes($p5);
+      $p7 = is_null($p7) ? $p7 : addslashes($p7);
       return delete_record($p1, $p2, $p3, $p4, $p5, $p6, $p7);
    }
 }
@@ -147,16 +173,20 @@ function sloodle_get_field_sql($p1=null) {
    }
 }
 
-function sloodle_set_field($p1=null, $p2=null, $p3=null, $p4=null, $p5=null, $p6=null, $p7=null, $p8=null) {
+function sloodle_set_field($p1=null, $p2=null, $p3=null, $p4=null, $p5=null, $p6=null, $p7=null, $p8=null, $p9=null) {
    if ( sloodle_do_use_db_object() ) {
       global $DB;
-      return $DB->set_field($p1, $p2, $p3, sloodle_conditions_to_array( $p4, $p5, $p6, $p7, $p8) );
+      return $DB->set_field($p1, $p2, $p3, sloodle_conditions_to_array( $p4, $p5, $p6, $p7, $p8, $p9) );
    } else {
-      return set_field($p1, $p2, $p3, $p4, $p5, $p6, $p7, $p8);
+      $p3 = is_null($p3) ? $p3 : addslashes($p3);
+      $p5 = is_null($p5) ? $p5 : addslashes($p5);
+      $p7 = is_null($p7) ? $p7 : addslashes($p7);
+      $p9 = is_null($p9) ? $p9 : addslashes($p9);
+      return set_field($p1, $p2, $p3, $p4, $p5, $p6, $p7, $p8, $p9);
    }
 }
 
-function sloodle_sql_ilike($p1=null) {
+function sloodle_sql_ilike() {
    if ( sloodle_do_use_db_object() ) {
       global $DB;
       return $DB->sql_ilike();
