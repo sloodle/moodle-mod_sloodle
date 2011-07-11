@@ -1207,7 +1207,31 @@ if ($result && $oldversion < 2011070900) {
         $result = $result && create_table($table);
     }
 
+    if ($result && $oldversion < 2011071101) {
 
+	// needed by moodle 2 (but should already have been in <=1.9)
+	// see http://docs.moodle.org/dev/Text_formats_2.0
+
+        $table = new XMLDBTable('sloodle');
+        $field = new XMLDBField('introformat');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, null, null, null, null, null, 'intro');
+
+        if (!field_exists($table, $field)) {
+            add_field($table, $field);
+        }
+
+        // conditionally migrate to html format in intro
+        if ($CFG->texteditors !== 'textarea') {
+            $rs = get_records('sloodle', 'introformat', FORMAT_MOODLE);
+            foreach ($rs as $q) {
+                $q->intro       = text_to_html($q->intro, false, false, true);
+                $q->introformat = FORMAT_HTML;
+                update_record('sloodle', $q);
+            }
+            $rs->close();
+        }
+
+    }
 
 return $result; 
 }
