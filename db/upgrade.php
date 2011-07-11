@@ -463,7 +463,7 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         echo "{$numupdated} slide(s) updated.<br/>";
     }
 
-    if ($result && !table_exists('sloodle_currency_types')) {     
+    if ($result && !table_exists(new XMLDBTable('sloodle_currency_types'))) {     
         $table = new XMLDBTable('sloodle_currency_types');
          echo "creating new currency table for site wide virtual currency<br/>";               
         $field = new XMLDBField('id');
@@ -696,7 +696,7 @@ if ($result && $oldversion < 2011070900) {
     // Sloodle 1.2 snuck in in the middle of development and messed up the normal order.
     // This should be OK as long as we don't get another release in between...
     // If we absolutely have to, leaving the space up to 2009073000 to denote 1.2-series releases.
-    if ( $result && !table_exists('sloodle_activity_tool') ) { 
+    if ( $result && !table_exists(new XMLDBTable('sloodle_activity_tool')) ) { 
                                                                                                                                                                                                                                                             
     /// Insert 'sloodle_activity_tool' table                                                                                       
         echo " - sloodle_activity_tool<br/>";                                                                                       
@@ -721,7 +721,7 @@ if ($result && $oldversion < 2011070900) {
                                                                                                                   
 
   /// Insert 'sloodle_activity_tracker' table                                                                                  
-    if ( $result && !table_exists('sloodle_activity_tracker') ) { 
+    if ( $result && !table_exists(new XMLDBTable('sloodle_activity_tracker')) ) { 
         echo " - sloodle_activity_tracker<br/>";                                                                              
         $table = new XMLDBTable('sloodle_activity_tracker');                                                                    
                                                                                                                                                                                                                                                        
@@ -738,7 +738,7 @@ if ($result && $oldversion < 2011070900) {
                 
     }
 
-    if ( $result && !table_exists('sloodle_activity_tracker') ) { 
+    if ( $result && !table_exists(new XMLDBTable('sloodle_tracker')) ) { 
     /// Define table sloodle_tracker to be created
         $table = new XMLDBTable('sloodle_tracker');
 
