@@ -43,7 +43,7 @@
 	}
 
 	function FetchAll() {
-		$recs = get_records('sloodle_currency_types', null, null, 'displayorder asc, name asc');
+		$recs = sloodle_get_records('sloodle_currency_types', null, null, 'displayorder asc, name asc');
 		if (!$recs) {
 			return false;
 		}

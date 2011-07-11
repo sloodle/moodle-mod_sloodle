@@ -374,14 +374,14 @@ class SloodleObjectConfig {
 
 		// We need to fetch a list of visible quizzes on the course
 		// Get the ID of the chat type
-		$rec = get_record('modules', 'name', $modtype);
+		$rec = sloodle_get_record('modules', 'name', $modtype);
 		if (!$rec) {
 			return false;
 		}
 		$moduleid = $rec->id;
 
 		// Get all visible quizzes in the current course
-		$recs = get_records_select('course_modules', "course = ".intval($courseid)." AND module = ".intval($moduleid)." AND visible = 1");
+		$recs = sloodle_get_records_select('course_modules', "course = ".intval($courseid)." AND module = ".intval($moduleid)." AND visible = 1");
 		if (!$recs) {
 			return false;
 		    //error(get_string('noquizzes','sloodle'));
@@ -389,7 +389,7 @@ class SloodleObjectConfig {
 
 		foreach ($recs as $cm) {
 			// Fetch the quiz instance
-			$inst = get_record($modtype, 'id', $cm->instance);
+			$inst = sloodle_get_record($modtype, 'id', $cm->instance);
 			if (!$inst) {
 				continue;
 			}
@@ -624,7 +624,7 @@ class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOptio
 
 	function SloodleConfigurationOptionCurrencyChoice( $fieldname, $title, $description, $default = '', $length = 8 ) {
 
-		if (!$currencies = get_records('sloodle_currency_types') ) {
+		if (!$currencies = sloodle_get_records('sloodle_currency_types') ) {
 			return false;
 		}
 

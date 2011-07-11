@@ -332,7 +332,7 @@
             // Make sure the necessary data is available
             if (!(isset($this->sloodle_course_data->loginzonepos) && isset($this->sloodle_course_data->loginzonesize) && isset($this->sloodle_course_data->loginzoneregion))) return false;
             // Delete any existing LoginZone allocation for this user
-            delete_records('sloodle_loginzone_allocation', 'userid', $user->get_user_id());
+            sloodle_delete_records('sloodle_loginzone_allocation', 'userid', $user->get_user_id());
            
             // We will try up to 10 times to find a new available position
             $loginzonesize = sloodle_vector_to_array($this->sloodle_course_data->loginzonesize);
@@ -346,7 +346,7 @@
 
                 $rndpos_str = sloodle_array_to_vector($rndpos_arr);
                 // Is the position already taken?
-                if (!get_record('sloodle_loginzone_allocation', 'course', $this->get_course_id(), 'position', $rndpos_str)) {
+                if (!sloodle_get_record('sloodle_loginzone_allocation', 'course', $this->get_course_id(), 'position', $rndpos_str)) {
                     // Nobody has the position
                     $success = true;
                 }
@@ -361,7 +361,7 @@
             $alloc->position = $rndpos_str;
             $alloc->timecreated = time();
             // Attempt to insert it into the database
-            if (!insert_record('sloodle_loginzone_allocation', $alloc)) return false;
+            if (!sloodle_insert_record('sloodle_loginzone_allocation', $alloc)) return false;
             return true;
         }
        
@@ -375,7 +375,7 @@
             // Make sure the necessary data is available
             if (!(isset($this->sloodle_course_data->loginzonepos) && isset($this->sloodle_course_data->loginzonesize) && isset($this->sloodle_course_data->loginzoneregion))) return false;
             // Attempt to fetch the data
-            $alloc = get_record('sloodle_loginzone_allocation', 'course', $this->get_course_id(), 'userid', $user->get_user_id());
+            $alloc = sloodle_get_record('sloodle_loginzone_allocation', 'course', $this->get_course_id(), 'userid', $user->get_user_id());
             if (!$alloc) return false;
             $relpos = sloodle_vector_to_array($alloc->position);
             // Calculate the absolute position of the allocation
@@ -406,10 +406,10 @@
             $altrelposstr = sloodle_array_to_vector($altrelpos);
        
             // Attempt to find a matching LoginZone position in the database
-            $rec = get_record('sloodle_loginzone_allocation', 'course', $this->get_course_id(), 'position', $relposstr);
+            $rec = sloodle_get_record('sloodle_loginzone_allocation', 'course', $this->get_course_id(), 'position', $relposstr);
             if (!$rec)
             {
-                $rec = get_record('sloodle_loginzone_allocation', 'course', $this->get_course_id(), 'position', $altrelposstr);
+                $rec = sloodle_get_record('sloodle_loginzone_allocation', 'course', $this->get_course_id(), 'position', $altrelposstr);
             }
             if (!$rec) return false;
             // Load the user
@@ -424,7 +424,7 @@
         */
         function delete_loginzone_allocation($user)
         {
-            delete_records('sloodle_loginzone_allocation', 'userid', $user->get_user_id());
+            sloodle_delete_records('sloodle_loginzone_allocation', 'userid', $user->get_user_id());
         }
        
         /**
@@ -456,7 +456,7 @@
                 // It is a course ID - make sure it's valid
                 if ($course <= 0) return false;
                 // Load the course data
-                $this->course_object = get_record('course', 'id', $course);
+                $this->course_object = sloodle_get_record('course', 'id', $course);
                 if (!$this->course_object) {
                     $this->course_object = null;
                     return false;
@@ -471,7 +471,7 @@
             }
            
             // Fetch the Sloodle course data
-            $this->sloodle_course_data = get_record('sloodle_course', 'course', $this->course_object->id);
+            $this->sloodle_course_data = sloodle_get_record('sloodle_course', 'course', $this->course_object->id);
             // Did it fail?
             if (!$this->sloodle_course_data) {
                 // Create the new entry
@@ -481,7 +481,7 @@
                 $this->sloodle_course_data->loginzonepos = '';
                 $this->sloodle_course_data->loginzonesize = '';
                 $this->sloodle_course_data->loginzoneregion = '';
-                $this->sloodle_course_data->id = insert_record('sloodle_course', $this->sloodle_course_data);
+                $this->sloodle_course_data->id = sloodle_insert_record('sloodle_course', $this->sloodle_course_data);
                 // Did something go wrong?
                 if (!$this->sloodle_course_data->id) {
                     $this->course_object = null;
@@ -531,7 +531,7 @@
             if (empty($this->course_object) || $this->course_object->id <= 0) return false;
             if (empty($this->sloodle_course_data) || $this->sloodle_course_data->id <= 0) return false;
             // Update the Sloodle data
-            return update_record('sloodle_course', $this->sloodle_course_data);
+            return sloodle_update_record('sloodle_course', $this->sloodle_course_data);
         }
        
         /**
@@ -541,7 +541,7 @@
         function get_layout_names()
         {
             // Fetch the layout records
-            $layouts = get_records('sloodle_layout', 'course', $this->course_object->id, 'name');
+            $layouts = sloodle_get_records('sloodle_layout', 'course', $this->course_object->id, 'name');
             if (!$layouts) return array();
             // Construct the array of names
             $layout_names = array();
@@ -561,7 +561,7 @@
         function get_layout_entries($name)
         {
             // Attempt to find the relevant layout
-            $layout = get_record('sloodle_layout', 'course', $this->course_object->id, 'name', $name);
+            $layout = sloodle_get_record('sloodle_layout', 'course', $this->course_object->id, 'name', $name);
             if (!$layout) return false;
            
             return $this->get_layout_entries_for_layout_id($layout->id);
@@ -575,7 +575,7 @@
         function get_layout_entries_for_layout_id($id)
         {
             // Fetch all entries
-            $recs = get_records('sloodle_layout_entry', 'layout', $id);
+            $recs = sloodle_get_records('sloodle_layout_entry', 'layout', $id);
             if (!$recs) return array();
            
             // Construct the array of SloodleLayoutEntry objects
@@ -593,7 +593,7 @@
         */
         function get_layouts() {
             // Fetch the layout records
-            $layoutrecs = get_records('sloodle_layout', 'course', $this->course_object->id, 'name');
+            $layoutrecs = sloodle_get_records('sloodle_layout', 'course', $this->course_object->id, 'name');
             $layouts = array();
 
             if (!$layoutrecs) return array();
@@ -613,13 +613,13 @@
         function delete_layout($name)
         {
             // Attempt to find the relevant layout
-            $layout = get_record('sloodle_layout', 'course', $this->course_object->id, 'name', $name);
+            $layout = sloodle_get_record('sloodle_layout', 'course', $this->course_object->id, 'name', $name);
             if (!$layout) return;
            
             // Delete all related entries
-            delete_records('sloodle_layout_entry', 'layout', $layout->id);
+            sloodle_delete_records('sloodle_layout_entry', 'layout', $layout->id);
             // Delete the layout itself
-            delete_records('sloodle_layout', 'course', $this->course_object->id, 'name', $name);
+            sloodle_delete_records('sloodle_layout', 'course', $this->course_object->id, 'name', $name);
         }
        
         /**
@@ -632,7 +632,7 @@
         function save_layout($name, $entries, $add = false)
         {
             // Attempt to find the relevant layout
-            $layout = get_record('sloodle_layout', 'course', $this->course_object->id, 'name', $name);
+            $layout = sloodle_get_record('sloodle_layout', 'course', $this->course_object->id, 'name', $name);
             $lid = 0;
             if ($layout) {
                $lid = $layout->id;
@@ -659,7 +659,7 @@
                 // This will happen when we save
                 // TODO: make add-only functionality for backwards compatibility
                 if (!$add) {
-                        delete_records('sloodle_layout_entry', 'layout', $layout->id);
+                        sloodle_delete_records('sloodle_layout_entry', 'layout', $layout->id);
                 }
 */
 
@@ -679,7 +679,7 @@
                 $layout->timeupdated = time();
                 $layout->entries = $entries;
                 $layout->populate_entries_from_active_objects();
-                $layout->id = $layout->insert();  #insert_record('sloodle_layout', $layout);
+                $layout->id = $layout->insert();  #sloodle_insert_record('sloodle_layout', $layout);
                 if (!$layout->id) return false;
                 $this->layout = $layout;
             }
@@ -700,7 +700,7 @@
                    $rec->copy_active_object_with_uuid($e->objectuuid);
                 }
                
-                $entry_id = insert_record('sloodle_layout_entry', $rec);
+                $entry_id = sloodle_insert_record('sloodle_layout_entry', $rec);
                
             }
 */
@@ -714,14 +714,14 @@
              $cid=$contextid->id;
              $sql= "SELECT distinct sl.*,sl.uuid as avuuid,u.id, u.firstname, u.lastname FROM {$CFG->prefix}user u INNER JOIN {$CFG->prefix}sloodle_users sl ON sl.userid=u.id INNER JOIN {$CFG->prefix}role_assignments ra ON ra.userid=u.id AND ra.contextid={$cid}";
              
-             $enrolledUsers = get_records_sql($sql);
+             $enrolledUsers = sloodle_get_records_sql($sql);
             //return $enrolledUsers
             return $enrolledUsers;
         }
             
         function get_layout($layoutid) {
 
-            $rec = get_record('sloodle_layout', 'course', $this->course_object->id, 'id', $layoutid);
+            $rec = sloodle_get_record('sloodle_layout', 'course', $this->course_object->id, 'id', $layoutid);
             return new SloodleLayout($rec);
 
         }

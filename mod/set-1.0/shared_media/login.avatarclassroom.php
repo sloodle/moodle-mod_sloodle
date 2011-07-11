@@ -7,7 +7,7 @@ if (!$USER || !$USER->id) {
 
 	$session = new AvatarClassroomSignedSiteListSession();
 	if ($session->isUserAllowedToUseSite('http://'.$_SERVER['SERVER_NAME'])) {
-		$user = get_record('user', 'username', 'admin');
+		$user = sloodle_get_record('user', 'username', 'admin');
 		if ($user) {
 			add_to_log(SITEID, 'user', 'login', "", $user->id, 0, $user->id);
 			$USER = complete_user_login($user);

@@ -66,7 +66,7 @@ class sloodle_view_backpack extends sloodle_base_view
         $isItemAdd= optional_param('isItemAdd',0, PARAM_INT);
 
         //check if valid course
-        if (!$this->course = get_record('course', 'id', $id)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
 
@@ -111,7 +111,7 @@ class sloodle_view_backpack extends sloodle_base_view
                     $backpack_item->description="moodle add by ". $USER->username;
 
                     //add it to the users backpack                    
-                    insert_record('sloodle_award_points',$backpack_item);
+                    sloodle_insert_record('sloodle_award_points',$backpack_item);
                 } 
             } 
         } 
@@ -200,7 +200,7 @@ class sloodle_view_backpack extends sloodle_base_view
 		 from {$prefix}sloodle_award_points p inner join {$prefix}sloodle_award_rounds ro on ro.id=p.roundid 
 		 where ro.courseid = {$courseid} group by p.userid, p.currencyid order by balance desc;
 	";
-        $scores = get_records_sql( $scoresql );
+        $scores = sloodle_get_records_sql( $scoresql );
         
         //build usersql
         $usersql = "select max(u.id) as userid, u.firstname as firstname, u.lastname as lastname, 
@@ -208,7 +208,7 @@ class sloodle_view_backpack extends sloodle_base_view
 		left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid={$contextid} 
 		group by u.id order by avname asc;
 	";
-        $students = get_records_sql( $usersql);
+        $students = sloodle_get_records_sql( $usersql);
         
         //create an array by userid
 	$students_by_userid = array();
@@ -304,7 +304,7 @@ class sloodle_view_backpack extends sloodle_base_view
         $rowText='<select style="left:20px;text-align:left;" name="controllerid">';
 
         //get all controllers
-        $recs = get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
+        $recs = sloodle_get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
         
         // Make sure we have at least one controller
         if ($recs == false || count($recs) == 0) {

@@ -52,7 +52,7 @@ class SloodleLayoutRecipe {
 		global $CFG;
 		$sql = "select cm.id as id, cm.instance as instance, m.name as module_name from {$CFG->prefix}modules m inner join {$CFG->prefix}course_modules cm on m.id=cm.module where m.name in( $instr ) AND cm.visible = 1;";
 
-		$recs = get_records_sql( $sql );
+		$recs = sloodle_get_records_sql( $sql );
                 if (!$recs) {
                         return false;
                 }
@@ -69,7 +69,7 @@ class SloodleLayoutRecipe {
 				// Filter by instance if there are module_filters - otherwise we can add the object without bothering to fetch the module instance
 				if ( (is_array($defn->module_filters)) && (count($defn->module_filters) > 0) ) {
 					if (!$instance) {
-						$instance = get_record($cm->module_name, 'id', $cm->instance);
+						$instance = sloodle_get_record($cm->module_name, 'id', $cm->instance);
 					}
 					foreach($defn->module_filters as $n => $v) {
 						if ($instance->$n != $v) {

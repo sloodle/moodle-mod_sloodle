@@ -780,22 +780,22 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         $newCurrency= new stdClass();
         $newCurrency->name=get_string('wallet:gold', 'sloodle');
         $newCurrency->units=get_string('wallet:coins', 'sloodle');
-        if (insert_record('sloodle_currency_types',$newCurrency)) echo "Added Gold Coins currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency)) echo "Added Gold Coins currency: OK<br>";
 
         $newCurrency= new stdClass();
         $newCurrency->name=get_string('wallet:silver', 'sloodle');
         $newCurrency->units=get_string('wallet:coins', 'sloodle');
-        if (insert_record('sloodle_currency_types',$newCurrency)) echo "Added Silver Coins currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency)) echo "Added Silver Coins currency: OK<br>";
         
         $newCurrency= new stdClass();
         $newCurrency->name=get_string('wallet:bronze', 'sloodle');
         $newCurrency->units=get_string('wallet:coins', 'sloodle');
-        if (insert_record('sloodle_currency_types',$newCurrency))echo "Added Bronze Coins currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Bronze Coins currency: OK<br>";
         
         $newCurrency= new stdClass();
         $newCurrency->name=get_string('wallet:credits', 'sloodle');
         $newCurrency->units=NULL;
-        if (insert_record('sloodle_currency_types',$newCurrency))echo "Added Credits currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Credits currency: OK<br>";
     }
     if ($result && $oldversion < 2010071000) {     
         $table = new XMLDBTable('sloodle_awards');
@@ -883,36 +883,36 @@ function xmldb_sloodle_upgrade($oldversion=0) {
     if ($result && $oldversion < 2010080800) {     
         //fixing the names inserted.
         //update gold name
-        $record = get_record('sloodle_currency_types','name',get_string('wallet:gold', 'sloodle'));
+        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:gold', 'sloodle'));
         if ($record){
             $record->name=get_string('backpack:gold', 'sloodle');  
-            update_record('sloodle_currency_types',$record);
+            sloodle_update_record('sloodle_currency_types',$record);
         }
         //update silver name
-        $record = get_record('sloodle_currency_types','name',get_string('wallet:silver', 'sloodle'));
+        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:silver', 'sloodle'));
         if ($record){
             $record->name=get_string('backpack:silver', 'sloodle');  
-            update_record('sloodle_currency_types',$record);
+            sloodle_update_record('sloodle_currency_types',$record);
         }
         //update bronze name
-        $record = get_record('sloodle_currency_types','name',get_string('wallet:bronze', 'sloodle'));
+        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:bronze', 'sloodle'));
         if ($record){
             $record->name=get_string('backpack:bronze', 'sloodle');  
-            update_record('sloodle_currency_types',$record);
+            sloodle_update_record('sloodle_currency_types',$record);
         }
         
         //update bronze name
-        $record = get_record('sloodle_currency_types','name',get_string('wallet:credits', 'sloodle'));
+        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:credits', 'sloodle'));
         if ($record){
             $record->name=get_string('backpack:credits', 'sloodle');  
-            update_record('sloodle_currency_types',$record);
+            sloodle_update_record('sloodle_currency_types',$record);
         }
         
         //update bronze name
-        $record = get_record('sloodle_currency_types','name',get_string('wallet:magic', 'sloodle'));
+        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:magic', 'sloodle'));
         if ($record){
             $record->name=get_string('backpack:magic', 'sloodle');  
-            update_record('sloodle_currency_types',$record);
+            sloodle_update_record('sloodle_currency_types',$record);
         }
     }
 if ($result && $oldversion < 2010091200) {     
@@ -921,23 +921,23 @@ if ($result && $oldversion < 2010091200) {
         //drop units field
         $result = $result && drop_field($table,$field);
         //delete all currency types 
-        $result = $result && delete_records('sloodle_currency_types');
+        $result = $result && sloodle_delete_records('sloodle_currency_types');
         //add new currency types
         $newCurrency= new stdClass();
         $newCurrency->name="Gold Coins";
-        if (insert_record('sloodle_currency_types',$newCurrency)) echo "Added Gold Coins currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency)) echo "Added Gold Coins currency: OK<br>";
         $newCurrency= new stdClass();
         $newCurrency->name="Silver Coins";
-        if (insert_record('sloodle_currency_types',$newCurrency)) echo "Added Silver Coins currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency)) echo "Added Silver Coins currency: OK<br>";
         $newCurrency= new stdClass();
         $newCurrency->name="Bronze Coins";
-        if (insert_record('sloodle_currency_types',$newCurrency))echo "Added Bronze Coins currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Bronze Coins currency: OK<br>";
         $newCurrency= new stdClass();
         $newCurrency->name="Credits";
-        if (insert_record('sloodle_currency_types',$newCurrency))echo "Added Credits currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Credits currency: OK<br>";
         $newCurrency= new stdClass();
         $newCurrency->name="Magic Points";
-        if (insert_record('sloodle_currency_types',$newCurrency))echo "Added Magic currency: OK<br>";
+        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Magic currency: OK<br>";
     }   
  if ($result && $oldversion < 2010110311) {      
         $table = new XMLDBTable('sloodle_users'); 

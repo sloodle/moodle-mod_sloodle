@@ -35,7 +35,7 @@
 
     	    for ($i=1; $i<100000; $i++) {
                  $candidate = $prefix.$i;
-                 if (!$rec = get_record('sloodle_layout','name',$candidate)) {
+                 if (!$rec = sloodle_get_record('sloodle_layout','name',$candidate)) {
                      return $candidate;
                  }
 	    }
@@ -84,7 +84,7 @@
 		$rezzeruuid = addslashes($rezzeruuid);
 		$layoutid = intval($this->id);
 		$select = "select count(*) as cnt from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_layout_entry le on a.layoutentryid=le.id where a.rezzeruuid='$rezzeruuid' and le.layout=$layoutid";
-		$recs = get_records_sql( $select );
+		$recs = sloodle_get_records_sql( $select );
 		if (!$recs) {
 			return false;
 		}
@@ -104,7 +104,7 @@
 			$rezzeruuid = addslashes($rezzeruuid);
 			$select .= " and rezzeruuid='$rezzeruuid'";
 		}
-		$recs = get_records_sql( $select );
+		$recs = sloodle_get_records_sql( $select );
 		if (!$recs) {
 			return false;
 		}
@@ -202,7 +202,7 @@
         function delete() {
 
             $this->delete_entries();
-            if (!delete_records('sloodle_layout', 'id', $this->id)) {
+            if (!sloodle_delete_records('sloodle_layout', 'id', $this->id)) {
                return false;
             }
             return true;
@@ -221,7 +221,7 @@
             $clone = new SloodleLayout();
             $clone->name = $name;
             $clone->course = $this->course;
-            if (!$cloneid = insert_record('sloodle_layout', $clone)) {
+            if (!$cloneid = sloodle_insert_record('sloodle_layout', $clone)) {
                 return false;
             }
 	    $clone->id = $cloneid;
@@ -542,7 +542,7 @@
         }
 
 	function active_objects() {
-            $recs = get_records('sloodle_active_object','layout_entry',intval($this->id));
+            $recs = sloodle_get_records('sloodle_active_object','layout_entry',intval($this->id));
 
             $aos = array();
             if ($rec) {
@@ -592,10 +592,10 @@
             if (!$sloodlemoduleid = intval($this->get_config('sloodlemoduleid'))){
                 return null;
             }
-            if (!$cm = get_record('course_modules', 'id', $sloodlemoduleid)) {
+            if (!$cm = sloodle_get_record('course_modules', 'id', $sloodlemoduleid)) {
                 return null;
             }
-            if (!$inst = get_record($modtype, 'id', $cm->instance)) {
+            if (!$inst = sloodle_get_record($modtype, 'id', $cm->instance)) {
 	        return null;
             }
             return $inst;

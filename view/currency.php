@@ -59,7 +59,7 @@ class sloodle_view_currency extends sloodle_base_view
     {
         $id = required_param('id', PARAM_INT);
 
-        if (!$this->course = get_record('course', 'id', $id)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(s(get_string('failedcourseload', 'sloodle')));
 
@@ -89,7 +89,7 @@ class sloodle_view_currency extends sloodle_base_view
 		$currency->imageurl = ($imageurl != "") ? $imageurl : null;
 
                 //update
-                $result = update_record('sloodle_currency_types',$currency);
+                $result = sloodle_update_record('sloodle_currency_types',$currency);
                 if (!$result) {
                     $errorlink = $CFG->wwwroot."/mod/sloodle/view.php?_type=currency&id={$id}";
                     print_error(get_string('general:fail','sloodle'),$errorlink);
@@ -110,7 +110,7 @@ class sloodle_view_currency extends sloodle_base_view
                 $currency->imageurl = $imageurl;
 
                 //update
-                $result = insert_record('sloodle_currency_types',$currency);
+                $result = sloodle_insert_record('sloodle_currency_types',$currency);
                 if (!$result) {
                     $errorlink = $CFG->wwwroot."/mod/sloodle/view.php?_type=currency&id={$id}";
                     print_error(get_string('general:fail','sloodle'),$errorlink);
@@ -121,7 +121,7 @@ class sloodle_view_currency extends sloodle_base_view
             case "confirmdelete":
                      
                  $currencyid= required_param('currencyid', PARAM_INT);        
-                 $result = delete_records('sloodle_currency_types','id',$currencyid);
+                 $result = sloodle_delete_records('sloodle_currency_types','id',$currencyid);
                  
                  if (!$result) {
                      $errorlink = $CFG->wwwroot."/mod/sloodle/view.php?_type=currency&id={$id}";
@@ -230,7 +230,7 @@ class sloodle_view_currency extends sloodle_base_view
                 //set size of table cells
                 $sloodletable->size = array('10%','5%','50%','45%','25%');            
                 //get currencies 
-                //get_records($table, $field='', $value='', $sort='', $fields='*', $limitfrom='', $limitnum='')
+                //sloodle_get_records($table, $field='', $value='', $sort='', $fields='*', $limitfrom='', $limitnum='')
                 $currencyTypes = SloodleCurrency::FetchAll();
 
                 foreach ($currencyTypes as $c){
@@ -345,7 +345,7 @@ class sloodle_view_currency extends sloodle_base_view
         print_box_start('generalbox boxaligncenter boxwidthfull leftpara');
         print('<form action="" method="POST">');
 
-           $c = get_record('sloodle_currency_types','id',$currencyid);
+           $c = sloodle_get_record('sloodle_currency_types','id',$currencyid);
            $sloodletable = new stdClass(); 
            //set up column headers table data
            $sloodletable->head = array(                         
@@ -393,7 +393,7 @@ class sloodle_view_currency extends sloodle_base_view
         //display all currencies
         print_box_start('generalbox boxaligncenter boxwidthfull leftpara');
         print('<form action="" method="POST">');
-           $c= get_record('sloodle_currency_types','id',$currencyid);
+           $c= sloodle_get_record('sloodle_currency_types','id',$currencyid);
            $sloodletable = new stdClass(); 
            //set up column headers table data
            $sloodletable->head = array(                         

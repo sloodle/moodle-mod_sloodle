@@ -103,13 +103,13 @@
             }
             
             // Load from the primary table: sloodle instance
-            if (!($this->sloodle_instance = get_record('sloodle', 'id', $this->cm->instance))) {
+            if (!($this->sloodle_instance = sloodle_get_record('sloodle', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load Sloodle module with instance ID #{$this->cm->instance}.<br/>");
                 return false;
             }
             
             // Load from the secondary table: sloodle_tracker
-            if (!($this->tracker = get_record('sloodle_tracker', 'sloodleid', $this->cm->instance))) {
+            if (!($this->tracker = sloodle_get_record('sloodle_tracker', 'sloodleid', $this->cm->instance))) {
                 sloodle_debug("Failed to load Tracker record with sloodleid #{$this->cm->instance}.<br/>");
                 return false;
             }
@@ -124,7 +124,7 @@
         function get_objects()
         {
             // Get all tool record entries for this SLOODLE Tracker, sorted by name
-            $recs = get_records('sloodle_activity_tool', 'trackerid', $this->sloodle_instance->id, 'name');
+            $recs = sloodle_get_records('sloodle_activity_tool', 'trackerid', $this->sloodle_instance->id, 'name');
             if (!$recs) return array();
             // Convert it to an array of strings
             $entries = array();
@@ -146,7 +146,7 @@
             
             $result = true;
             
-            $entry = get_record('sloodle_activity_tool', 'uuid', $uuid);
+            $entry = sloodle_get_record('sloodle_activity_tool', 'uuid', $uuid);
             // The tool doesn't exist in the database
             if (!$entry) {
             
@@ -161,7 +161,7 @@
             	$entry->timeupdated = $timestamp;
          	
             	// Insert it
-            	$entry->id = insert_record('sloodle_activity_tool', $entry);
+            	$entry->id = sloodle_insert_record('sloodle_activity_tool', $entry);
             	if (!$entry->id) $result = false;
             }
             // The tool already exists, it has to be updated
@@ -174,7 +174,7 @@
             	$entry->timeupdated = $timestamp;
 	            
 	            // Update it
-            	if (!update_record('sloodle_activity_tool', $entry)) $result = false;
+            	if (!sloodle_update_record('sloodle_activity_tool', $entry)) $result = false;
         	}
             return $result;
         }
@@ -193,7 +193,7 @@
             
             $result = true;
             // Has the avatar already interact with this object?
-            $entry = get_record('sloodle_activity_tracker', 'objuuid', $objuuid, 'avuuid',$avuuid);
+            $entry = sloodle_get_record('sloodle_activity_tracker', 'objuuid', $objuuid, 'avuuid',$avuuid);
             // If not, the new action is recorded
             if (!$entry) {
 
@@ -205,14 +205,14 @@
 	         	$entry->timeupdated = $timestamp;
 	            
 	            // Insert it
-	            $entry->id = insert_record('sloodle_activity_tracker', $entry);
+	            $entry->id = sloodle_insert_record('sloodle_activity_tracker', $entry);
 	            if (!$entry->id) $result = false;
             }
             // If yes, "old" interaction is updated
         	else{
                 $entry->trackerid = $trackerid;        	 
         	    $entry->timeupdated = $timestamp;
-				if (!update_record('sloodle_activity_tracker', $entry)) $result = false;
+				if (!sloodle_update_record('sloodle_activity_tracker', $entry)) $result = false;
 			}
             return $result;
       }
@@ -284,7 +284,7 @@
             $presenter->framewidth = $info['FRAMEWIDTH']['0']['#'];
             $presenter->frameheight = $info['FRAMEHEIGHT']['0']['#'];
             
-            $presenter->id = insert_record('sloodle_presenter', $presenter);
+            $presenter->id = sloodle_insert_record('sloodle_presenter', $presenter);
             
             // Go through each slide in the presenter backup
             $numslides = count($info['SLIDES']['0']['#']['SLIDE']);
@@ -300,7 +300,7 @@
                 $slide->type = $curslide['TYPE']['0']['#'];
                 $slide->ordering = $curslide['ORDERING']['0']['#'];
                 
-                $slide->id = insert_record('sloodle_presenter_entry', $slide);
+                $slide->id = sloodle_insert_record('sloodle_presenter_entry', $slide);
             }
         
             return true;*/

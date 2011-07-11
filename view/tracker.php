@@ -161,7 +161,7 @@ XXXEODXXX;
                 if (count($parts) == 2 && $parts[0] == 'sloodledeleteobj')
                 {
                     // Only delete the activity if it belongs to this controller
-                    delete_records('sloodle_activity_tracker', 'trackerid', $this->cm->id, 'id', (int)$parts[1]);                        
+                    sloodle_delete_records('sloodle_activity_tracker', 'trackerid', $this->cm->id, 'id', (int)$parts[1]);                        
                 }
             }
         }
@@ -169,14 +169,14 @@ XXXEODXXX;
         // Has a reset all tasks action been requested? (This deletes all activities from the module)
         if ($action == 'delete_all_tasks' && $canManage)
         {
-            delete_records('sloodle_activity_tracker', 'trackerid', $this->cm->id);
-            delete_records('sloodle_activity_tool', 'trackerid', $this->cm->id);
+            sloodle_delete_records('sloodle_activity_tracker', 'trackerid', $this->cm->id);
+            sloodle_delete_records('sloodle_activity_tool', 'trackerid', $this->cm->id);
         }
 
         // Has a reset all progress action been requested?
         if ($action == 'reset_all_progress' && $canManage)
         {
-            delete_records('sloodle_activity_tracker', 'trackerid', $this->cm->id);
+            sloodle_delete_records('sloodle_activity_tracker', 'trackerid', $this->cm->id);
         }
 
 
@@ -244,7 +244,7 @@ XXXEODXXX;
                     $line[0] = "<a href=\"{$url_moodleprofile}\">{$u->firstname} {$u->lastname}</a>";                    
                     
                     // Get the Sloodle data for this Moodle user
-                    $sloodledata = get_records('sloodle_users', 'userid', $u->id, 'uuid, avname');
+                    $sloodledata = sloodle_get_records('sloodle_users', 'userid', $u->id, 'uuid, avname');
                     
                    // Initialize our search index    
                     /////////////////////////////////////////////////////////////////////////$dateIndex=false;
@@ -287,7 +287,7 @@ XXXEODXXX;
                 echo "<br/>";
         		
         		// Get all the tasks for this Tracker, ordered by "taskname"
-       		 	$recs = get_records('sloodle_activity_tool', 'trackerid', $this->cm->id, 'taskname');
+       		 	$recs = sloodle_get_records('sloodle_activity_tool', 'trackerid', $this->cm->id, 'taskname');
             
             	if (is_array($recs) && count($recs) > 0)
                 {
@@ -305,7 +305,7 @@ XXXEODXXX;
                  	    if (empty($obj->type)) continue;
                    	    
                   	    //Has this user completed the task?
-                  	    $act = get_record('sloodle_activity_tracker','avuuid',$avatarid,'objuuid',$obj->uuid,'trackerid',$this->cm->id);
+                  	    $act = sloodle_get_record('sloodle_activity_tracker','avuuid',$avatarid,'objuuid',$obj->uuid,'trackerid',$this->cm->id);
                   	    
                   	    //Yes. Activity completed
 						if (!empty($act)){

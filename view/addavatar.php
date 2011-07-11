@@ -102,7 +102,7 @@ class sloodle_view_addavatar extends sloodle_base_view
         
         // Fetch the Moodle course data
         $courseid = optional_param('course', SITEID, PARAM_INT);
-        if (!$this->course = get_record('course', 'id', $courseid)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $courseid)) error('Could not find course.');
     }
 
     /**
@@ -137,7 +137,7 @@ class sloodle_view_addavatar extends sloodle_base_view
         $form_avname = required_param('sloodleavname', PARAM_TEXT);
         
         // Make sure the given UUID doesn't already exist in the database
-        if (count_records('sloodle_users', 'uuid', $form_uuid))
+        if (sloodle_count_records('sloodle_users', 'uuid', $form_uuid))
         {
             $this->msg_error[] = get_string('avataruuidalreadyindb', 'sloodle');
             $this->add_status = -1;

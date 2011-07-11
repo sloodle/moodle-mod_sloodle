@@ -264,7 +264,7 @@
             //$response->add_data_line(array('set:rotation', $this->rotation));
             $response->add_data_line(array('set:layoutentryid', $this->layoutentryid));
             //search for setings for this object
-            $settings = get_records('sloodle_object_config', 'object', $this->id);
+            $settings = sloodle_get_records('sloodle_object_config', 'object', $this->id);
              if (!$settings) {
                 // Error: no configuration settings... there should be at least one indicating the type
 /*
@@ -310,7 +310,7 @@
 	    } 
 
             // Delete all config entries and the object record itself
-            return ( delete_records('sloodle_object_config', 'object', $this->id) && delete_records('sloodle_active_object', 'id', $this->id) );
+            return ( sloodle_delete_records('sloodle_object_config', 'object', $this->id) && sloodle_delete_records('sloodle_active_object', 'id', $this->id) );
 
 	}
 
@@ -318,7 +318,7 @@
            //write local data to a new or existing record
            //search for id
            //if exists update
-           $result = get_record("sloodle_active_object",'id',$this->id);
+           $result = sloodle_get_record("sloodle_active_object",'id',$this->id);
            if (!$result ) {
                 //id,controllerid,userid,uuid,password,name,type,timeupdated
                     // No - insert a new record
@@ -334,7 +334,7 @@
                     $result->password = $this->password;
                     $result->name = $this->name;
                     $result->type = $this->type;
-                    $success = insert_record('sloodle_active_object', $result );
+                    $success = sloodle_insert_record('sloodle_active_object', $result );
 
            }//endif
            else {
@@ -350,7 +350,7 @@
                     $result->name = $this->name;
                     $result->type = $this->type;
                     $result->httpinurl = $this->httpinurl;
-                    if (update_record('sloodle_active_object', $result)) $success = $result->id;
+                    if (sloodle_update_record('sloodle_active_object', $result)) $success = $result->id;
            }//end else
 
 	    $this->course = new SloodleCourse();
@@ -364,7 +364,7 @@
         // Return true on success, false on fail
         public function load( $id) {
 
-            $rec = get_record('sloodle_active_object','id',$id);
+            $rec = sloodle_get_record('sloodle_active_object','id',$id);
 
             if ($rec) {
                 $this->loadFromRecord($rec);
@@ -381,7 +381,7 @@
         // Return true on success, false on fail
         public function loadByUUID( $uuid ) {
 
-            $rec = get_record('sloodle_active_object','uuid',$uuid);
+            $rec = sloodle_get_record('sloodle_active_object','uuid',$uuid);
 
             if ($rec) {
                 $this->loadFromRecord($rec);
@@ -434,7 +434,7 @@
 		$existingconfigs = $this->config_name_config_hash();
 		$done_configs = array();
 
-		$configs = get_records('sloodle_layout_entry_config','layout_entry', $layoutentryid);
+		$configs = sloodle_get_records('sloodle_layout_entry_config','layout_entry', $layoutentryid);
 		$ok = true;
 		if (count($configs) > 0) {
 			foreach($configs as $config) {
@@ -447,13 +447,13 @@
 					} else {
 						$updated_config = $existingconfigs[ $name ];
 						$updated_config->value = $config->value;
-						update_record( 'sloodle_object_config', $updated_config);
+						sloodle_update_record( 'sloodle_object_config', $updated_config);
 						$done_configs[ $name ] = true;
 					}
 				} else {
 					$config->id = null;
 					$config->object = $this->id;
-					if (!insert_record('sloodle_object_config',$config)) {
+					if (!sloodle_insert_record('sloodle_object_config',$config)) {
 						$ok = false;
 					}
 				}
@@ -485,14 +485,14 @@
 		return false;
 	   }
             $this->timeupdated = time();
-            return update_record('sloodle_active_object', $this);
+            return sloodle_update_record('sloodle_active_object', $this);
 	}
 
 	public function config_value( $name ) {
-		if ($config = get_record('sloodle_object_config', 'object', $this->id, 'name', $name)) {
+		if ($config = sloodle_get_record('sloodle_object_config', 'object', $this->id, 'name', $name)) {
 			return $config->value;
 		}
-		$config = get_record('sloodle_object_config', 'object', $this->id);
+		$config = sloodle_get_record('sloodle_object_config', 'object', $this->id);
 
 		return null;
 	}
@@ -527,7 +527,7 @@
 		*/
 
 		// TODO: It might be (marginally) more efficient to filter this for things we're interested in in the query.
-		$all_configs = get_records('sloodle_object_config', 'object', $this->id);
+		$all_configs = sloodle_get_records('sloodle_object_config', 'object', $this->id);
 		foreach($relevant_config_names as $configname) {
 			$fieldname = $configname.'_'.$interaction;
 			foreach($all_configs as $c) {
@@ -573,7 +573,7 @@
 		}
 		$controllerid = intval($controllerid);
 		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=$controllerid and a.httpinurl IS NOT NULL and a.name in ($instr);";
-		$recs = get_records_sql($sql);
+		$recs = sloodle_get_records_sql($sql);
 
 		$msg = "$success_code\n"; 
 		foreach($params as $n=>$v) {
@@ -614,7 +614,7 @@
 		// If the ID is empty, then we have no configuration settings to get
 		if (empty($id)) return array();
 
-		$recs = get_records('sloodle_object_config', 'object', $id);
+		$recs = sloodle_get_records('sloodle_object_config', 'object', $id);
 		if (!$recs) return false;
 
 		$config = array();

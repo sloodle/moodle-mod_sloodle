@@ -58,7 +58,7 @@ class sloodle_view_course extends sloodle_base_view
     function process_request()
     {
         $id = required_param('id', PARAM_INT);
-        if (!$this->course = get_record('course', 'id', $id)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
     }
@@ -201,14 +201,14 @@ class sloodle_view_course extends sloodle_base_view
         // Have we been instructed to clear all pending allocations?
         if (isset($_REQUEST['clear_loginzone_allocations'])) {
             // Delete all allocations relating to this course
-            delete_records('sloodle_loginzone_allocation', 'course', $this->course->id);
+            sloodle_delete_records('sloodle_loginzone_allocation', 'course', $this->course->id);
         }
         
         // Create a form
         echo "<form action=\"view_course.php\" method=\"POST\">\n";
         echo "<input type=\"hidden\" name=\"id\" value=\"{$this->course->id}\">\n";
         // Determine how many allocations there are for this course
-        $allocs = count_records('sloodle_loginzone_allocation', 'course', $this->course->id);
+        $allocs = sloodle_count_records('sloodle_loginzone_allocation', 'course', $this->course->id);
         echo get_string('pendingallocations','sloodle').': '.$allocs.'&nbsp;&nbsp;';
         echo '<input type="submit" name="clear_loginzone_allocations" value="'.get_string('delete','sloodle').'"/>';
         echo "</form>\n";

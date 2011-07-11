@@ -76,7 +76,7 @@ $layoutid = $cloneid;
 
         // Get a list of controllers which the user is permitted to authorise objects on
         $controllers = array();
-        $recs = get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
+        $recs = sloodle_get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
         // Make sure we have at least one controller
         if ($recs == false || count($recs) == 0) {
             error(get_string('objectauthnocontrollers','sloodle'));

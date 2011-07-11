@@ -80,7 +80,7 @@
             }
             
             // Load from the primary table: Sloodle instance
-            if (!($this->sloodle_module_instance = get_record('sloodle', 'id', $this->cm->instance))) {
+            if (!($this->sloodle_module_instance = sloodle_get_record('sloodle', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load controller Sloodle module instance.<br>");
                 return false;
             }
@@ -91,7 +91,7 @@
             }
             
             // Load from the secondary table: Controller instance
-            if (!($this->sloodle_controller_instance = get_record('sloodle_controller', 'sloodleid', $this->cm->instance))) {
+            if (!($this->sloodle_controller_instance = sloodle_get_record('sloodle_controller', 'sloodleid', $this->cm->instance))) {
                 sloodle_debug("Failed to load controller secondary data table.<br>");
                 return false;
             }
@@ -111,9 +111,9 @@
             if (empty($this->sloodle_module_instance) || empty($this->sloodle_controller_instance)) return false;
             // Attempt to update the primary table
             $this->sloodle_module_instance->timemodified = time();
-            if (!update_record('sloodle', $this->sloodle_module_instance)) return false;
+            if (!sloodle_update_record('sloodle', $this->sloodle_module_instance)) return false;
             // Attempt to update the secondary table
-            if (!update_record('sloodle_controller', $this->sloodle_controller_instance)) return false;
+            if (!sloodle_update_record('sloodle_controller', $this->sloodle_controller_instance)) return false;
             
             // Everything seems OK
             return true;
@@ -297,7 +297,7 @@
             if ($user->is_user_loaded()) $userid = $user->get_user_id();
             
             // Check to see if an entry already exists for this object
-            $entry = get_record('sloodle_active_object', 'uuid', $uuid);
+            $entry = sloodle_get_record('sloodle_active_object', 'uuid', $uuid);
             if (!$entry) {
                 // Create a new entry
                 $entry = new stdClass();
@@ -309,7 +309,7 @@
                 $entry->type = $type;
                 $entry->timeupdated = $timestamp;
                 // Attempt to insert the entry
-                $entry->id = insert_record('sloodle_active_object', $entry);
+                $entry->id = sloodle_insert_record('sloodle_active_object', $entry);
                 if (!$entry->id) return false;
                 
             } else {
@@ -321,7 +321,7 @@
                 $entry->type = $type;
                 $entry->timeupdated = $timestamp;
                 // Attempt to update the database
-                if (!update_record('sloodle_active_object', $entry)) return false;
+                if (!sloodle_update_record('sloodle_active_object', $entry)) return false;
             }
             
             return $entry->id;
@@ -337,13 +337,13 @@
 	*/
 	function configure_object_from_layout_entry($authid, $layout_entry_id) {
 
-	   $configs = get_records('sloodle_layout_entry_config','layout_entry',$layout_entry_id);
+	   $configs = sloodle_get_records('sloodle_layout_entry_config','layout_entry',$layout_entry_id);
 	   $ok = true;
 	   if (count($configs) > 0) {
 	      foreach($configs as $config) {
 	         $config->id = null;
 	         $config->object = $authid;
-	         if (!insert_record('sloodle_object_config',$config)) {
+	         if (!sloodle_insert_record('sloodle_object_config',$config)) {
 		    $ok = false;
 	         }
 	      }
@@ -358,14 +358,14 @@
 	   // ...then clone its config
 
            // Check to see if an entry already exists for this object
-           $parententry = get_record('sloodle_active_object', 'uuid', $parent_object);
+           $parententry = sloodle_get_record('sloodle_active_object', 'uuid', $parent_object);
 /*
            if (!$parententry) {
               return false;
            }
 */
 
-           $parentconfigs = get_records('sloodle_object_config','object',$parententry->id);
+           $parentconfigs = sloodle_get_records('sloodle_object_config','object',$parententry->id);
            $ok = true;
            if (count($parentconfigs) > 0) {
               $clonedconfig = new stdClass();
@@ -373,7 +373,7 @@
                  $clonedconfig->object = $authid;
                  $clonedconfig->name = $config->name;
                  $clonedconfig->value = $config->value;
-                 if (!insert_record('sloodle_object_config',$clonedconfig)) {
+                 if (!sloodle_insert_record('sloodle_object_config',$clonedconfig)) {
                     $ok = false;
                  }
               }
@@ -400,7 +400,7 @@
             if ($timestamp == null) $timestamp = time();
             
             // Check to see if an entry already exists for this object
-            $entry = get_record('sloodle_active_object', 'uuid', $uuid);
+            $entry = sloodle_get_record('sloodle_active_object', 'uuid', $uuid);
             if (!$entry) {
                 // Create a new entry
                 $entry = new stdClass();
@@ -412,7 +412,7 @@
                 $entry->type = $type;
                 $entry->timeupdated = $timestamp;
                 // Attempt to insert the entry
-                $entry->id = insert_record('sloodle_active_object', $entry);
+                $entry->id = sloodle_insert_record('sloodle_active_object', $entry);
                 if (!$entry->id) return false;
                 
             } else {
@@ -424,7 +424,7 @@
                 $entry->userid = 0;
                 $entry->timeupdated = $timestamp;
                 // Attempt to update the database
-                if (!update_record('sloodle_active_object', $entry)) return false;
+                if (!sloodle_update_record('sloodle_active_object', $entry)) return false;
             }
             
             return $entry->id;
@@ -439,12 +439,12 @@
         function update_object_type($uuid, $type)
         {
             // Attempt to find an entry for the object
-            $entry = get_record('sloodle_active_object', 'uuid', $uuid);
+            $entry = sloodle_get_record('sloodle_active_object', 'uuid', $uuid);
             if (!$entry) return false;
             // Update the type and time
             $entry->type = $type;
             $entry->timeupdated = time();
-            if (!update_record('sloodle_active_object', $entry)) return false;
+            if (!sloodle_update_record('sloodle_active_object', $entry)) return false;
             return true;
         }
         
@@ -460,14 +460,14 @@
         function authorise_object($uuid, $user, $type = null)
         {
             // Attempt to find an unauthorised entry for the object
-            $entry = get_record('sloodle_active_object', 'uuid', $uuid);
+            $entry = sloodle_get_record('sloodle_active_object', 'uuid', $uuid);
             if (!$entry) return false;
             // Update the controller, user and time
             $entry->controllerid = $this->get_id();
             $entry->userid = $user->get_user_id();
             if (!empty($type)) $entry->type = $type;
             $entry->timeupdated = time();
-            if (!update_record('sloodle_active_object', $entry)) return false;
+            if (!sloodle_update_record('sloodle_active_object', $entry)) return false;
             return true;
         }
         
@@ -480,7 +480,7 @@
         function check_authorisation($uuid, $password)
         {
             // Attempt to find an entry for the object
-            $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $uuid);
+            $entry = sloodle_get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $uuid);
             if (!$entry) return false;
             // Make sure we have the type data
 
@@ -502,7 +502,7 @@
         function get_authorizing_user($uuid)
         {
             // Attempt to find an entry for the object
-            $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $uuid);
+            $entry = sloodle_get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $uuid);
             if (!$entry) return false;
             return (int)$entry->userid;
         }
@@ -516,13 +516,13 @@
         function remove_object($id)
         {
             // Check what type the ID is
-            if (is_string($id)) $entry = get_record('sloodle_active_object', 'uuid', $id);
-            else $entry = get_record('sloodle_active_object', 'id', (int)$id);
+            if (is_string($id)) $entry = sloodle_get_record('sloodle_active_object', 'uuid', $id);
+            else $entry = sloodle_get_record('sloodle_active_object', 'id', (int)$id);
             if (!$entry) return;
             
             // Delete all config entries and the object record itself
-            delete_records('sloodle_object_config', 'object', $entry->id);
-            delete_records('sloodle_active_object', 'id', $entry->id);
+            sloodle_delete_records('sloodle_object_config', 'object', $entry->id);
+            sloodle_delete_records('sloodle_active_object', 'id', $entry->id);
         }
         
         /**
@@ -533,8 +533,8 @@
         function get_object($id)
         {
             // Check what type the ID is
-            if (is_string($id)) $entry = get_record('sloodle_active_object', 'uuid', $id);
-            else $entry = get_record('sloodle_active_object', 'id', (int)$id);
+            if (is_string($id)) $entry = sloodle_get_record('sloodle_active_object', 'uuid', $id);
+            else $entry = sloodle_get_record('sloodle_active_object', 'id', (int)$id);
             if (!$entry) return false;
             
             // Create a dummy SloodleSession
@@ -571,12 +571,12 @@
             if (empty($id)) return array();
         
             // Check what type the ID is and fetch the object
-            if (is_string($id)) $entry = get_record('sloodle_active_object', 'uuid', $id);
-            else $entry = get_record('sloodle_active_object', 'id', (int)$id);
+            if (is_string($id)) $entry = sloodle_get_record('sloodle_active_object', 'uuid', $id);
+            else $entry = sloodle_get_record('sloodle_active_object', 'id', (int)$id);
             if (!$entry) return array();
             
             // Fetch the values
-            $recs = get_records('sloodle_object_config', 'object', $entry->id);
+            $recs = sloodle_get_records('sloodle_object_config', 'object', $entry->id);
             if (!$recs) return false;
             // Construct our associative array
             $config = array();
@@ -595,13 +595,13 @@
         function ping_object($id)
         {
             // Check what type the ID is and fetch the object
-            if (is_string($id)) $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $id);
-            else $entry = get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'id', (int)$id);
+            if (is_string($id)) $entry = sloodle_get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $id);
+            else $entry = sloodle_get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'id', (int)$id);
             if (!$entry) return false;
             
             // Update the record
             $entry->timeupdated = time();
-            return update_record('sloodle_active_object', $entry);
+            return sloodle_update_record('sloodle_active_object', $entry);
         }
         
     }

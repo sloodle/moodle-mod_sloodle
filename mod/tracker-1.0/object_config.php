@@ -59,7 +59,7 @@
         
         // We need to fetch a list of visible Second Life Tracker modules on the course
         // Get the ID of the chat type
-        $rec = get_record('modules', 'name', 'sloodle');
+        $rec = sloodle_get_record('modules', 'name', 'sloodle');
         if (!$rec) {
             sloodle_debug("Failed to get Sloodle module type.");
             exit();
@@ -67,11 +67,11 @@
         $sloodlemoduleid = $rec->id;
         
         // Get all visible SLOODLE Tracker modules in the current course
-        $recs = get_records_select('course_modules', "course = $courseid AND module = $sloodlemoduleid AND visible = 1");
+        $recs = sloodle_get_records_select('course_modules', "course = $courseid AND module = $sloodlemoduleid AND visible = 1");
         $trackers = array();
         foreach ($recs as $cm) {
             // Fetch the Sloodle instance
-            $inst = get_record('sloodle', 'id', $cm->instance, 'type', SLOODLE_TYPE_TRACKER);
+            $inst = sloodle_get_record('sloodle', 'id', $cm->instance, 'type', SLOODLE_TYPE_TRACKER);
             if (!$inst) continue;
             // Store the Sloodle details
             $trackers[$cm->id] = $inst->name;

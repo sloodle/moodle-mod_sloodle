@@ -49,7 +49,7 @@ class sloodle_view_currency extends sloodle_base_view
     function process_request()
     {
         $id = required_param('id', PARAM_INT);
-        if (!$this->course = get_record('course', 'id', $id)) error('Could not find course.');
+        if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
     }
@@ -108,7 +108,7 @@ class sloodle_view_currency extends sloodle_base_view
             //set size of table cells
             $sloodletable->size = array('15%','10%', '50%','5%','20%');
 
-         $logData = get_records('sloodle_logs','course',$this->sloodle_course->get_course_id(), 'timemodified DESC');
+         $logData = sloodle_get_records('sloodle_logs','course',$this->sloodle_course->get_course_id(), 'timemodified DESC');
           
         
         if (count($logData)>0){
@@ -117,7 +117,7 @@ class sloodle_view_currency extends sloodle_base_view
                          $link_url=' <a href="'.$CFG->wwwroot.'/user/view.php?id='.$ld->userid."&course=";
                          $link_url.=$this->sloodle_course->get_course_id().'">'.$ld->avname."</a>";
                          $trowData[]=$link_url;    
-                         $userData = get_record('user','id',$ld->userid);
+                         $userData = sloodle_get_record('user','id',$ld->userid);
                          $username= $userData->username;                         
                          $trowData[]=$username;    
                          $trowData[]=$ld->action;    
