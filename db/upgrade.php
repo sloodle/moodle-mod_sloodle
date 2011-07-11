@@ -1220,17 +1220,6 @@ if ($result && $oldversion < 2011070900) {
             add_field($table, $field);
         }
 
-        // conditionally migrate to html format in intro
-        if ($CFG->texteditors !== 'textarea') {
-            $rs = get_records('sloodle', 'introformat', FORMAT_MOODLE);
-            foreach ($rs as $q) {
-                $q->intro       = text_to_html($q->intro, false, false, true);
-                $q->introformat = FORMAT_HTML;
-                update_record('sloodle', $q);
-            }
-            $rs->close();
-        }
-
     }
 
 return $result; 
