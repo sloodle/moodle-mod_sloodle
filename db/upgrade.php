@@ -421,119 +421,6 @@ function xmldb_sloodle_upgrade($oldversion=0) {
 
     }
 
-  if ($result && $oldversion < 2009042901) {
-      echo "Dropping old stipendgiver transaction tables<br/>";
-        $table = new XMLDBTable('sloodle_stipendgiver_trans');
-        drop_table($table);
-        //add extra filed to stipend giver for added security in giving out stipends
-         echo "creating ipoint_trans table for the Awards<br/>";               
-    /// Define field id to be added to sloodle_award_trans
-        $table = new XMLDBTable('sloodle_award_trans');
-        
-        
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $table->addField($field);
-        $field = new XMLDBField('sloodleid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'id');
-        $table->addField($field);
-        $field = new XMLDBField('avuuid');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, null, null, null, null, null, 'sloodleid');
-        $table->addField($field);
-        $field = new XMLDBField('userid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'avuuid');
-        $table->addField($field);
-        $field = new XMLDBField('avname');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null, null, null, 'userid');
-        $table->addField($field);
-        $field = new XMLDBField('itype');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, null, null, null, 'avname');
-        $table->addField($field);
-        $field = new XMLDBField('amount');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'itype');
-        $table->addField($field);
-        $field = new XMLDBField('idata');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'amount');
-        $table->addField($field);
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'idata');
-        $table->addField($field);   
-            /// Adding keys to table sloodle_ipointTrans
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);                                           
-    }     
-      if ($result && $oldversion < 2009073002){
-         $table = new XMLDBTable('sloodle_ibank');     
-         drop_table($table);
-         echo "creating new sloodle_awards table";
-          $table = new XMLDBTable('sloodle_awards');
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);
-        $table->addField($field);
-        $field = new XMLDBField('sloodleid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'id');
-        $table->addField($field);            
-        $field = new XMLDBField('xmlchannel');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '40', null, null, null, null, null, '', 'sloodleid');
-        $table->addField($field);            
-        $field = new XMLDBField('enabled');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'xmlchannel');
-        $table->addField($field);                    
-        $field = new XMLDBField('icurrency');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, 'Lindens', 'enabled');
-        $table->addField($field);            
-        $field = new XMLDBField('assignmentid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'icurrency');
-        $table->addField($field);            
-        $field = new XMLDBField('maxpoints');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '100', 'assignmentid');
-        $table->addField($field);            
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'maxpoints');
-        $table->addField($field);            
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);
-     }
-     if ($result && $oldversion < 2009073001) {
-      echo "Dropping old sloodle_award_trans tables<br/>";
-        $table = new XMLDBTable('sloodle_award_trans');
-        drop_table($table);
-        //add extra filed to stipend giver for added security in giving out stipends
-         echo "creating sloodle_award_trans table for sloodle_awards<br/>";               
-    /// Define field id to be added to sloodle_award_trans
-        $table = new XMLDBTable('sloodle_award_trans');
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $table->addField($field);
-        $field = new XMLDBField('sloodleid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'id');
-        $table->addField($field);
-        $field = new XMLDBField('avuuid');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, null, null, null, null, null, 'sloodleid');
-        $table->addField($field);
-        $field = new XMLDBField('userid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'avuuid');
-        $table->addField($field);
-        $field = new XMLDBField('avname');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null, null, null, 'userid');
-        $table->addField($field);
-        $field = new XMLDBField('itype');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, null, null, null, 'avname');
-        $table->addField($field);
-        $field = new XMLDBField('amount');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'itype');
-        $table->addField($field);
-        $field = new XMLDBField('idata');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'amount');
-        $table->addField($field);
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'idata');
-        $table->addField($field);   
-            /// Adding keys to table sloodle_ipointTrans
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);                                           
-    }
-    
     if ($result && $oldversion < 2009110500) {
         echo "Converting Presenter slide type IDs... ";
         // Standardize any Presenter slides to use type names "image", "web", and "video".
@@ -573,192 +460,7 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         }
         echo "{$numupdated} slide(s) updated.<br/>";
     }
- if ($result && $oldversion < 2010032202) {
-      echo "adding sloodle award scoreboards table to house dynamic urls<br/>";
-        $table = new XMLDBTable('sloodle_award_scoreboards');
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $table->addField($field);
-        $field = new XMLDBField('sloodleid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'id');
-        $table->addField($field);
-        $field = new XMLDBField('name');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, null, 'sloodleid');
-        $table->addField($field);
-        $field = new XMLDBField('url');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null, 'name');
-        $table->addField($field);
-        $field = new XMLDBField('type');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '40', null, null, null, null, null, null, 'url');
-        $table->addField($field);
-        $field = new XMLDBField('enabled');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null, null, '0', 'type');
-        $table->addField($field);        
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'enabled');
-        $table->addField($field);           
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);                                           
-    }
 
-    if ($result && $oldversion < 2010062100) {
-      echo "modifying sloodle_award_scoreboards table to include gameid field<br/>";
-        $table = new XMLDBTable('sloodle_award_scoreboards');
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $table->addField($field);
-        $field = new XMLDBField('sloodleid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'id');
-        $table->addField($field);
-          $field = new XMLDBField('gameid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_UNSIGNED, null, null, null, null, 'sloodleid');
-        $table->addField($field);
-        $field = new XMLDBField('name');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, null, 'gameid');
-        $table->addField($field);
-        $field = new XMLDBField('url');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null, 'name');
-        $table->addField($field);
-        $field = new XMLDBField('type');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '40', null, null, null, null, null, null, 'url');
-        $table->addField($field);
-        $field = new XMLDBField('enabled');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null, null, '0', 'type');
-        $table->addField($field);        
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'enabled');
-        $table->addField($field);           
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);                                           
-    }
-     if ($result && $oldversion < 2010062101) {
-        //adding new field called gameid
-        echo 'adding a new field to the sloodle_award_trans table called gameid';     
-        $table = new XMLDBTable('sloodle_award_trans');
-        $field = new XMLDBField('gameid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_UNSIGNED, null, null, null, null, 'sloodleid');
-        $result = $result && add_field($table,$field);  
-    }
-
-     if ($result && $oldversion < 2010062103) {     
-        $table = new XMLDBTable('sloodle_award_games');
-         echo "creating new sloodle_award_games table for sloodle_awards so we can have multiple game instances per scoreboard, and the scoreboard will act as a leader board instead of a one-off-game<br/>";               
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $table->addField($field);
-        $field = new XMLDBField('sloodleid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, null, null, 'id');
-        $table->addField($field);
-        $field = new XMLDBField('name');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, null, null, null, null, null, 'sloodleid');
-        $table->addField($field);
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'name');
-        $table->addField($field);   
-            /// Adding keys to table sloodle_ipointTrans
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);                                           
-     }
-     if ($result && $oldversion < 2010062103) {     
-        $table = new XMLDBTable('sloodle_award_players');
-        echo "creating new sloodle_award_players table<br/>";               
-        // Define field id to be added to sloodle_award_trans
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $table->addField($field);
-        $field = new XMLDBField('gameid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, null, null, 'id');
-        $table->addField($field);
-        $field = new XMLDBField('avuuid');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, null, null, null, null, null, 'gameid');
-        $table->addField($field);
-        $field = new XMLDBField('userid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'avuuid');
-        $table->addField($field);
-        $field = new XMLDBField('avname');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null, null, null, 'userid');
-        $table->addField($field);
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'avname');
-        $table->addField($field);   
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);                                           
-      }     
-      if ($result && $oldversion < 2010062105) {
-           echo "adding a new gameid field to the sloodle_award_scoreboards table";
-           $table = new XMLDBTable('sloodle_award_scoreboards');
-           $field = new XMLDBField('gameid');
-           $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_UNSIGNED, null, null, null, null, 'sloodleid');
-           $result = $result && add_field($table,$field);
-      }
-      if ($result && $oldversion < 2010062300) {     
-        $table = new XMLDBTable('sloodle_awards_teams');
-        echo "creating new sloodle_awards_teams table for sloodle_awards so we can have team functionality <br/>";               
-        // Define field id to be added to sloodle_award_trans
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $table->addField($field);        
-        $field = new XMLDBField('sloodleid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, null, null, 'id');
-        $table->addField($field);
-        $field = new XMLDBField('gameid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, null, null, 'sloodleid');
-        $table->addField($field);
-        $field = new XMLDBField('groupid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, null, null, 'gameid');
-        $table->addField($field);
-        $field = new XMLDBField('groupname');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, null, 'groupid');
-        $table->addField($field);        
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'groupname');
-        $table->addField($field);   
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);                                           
-     }
-     if ($result && $oldversion < 2010070601) {     
-        $table = new XMLDBTable('sloodle_logs');
-        echo "creating new log table for avatar tracking<br/>";               
-        // Define field id to be added to sloodle_award_trans
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $table->addField($field);
-        $field = new XMLDBField('userid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, null, null, 'id');
-        $table->addField($field);
-        $field = new XMLDBField('avuuid');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, null, 'userid');
-        $table->addField($field);
-        $field = new XMLDBField('avname');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '70', null, XMLDB_NOTNULL, null, null, null, null, 'avuuid');
-        $table->addField($field);
-        $field = new XMLDBField('course');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, null, null, null, 'avname');
-        $table->addField($field);
-        $field = new XMLDBField('action');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '150', null, null, null, null, null, null, 'course');
-        $table->addField($field);        
-        $field = new XMLDBField('url');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '150', null, null, null, null, null, null, 'action');
-        $table->addField($field);        
-        $field = new XMLDBField('slurl');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '150', null, null, null, null, null, null, 'url');
-        $table->addField($field);        
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'slurl');
-        $table->addField($field);   
-        // Adding keys to table sloodle_ipointTrans
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $result = $result && create_table($table);                                           
-     }
-     if ($result && $oldversion < 2010070701) {     
-        echo "Adding new field called \'currency\' to sloodle_award_trans tables<br/>";
-        $table = new XMLDBTable('sloodle_award_trans');
-        echo "creating new sloodle_award_trans table now<br/>";               
-        $field = new XMLDBField('currency');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, null, null, null, null, null, 'avname');
-        $result = $result && add_field($table,$field);
-    } 
     if ($result && $oldversion < 2010070709) {     
         $table = new XMLDBTable('sloodle_currency_types');
          echo "creating new currency table for site wide virtual currency<br/>";               
@@ -768,177 +470,17 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         $field = new XMLDBField('name');
         $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, null, 'id');
         $table->addField($field);        
-        $field = new XMLDBField('units');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '15', null, NULL, null, null, null, null, 'name');
-        $table->addField($field);        
         $field = new XMLDBField('timemodified');
         $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'units');
         $table->addField($field);   
         $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
         $result = $result && create_table($table);           
-        //add currencies
-        $newCurrency= new stdClass();
-        $newCurrency->name=get_string('wallet:gold', 'sloodle');
-        $newCurrency->units=get_string('wallet:coins', 'sloodle');
-        if (sloodle_insert_record('sloodle_currency_types',$newCurrency)) echo "Added Gold Coins currency: OK<br>";
 
-        $newCurrency= new stdClass();
-        $newCurrency->name=get_string('wallet:silver', 'sloodle');
-        $newCurrency->units=get_string('wallet:coins', 'sloodle');
-        if (sloodle_insert_record('sloodle_currency_types',$newCurrency)) echo "Added Silver Coins currency: OK<br>";
-        
-        $newCurrency= new stdClass();
-        $newCurrency->name=get_string('wallet:bronze', 'sloodle');
-        $newCurrency->units=get_string('wallet:coins', 'sloodle');
-        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Bronze Coins currency: OK<br>";
-        
-        $newCurrency= new stdClass();
-        $newCurrency->name=get_string('wallet:credits', 'sloodle');
-        $newCurrency->units=NULL;
-        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Credits currency: OK<br>";
-    }
-    if ($result && $oldversion < 2010071000) {     
-        $table = new XMLDBTable('sloodle_awards');
-        echo "modifying sloodle_awards<br/>";               
-        $table = new XMLDBTable('sloodle_awards');
-        //start dropping fields we no longer need
-        echo 'dropping xmlchannel field in sloodle_awards table, no longer needed';
-        $field = new XMLDBField('xmlchannel');
-        $result = $result && drop_field($table,$field);
-        
-        echo 'dropping icurrency field in sloodle_awards table, no longer needed';
-        $field = new XMLDBField('icurrency');
-        $result = $result && drop_field($table,$field);
-        
-        echo 'dropping assignmentid field in sloodle_awards table, no longer needed';
-        $field = new XMLDBField('assignmentid');
-        $result = $result && drop_field($table,$field);
-        
-        echo 'dropping enabled field in sloodle_awards table, no longer needed';
-        $field = new XMLDBField('enabled');
-        $result = $result && drop_field($table,$field);
-                
-        $field = new XMLDBField('default_currency');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, 'Credits', 'sloodleid');
-        $result = $result && add_field($table,$field);                    
-    }    
-    
-    if ($result && $oldversion < 2010071015) {     
-        echo "Changing some fields from NOTNULL to NULL<br/>";
-        $table = new XMLDBTable('sloodle_award_trans');
-      
-        // Define field id to be added to sloodle_award_trans
-        $table = new XMLDBTable('sloodle_award_trans');
-        $field = new XMLDBField('id');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null, null);    
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('sloodleid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'id');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('gameid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null,NULL, null, null, null, null, 'sloodleid');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('avuuid');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, null, null, null, null, null, 'gameid');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('userid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'avuuid');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('avname');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '40', null, null, null, null, null, null, 'userid');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('currency');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, null, null, null, null, null, 'avname');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('itype');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, null, null, null, 'currency');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('amount');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, null, null, null, null, '0', 'itype');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('idata');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null, 'amount');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-        
-        $field = new XMLDBField('timemodified');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'idata');
-        $result = $result && change_field_type($table, $field, TRUE, TRUE);        
-    } 
-    if ($result && $oldversion < 2010080600) {     
-        echo "Adding course field<br/>";
-        $table = new XMLDBTable('sloodle_award_trans');
-        $field = new XMLDBField('courseid');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '11', null,NULL, null, null, null, null, 'sloodleid');
-        $result = $result && add_field($table,$field);
-    } 
-    if ($result && $oldversion < 2010080800) {     
-        //fixing the names inserted.
-        //update gold name
-        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:gold', 'sloodle'));
-        if ($record){
-            $record->name=get_string('backpack:gold', 'sloodle');  
-            sloodle_update_record('sloodle_currency_types',$record);
-        }
-        //update silver name
-        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:silver', 'sloodle'));
-        if ($record){
-            $record->name=get_string('backpack:silver', 'sloodle');  
-            sloodle_update_record('sloodle_currency_types',$record);
-        }
-        //update bronze name
-        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:bronze', 'sloodle'));
-        if ($record){
-            $record->name=get_string('backpack:bronze', 'sloodle');  
-            sloodle_update_record('sloodle_currency_types',$record);
-        }
-        
-        //update bronze name
-        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:credits', 'sloodle'));
-        if ($record){
-            $record->name=get_string('backpack:credits', 'sloodle');  
-            sloodle_update_record('sloodle_currency_types',$record);
-        }
-        
-        //update bronze name
-        $record = sloodle_get_record('sloodle_currency_types','name',get_string('wallet:magic', 'sloodle'));
-        if ($record){
-            $record->name=get_string('backpack:magic', 'sloodle');  
-            sloodle_update_record('sloodle_currency_types',$record);
-        }
-    }
-if ($result && $oldversion < 2010091200) {     
-        $table = new XMLDBTable('sloodle_currency_types');
-        $field= new XMLDBField('units');
-        //drop units field
-        $result = $result && drop_field($table,$field);
-        //delete all currency types 
-        $result = $result && sloodle_delete_records('sloodle_currency_types');
-        //add new currency types
-        $newCurrency= new stdClass();
-        $newCurrency->name="Gold Coins";
-        if (sloodle_insert_record('sloodle_currency_types',$newCurrency)) echo "Added Gold Coins currency: OK<br>";
-        $newCurrency= new stdClass();
-        $newCurrency->name="Silver Coins";
-        if (sloodle_insert_record('sloodle_currency_types',$newCurrency)) echo "Added Silver Coins currency: OK<br>";
-        $newCurrency= new stdClass();
-        $newCurrency->name="Bronze Coins";
-        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Bronze Coins currency: OK<br>";
-        $newCurrency= new stdClass();
         $newCurrency->name="Credits";
         if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Credits currency: OK<br>";
-        $newCurrency= new stdClass();
-        $newCurrency->name="Magic Points";
-        if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Magic currency: OK<br>";
-    }   
+    }
+    
+
  if ($result && $oldversion < 2010110311) {      
         $table = new XMLDBTable('sloodle_users'); 
          // Add the new 'profilepic' field
@@ -947,6 +489,7 @@ if ($result && $oldversion < 2010091200) {
          $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, null, null, null, null, '', 'avname');
          $result = $result && add_field($table,$field);                    
  }
+
     if ($result && $oldversion < 2010110501) {
 
     /// Define field httpinurl to be added to sloodle_active_object
@@ -1165,7 +708,6 @@ if ($result && $oldversion < 2011070900) {
         $table->addFieldInfo('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null);                      
         $table->addFieldInfo('type', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, null);                     
         $table->addFieldInfo('timeupdated', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0');  
-                                                                                                                                                                                                                                                            
         $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));                                                          
                                                                                                                                                                                                                                                         
         $table->addIndexInfo('uuid', XMLDB_INDEX_UNIQUE, array('uuid'));                                                         
@@ -1189,7 +731,6 @@ if ($result && $oldversion < 2011070900) {
                                                                                                 
         $result = $result && create_table($table);         
         if (!$result) echo "error<br/>";
-        
                 
 
     /// Define table sloodle_tracker to be created
