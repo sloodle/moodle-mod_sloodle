@@ -42,7 +42,7 @@
     print_header_simple(get_string('userobjectauth', 'sloodle'), "", get_string('userobjectauth', 'sloodle'), "", "", true);
     
     // Make sure it's not a guest who is logged in
-    if (isguest()) {
+    if (isguestuser()) {
         ?>
         <div style="text-align:center;">
          <h3><?php print_string('error', 'sloodle'); ?></h3>
