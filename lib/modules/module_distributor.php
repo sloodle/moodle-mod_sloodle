@@ -152,7 +152,7 @@
         function send_object($objname, $uuid)
         {
             // Check that the object exists in this distributor
-            if (!sloodle_record_exists('sloodle_distributor_entry', 'distributorid', $this->distrib_id, 'name', addslashes($objname))) return false;
+            if (!sloodle_record_exists('sloodle_distributor_entry', 'distributorid', $this->distrib_id, 'name', $objname)) return false;
             // Send the XMLRPC request
             return sloodle_send_xmlrpc_message($this->sloodle_distributor_instance->channel, 0, "1|OK\\nSENDOBJECT|$uuid|$objname");
         }

@@ -165,7 +165,7 @@
                 $result = restore_decode_content_links_worker($content,$restore);
                 if ($result != $content) {
                     //Update record
-                    $sloodle->intro = addslashes($result);
+                    $sloodle->intro = $result;
                     $status = sloodle_update_record("sloodle", $sloodle);
                     if (debugging()) {
                         if (!defined('RESTORE_SILENTLY')) {

@@ -69,8 +69,8 @@
         if (in_array($k, $IGNORE_PARAMS)) continue;
         
         // Store the setting
-        $config_setting->name = addslashes($k);
-        $config_setting->value = addslashes($v);
+        $config_setting->name = $k;
+        $config_setting->value = $v;
         if (sloodle_insert_record('sloodle_object_config', $config_setting)) {
             $numstored++;
         }

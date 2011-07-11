@@ -142,7 +142,7 @@
             // Ignore empty messages
             if (empty($message)) return false;
             // Make sure the message is safe
-            $message = addslashes(clean_text(stripslashes($message)));
+            $message = clean_text(stripslashes($message));
             
             // We need to get the user ID for the message
             $userid = 0;
