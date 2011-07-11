@@ -473,26 +473,14 @@
         
         /**
         * Checks if the specified object is authorised for this controller with the given password.
-        * @param string $uuid The UUID of the object to check
+        * @param string $object The active object to check
         * @param string $password The password to check
         * @return bool True if object is authorised, or false if not
         */
-        function check_authorisation($uuid, $password)
+        function check_authorisation($active_object, $password)
         {
-            // Attempt to find an entry for the object
-            $entry = sloodle_get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $uuid);
-            if (!$entry) return false;
-            // Make sure we have the type data
-
-            // Edmund Edgar, 2009-01-31: 
-            // The type-checking is breaking the auto-configuration based on a profile.
-            // It should probably already have been filled in somewhere, so this is probably an auto-configuration bug.
-            // But we should probably be doing this check somewhere else, as it's not an authorization check.
-            // Maybe it needs its own error code?
-            //if (empty($entry->type)) return false;
-            
             // Verify the password
-            return ($password == $entry->password);
+            return ($password == $active_object->password);
         }
         
         /**
@@ -604,6 +592,149 @@
             return sloodle_update_record('sloodle_active_object', $entry);
         }
         
+        
+        /**
+        * Returns an array of active object records, or false if something went wrong.
+        * (Cannot be called statically... object must be authorised for this controller).
+        * @param string $rezzeruuid: The uuid of the rezzer which rezzed the object, or null for all active objects, regardless of rezzer.
+        * @param int $layoutentryid: The layout entry id object, or null for all active objects, regardless of layout entry.
+        * @return array() active object objects, or false on failure
+        */
+        function get_active_objects( $rezzeruuid = null, $layoutentryid = null ) {
+
+            $id = $this->get_id();
+            $aos = array();
+            if (!$id) {
+               return false;
+            }
+            $recs = array();
+
+            $select = 'controllerid = '.intval($id);
+            if ($rezzeruuid) {
+               $select .= " and rezzeruuid = '".$rezzeruuid."'";
+            }
+            if ($layoutentryid) {
+               $select .= " and layoutentryid = ".intval($layoutentryid);
+            }
+
+            $recs = get_records_select('sloodle_active_object', $select);
+            if (!$recs) {
+                return false;        
+            }
+            foreach($recs as $rec) {
+                if ($rec && $rec->id) {
+                    $ao = new SloodleActiveObject();
+                    $ao->loadFromRecord($rec);
+                    $aos[] = $ao;
+               }
+            }
+            return $aos; 
+        }
+
+        /*
+        * Return the ID of the currently active round for the controller.
+        * @return int $roundid or null if there isn't one
+        */
+        function get_active_roundid($force_create = false) {
+ 
+            $open_rounds = get_records( 'sloodle_award_rounds', 'controllerid', $this->get_id() );
+            foreach($open_rounds as $or ) {
+                if ($or->timeended > 0) { // closed
+                    continue;
+                }
+                return $or->id;
+            }
+
+            if ($force_create) {
+                $created_round = $this->make_new_round();
+                return $created_round->id;
+            }
+
+            return 0;
+ 
+        }
+
+        function clone_round_participation($fromroundid, $toroundid) {
+            
+            global $CFG;
+            $prefix = $CFG->prefix;
+        
+            $user_curr = array();
+            $scores = get_records('sloodle_award_points', 'roundid', $fromroundid);
+            if ($scores) {
+                foreach($scores as $score) {
+                    $userid = $score->userid;
+                    $currencyid = $score->currencyid;
+                    if (isset($user_curr[ $userid ][$currencyid] )) {
+                        continue;
+                    }
+                    $score->amount = 0;
+                    $score->id = null;
+                    $score->description = null;
+                    $score->roundid = $toroundid;
+                    insert_record( 'sloodle_award_points', $score );
+                    $user_curr[ $userid ] = array();
+                    $user_curr[ $userid ][$currencyid] = true;
+                }
+            }
+
+            return true;
+
+        }
+
+        function make_new_round( $clone_active_round_participation = false ) {
+
+            if (!$courseid = intval($this->get_course_id())) {
+                return false;
+            }
+
+            $previous_round_id = 0;
+            if ($clone_active_round_participation) {
+                $previous_round_id = $this->get_active_roundid();
+            }
+           
+            $round = new stdClass();
+            $round->timestarted = time();
+            $round->timeended = 0;
+            $round->name = '';
+            $round->controllerid = $this->get_id();
+            $round->courseid = $courseid; // We specify this too so that you can delete the controller but keep the scores.
+
+            if (!$roundid = insert_record('sloodle_award_rounds', $round)) {
+                return false;
+            }
+
+            if ($clone_active_round_participation) {
+                $this->clone_round_participation( $previous_round_id, $roundid );
+            }
+
+            $round->id = $roundid;
+
+            $this->close_rounds_except( $roundid );
+
+            return $round;
+
+        }
+
+        function close_rounds_except( $roundid ) {
+
+            $open_rounds = get_records( 'sloodle_award_rounds', 'controllerid', $this->get_id() );
+            foreach($open_rounds as $or ) {
+                if ($or->id == $roundid) {
+                   continue;
+                }
+                if ($or->timeended > 0) {
+                    continue;
+                }
+                $or->timeended = time();
+                update_record( 'sloodle_award_rounds', $or );
+            }
+
+            return true;
+
+        }
+
+
     }
 
 ?>
