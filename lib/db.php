@@ -82,8 +82,8 @@ function sloodle_insert_record($p1=null, $p2=null, $returnid=true, $primarykey='
 
 function sloodle_sanitize_object($obj) {
    $props = get_object_vars( $obj );
-   foreach($props as $prop) {
-      $obj->$prop = addslashes($obj->$prop);
+   foreach($props as $prop => $val) {
+      $obj->$prop = addslashes($val);
    }
    return $obj;
 }
