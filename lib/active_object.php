@@ -464,7 +464,7 @@
 		if (count($existingconfigs) > 0) {
 			foreach($existingconfigs as $config) {
 				if (!isset($done_configs[ $config->name ] )) {
-					if (!delete_record('sloodle_object_config', $config)) {
+					if (!sloodle_delete_records('sloodle_object_config', 'id', $config->id)) {
 						$ok = false;
 					}
 				}

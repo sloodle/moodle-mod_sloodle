@@ -142,19 +142,6 @@ function sloodle_delete_records_select($p1=null, $p2=null) {
    }
 }
 
-
-function sloodle_delete_record($p1=null, $p2=null, $p3=null, $p4=null, $p5=null, $p6=null, $p7=null) {
-   if ( sloodle_do_use_db_object() ) {
-      global $DB;
-      return $DB->delete_record($p1, array($p2=>$p3, $p4=>$p5, $p6=>$p7) );
-   } else {
-      $p3 = is_null($p3) ? $p3 : addslashes($p3);
-      $p5 = is_null($p5) ? $p5 : addslashes($p5);
-      $p7 = is_null($p7) ? $p7 : addslashes($p7);
-      return delete_record($p1, $p2, $p3, $p4, $p5, $p6, $p7);
-   }
-}
-
 function sloodle_get_field($p1=null, $p2=null, $p3=null, $p4=null, $p5=null, $p6=null, $p7=null, $p8=null) {
    if ( sloodle_do_use_db_object() ) {
       global $DB;
