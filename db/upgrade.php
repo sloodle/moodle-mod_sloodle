@@ -1,5 +1,7 @@
 <?php
 
+require(dirname(__FILE__).'/../lib/db.php');
+
 /**
 * Database upgrade script for Moodle's db-independent XMLDB.
 * @ignore
@@ -461,7 +463,7 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         echo "{$numupdated} slide(s) updated.<br/>";
     }
 
-    if ($result && $oldversion < 2010070709) {     
+    if ($result && !table_exists('sloodle_currency_types')) {     
         $table = new XMLDBTable('sloodle_currency_types');
          echo "creating new currency table for site wide virtual currency<br/>";               
         $field = new XMLDBField('id');
@@ -694,7 +696,7 @@ if ($result && $oldversion < 2011070900) {
     // Sloodle 1.2 snuck in in the middle of development and messed up the normal order.
     // This should be OK as long as we don't get another release in between...
     // If we absolutely have to, leaving the space up to 2009073000 to denote 1.2-series releases.
-    if ( ($result && $oldversion < 2011070901) && !($oldversion >= 2009072730 && $oldversion < 2009073000) ) { 
+    if ( $result && !table_exists('sloodle_activity_tool') ) { 
                                                                                                                                                                                                                                                             
     /// Insert 'sloodle_activity_tool' table                                                                                       
         echo " - sloodle_activity_tool<br/>";                                                                                       
@@ -715,9 +717,11 @@ if ($result && $oldversion < 2011070900) {
         $result = $result && create_table($table);                                                                               
         if (!$result) echo "error<br/>";                                                                                     
                                                                                                                                                                                                         
+     }
                                                                                                                   
 
   /// Insert 'sloodle_activity_tracker' table                                                                                  
+    if ( $result && !table_exists('sloodle_activity_tracker') ) { 
         echo " - sloodle_activity_tracker<br/>";                                                                              
         $table = new XMLDBTable('sloodle_activity_tracker');                                                                    
                                                                                                                                                                                                                                                        
@@ -732,7 +736,9 @@ if ($result && $oldversion < 2011070900) {
         $result = $result && create_table($table);         
         if (!$result) echo "error<br/>";
                 
+    }
 
+    if ( $result && !table_exists('sloodle_activity_tracker') ) { 
     /// Define table sloodle_tracker to be created
         $table = new XMLDBTable('sloodle_tracker');
 
