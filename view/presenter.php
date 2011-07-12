@@ -501,6 +501,23 @@ class sloodle_view_presenter extends sloodle_base_view_module
         $streditslide = get_string('presenter:editslide', 'sloodle');
         $strviewslide = get_string('presenter:viewslide', 'sloodle');
         $strdeleteslide = get_string('presenter:deleteslide', 'sloodle');
+
+	// pixpath breaks in Moodle 2.
+	if ( SLOODLE_IS_ENVIRONMENT_IS_MOODLE_2 ) {
+		global $OUTPUT;	 
+		$moveheregif = $OUTPUT->pix_url('movehere');
+		$movegif = $OUTPUT->pix_url('t/move');
+		$editgif = $OUTPUT->pix_url('t/edit');
+		$previewgif = $OUTPUT->pix_url('t/preview');
+		$deletegif = $OUTPUT->pix_url('t/delete');
+	} else {
+		$moveheregif = "{$CFG->pixpath}/movehere.gif";
+		$movegif = "{$CFG->pixpath}/t/move.gif";
+		$editgif = "{$CFG->pixpath}/t/edit.gif";
+		$previewgif = "{$CFG->pixpath}/t/preview.gif";
+		$deletegif = "{$CFG->pixpath}/t/delete.gif";	
+	}
+
         
          // Get a list of entry URLs
         $entries = $this->presenter->get_slides();
@@ -601,7 +618,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
                 // If we are in move mode, then add a 'move here' row before this slide
                 if ($this->presenter_mode == 'moveslide') { 
                     $movelink = SLOODLE_WWWROOT."/view.php?id={$this->cm->id}&amp;mode=setslideposition&amp;entry={$this->movingentryid}&amp;position={$entry->slideposition}";
-                    $movebutton = "<a href=\"{$movelink}\" title=\"{$strmove}\"><img src=\"{$CFG->pixpath}/movehere.gif\" class=\"\" alt=\"{$strmove}\" /></a>\n";
+                    $movebutton = "<a href=\"{$movelink}\" title=\"{$strmove}\"><img src=\"{$moveheregif}\" class=\"\" alt=\"{$strmove}\" /></a>\n";
                     $entriesTable->data[] = array('', '', $movebutton, '', '', '');
 
                     // If the current row belongs to the slide being moved, then emphasise it, and append (moving) to the end
@@ -622,10 +639,10 @@ class sloodle_view_presenter extends sloodle_base_view_module
                 
                 // Construct our list of action buttons
                 $actionButtons = '';
-                $actionButtons .= "<a href=\"{$actionLinkMove}\" title=\"{$strmoveslide}\"><img src=\"{$CFG->pixpath}/t/move.gif\" class=\"iconsmall\" alt=\"{$strmove}\" /></a>\n";
-                $actionButtons .= "<a href=\"{$actionLinkEdit}\" title=\"{$streditslide}\"><img src=\"{$CFG->pixpath}/t/edit.gif\" class=\"iconsmall\" alt=\"{$stredit}\" /></a>\n";
-                $actionButtons .= "<a href=\"{$actionLinkView}\" title=\"{$strviewslide}\"><img src=\"{$CFG->pixpath}/t/preview.gif\" class=\"iconsmall\" alt=\"{$strview}\" /></a>\n";
-                $actionButtons .= "<a href=\"{$actionLinkDelete}\" title=\"{$strdeleteslide}\"><img src=\"{$CFG->pixpath}/t/delete.gif\" class=\"iconsmall\" alt=\"{$strdelete}\" /></a>\n";
+                $actionButtons .= "<a href=\"{$actionLinkMove}\" title=\"{$strmoveslide}\"><img src=\"{$movegif}\" class=\"iconsmall\" alt=\"{$strmove}\" /></a>\n";
+                $actionButtons .= "<a href=\"{$actionLinkEdit}\" title=\"{$streditslide}\"><img src=\"{$editgif}\" class=\"iconsmall\" alt=\"{$stredit}\" /></a>\n";
+                $actionButtons .= "<a href=\"{$actionLinkView}\" title=\"{$strviewslide}\"><img src=\"{$previewgif}\" class=\"iconsmall\" alt=\"{$strview}\" /></a>\n";
+                $actionButtons .= "<a href=\"{$actionLinkDelete}\" title=\"{$strdeleteslide}\"><img src=\"{$deletegif}\" class=\"iconsmall\" alt=\"{$strdelete}\" /></a>\n";
                 $actionButtons .= $addButtons;
 
                
@@ -662,7 +679,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
             $movebutton = '';
             if ($this->presenter_mode == 'moveslide') {
                 $movelink = SLOODLE_WWWROOT."/view.php?id={$this->cm->id}&amp;mode=setslideposition&amp;entry={$this->movingentryid}&amp;position={$endentrynum}";
-                $movebutton = "<a href=\"{$movelink}\" title=\"{$strmove}\"><img src=\"{$CFG->pixpath}/movehere.gif\" class=\"\" alt=\"{$strmove}\" /></a>\n";
+                $movebutton = "<a href=\"{$movelink}\" title=\"{$strmove}\"><img src=\"{$moveheregif}\" class=\"\" alt=\"{$strmove}\" /></a>\n";
             }
             
             // Add a button to delete all selected slides
