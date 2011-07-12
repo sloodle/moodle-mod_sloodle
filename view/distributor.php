@@ -135,7 +135,7 @@ class sloodle_view_distributor extends sloodle_base_view_module
             // Make sure the associated Moodle user can view the current course
             if (!has_capability('moodle/course:view', $this->course_context, $a->userid)) continue;
             // Make sure the associated Moodle user does not have a guest role (Moodle 1.x only)
-	    if (!SLOODLE_IS_ENVIRONMENT_IS_MOODLE_2) {
+	    if (!SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
                 if (has_capability('moodle/legacy:guest', $this->course_context, $a->userid, false)) continue;
 	    }
 

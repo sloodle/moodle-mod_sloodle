@@ -37,7 +37,7 @@
     /** The Sloodle version number. */
     define('SLOODLE_VERSION', 2.0); // This is the release version, not the module version (which is in version.php)
 
-    define('SLOODLE_IS_ENVIRONMENT_IS_MOODLE_2', ($CFG->version >= 2010060800) );
+    define('SLOODLE_IS_ENVIRONMENT_MOODLE_2', ($CFG->version >= 2010060800) );
 
     
 //---------------------------------------------------------------------

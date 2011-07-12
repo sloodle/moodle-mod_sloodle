@@ -503,7 +503,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
         $strdeleteslide = get_string('presenter:deleteslide', 'sloodle');
 
 	// pixpath breaks in Moodle 2.
-	if ( SLOODLE_IS_ENVIRONMENT_IS_MOODLE_2 ) {
+	if ( SLOODLE_IS_ENVIRONMENT_MOODLE_2 ) {
 		global $OUTPUT;	 
 		$moveheregif = $OUTPUT->pix_url('movehere');
 		$movegif = $OUTPUT->pix_url('t/move');
