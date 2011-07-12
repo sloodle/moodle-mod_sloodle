@@ -236,7 +236,7 @@ $string['numsloodleentries'] = '# SLOODLE entries';
 $string['numsettingsstored'] = 'Number of settings stored:';
 $string['numobjects'] = 'Number of objects';
 $string['numdeleted'] = 'Number deleted';
-$string['numprims'] = 'Prim Count: $a';
+$string['numprims'] = 'Prim Count: {$a}';
 
 $string['nochatrooms'] = 'There are no chatrooms available in this course.';
 $string['nochoices'] = 'There are no choices available in this course.';
@@ -332,13 +332,13 @@ $string['presenter:moveslide'] = 'Move this slide';
 $string['presenter:editslide'] = 'Edit this slide';
 $string['presenter:viewslide'] = 'View this slide';
 $string['presenter:deleteslide'] = 'Delete this slide from the presentation';
-$string['presenter:movingslide'] = 'Currently moving slide \"$a\".';
+$string['presenter:movingslide'] = 'Currently moving slide \"{$a}\".';
 
-$string['presenter:confirmdelete'] = 'Are you sure you want to delete slide \"$a\" from this presentation?';
-$string['presenter:confirmdeletemultiple'] = 'Are you sure you want to delete $a slide(s) from the presentation?';
+$string['presenter:confirmdelete'] = 'Are you sure you want to delete slide \"{$a}\" from this presentation?';
+$string['presenter:confirmdeletemultiple'] = 'Are you sure you want to delete {$a} slide(s) from the presentation?';
 
-$string['presenter:deletedslide'] = 'Deleted slide \"$a\" from the presentation.';
-$string['presenter:deletedslides'] = 'Deleted $a slide(s) from the presentation.';
+$string['presenter:deletedslide'] = 'Deleted slide \"{$a}\" from the presentation.';
+$string['presenter:deletedslides'] = 'Deleted {$a} slide(s) from the presentation.';
 $string['presenter:noslidesfordeletion'] = 'No slides selected for deletion. Please select one or more slides by ticking the checkboxes on the left, and then click \"Delete Selected\" again.';
 
 $string['presenter:sloodleinsert'] = 'Insert at position:';                          
@@ -358,7 +358,7 @@ $string['presenter:importname'] = 'Import Name';
 $string['presenter:importnamecaption'] = '(Optional) Enter a name for the material you are importing.';
 $string['presenter:importfailed'] = 'Import failed. This plugin may not be compatible with your server.';
 $string['presenter:importneedimagick'] = 'You need ImageMagick installed from http://www.imagemagick.org/ and (optionally) MagickWand to use this plugin. GhostScript is also required.';
-$string['presenter:importsuccessful'] = 'Import successful. $a slide(s) have been added to your presentation.';
+$string['presenter:importsuccessful'] = 'Import successful. {$a} slide(s) have been added to your presentation.';
 
 $string['presenter:magickwandnotinstalled'] = 'The MagickWand extension could not be loaded.';
 $string['presenter:usingmagickwand'] = 'Using MagickWand extension.';
@@ -447,9 +447,9 @@ $string['status'] = 'Status';
 $string['storedlayouts'] = 'Stored Layouts';
 $string['submit'] = 'Submit';
 
-$string['timeago'] = '$a ago'; // $a = period of time, e.g. "3 weeks"
+$string['timeago'] = '{$a} ago'; // $a = period of time, e.g. "3 weeks"
 $string['type'] = 'Type';
-$string['trydirectlink'] = 'If you cannot see the above entry, try this <a href=\"$a\">direct link</a> instead.';
+$string['trydirectlink'] = 'If you cannot see the above entry, try this <a href=\"{$a}\">direct link</a> instead.';
 $string['tracker:settings'] = 'Tracker Settings';
 $string['tracker:nousers'] = 'No users found in course.';
 $string['trackeradmin'] = 'Administration';
@@ -471,7 +471,7 @@ $string['unknowntype'] = 'Unknown type';
 
 $string['upload:selectfile'] = 'Select file to upload';
 $string['upload:file'] = 'Upload File';
-$string['upload:maxsize'] = 'Estimated maximum upload size: $a';
+$string['upload:maxsize'] = 'Estimated maximum upload size: {$a}';
 $string['upload:emptyfile'] = 'Uploaded file is empty. (This may mean the file was too big to upload.)';
 
 $string['uuid'] = 'UUID';
