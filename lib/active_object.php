@@ -598,7 +598,7 @@
 			// If this stuff fails, tough. We did our best.
 			if ($ao->sendMessage($msgtosend)) {
 				$ao->lastmessagetimestamp = time();
-				$ao->update();
+				$ao->save();
 			}
 		}
 
