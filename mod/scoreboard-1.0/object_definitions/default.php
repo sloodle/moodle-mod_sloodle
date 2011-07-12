@@ -17,6 +17,9 @@ $sloodleconfig->field_sets = array(
                 'sloodlerefreshtime' => new SloodleConfigurationOptionText( 'sloodlerefreshtime', 'refreshtimeseconds', '', 600, 8 ),
 		'sloodlecurrencyid' => new SloodleConfigurationOptionCurrencyChoice( 'sloodlecurrencyid', 'awards:currency', '', '', 0), 
 		//'sloodleshowallcontrollers' => new SloodleConfigurationOptionYesNo( 'sloodleshowallcontrollers', 'awards:showallcontrollers', 0 ),
+	),
+	'accesslevel' => array(
+                'sloodleobjectaccesslevelctrl'  => $sloodleconfig->access_level_object_control_option()
 	)
 );
 ?>

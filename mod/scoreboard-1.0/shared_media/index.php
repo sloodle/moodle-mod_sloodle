@@ -29,15 +29,31 @@
 
 	require_once(SLOODLE_LIBROOT.'/object_configs.php');
 	require_once(SLOODLE_LIBROOT.'/active_object.php');
+	require_once(SLOODLE_LIBROOT.'/currency.php');
 
  	require_once('scoreboard_active_object.inc.php');
 
         $object_uuid = required_param('sloodleobjuuid');
         $sao = SloodleScoreboardActiveObject::ForUUID( $object_uuid );
 
-        $is_logged_in = isset($USER) && ($USER->id > 0);
-        $is_admin = $is_logged_in && has_capability('moodle/course:manageactivities', $sao->context);
+        //$is_admin = $is_logged_in && has_capability('moodle/course:manageactivities', $sao->context);
 
+        $is_admin = ( isset($_REQUEST['mode']) && ($_REQUEST['mode'] == 'admin') );
+
+        if ($is_admin) {
+                require_login($sao->course->id);
+		$is_logged_in = true;
+        }
+
+	if ($is_admin) {
+		require_capability('moodle/course:manageactivities', $sao->context);
+	}
+
+	if (!$currencyid = $sao->currencyid) {
+		print_error(('Currency ID missing'));
+	}	
+
+	$currency = SloodleCurrency::ForID( $currencyid );
 
 	$student_scores = $sao->get_student_scores($include_scoreless_users = $is_admin);
 	
@@ -57,7 +73,7 @@ header('Pragma: public');
 
 	print_site_placeholder( $sitesURL );
 //	print_round_list( $roundrecs );
-	print_score_list( "All groups", $student_scores, $object_uuid, $sao->currencyid, $sao->roundid, $sao->refreshtime, $is_logged_in, $is_admin); 
+	print_score_list( 'scoreboard:allstudents', $student_scores, $object_uuid, $currency, $sao->roundid, $sao->refreshtime, $is_logged_in, $is_admin); 
 
 	print_html_bottom();
 

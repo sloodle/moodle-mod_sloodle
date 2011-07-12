@@ -57,7 +57,7 @@ function print_round_list($rounds) {
 <?php
 }
 
-function print_score_list( $group_name, $student_scores, $active_object_uuid, $currencyid, $roundid, $refreshtime, $is_logged_in, $is_admin ) {
+function print_score_list( $group_name, $student_scores, $active_object_uuid, $currency, $roundid, $refreshtime, $is_logged_in, $is_admin ) {
 ?>
 <script>
 var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
@@ -65,7 +65,7 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 
      
     <ul id="scorelist" class="<?= $is_admin ? 'admin_view' : 'student_view' ?>" data-refresh-seconds="<?=intval($refreshtime) ?>" data-parent="roundlist" title="Scores" selected="true">
-        <li class="group divider above_scores"><?= $is_admin ? 'Students Displayed On Scoreboard' : 'All Students' ?> </li>
+        <li class="group divider above_scores"><?= s(get_string($group_name, 'sloodle')) ?> <? $is_admin ? s(get_string('scoreboard:displayedonscreen', 'sloodle')) : '' ?> - <?= s($currency->name) ?></li>
 	<?php
 	foreach($student_scores as $score) { 
 		if ($score->has_scores) {
@@ -75,7 +75,7 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 	?>
 	<li class="divider below_scores"></li>
 	<?php if ($is_admin) { ?>
-        <li class="group divider above_no_scores">Students Not Displayed On Scoreboard</li>
+        <li class="group divider above_no_scores"><?= s(get_string('scoreboard:notdisplayedonscreen', 'sloodle')) ?> </li>
 	<?php
 	foreach($student_scores as $score) { 
 		if (!$score->has_scores) {
@@ -83,8 +83,9 @@ var active_object_uuid = '<?= htmlentities($active_object_uuid) ?>';
 		}
 	}
 	?>
-	<li class="group divider end below_no_scores"></li>
-	<li class="new_round_link">New round</li>
+	<li class="divider end below_no_scores"></li>
+        <li class="group"><?= s(get_string('scoreboard:controlscoreboard', 'sloodle')) ?></li>
+	<li class="new_round_link"><?= s(get_string('scoreboard:newround', 'sloodle')) ?></li>
 	<?php } ?>
 
 <?php /*
@@ -116,13 +117,13 @@ function render_score_li($score, $is_admin) {
 	<?php if (false &&$is_logged_in) { ?>
 		<a data-userid="<?= $score->userid?>" href="#edit_student" class="student_edit_link" >
 	<?php } ?>
-		<span class="avatar_name"><?= ( $score->avname != '' ) ? htmlentities( $score->avname ) : htmlentities($score->firstname.' '.$score->lastname) ?></span>
+		<span class="avatar_name"><?= ( $score->avname != '' ) ? s( $score->avname ) : s($score->firstname.' '.$score->lastname) ?></span>
 	<?php 
 	if ($is_admin) { 
 	?>
 		<span class="score_change_section">
-		<span class="show_link score_change" data-score-change="0">Show </span>
-		<span class="user_score_delete_link" >Delete </span>
+		<span class="show_link score_change" data-score-change="0"><?= s(get_string('scoreboard:showonscoreboard', 'sloodle')) ?></span>
+		<span class="user_score_delete_link" ><?=s(get_string('scoreboard:removefromscoreboard', 'sloodle'))?></span>
 		&nbsp; 
 		&nbsp; 
 	<?php

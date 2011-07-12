@@ -25,7 +25,6 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 	function initialize() {
 
 		$configs = $this->config_name_value_hash();
-		$this->currencyid = intval($configs['sloodlecurrencyid']);
 
 		if ( isset($configs['sloodleroundid']) && $configs['sloodleroundid'] > 0) {
 			$this->roundid = intval($configs['sloodleroundid']);
@@ -33,7 +32,8 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 			$this->roundid = $this->course->controller->get_active_roundid();
 		}
 
-		$this->refreshtime = isset($configs['sloodlerefreshtime']) ? $configs['sloodlerefreshtime'] : 60;
+		$this->currencyid =  isset($configs['sloodlecurrencyid']) ? intval($configs['sloodlecurrencyid']) : 0; 
+		$this->refreshtime = isset($configs['sloodlerefreshtime']) ? intval($configs['sloodlerefreshtime']) : 60;
 
 		$this->context = get_context_instance(CONTEXT_COURSE, $this->course->course_object->id);
 		$this->courseid = $this->course->course_object->id;

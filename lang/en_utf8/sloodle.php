@@ -530,6 +530,7 @@ $string['awards:update']='Update';
 $string['awards:cantupdate']='Error Can\'t update transaction record';
 $string['awards:successfullupdate']='Updated the following users: ';
 $string['awards:typeofcurrency']='Type of Currency';
+$string['awards:currency']='Currency';
 $string['awards:amount']='Amount';
 $string['awards:totalallocations']='Total Allocated';
 $string['awards:totaldebits']='Total Debits';
@@ -715,4 +716,11 @@ $string['backpacks:nameunknown'] = 'Unknown';
 $string['backpacks:Backpack Contents'] = 'Backpack Contents';
 $string['backpacks:noavatar'] = 'No avatars linked yet';
 
+$string['scoreboard:allstudents'] = 'Students';
+$string['scoreboard:removefromscoreboard'] = 'Remove';
+$string['scoreboard:showonscoreboard'] = 'Show';
+$string['scoreboard:newround'] = 'New Round';
+$string['scoreboard:displayedonscreen'] = 'Displayed On Scoreboard';
+$string['scoreboard:notdisplayedonscreen'] = 'Not Displayed On Scoreboard';
+$string['scoreboard:controlscoreboard'] = 'Control Scores';
 

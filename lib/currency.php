@@ -71,5 +71,15 @@
 
 	}
 
+	function ForID($id) {
+		$rec = sloodle_get_record( 'sloodle_currency_types', 'id', $id );
+		if (!$rec) {
+			return null;
+		}
+		$curr = new SloodleCurrency();
+		$curr->loadFromRow( $rec );
+		return $curr;
+	}
+
 }
 ?>
