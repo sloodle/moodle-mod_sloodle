@@ -38,6 +38,8 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 		$this->context = get_context_instance(CONTEXT_COURSE, $this->course->course_object->id);
 		$this->courseid = $this->course->course_object->id;
 
+		return true;
+
 	}
 
 	function get_student_scores($is_admin) {

@@ -46,13 +46,26 @@
 		var has_scores = changedscorejq.hasClass('has_scores');
 		var prevjq;
 		var nextjq;
+		var i = 0;
 		while (prevjq = changedscorejq.prev()) {
+			i++;
+			// This shouldn't happen, but stop us going into an infinite loop and hanging the browser if something goes wrong.
+			if (i>1000) {
+				break;
+			}
 			// If we don't have a score, never put us above something that does.
 			if (!has_scores && prevjq.hasClass('has_scores')) {
 				break;
 			}
 			// If we don't have score info, there's something wrong.
 			if (prevjq.find('.score_info').length == 0) {
+				if (has_scores) {
+					// if we're at the top of the no-score section, jump to the bottom of the score section.
+					if ( prevjq.hasClass('above_no_scores') ) {
+						$('.below_scores').before(changedscorejq);
+						continue;
+					}
+				}
 				break;
 			}
 			if ( has_scores && !prevjq.hasClass('has_scores') ) { // always go above something with no scores
@@ -73,6 +86,13 @@
 			}
 			// If we don't have score info, there's something wrong.
 			if (nextjq.find('.score_info').length == 0) {
+				if (!has_scores) {
+					// if we're at the top of the no-score section, jump to the bottom of the score section.
+					if ( nextjq.hasClass('below_scores') ) {
+						$('.above_no_scores').after(changedscorejq);
+						continue;
+					}
+				}
 				break;
 			}
 			// If I don't have scores but the next guy does, go below him

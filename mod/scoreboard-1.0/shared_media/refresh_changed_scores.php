@@ -32,6 +32,8 @@
 	/** Include the Sloodle PHP API. */
 	/** Sloodle core library functionality */
 	require_once(SLOODLE_DIRROOT.'/lib.php');
+        require_once(SLOODLE_DIRROOT.'/lib/db.php');
+
 	/** General Sloodle functions. */
 	require_once(SLOODLE_LIBROOT.'/general.php');
 	/** Sloodle course data. */
