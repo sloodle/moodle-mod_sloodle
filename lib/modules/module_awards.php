@@ -83,9 +83,9 @@
             // Fetch the course module data
             if (!($this->cm = get_coursemodule_from_id('sloodle', $id))) return false;
             // Load from the primary table: Sloodle instance
-            if (!($this->sloodle_module_instance = get_record('sloodle', 'id', $this->cm->instance))) return false;
+            if (!($this->sloodle_module_instance = sloodle_get_record('sloodle', 'id', $this->cm->instance))) return false;
             // Load from the primary table: sloodle instance
-            if (!($this->sloodle_instance = get_record('sloodle', 'id', $this->cm->instance))) {
+            if (!($this->sloodle_instance = sloodle_get_record('sloodle', 'id', $this->cm->instance))) {
                 sloodle_debug("Failed to load Sloodle module with instance ID #{$cm->instance}.<br/>");
                 return false;
             }
@@ -95,7 +95,7 @@
             if ($this->sloodle_module_instance->type != SLOODLE_TYPE_AWARDS) return false;
             
             // Load from the secondary table: StipendGiver instance
-            if (!($this->sloodle_awards_instance = get_record('sloodle_awards', 'sloodleid', $this->cm->instance))) return false;
+            if (!($this->sloodle_awards_instance = sloodle_get_record('sloodle_awards', 'sloodleid', $this->cm->instance))) return false;
             
             return true;
         }
@@ -106,7 +106,7 @@
 
 		// Find the active round for the controller, or make one if there isn't one.
 		$timets = time();
-		$roundrecs = get_records_select('sloodle_award_rounds', "controllerid = $controllerid AND ( (timestarted <= $timets ) OR (timestarted = 0) ) AND ( (timeended >= $timets ) OR (timeended = 0) ) ");
+		$roundrecs = sloodle_get_records_select('sloodle_award_rounds', "controllerid = $controllerid AND ( (timestarted <= $timets ) OR (timestarted = 0) ) AND ( (timeended >= $timets ) OR (timeended = 0) ) ");
 
 		$need_notify = false;
 
@@ -119,7 +119,7 @@
 			$round->timestarted = time();
 			$round->timeended = 0;
 			$round->name = '';
-			if ( !insert_record('sloodle_award_rounds', $round) ) {
+			if ( !sloodle_insert_record('sloodle_award_rounds', $round) ) {
 				return false;
 			}
 		}
@@ -149,7 +149,7 @@
 			$award->timeawarded = $time;
 			$award->roundid = $roundid;
 
-			if ( !insert_record('sloodle_award_points', $award) ) {
+			if ( !sloodle_insert_record('sloodle_award_points', $award) ) {
 				return false;
 			}
 
@@ -172,7 +172,7 @@
 			$award->amount = $numpoints * $multiplier;
 			$award->timeawarded = $time;
 			$award->roundid = $roundid;
-			if ( !insert_record('sloodle_award_points', $award) ) {
+			if ( !sloodle_insert_record('sloodle_award_points', $award) ) {
 				return false;
 			}
 
@@ -186,7 +186,7 @@
 			// ...where the scoreboard etc will register with Sloodle that it's interested in certain events.
 
 			// TODO: Figure out the round/controller filters
-			$user_point_total_recs = get_records_sql( "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where currencyid=$currencyid and roundid=$roundid and userid=$userid;");
+			$user_point_total_recs = sloodle_get_records_sql( "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where currencyid=$currencyid and roundid=$roundid and userid=$userid;");
 			if (!$user_point_total_recs && (count($user_point_total_recs) == 0 ) ) {
 				return false;
 			}
