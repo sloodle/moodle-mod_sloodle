@@ -66,3 +66,7 @@ input.rename_layout_input {
 
 .logininput { border: 1px solid black; font-size:28px;}
 
+form {
+	height:1000px;
+}
+

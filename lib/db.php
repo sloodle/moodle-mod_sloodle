@@ -84,6 +84,10 @@ function sloodle_insert_record($p1=null, $p2=null, $returnid=true, $primarykey='
 function sloodle_sanitize_object($obj) {
    $props = get_object_vars( $obj );
    foreach($props as $prop => $val) {
+      // ignore values that aren't regular strings / ints etc
+      if (is_array($val) || is_object($val)) {
+         continue;
+      }
       $obj->$prop = addslashes($val);
    }
    return $obj;

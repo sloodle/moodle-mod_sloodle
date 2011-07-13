@@ -8,7 +8,7 @@ $sloodleconfig->module_choice_message = 'selectquiz';// TODO: There's some extra
 $sloodleconfig->module_no_choices_message = 'noquizzes';
 $sloodleconfig->group      = 'activity';
 $sloodleconfig->show       = true;
-$sloodleconfig->aliases    = array('SLOODLE 1.1 Quiz Chair');
+$sloodleconfig->aliases    = array('SLOODLE 1.2 Quiz Chair', 'SLOODLE 1.1 Quiz Chair');
 $sloodleconfig->field_sets = array( 
 	'generalconfiguration' => array( //TODO: Check defaults
 		'sloodlerepeat' => new SloodleConfigurationOptionYesNo( 'sloodlerepeat', 'repeatquiz', null, 0 ),
@@ -19,6 +19,7 @@ $sloodleconfig->field_sets = array(
 	'accesslevel' => array(
 		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(), 
 		'sloodleserveraccesslevel'     => $sloodleconfig->access_level_server_option(),
-	)
+	),
+        'awards' => $sloodleconfig->awards_setting_options() 
 );
 ?>

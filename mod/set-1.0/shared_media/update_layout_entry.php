@@ -68,8 +68,9 @@ $failures = array();
 $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
 
 foreach($active_objects as $ao) {
-	if ($ao->configure_for_layout()) {
-		$response = $ao->sendMessage('do:reset');
+	if (true || $ao->configure_for_layout()) {
+
+		$response = $ao->refreshConfig();
 		sleep(1);
 		$response2 = $ao->sendConfig();
 	} 

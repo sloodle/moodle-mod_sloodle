@@ -441,7 +441,7 @@ class SloodleObjectConfig {
 	function awards_setting_options( $interactions = null ) {
 
 		if ($interactions == null) {
-			$interactions = array('default' => array('interactwithobjectplus', 'interactwithobjectminus') );
+			$interactions = array('default' => array('awards:interactwithobjectplus', 'awards:interactwithobjectminus') );
 		}
 		$configs = array();
 		
@@ -451,9 +451,9 @@ class SloodleObjectConfig {
 			$withdraw_points_fieldname   = 'sloodleawardswithdraw_numpoints_'.$interactionname;
 			$withdraw_currency_fieldname = 'sloodleawardswithdraw_currency_'.$interactionname;
 			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabels[0], '', 0, 8);
-			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, 'currency', '', '', 8);
+			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, 'awards:currency', '', '', 8);
 			$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
-			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'currency', '', '', 8);
+			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'awards:currency', '', '', 8);
 			$configs[ $deposit_currency_fieldname ]->is_value_translatable = false;
 			$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
 		}

@@ -32,7 +32,6 @@ if (!$layoutentryid) {
 $result = '';
 $layoutentry = new SloodleLayoutEntry();
 if ($layoutentry->load($layoutentryid)) {
-
 	if (!$layoutentry->delete()) {
 		error_output('Layout entry deletion failed');
 	}

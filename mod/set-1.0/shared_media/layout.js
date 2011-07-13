@@ -616,7 +616,7 @@
 			"clone_layout.php",  
 			{
 				layoutid: layoutid,
-				rezzeruuid: rezzeruuid,
+				rezzeruuid: rezzer_uuid,
 				ts: new Date().getTime()
 			},
 			function(json) {  
@@ -771,7 +771,7 @@
 
 			$('#add_configuration_above_me_'+$(this).attr('id')).before(editFrm);
 
-			editFrm.unbind('click').click(function() {
+			editFrm.find('.update_layout_entry_button').unbind('click').click(function() {
 				return update_layout_configuration($(this));
 			});
 

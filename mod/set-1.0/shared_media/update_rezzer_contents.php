@@ -65,7 +65,8 @@ if ( !$rezzer->loadByUUID($rezzeruuid) ) {
 	error_output( 'Rezzer could not be loaded' );
 }
 
-if (!$objects_in_rezzer = $rezzer->listInventory( $include_sloodle = false )) {
+$objects_in_rezzer = $rezzer->listInventory( $include_sloodle = false );
+if ( $objects_in_rezzer === FALSE) {
 	error_output('Fetching inventory failed');
 }
 
@@ -89,17 +90,17 @@ foreach($objects_in_rezzer as $objname) {
 	$element_id = print_config_form( $e, $config, $courseid, $controllerid, $layout->id, 'misc', $rezzeruuid);
 	$edit_object_forms[$element_id] = ob_get_clean();
 
-
-	$content = array(
-		'result' => 'refreshed',
-		//'layoutname' => $layoutname, // TODO: Get this from the object_configs
-		//'layoutid' => $layoutid,
-		//'courseid' => $courseid,
-		'html_list_items' => $html_list_items,
-		'add_object_forms' => $add_object_forms,
-		'edit_object_forms' => $edit_object_forms
-	);
 }
+
+$content = array(
+	'result' => 'refreshed',
+	//'layoutname' => $layoutname, // TODO: Get this from the object_configs
+	//'layoutid' => $layoutid,
+	//'courseid' => $courseid,
+	'html_list_items' => $html_list_items,
+	'add_object_forms' => $add_object_forms,
+	'edit_object_forms' => $edit_object_forms
+);
 
 print json_encode($content);
 exit;

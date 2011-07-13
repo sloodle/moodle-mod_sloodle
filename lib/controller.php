@@ -614,7 +614,7 @@
 
             $select = 'controllerid = '.intval($id);
             if ($rezzeruuid) {
-               $select .= " and rezzeruuid = '".$rezzeruuid."'";
+               $select .= " and rezzeruuid = '".addslashes($rezzeruuid)."'";
             }
             if ($layoutentryid) {
                $select .= " and layoutentryid = ".intval($layoutentryid);

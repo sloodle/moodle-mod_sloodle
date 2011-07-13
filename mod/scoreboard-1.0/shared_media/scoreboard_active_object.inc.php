@@ -112,17 +112,25 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
 	function delete_scores( $userid ) {
 
-                SloodleActiveObject::NotifySubscriberObjects( 'awards_points_deletion', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
+		if (!sloodle_delete_records( 'sloodle_award_points', 'roundid', $this->roundid, 'userid', $userid )) {
+			return false;
+		}
 
-		return sloodle_delete_records( 'sloodle_award_points', 'roundid', $this->roundid, 'userid', $userid );
+                SloodleActiveObject::NotifySubscriberObjects( 'awards_points_deletion', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
+	
+		return true;
 		
 	}
 
 	function make_new_round() {
+
+		if (!$this->course->controller->make_new_round( $clone_active_participation = true)) {
+			return false;
+		}
 		
                 SloodleActiveObject::NotifySubscriberObjects( 'awards_points_round_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
 
-		return $this->course->controller->make_new_round( $clone_active_participation = true);
+		return true;
 
 	}
 

@@ -34,12 +34,12 @@
             
         }
 
-	function loadFromRow($row) {
-		$this->id = $row->id;
-		$this->name = $row->name;
-		$this->timemodified = $row->timemodified;
-		$this->imageurl = $row->imageurl;
-		$this->displayorder = $row->displayorder;
+	function loadFromRecord($rec) {
+		$this->id = $rec->id;
+		$this->name = $rec->name;
+		$this->timemodified = $rec->timemodified;
+		$this->imageurl = $rec->imageurl;
+		$this->displayorder = $rec->displayorder;
 	}
 
 	function FetchAll() {
@@ -50,7 +50,7 @@
 		$currencies = array();
 		foreach($recs as $rec) {
 			$c = new SloodleCurrency();	
-			$c->loadFromRow($rec);
+			$c->loadFromRecord($rec);
 			$currencies[] = $c;
 		}
 		return $currencies;
@@ -77,7 +77,7 @@
 			return null;
 		}
 		$curr = new SloodleCurrency();
-		$curr->loadFromRow( $rec );
+		$curr->loadFromRecord( $rec );
 		return $curr;
 	}
 

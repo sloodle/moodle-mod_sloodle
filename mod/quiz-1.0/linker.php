@@ -369,6 +369,24 @@
         $attempt->timemodified = $timestamp;
 
     // We have now finished processing form data
+
+    // With post sloodle-2.0 quiz chairs, we should be told what happened to the score.
+    // In theory we should be able to get this from the data we already have, but it seems complex...
+    // The process_interactions allows us to award points if there is an instruction to do so in the object config.
+	$scorechange = floatval(optional_param( 'scorechange', 0, PARAM_TEXT));
+	if (!is_null($sloodle->active_object)) {
+
+
+		if ($scorechange > 0) {
+			$sloodle->active_object->process_interactions( 'SloodleModuleAwards', 'default', 1, $sloodle->user->get_user_id() );
+		} else if ($scorechange < 0) {
+			//$sloodle->active_object->process_interactions( 'SloodleModuleAwards', 'answerincorrect', 1, $sloodle->user->get_user_id() );
+		}
+		// TODO: Maybe we should set a side effect code here?
+	} 
+
+		
+
     }
 
 

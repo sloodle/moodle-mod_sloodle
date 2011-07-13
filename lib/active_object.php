@@ -151,6 +151,9 @@
 
         //sends a curl message to our objects httpinurl
         public function sendMessage($msg){
+
+		SloodleDebugLogger::log('HTTP-IN', $msg);
+
                 $ch = curl_init();    // initialize curl handle
                 curl_setopt($ch, CURLOPT_URL, $this->httpinurl ); // set url to post to
                 curl_setopt($ch, CURLOPT_FAILONERROR,0);
@@ -211,7 +214,8 @@
 		return $ret;
 
 	}
-        	// Sends a message to the object telling it to derez itself.
+
+	// Sends a message to the object telling it to derez itself.
 	// Deletes the active_object record if successful.
 	// NB the object can't report back whether it successfully derezzed itself, because it no longer exists.	
 	// We'll go by whether it acknowledged the derez command, which is as close as we can get.
@@ -240,6 +244,34 @@
 		return $this->delete();
 
 	}
+
+	// Sends a message to the object telling it to refresh its configuration.
+	// Return true on success, false on failure
+	public function refreshConfig() {
+
+		if (!$this->httpinurl) {
+			return false;
+		}
+		//build response string
+		$response = new SloodleResponse();
+		$response->set_status_code(1);
+		$response->set_status_descriptor('SYSTEM');
+		$response->set_request_descriptor('REFRESH_CONFIG');
+		$response->add_data_line('do:requestconfig');
+
+		//create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
+		$renderStr="";
+		$response->render_to_string($renderStr);
+		//send message to httpinurl
+		$reply = $this->sendMessage($renderStr);
+		if ( !( $reply['info']['http_code'] == 200 ) ) {
+			return false;
+		}
+
+		return true;
+
+	}
+
 
         /*
         * writes config data to a response object, and sends it this objects httpinurl
@@ -294,7 +326,6 @@
             $response->render_to_string($renderStr);
             //curl send this to our object's httpinurl
 
-            SloodleDebugLogger::log('HTTP-IN', $renderStr);
 
             return $this->sendMessage( $renderStr );
         }
@@ -327,6 +358,7 @@
                     $result->userid = $this->userid;
                     $result->uuid = $this->uuid;
                     $result->httpinurl = $this->httpinurl;
+                    $result->httpinpassword = $this->httpinpassword;
                     $result->position = $this->position;
                     $result->rotation = $this->rotation;
                     $result->rezzeruuid = $this->rezzeruuid;
@@ -334,6 +366,8 @@
                     $result->password = $this->password;
                     $result->name = $this->name;
                     $result->type = $this->type;
+                    $result->mediakey = $this->mediakey;
+                    $result->lastmessagetimestamp = $this->lastmessagetimestamp;
                     $success = sloodle_insert_record('sloodle_active_object', $result );
 
            }//endif
@@ -349,7 +383,9 @@
                     $result->password = $this->password;
                     $result->name = $this->name;
                     $result->type = $this->type;
-                    $result->httpinurl = $this->httpinurl;
+                    $result->httpinpassword = $this->httpinpassword;
+                    $result->mediakey = $this->mediakey;
+                    $result->lastmessagetimestamp = $this->lastmessagetimestamp;
                     if (sloodle_update_record('sloodle_active_object', $result)) $success = $result->id;
            }//end else
 
@@ -402,10 +438,13 @@
            $this->type = $rec->type;
            $this->timeupdated = $rec->timeupdated;
            $this->httpinurl = $rec->httpinurl;
+	   $this->httpinpassword = $rec->httpinpassword;
            $this->layoutentryid = $rec->layoutentryid;
            $this->position = $rec->position;
            $this->rotation = $rec->rotation;
            $this->rezzeruuid = $rec->rezzeruuid;
+	   $this->mediakey = $rec->mediakey;
+	   $this->lastmessagetimestamp = $rec->lastmessagetimestamp;
 
 	   // TODO: This is probably mostly not needed.
            // We should fetch this lazily when we need the course name or whatever it is we want here.
@@ -464,9 +503,7 @@
 		if (count($existingconfigs) > 0) {
 			foreach($existingconfigs as $config) {
 				if (!isset($done_configs[ $config->name ] )) {
-					if (!sloodle_delete_records('sloodle_object_config', 'id', $config->id)) {
-						$ok = false;
-					}
+					sloodle_delete_records('sloodle_object_config', 'id', $config->id);
 				}
 			}	
 		}
@@ -499,15 +536,19 @@
 
 	public function process_interactions( $plugin_class, $interaction, $multiplier, $userid ) {
 
+  SloodleDebugLogger::log('DEBUG', 'in process_interactions');
 		if ( !$userid = intval($userid) ) {
+  SloodleDebugLogger::log('DEBUG', 'no userid');
 			return false;
 		}
 
 		if ( $multiplier == 0 ) {
+  SloodleDebugLogger::log('DEBUG', 'no multiplier');
 			return false;
 		}
 
 		if (!class_exists($plugin_class)) {
+  SloodleDebugLogger::log('DEBUG', 'no class'.$plugin_class);
 			return false;
 		}
 
@@ -516,6 +557,8 @@
 		$relevant_configs = array();
 
 		$relevant_config_names = call_user_func(array($plugin_class, 'InteractionConfigNames'));
+
+
 
 		/*
 		$relevant_config_names = array( 
@@ -540,13 +583,16 @@
 
 		if (count($relevant_configs) == 0) {
 			// Nothing to do here
+  SloodleDebugLogger::log('DEBUG', "no relevatn confis");
 			return true;
 		}
 
 		if (!$controllerid = intval($this->controllerid) ) {
+  SloodleDebugLogger::log('DEBUG', "no controllerid");
 			return false;
 		}
 
+  SloodleDebugLogger::log('DEBUG', "ok, continue");
 		return call_user_func_array( array($plugin_class, 'ProcessInteractions'), array( $relevant_configs, $controllerid, $multiplier, $userid ));
 
 	}
@@ -568,7 +614,7 @@
 		$instr = '';
 		$delim = '';
 		foreach($interested_object_names as $on) {
-			$instr .= $delim."'".$on."'";
+			$instr .= $delim."'".addslashes($on)."'";
 			$delim = ',';
 		}
 		$controllerid = intval($controllerid);
@@ -591,8 +637,8 @@
 			// ...and the object will know it needs to do something to catch up, like polling the server.
 			$ts = time();
 			if ($addtimestampparams) {
-				$msg .= "thismessagesendtimestamp|".$ts."\n";
-				$msg .= "lastmessagesendtimestamp|".$ao->lastmessagesendtimestamp."\n";
+				$msgtosend .= "lastmessagetimestamp|".$ao->lastmessagetimestamp."\n";
+				$msgtosend .= "messagetimestamp|".$ts."\n";
 			}
 
 			// If this stuff fails, tough. We did our best.
