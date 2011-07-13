@@ -21,6 +21,7 @@
     require_once('../sl_config.php');
     /** Include the Sloodle PHP API. */
     require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
+    require_once(SLOODLE_LIBROOT.'/general.php');
 
     // Attempt to authenticate the request
     // (only require authentication if controller ID and/or password is set)
@@ -32,7 +33,61 @@
     $rezzeruuid = $sloodle->request->required_param('sloodleobjuuid');
     $httpinurl = $sloodle->request->required_param('httpinurl');    
     $childobjectuuid= $sloodle->request->required_param('childobjectuuid');
-    $extraParams = array( 'sloodlerezzeruuid' => $rezzeruuid );   
+    $controllerid = $sloodle->request->required_param('sloodlecontrollerid');
+    $objectname = $sloodle->request->optional_param('sloodleobjname');
+    $extraParams = ($rezzeruuid == $childobjectuuid) ? array() : array( 'sloodlerezzeruuid' => $rezzeruuid );   
+
+    if ($childobjectuuid == $rezzeruuid) {
+
+	// configs come from a notecard
+	$configs = array();
+	$configs['sloodlecontrollerid'] = $controllerid;
+	foreach($_POST as $n=>$v) {
+		if (preg_match('/^set\:(.*)$/', $n, $matches) ) {
+			$configs[ $matches[1] ] = $v;
+		}
+	}
+	$objecttype = isset($configs['sloodleobjtype']) ? $configs['sloodleobjtype'] : 'unknown';
+
+        // This is an object trying to register itself with a notecard.
+        // Go ahead an do it - it has a legitimate prim password or it would have been stopped already.
+        $controller = new SloodleController();
+        if (!$controller->load( $controllerid )) {
+            $sloodle->response->set_status_code(-217);//Could not save HTTP In URL for rezzed object
+            $sloodle->response->set_status_descriptor('OBJECT_AUTH');
+            $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
+        }
+
+	// TODO: Refactor and move this stuff into activeobject
+
+	// first time we way it
+	if(!$ao = SloodleActiveObject::loadByUUID( $childobjectuuid )) {
+		$primpassword = sloodle_random_web_password();
+		if ( !$authid = $controller->register_object($childobjectuuid, $objectname, $sloodle->user, $primpassword, $objecttype) ) {
+		    $sloodle->response->set_status_code(-217);//Could not save HTTP In URL for rezzed object
+		    $sloodle->response->set_status_descriptor('OBJECT_AUTH');
+		    $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
+		}
+	} else {
+		$authid = $ao->id;
+		// already got it - clean out old configs
+		sloodle_delete_records('sloodle_object_config', 'object', $authid); 
+	}
+
+	if (count($configs) > 0) {
+		foreach($configs as $n => $v) {
+			$config->id = null;
+			$config->object = $authid;
+			$config->name = $n;
+			$config->value = $v;
+			if (!sloodle_insert_record('sloodle_object_config',$config)) {
+				$ok = false;
+			}
+		}
+	}
+
+    }
+
     //search for active_object table
     //create new active object for found record
     $active_object= new SloodleActiveObject();
@@ -40,6 +95,7 @@
     $sloodle->response->add_data_line($childobjectuuid);
 
     if(!$active_object->loadByUUID( $childobjectuuid )){
+
             $active_object->response = new SloodleResponse();
             $active_object->response->set_status_code(-201);
             $active_object->response->set_status_descriptor('OBJECT_AUTH');
@@ -50,8 +106,9 @@
             $sloodle->response->set_status_code(-218);//child object not found
             $sloodle->response->set_status_descriptor('OBJECT_AUTH');
             $sloodle->response->render_to_output();
-    }//endif
-    else{
+
+    } else{
+
          //save httpinurl
          $active_object->httpinurl=$httpinurl;
          if (!$active_object->save()) {                
@@ -59,6 +116,7 @@
             $sloodle->response->set_status_descriptor('OBJECT_AUTH');
             $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
          }
+
         //active object is loaded, send config to the object, and also send the rezzeruuid to the object so 
         //our object also knows its rezzer uuid 
         $result = $active_object->sendConfig($extraParams);

@@ -87,7 +87,7 @@ if (!( $reply['info']['http_code'] == 200 ) ) {
 
 $rezzed_object_uuid = $reply['result'];
 
-if ( !$authid = $controller->register_object($rezzed_object_uuid, $objectname, $sloodleuser, $primpassword, 'reg-enrol-1.0') ) {
+if ( !$authid = $controller->register_object($rezzed_object_uuid, $objectname, $sloodleuser, $primpassword, 'TODO-Get-type') ) {
 	error_output('Object registration failed');
 }
 

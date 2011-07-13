@@ -291,10 +291,12 @@
             $response->add_data_line(array('set:sloodlecoursename_full', $this->course->get_short_name()));
             $response->add_data_line(array('set:sloodlepwd', $this->uuid.'|'.$this->password)); // NB We need to prepend the UUID - otherwise Sloodle treats it like a prim password
             $response->add_data_line(array('set:sloodleserverroot', $CFG->wwwroot));
-            $response->add_data_line(array('set:position', $this->position, $this->rotation, $this->rezzeruuid));
-            //$response->add_data_line(array('set:rezzeruuid', $this->rezzeruuid));
-            //$response->add_data_line(array('set:rotation', $this->rotation));
-            $response->add_data_line(array('set:layoutentryid', $this->layoutentryid));
+	    if ($this->layoutentryid) {
+		    $response->add_data_line(array('set:position', $this->position, $this->rotation, $this->rezzeruuid));
+		    //$response->add_data_line(array('set:rezzeruuid', $this->rezzeruuid));
+		    //$response->add_data_line(array('set:rotation', $this->rotation));
+		    $response->add_data_line(array('set:layoutentryid', $this->layoutentryid));
+	    }
             //search for setings for this object
             $settings = sloodle_get_records('sloodle_object_config', 'object', $this->id);
              if (!$settings) {
@@ -536,19 +538,15 @@
 
 	public function process_interactions( $plugin_class, $interaction, $multiplier, $userid ) {
 
-  SloodleDebugLogger::log('DEBUG', 'in process_interactions');
 		if ( !$userid = intval($userid) ) {
-  SloodleDebugLogger::log('DEBUG', 'no userid');
 			return false;
 		}
 
 		if ( $multiplier == 0 ) {
-  SloodleDebugLogger::log('DEBUG', 'no multiplier');
 			return false;
 		}
 
 		if (!class_exists($plugin_class)) {
-  SloodleDebugLogger::log('DEBUG', 'no class'.$plugin_class);
 			return false;
 		}
 
@@ -583,16 +581,13 @@
 
 		if (count($relevant_configs) == 0) {
 			// Nothing to do here
-  SloodleDebugLogger::log('DEBUG', "no relevatn confis");
 			return true;
 		}
 
 		if (!$controllerid = intval($this->controllerid) ) {
-  SloodleDebugLogger::log('DEBUG', "no controllerid");
 			return false;
 		}
 
-  SloodleDebugLogger::log('DEBUG', "ok, continue");
 		return call_user_func_array( array($plugin_class, 'ProcessInteractions'), array( $relevant_configs, $controllerid, $multiplier, $userid ));
 
 	}
