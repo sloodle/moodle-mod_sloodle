@@ -34,21 +34,21 @@
         integer eof = FALSE; // Have we reached the end of the configuration data?
         
         integer SLOODLE_CHANNEL_AVATAR_DIALOG = 1001;
-        integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857353; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
+        integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
         integer SLOODLE_CHANNEL_AVATAR_IGNORE = -1639279999;
         
-        integer SLOODLE_CHANNEL_QUIZ_FETCH_FEEDBACK = -1639271101;
-        integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102;
-        integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103;
-        integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104;
-        integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105;
-        integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;
-        integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107;
+        integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102; //Tells us to start a quiz for the avatar, if possible.; Ordinary quiz chair will have a second script that detects and avatar sitting on it and sends it. Awards-integrated version waits for a game ID to be set before doing this.
+        integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103; //Sent by main quiz script to tell UI scripts that quiz has started for avatar with key
+        integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104; //Sent by main quiz script to tell UI scripts that quiz has finished for avatar with key, with x/y correct in string
+        integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
+        integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;  //Sent by main quiz script to tell UI scripts that question has been answered by avatar with key. String contains selected option ID + "|" + option text + "|"
+        integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107; 
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUESTION = -1639271108;
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
-        integer SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION = -1639271111;                
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112;
+        integer SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION = -1639271111;            
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key.
+        integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
 
 
         integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
@@ -190,7 +190,7 @@
         }
         
         // Notify the server of a response
-        notify_server(string qtype, integer questioncode, string responsecode)
+        notify_server(string qtype, integer questioncode, string responsecode, float scorechange)
         {
             string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
             body += "&sloodlepwd=" + sloodlepwd;
@@ -202,6 +202,7 @@
             body += "&resp" + (string)questioncode + "_submit=1";
             body += "&questionids=" + (string)questioncode;
             body += "&action=notify";
+            body += "&scorechange="+(string)scorechange;
             
             llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
         }
@@ -251,7 +252,7 @@
                 }        
             }
             
-            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, "ASKED QUESTION", sitter);
+            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, (string)question_id+"|"+qtext, sitter);
             
         }
         
@@ -363,6 +364,8 @@
                     // Is it a reset command?
                     if (str == "do:reset") {
                         llResetScript();
+                    } else if (str == "do:reconfigure"  || str == "do:requestconfig") {
+                        state default; // The main script is about to receive new configuration data... get ready to receive it too
                     }
                     return;
                 }
@@ -370,7 +373,7 @@
                         
             state_entry()
             {
-   
+
             }
             
             state_exit()
@@ -390,13 +393,14 @@
                     if (channel != 0) return;
                 }
             
-                string feedback_id; // used when the feedback is too long, and we have to fetch it off the server
+                string opid; // used when the feedback is too long, and we have to fetch it off the server
             
                 // Only listen to the sitter
                 if (id == sitter) {
                     // Handle the answer...
                     float scorechange = 0;
                     string feedback = "";
+                    string answeroptext = "";
                     
                     // Check the type of question this was
                     if ((qtype == "multichoice") || (qtype == "truefalse")) {
@@ -409,10 +413,11 @@
                             
                             feedback = llList2String(opfeedback, answer_num);
                             scorechange = llList2Float(opgrade, answer_num);
-                            feedback_id = llList2String(opids, answer_num);
+                            opid = llList2String(opids, answer_num);
+                            answeroptext = llList2String(optext, answer_num);
 
                             // Notify the server of the response
-                            notify_server(qtype, question_id, llList2String(opids, answer_num));
+                            notify_server(qtype, question_id, llList2String(opids, answer_num),scorechange);
                         } else {
                             sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidchoice", [llKey2Name(sitter)], null_key, "quiz");
                             ask_question();
@@ -425,9 +430,10 @@
                                    if (llToLower(message) == llToLower(llList2String(optext, x))) {
                                       feedback = llList2String(opfeedback, x);
                                       scorechange = llList2Float(opgrade, x);
-                                      feedback_id = llList2String(opids, x);
+                                      opid = llList2String(opids, x);
+                                      answeroptext = llList2String(optext, x);
                                    }
-                               notify_server(qtype, question_id, message);
+                               notify_server(qtype, question_id, message, scorechange);
                                }        
                     } else if (qtype == "numerical") {
                                // Notify the server of the response
@@ -438,9 +444,10 @@
                                    if (number == (float)llList2String(optext, x)) {
                                       feedback = llList2String(opfeedback, x);
                                       scorechange = llList2Float(opgrade, x);
-                                      feedback_id = llList2String(opids, x);                                      
+                                      opid = llList2String(opids, x);
+                                      answeroptext = llList2String(optext, x);                                      
                                    }
-                                   notify_server(qtype, question_id, message);
+                                   notify_server(qtype, question_id, message, scorechange);
                                }        
                     } 
                     
@@ -449,8 +456,10 @@
                         sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype], null_key, "quiz");
                     }                
                     
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR, opid+"|"+answeroptext, sitter);    
+                    
                     if (feedback == "[[LONG]]") // special long feedback placeholder for when there is too much feedback to give to the script
-                        feedbackreq = request_feedback( question_id, feedback_id );
+                        feedbackreq = request_feedback( question_id, opid );
                     else if (feedback != "") llInstantMessage(sitter, feedback); // Text feedback
                     else if (scorechange > 0.0) {                                                    
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct", [llKey2Name(sitter)], sitter, "quiz");
@@ -468,7 +477,7 @@
                     opgrade = [];
                     opfeedback = [];              
                     
-                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR, (string)scorechange, sitter);                                                                              
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)scorechange, sitter);                                                                              
     
                 }
             }
@@ -591,5 +600,4 @@
             }
             
         }
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/quiz-1.0/sloodle_quiz_question_handler.lsl 
+
