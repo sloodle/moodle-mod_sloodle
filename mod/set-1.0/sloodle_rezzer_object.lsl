@@ -1,5 +1,5 @@
 /*********************************************
-*  Copyrght (c) 2009 various contributors (see below)
+*  Copyright (c) 2009 - 2011 various contributors (see below)
 *  Released under the GNU GPL 3.0
 *  This script can be used in your scripts, but you must include this copyright header as per the GPL Licence
 *  For more information about GPL 3.0 - see: http://www.gnu.org/copyleft/gpl.html
@@ -54,7 +54,18 @@ integer sloodle_handle_command(string str)
             return 1;
         } else if (name == "do:derez") {
             llDie();
-        } else if (name=="do:requestconfig") {
+        } else if ( (name=="do:requestconfig") || (name=="do:reset") ) {
+            string this_script = llGetScriptName();                
+            integer n = llGetInventoryNumber(INVENTORY_SCRIPT); 
+            while(n) {
+                string script_name = llGetInventoryName(INVENTORY_ALL, --n);
+                // Reset all sloodle scripts. If for some reason we make a sloodle script that we don't want reset, call it "sloodle_reset".
+                if ( (script_name != this_script) && (llGetSubString( script_name, 0, 7) == "sloodle_" ) && (llGetSubString( script_name, 0, 15) != "sloodle_noreset_" ) ) {
+                    llResetOtherScript( script_name );
+                }
+            }
+            // Give them a second to get started to avoid trying to configure them before they're ready.
+            llSleep(1);
             llResetScript(); 
         }
     } 
