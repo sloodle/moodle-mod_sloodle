@@ -58,7 +58,7 @@ integer sloodle_handle_command(string str)
             string this_script = llGetScriptName();                
             integer n = llGetInventoryNumber(INVENTORY_SCRIPT); 
             while(n) {
-                string script_name = llGetInventoryName(INVENTORY_ALL, --n);
+                string script_name = llGetInventoryName(INVENTORY_SCRIPT, --n);
                 // Reset all sloodle scripts. If for some reason we make a sloodle script that we don't want reset, call it "sloodle_reset".
                 if ( (script_name != this_script) && (llGetSubString( script_name, 0, 7) == "sloodle_" ) && (llGetSubString( script_name, 0, 15) != "sloodle_noreset_" ) ) {
                     llResetOtherScript( script_name );
