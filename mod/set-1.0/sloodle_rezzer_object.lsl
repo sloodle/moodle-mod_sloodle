@@ -5,277 +5,232 @@
 *  For more information about GPL 3.0 - see: http://www.gnu.org/copyleft/gpl.html
 *  This script is part of the SLOODLE Project see http://sloodle.org
 *
-*  http_in_config_requester
+*  sloodle_rezzer_object
 *  Copyright:
 *  Paul G. Preibisch (Fire Centaur in SL) fire@b3dMultiTech.com  
-*
 *  Edmund Edgar (Edmund Earp in SL) ed@socialminds
 *
-*  This script will get an httpin url, open a shared media page allowing it to be used
+*  This script will get an httpin url, and shout it out to the rezzer.  It will then wait to receive its config via httpin, and send it as a linked message to all other scripts
 */
 
-integer SLOODLE_CHANNEL_OBJECT_DIALOG                   = -3857343;//configuration channel
+integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;//configuration channel
 integer SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL = -1639270089; //Object creator telling itself it wants to rez an object at a position (specified as key)
 
 string SLOODLE_EOF = "sloodleeof";
-string inventorystr = "";
 
-sloodle_handle_command(string str) {
-         if (str=="do:requestconfig")llResetScript();         
-}
+vector rezzer_position_offset;
+rotation rezzer_rotation_offset;
+key rezzer_uuid;
+integer isconfigured = 0;
 
-sloodle_tell_other_scripts(string msg)
-{
-   
-    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_OBJECT_DIALOG, msg, NULL_KEY);   
-}
-
-// Update our inventory list
-update_inventory()
-{
-    integer numitems=0;
-    // We're going to build a string of all copyable inventory items
-
-    inventorystr = "";
-    numitems = llGetInventoryNumber(INVENTORY_OBJECT);
-    string itemname = "";
-    integer numavailable = 0;
-    
-    // Go through each item
-    integer i = 0;
-
-    for (i = 0; i < numitems; i++) {
-        // Get the name of this item
-        itemname = llGetInventoryName(INVENTORY_OBJECT, i);
-        // Make sure it's copyable, not a script, and not on the ignore list
-        if((llGetInventoryPermMask(itemname, MASK_OWNER) & PERM_COPY)) {
-            if (numavailable > 0) inventorystr += "\n";
-            inventorystr += itemname;
-            numavailable++;
-        }
-    }
-    
-}
 string myUrl;
 
-// This will be set according to the object type in default state_entry 
-vector rez_offset = ZERO_VECTOR; 
 
-rotation default_rez_rot = ZERO_ROTATION; // The default rotation to rez new objects at
-
-vector rez_pos = <0.0,0.0,0.0>; // This is used to store the actual rez position for a rez request
-rotation rez_rot = ZERO_ROTATION; // This is used to store the actual rez rotation for a rez request
-string rez_object = ""; // Name of the object we will rez
-string rez_object_list = "";
-
-key http_incoming_request_id;
-
-default {
+move_to_layout_position() {
     
-     state_entry() {    
+   // llOwnerSay("todo: move to position "+(string)rezzer_position_offset+", rot "+(string)rezzer_rotation_offset+ " in relation to rezzer "+(string)rezzer_uuid);   
+
+    list rezzerdetails = llGetObjectDetails( rezzer_uuid, [ OBJECT_POS, OBJECT_ROT ] );
+    vector rezzerpos = llList2Vector( rezzerdetails, 0 );
+    rotation rezzerrot = llList2Rot( rezzerdetails, 1 );
+    llSetPos( rezzerpos + ( rezzer_position_offset * rezzerrot ) );
+    llSetRot( rezzerrot * rezzer_rotation_offset );
+
+}
+
+// Configure by receiving a linked message from another script in the object
+// Returns TRUE if the object has all the data it needs
+integer sloodle_handle_command(string str) 
+{
+    list bits = llParseString2List(str,["|"],[]);
+    integer numbits = llGetListLength(bits);
+    
+    if (numbits >= 1 ) {
+        string name = llList2String(bits,0);
+        if (name == "set:position") {        
+            rezzer_position_offset = (vector)llList2String(bits,1);
+            rezzer_rotation_offset = (rotation)llList2String(bits,2);
+            rezzer_uuid = llList2Key(bits,3);
+            return 1;
+        } else if (name == "do:derez") {
+            llDie();
+        } else if (name=="do:requestconfig") {
+            llResetScript(); 
+        }
+    } 
+    return isconfigured;
+}
+
+
+sloodle_tell_other_scripts(string msg, integer channel)
+{    
+    integer status_code;
+    if (channel == 0) {
+    // Don't know the channel yet - get it from the message.
+        list lines;
+        lines = llParseStringKeepNulls( msg, ["\n"], [] );
+        string status_line = llList2String(lines, 0);
+        list status_bits;
+        status_bits = llParseStringKeepNulls( status_line, ["|"], [] );
+       
+        status_code = (integer)llList2String(status_bits, 0);
+
+        if (status_code == 1) {
+            status_code = SLOODLE_CHANNEL_OBJECT_DIALOG;
+        }
+    } else {
+        status_code = channel;        
+    }
+    // config requests need a SLOODLE_EOF on the end.
+    // this is a legacy from sending notecards line-by-line. 
+    if (status_code == SLOODLE_CHANNEL_OBJECT_DIALOG) {
+        msg = msg + "\n"+SLOODLE_EOF;
+    }
+   // llOwnerSay("sending msg with status code "+(string)status_code+": "+msg);
+    llMessageLinked(LINK_SET, status_code, msg, NULL_KEY);
+    
+}
+
+default{
+    state_entry() {    
         llSleep(1.0);
         llRequestURL();
     }
-    
-    link_message(integer sender_num, integer num, string str, key id)
-    {
-        // Check the channel
-        if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
-            // What was the message?
-            if (str == "do:reset") llResetScript();
-        }  
-    }       
 
-    http_request(key id, string method, string body){
+    on_rez(integer start_param) {
+        llSetText("", <1.0, 1.0, 1.0>, 1.0);        
+        llResetScript();
+    }          
         
+    http_request(key id, string method, string body){
           if ((method == URL_REQUEST_GRANTED)){
-
-                myUrl = body;       
+                myUrl=body;
+                //shout it out to the rezzer our httpinUrl
+                llRegionSay(SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL,myUrl);
                 
-                string paramstr = "&sloodleobjuuid=" + (string)llGetKey() + "&sloodleobjname=" + llEscapeURL(llGetObjectName()) + "&sloodleuuid=" + (string)llGetOwner() + "&sloodleavname=" + llEscapeURL(llKey2Name(llGetOwner()));
-                string path = "/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr;
-
-                // If there's a URL in the object description field, use that for login. 
-                // Otherwise, show a form so the user can input it.
-                string desc = llGetObjectDesc();
-                string url = "";
-                                
-                if ( ( llGetSubString(desc, 0, 6) == "http://" ) || ( llGetSubString(desc, 0, 7) == "https://" ) ) {
-                    
-                    url = desc + path;
-                    
-                } else {
-                                      
-                    // For avatar classroom use:    
-                    //string url = "http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr // avatar classroom
-                    
-                    url = "data:text/html,<div style=\"text-align:center;width:1000px;height:750px;margin-top:200px;font-size:200%\" ><form onsubmit=\"window.location=this.n.value+'"+path+"';return false;\">Moodle URL<br /><input style=\"height:60px;width:800px;margin:50px;\" type=\"text\" name=\"n\"><br /><input style=\":border:1px solid;width:200px;height:50px\" type=\"submit\" value=\"Submit\"></form></div>";
+                llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL, myUrl, NULL_KEY);
                 
-                }
-                           
-                //llOwnerSay("got url URL_REQUEST_GRANTED"+"http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr);
-                llClearPrimMedia(4);
-                llSetPrimMediaParams( 4, [ PRIM_MEDIA_CURRENT_URL, url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_GROUP ] );
-                llSetPrimMediaParams( 4, [ PRIM_MEDIA_HOME_URL, url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_GROUP ] );                
-                state ready;
+               // llOwnerSay("got url "+myUrl);
+          } else if (method == "POST"){                            
+               //this is where we receive data from from our server
+                llHTTPResponse(id, 200, "OK");                       
+                list lines;
+                lines = llParseStringKeepNulls( body, ["\n"], [] );
                 
-          }
+                integer numlines = llGetListLength(lines);
+                integer i = 0;          
+                for (i=0; i < numlines; i++) {
+                    isconfigured = sloodle_handle_command(llList2String(lines, i));                
+                }                                                         
+                
+                sloodle_tell_other_scripts(body,0);
+                // This is the end of the configuration data
+                llSleep(0.2);
+                sloodle_tell_other_scripts(SLOODLE_EOF, 0);
+                
+                if (isconfigured == 1) {
+                    move_to_layout_position();
+                    state ready;
+                }                
+          }//endif
      }//http
-           
-
-    on_rez(integer start_param) {
-        llResetScript();
-    }             
-          
-    changed(integer change) {
-
-        if (change & CHANGED_REGION_START) {
-            llResetScript();
-        }
-           
-    }     
+     
+     changed(integer change) {
+         if (change ==CHANGED_INVENTORY){         
+             llResetScript();
+         }
+     }
 }
-             
-state ready {
- 
-    link_message(integer sender_num, integer num, string str, key id)
+
+state ready {    
+            
+    state_entry()
     {
-        // Check the channel
-        if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
-            // What was the message?
-            if (str == "do:reset") llResetScript();
-        }  
-    }              
+        // llOwnerSay("ready state");
+        llListen(232323, "", rezzer_uuid, "");        
+    } 
 
-    on_rez(integer start_param) {
-        llResetScript();
-    }  
-                
-    http_request(key id, string method, string body){
+    listen(integer channel, string name, key id, string message) {
+    
+       // llOwnerSay(message);
+    
+        list bits = llParseString2List( message, ["|"], [] );
+        vector change_pos = (vector)llList2String( bits, 0 );
+        rotation change_rot = (rotation)llList2String( bits, 1 );
+        vector parent_pos = (vector)llList2String( bits, 2);
+       // llOwnerSay("got message" + message);       
+
+        // Apply the position changes first, then the rotation
+        vector before_pos = llGetPos();
+        if (before_pos.z > 0) { // sometimes this comes out at 0, but we don't want to go to the corner of the sim
+            llSetPos( before_pos - change_pos );
+        }
+
+        before_pos = llGetPos();
+        rotation before_rot = llGetRot();
+
+        //llOwnerSay("Rot: "+(string)llRot2Euler(change_rot));
+        // llOwnerSay((string)(before_rot - change_rot));
+        // llOwnerSay("new pos: "+(string)(llGetPos() + ( before_pos - parent_pos) * change_rot));
+        //change_rot = llEuler2Rot( < 0, 0, 15 * DEG_TO_RAD > ); // pretend we rotated 15 degrees
+        vector currentPosition = llGetPos();
+        vector currentOffset = currentPosition - parent_pos;
+        //llOwnerSay("I plan to be "+(string)llVecDist(currentOffset, <0,0,0>)+" from parent");
+        vector rotatedOffset = currentOffset * change_rot;
+        vector newPosition = parent_pos + rotatedOffset;
+        llSetPos(newPosition);
         
-        if (method == "POST"){             
+        //llOwnerSay("new pos: "+(string)(llGetPos() + ( ( before_pos - parent_pos) * change_rot ) ) );        
+        // llSetPos( before_pos + ( ( parent_pos - before_pos ) * change_rot ) );        
+        
+        llSetRot( llGetRot() * change_rot );
 
+        //  llGetPos() + vPosOffset * llGetRot(), ZERO_VECTOR, llGetRot()        
+        
+    }
+    on_rez(integer start_param)
+    {
+        llResetScript();
+    }
+        
+    http_request(key id, string method, string body){
+          if (method == "POST"){                            
                //this is where we receive data from from our server
                 list lines;
                 lines = llParseStringKeepNulls( body, ["\n"], [] );
+                
+                integer numlines = llGetListLength(lines);
+                integer i = 0;   
               // llOwnerSay(body);
-               // llOwnerSay("Got a request - need to check what it is and probably rez something");
+                if (llList2String(lines,0) == "do:reportposition") {
+                    list rezzerdetails = llGetObjectDetails( rezzer_uuid, [ OBJECT_POS, OBJECT_ROT ] );
+                    vector rezzerpos = llList2Vector( rezzerdetails, 0 );
+                    rotation rezzerrot = llList2Rot( rezzerdetails, 1 );
+                    string reply = (string)( ( llGetPos() - rezzerpos ) / rezzerrot ) + "|" + (string)(llGetRot() / rezzerrot) + "|" + (string)rezzer_uuid;
+                    llHTTPResponse(id, 200, reply);
+                    return;
+                }
+                       
+                llHTTPResponse(id, 200, "OK");                   
 
-                list statusbits =  llParseStringKeepNulls( llList2String(lines,0), ["|"], []);
-                string requestType = llList2String( statusbits, 3 );
-                if (requestType == "REZ_OBJECT") {
-                  http_incoming_request_id = id;                    
-                    rez_object_list = llList2String(lines, 1); // This will be a pipe-delimited string of object choices. 
-                    rez_pos = (vector)llList2String(lines, 2);
-                    rez_rot = (rotation)llList2String(lines, 3);
-                    state rezz_and_reply;
-                    
-                } else if (requestType == "LIST_INVENTORY") {
-                  //  llOwnerSay("got LIST_INVENTORY request");                    
-                        
-                    update_inventory();
-                    //numPages = numItems/
-                    string resp="OK||||||||||"+"\n"+inventorystr;
-                    llHTTPResponse(id, 200, resp);                                     
-                    
-                } else { // I don't know how to handle this - throw it to someone else...
-              //  llOwnerSay("misc config message received");
-                // Currently used for configuration of the rezzer
-                    llHTTPResponse(id, 200, "OK");                       
-               // llOwnerSay(body);                
-                //integer i = 0;
-                //for (i=0; i<llGetListLength(lines); i++) {
-                   // llOwnerSay( llList2String(lines, i) );
-                  //  sloodle_tell_other_scripts(llList2String(lines, i));                       
-                //}
-                    sloodle_tell_other_scripts(body);
-                    // This is the end of the configuration data
-                    llSleep(0.2);
-                    sloodle_tell_other_scripts(SLOODLE_EOF);               
-              }//endif
-                    
+                for (i=0; i < numlines; i++) {
+                    isconfigured = sloodle_handle_command(llList2String(lines, i));
+                }                                                         
+                                
+                sloodle_tell_other_scripts(body, 0);
+                // This is the end of the configuration data
+                llSleep(0.2);
+                sloodle_tell_other_scripts(SLOODLE_EOF, 0);
+                
+                                    
+                       
           }//endif
      }//http
-                    
-    changed(integer change) {
 
-        if (change & CHANGED_REGION_START) {
-            llResetScript();
-        }
-           
-    }                    
-
+     changed(integer change) {
+         if (change ==CHANGED_INVENTORY){         
+             llResetScript();
+         }
+     }    
 }
-
-// Rez an object and reply to the outstanding http request
-state rezz_and_reply
-{
-    state_entry()
-    {
-        list objs = llParseStringKeepNulls( rez_object_list, ["|"], [] );
-        integer i;    
-        integer objectFound = 0;
-        while ( (objectFound == 0) && ( i < llGetListLength( objs ) ) ) {
-            rez_object = llList2String(objs, i);
-            if (llGetInventoryType(rez_object) == INVENTORY_OBJECT) {
-                objectFound = 1;
-            }
-            i++;
-        }
-            
-        if (objectFound == 0) { 
-           // llOwnerSay("could not find an object for the string "+rez_object_list);
-            llHTTPResponse(http_incoming_request_id, 500, "INVENTORY_NOT_FOUND");        
-            http_incoming_request_id = NULL_KEY;    
-            state ready;
-        }
-        
-        //llOwnerSay("unprocessed rot is "+(string)rot);
-        rez_pos = rez_pos * llGetRootRotation();
-        rez_rot = rez_rot * llGetRootRotation(); 
-
-       // llMessageLinked(LINK_SET,SLOODLE_CHANNEL_OBJECT_CREATOR_REZZING_STARTED, "", NULL_KEY);
-            
-        llSetTimerEvent(0);    
-        
-        llRezObject(rez_object, llGetRootPosition() + ( rez_pos * llGetRootRotation() ), ZERO_VECTOR, rez_rot, 0);          
-        
-        // Timeout after a while if the object doesn't get rezzed
-        llSetTimerEvent(10.0);
-    }
-    
-    timer()
-    {
-        llSetTimerEvent(0.0);        
-        llHTTPResponse(http_incoming_request_id, 200,"");
-        http_incoming_request_id = NULL_KEY;
-        
-        state ready;        
-    }
-    
-    object_rez(key id) 
-    {
-        llHTTPResponse(http_incoming_request_id, 200,(string)id);
-        http_incoming_request_id = NULL_KEY;    
-        state ready;                               
-    }
-    
-    link_message(integer sender_num, integer num, string str, key id)
-    {
-        // Check the channel
-        if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
-            // What was the message?
-            if (str == "do:reset") llResetScript();
-        }  
-    }
- 
-    changed(integer change) {
-
-        if (change & CHANGED_REGION_START) {
-            llResetScript();
-        }
-           
-    }
-}
-
 

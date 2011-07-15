@@ -1,14 +1,13 @@
 /*********************************************
-*  Copyrght (c) 2009 -2012 various contributors (see below)
+*  Copyright (c) 2009 - 2012 various contributors (see below)
 *  Released under the GNU GPL 3.0
 *  This script can be used in your scripts, but you must include this copyright header as per the GPL Licence
 *  For more information about GPL 3.0 - see: http://www.gnu.org/copyleft/gpl.html
 *  This script is part of the SLOODLE Project see http://sloodle.org
 *
-*  
+*  http_in_config_requester
 *  Copyright:
 *  Paul G. Preibisch (Fire Centaur in SL) fire@b3dMultiTech.com  
-*
 *  Edmund Edgar (Edmund Earp in SL) ed@socialminds
 *
 *  This script will get an httpin url, open a shared media page allowing it to be used
@@ -37,7 +36,7 @@ update_inventory()
     // We're going to build a string of all copyable inventory items
 
     inventorystr = "";
-    numitems = llGetInventoryNumber(INVENTORY_ALL);
+    numitems = llGetInventoryNumber(INVENTORY_OBJECT);
     string itemname = "";
     integer numavailable = 0;
     
@@ -48,7 +47,7 @@ update_inventory()
         // Get the name of this item
         itemname = llGetInventoryName(INVENTORY_OBJECT, i);
         // Make sure it's copyable, not a script, and not on the ignore list
-        if((llGetInventoryPermMask(itemname, MASK_OWNER) & PERM_COPY) && llGetInventoryType(itemname) != INVENTORY_SCRIPT ) {
+        if((llGetInventoryPermMask(itemname, MASK_OWNER) & PERM_COPY)) {
             if (numavailable > 0) inventorystr += "\n";
             inventorystr += itemname;
             numavailable++;
@@ -89,16 +88,34 @@ default {
     http_request(key id, string method, string body){
         
           if ((method == URL_REQUEST_GRANTED)){
-        
-                myUrl = body;
+
+                myUrl = body;       
                 
-                string paramstr;
-                paramstr = "&sloodleobjuuid=" + (string)llGetKey() + "&sloodleobjname=" + llEscapeURL(llGetObjectName()) + "&sloodleuuid=" + (string)llGetOwner() + "&sloodleavname=" + llEscapeURL(llKey2Name(llGetOwner()));
+                string paramstr = "&sloodleobjuuid=" + (string)llGetKey() + "&sloodleobjname=" + llEscapeURL(llGetObjectName()) + "&sloodleuuid=" + (string)llGetOwner() + "&sloodleavname=" + llEscapeURL(llKey2Name(llGetOwner()));
+                string path = "/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr;
+
+                // If there's a URL in the object description field, use that for login. 
+                // Otherwise, show a form so the user can input it.
+                string desc = llGetObjectDesc();
+                string url = "";
+                                
+                if ( ( llGetSubString(desc, 0, 6) == "http://" ) || ( llGetSubString(desc, 0, 7) == "https://" ) ) {
+                    
+                    url = desc + path;
+                    
+                } else {
+                                      
+                    // For avatar classroom use:    
+                    //string url = "http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr // avatar classroom
+                    
+                    url = "data:text/html,<div style=\"text-align:center;width:1000px;height:750px;margin-top:200px;font-size:200%\" ><form onsubmit=\"window.location=this.n.value+'"+path+"';return false;\">Moodle URL<br /><input style=\"height:60px;width:800px;margin:50px;\" type=\"text\" name=\"n\"><br /><input style=\":border:1px solid;width:200px;height:50px\" type=\"submit\" value=\"Submit\"></form></div>";
+                
+                }
                            
                 //llOwnerSay("got url URL_REQUEST_GRANTED"+"http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr);
                 llClearPrimMedia(4);
-                llSetPrimMediaParams( 4, [ PRIM_MEDIA_CURRENT_URL, "http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_GROUP ] );
-                
+                llSetPrimMediaParams( 4, [ PRIM_MEDIA_CURRENT_URL, url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_GROUP ] );
+                llSetPrimMediaParams( 4, [ PRIM_MEDIA_HOME_URL, url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_GROUP ] );                
                 state ready;
                 
           }
