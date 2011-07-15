@@ -98,7 +98,7 @@ $layoutid = $cloneid;
 
 	$courselayouts = array();
 
-        include(SLOODLE_LIBROOT.'/object_configs.php');
+        include_once(SLOODLE_LIBROOT.'/object_configs.php');
         $object_configs = SloodleObjectConfig::AllAvailableAsArray();
         $objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();
 

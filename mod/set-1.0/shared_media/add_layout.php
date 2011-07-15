@@ -80,7 +80,7 @@ if (!$layoutid = $layout->insert()) {
 
 	$courselayouts = array();
 
-        include(SLOODLE_LIBROOT.'/object_configs.php');
+        include_once(SLOODLE_LIBROOT.'/object_configs.php');
         $object_configs = SloodleObjectConfig::AllAvailableAsArray();
         $objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();
 
@@ -118,7 +118,6 @@ if (!$layoutid = $layout->insert()) {
                 $courselayouts[$cid] = $layouts;
                 $coursenames[$cid] = $moodle_course->fullname;
         }
-
 
 	include('index.template.php');
 

@@ -159,7 +159,7 @@ function print_add_layout_forms( $courses, $controllers, $rezzeruuid ) {
 		<input id="layoutname" name="layoutname" class="panel" style="width:80%; height:40px; margin:10px;">
 	</div>
 	</fieldset>
-	<span data-creating-text="Creating Scene" data-created-text="Create Scene" class="active_button create_layout_button" type="submit" href="#">Create Scene</span>
+	<span data-creating-text="Creating Scene" data-create-text="Create Scene" class="active_button create_layout_button" type="submit" href="#">Create Scene</span>
     </form>
 <?php
 		}

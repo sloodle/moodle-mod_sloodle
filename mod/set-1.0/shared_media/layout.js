@@ -230,7 +230,9 @@
 					insert_additional_object_html_items( item_list_jq, json.html_list_items, json.add_object_forms, json.edit_object_forms );
 					//itemjq.removeClass('syncing').addClass("synced");
 				} else if (result == 'failed') {
-					alert('failed');
+					// This can often happen legitimately, ie layout is deleted.
+					// Just ignore the failure and carry on.
+					//alert('failed');
 				} else {
 					alert('refresh returned unknown status');
 				}
@@ -395,7 +397,6 @@
 				var courseid = json.courseid;
 				var layoutname = json.layoutname;
 				if (result == 'added') {
-					//alert('added');
 					buttonjq.html( buttonjq.attr('data-create-text') );
 					insert_layout_into_course_divs( layoutid, courseid, layoutname, frmjq);
 

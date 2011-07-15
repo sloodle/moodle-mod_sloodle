@@ -29,11 +29,10 @@ if (!$layoutid) {
 }
 
 $layout = new SloodleLayout();
-if (!$layout->load($layoutid)) {
-	error_output( 'Could not load layout');
-}
-if (!$deleted = $layout->delete()) {
-	error_output( 'Layout deletion failed');
+if ($layout->load($layoutid)) {
+	if (!$deleted = $layout->delete()) {
+		error_output( 'Layout deletion failed');
+	}
 }
 
 $content = array(
