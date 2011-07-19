@@ -54,6 +54,9 @@
     $sloodle->authenticate_request();
     $sloodle->validate_user();
     $sloodle->user->login();
+
+    $sloodle->validate_requirements();
+
     
     // Grab our additional parameters
     $id = $sloodle->request->get_module_id();

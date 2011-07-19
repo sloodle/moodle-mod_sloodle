@@ -462,6 +462,36 @@ class SloodleObjectConfig {
 
 	}
 
+	function awards_pay_options( $interactions = null ) {
+
+		if ($interactions == null) {
+			//$interactions = array('default' => array('awards:interactwithobjectrequires', 'awards:interactwithobjectminus', 'awards:notenoughmessage') );
+			$interactions = array('default' => array('awards:interactwithobjectrequires') );
+		}
+		$configs = array();
+		
+		foreach($interactions as $interactionname => $interactionlabels) {
+
+			$require_points_fieldname      = 'sloodleawardsrequire_numpoints_'.$interactionname;
+			$require_currency_fieldname    = 'sloodleawardsrequire_currency_'.$interactionname;
+			//$withdraw_points_fieldname   = 'sloodleawardswithdraw_numpoints_'.$interactionname;
+			//$withdraw_currency_fieldname = 'sloodleawardswithdraw_currency_'.$interactionname;
+			$not_enough_message_fieldname = 'sloodleawardsrequire_notenoughmessage_'.$interactionname;
+
+			$configs[ $require_points_fieldname ]    = new SloodleConfigurationOptionText( $require_points_fieldname, $interactionlabels[0], '', 0, 8);
+			$configs[ $require_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $require_currency_fieldname, 'awards:currency', '', '', 8);
+			$configs[ $not_enough_message_fieldname]   = new SloodleConfigurationOptionText( $not_enough_message_fieldname, 'awards:notenoughmessage', '', '', 120);
+
+			//$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
+			//$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'awards:currency', '', '', 8);
+
+			$configs[ $require_currency_fieldname ]->is_value_translatable = false;
+			//$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
+		}
+
+		return $configs;
+
+	}
 	function module_choice( $courseid ) {
 
 		if (!$this->module) {
@@ -574,7 +604,7 @@ class SloodleConfigurationOptionText extends SloodleConfigurationOption {
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->description = $description;
-		$this->size = $length;
+		$this->size = $length > 40 ? 40 : $length;
 		$this->max_length = $length;
 		$this->default= $default;
 		$this->type = 'input';

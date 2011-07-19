@@ -199,6 +199,69 @@
 		return true;
 
 	}
+
+	function UserCurrencyBalance( $userid, $currencyid) {
+
+		global $CFG;
+		$userid = intval($userid);
+		$currencyid = intval($currencyid);
+		$balancesql = "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where userid = {$userid} and currencyid = {$currencyid}";
+		$results = sloodle_get_records_sql( $balancesql );
+		if (!$results || ( count($results) == 0) ) {
+  SloodleDebugLogger::log('DEBUG', "nothing found for $balancesql");
+			return 0;
+		}
+		$result = array_shift($results);
+  SloodleDebugLogger::log('DEBUG', "balance for sql $balancesql was ".$result->balance);
+
+		return $result->balance;
+
+	}
+
+	function RequirementFailures( $relevant_configs, $controllerid, $multiplier, $userid ) {
+
+  SloodleDebugLogger::log('DEBUG', "in ProcessRequirements");
+		global $CFG;
+
+		$minimum_balances = array();
+
+		if ( isset($relevant_configs['sloodleawardsrequire_numpoints']) && isset($relevant_configs['sloodleawardsrequire_currency']) ) {
+
+			$numpoints  = intval($relevant_configs['sloodleawardsrequire_numpoints']); 
+			$currencyid = intval($relevant_configs['sloodleawardsrequire_currency']);
+
+			if (!$currencyid) {
+				return false;
+			}
+
+			$minimum_balances[ $currencyid ] = $numpoints;
+			// Check the user's balance for that controller.
+
+  SloodleDebugLogger::log('DEBUG', "need $numpoints of currency $currencyid");
+
+		} else {
+
+  SloodleDebugLogger::log('DEBUG', "no relevant configs");
+		}
+
+
+		if (count($minimum_balances) == 0) {
+			return '';
+		}
+	
+		foreach($minimum_balances as $currencyid => $numpoints) {
+			if ( SloodleModuleAwards::UserCurrencyBalance($userid, $currencyid) < $numpoints ) {
+				if (isset($relevant_configs['sloodleawardsrequire_notenoughmessage']) && $relevant_configs['sloodleawardsrequire_notenoughmessage'] != '') {
+					return $relevant_configs['sloodleawardsrequire_notenoughmessage'];
+				} else {
+					return get_string('awards:notenoughcurrency', 'sloodle');
+				}
+			}
+		}
+
+		return '';
+
+	}
 	
 	function InteractionConfigNames() {
 		return array(
@@ -208,6 +271,18 @@
                         'sloodleawardswithdraw_currency'
 		);
 	}
+
+	function RequirementConfigNames() {
+		return array(
+                        'sloodleawardsrequire_numpoints',
+                        'sloodleawardsrequire_currency',
+                        //'sloodleawardswithdraw_numpoints',
+                        //'sloodleawardswithdraw_currency',
+			'sloodleawardsrequire_notenoughmessage'
+		);
+	}
+
+
 
     }
 ?>

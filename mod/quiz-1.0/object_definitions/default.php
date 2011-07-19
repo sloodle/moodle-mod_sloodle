@@ -20,6 +20,6 @@ $sloodleconfig->field_sets = array(
 		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(), 
 		'sloodleserveraccesslevel'     => $sloodleconfig->access_level_server_option(),
 	),
-        'awards' => $sloodleconfig->awards_setting_options() 
+        'awards' => array_merge( $sloodleconfig->awards_setting_options(), $sloodleconfig->awards_pay_options() )
 );
 ?>

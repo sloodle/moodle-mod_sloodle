@@ -536,6 +536,60 @@
 		return null;
 	}
 
+
+	public function requirement_failures( $plugin_class, $interaction, $multiplier, $userid ) {
+
+		SloodleDebugLogger::log('DEBUG', 'in requirement_failures');
+		if ( !$userid = intval($userid) ) {
+		SloodleDebugLogger::log('DEBUG', 'userid missing');
+			return false;
+		}
+
+		if ( $multiplier == 0 ) {
+		SloodleDebugLogger::log('DEBUG', 'multiplier missing');
+			return false;
+		}
+
+		if (!class_exists($plugin_class)) {
+		SloodleDebugLogger::log('DEBUG', 'plugin class $plugin_class not found');
+			return false;
+		}
+
+		// Find each of the tasks we have to handle for the interaction.
+		// This information is stored in the object config
+		$relevant_configs = array();
+
+		$relevant_config_names = call_user_func(array($plugin_class, 'RequirementConfigNames'));
+		SloodleDebugLogger::log('DEBUG', 'found config names'.join(':', $relevant_config_names));
+
+		// TODO: It might be (marginally) more efficient to filter this for things we're interested in in the query.
+		$all_configs = sloodle_get_records('sloodle_object_config', 'object', $this->id);
+		foreach($relevant_config_names as $configname) {
+			$fieldname = $configname.'_'.$interaction;
+			foreach($all_configs as $c) {
+				if ($c->name == $fieldname) {
+					$relevant_configs[ $configname] = $c->value;
+				}				
+			}
+		}
+
+
+		if (count($relevant_configs) == 0) {
+		SloodleDebugLogger::log('DEBUG', 'no relevant configs');
+			// Nothing to do here
+			return false;
+		}
+
+		if (!$controllerid = intval($this->controllerid) ) {
+		SloodleDebugLogger::log('DEBUG', 'no controller id');
+			return false;
+		}
+
+		SloodleDebugLogger::log('DEBUG', 'about to call '.$plugin_class.'RequirementFailures');
+		return call_user_func_array( array($plugin_class, 'RequirementFailures'), array( $relevant_configs, $controllerid, $multiplier, $userid ));
+
+	}
+
 	public function process_interactions( $plugin_class, $interaction, $multiplier, $userid ) {
 
 		if ( !$userid = intval($userid) ) {

@@ -17,6 +17,7 @@ $sloodleconfig->field_sets = array(
 	'accesslevel' => array(
 		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(),
 		'sloodleobjectaccesslevelctrl' => $sloodleconfig->access_level_object_control_option()
-	)
+	),
+	'awards' => $sloodleconfig->awards_pay_options()
 );
 ?>

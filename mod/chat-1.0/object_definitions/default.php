@@ -19,6 +19,8 @@ $sloodleconfig->field_sets = array(
 		'sloodleserveraccesslevel'     => $sloodleconfig->access_level_server_option(),
 		'sloodleobjectaccesslevelctrl' => $sloodleconfig->access_level_object_control_option(),
 	),
-        'awards' => $sloodleconfig->awards_setting_options() // Allows you to award points for taking part in a discussion. Not sure if we want to display this or not...
+//        'awards' => $sloodleconfig->awards_setting_options() // Allows you to award points for taking part in a discussion. Not sure if we want to display this or not...
+        'awards' => $sloodleconfig->awards_pay_options()
+
 );
 ?>

@@ -588,10 +588,23 @@
                 // Add a side effect code to our response data
                 $this->response->add_side_effect(422);
             }
-            
+	   
             // Make sure the user is logged-in
             return ($this->user->login());
         }
+
+	function validate_requirements($interaction = 'default', $multiplier = 1) {
+
+	    if (!is_null($this->active_object)) {
+	        if ($error_message = $this->active_object->requirement_failures( 'SloodleModuleAwards', 'default', $multiplier, $this->user->get_user_id())) {
+	    	    $this->response->quick_output(-1001, 'AWARDS', $error_message, false);
+	            exit();
+	        }
+	    }
+
+ 	    return true;
+         
+	}
         
         /**
         * Validate the avatar specified in the request, to ensure it is registered to a Moodle account.

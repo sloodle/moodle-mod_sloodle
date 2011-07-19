@@ -47,6 +47,9 @@
     if ($sloodleserveraccesslevel == 0) $sloodle->validate_user(false);
     else $sloodle->validate_user(true);
 
+
+    $sloodle->validate_requirements();
+
     
     // Has an incoming message been provided?
     $message = sloodle_clean_for_db($sloodle->request->optional_param('message', null));
