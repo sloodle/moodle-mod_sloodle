@@ -7,7 +7,7 @@ function print_html_top($loadfrom = '') {
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Avatar Classroom Setup</title>
+<title><?= s(get_string('rezzer:sloodlesetup', 'sloodle')) ?></title>
 <link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
 <style type="text/css" media="screen">@import "<?=$loadfrom?>iui/iui_avatarclassroom.css";</style>
 <style type="text/css" media="screen">@import "<?=$loadfrom?>layout.css";</style>
@@ -29,8 +29,8 @@ function print_toolbar( $baseurl ) {
 ?>
     <div class="toolbar">
         <h1 id="pageTitle"></h1>
-        <a id="backButton" class="button" href="#sitelist">Avatar Classroom</a>
-        <a class="button" onclick="document.location.href = '<?= $baseurl.'&logout=1&ts='.time()?>'" href="<?= $baseurl.'&logout=1&ts='.time()?>">Logout</a>
+        <a id="backButton" class="button" href="#sitelist"><?= s(get_string('rezzer:avatarclassroom', 'sloodle')) ?></a>
+        <a class="button" onclick="document.location.href = '<?= $baseurl.'&logout=1&ts='.time()?>'" href="<?= $baseurl.'&logout=1&ts='.time()?>"><?= s(get_string('rezzer:logout', 'sloodle')) ?></a>
     </div>
 <?php
 }
@@ -39,15 +39,15 @@ function print_toolbar( $baseurl ) {
 // Never actually loaded - we intercept "sitelist" and use it to redirect to the api. site.
 function print_site_placeholder( $sitesURL ) {
 ?>
-	<div id="sitelist" data-parent-url="<?= $sitesURL ?>" title="Avatar Classroom"></div>
+	<div id="sitelist" data-parent-url="<?= $sitesURL ?>" title="<?= s(get_string('rezzer:avatarclassroom', 'sloodle'))?>"></div>
 <?php
 }
 
 function print_site_list( $sites ) {
 ?>
      
-    <ul id="sitelist" title="Avatar Classroom" selected="true">
-        <li class="group">Sites</li>
+    <ul id="sitelist" title="<?= s(get_string('rezzer:avatarclassroom','sloodle')) ?>" selected="true">
+        <li class="group"><?= s(get_string('rezzer:sites', 'sloodle')) ?></li>
 	<?php foreach($sites as $site) { ?>
 	<?php if ('http://'.$_SERVER["SERVER_NAME"] == $site) { ?>
         <li><a class="active_site_link" href="#site_1"><?=$site?></a></li>
@@ -56,8 +56,8 @@ function print_site_list( $sites ) {
 	<?php } ?>
 	<?php } ?>
 	<li></li>
-        <li class="group">Add a site</li>
-        <li><a href="#addsite">Add a site</a></li>
+        <li class="group"><?= s(get_string('rezzer:addsite', 'sloodle'))?></li>
+        <li><a href="#addsite"><?= s(get_string('rezzer:addsite', 'sloodle'))?></a></li>
 	<li ></li>
     </ul>
 
@@ -70,7 +70,7 @@ $full = false;
 ?>
 
     <ul id="site_1" data-parent="sitelist" title="<?= "http://".$_SERVER["SERVER_NAME"]?>" <?= $hasSites ? '' : ' selected="true"' ?> >
-        <li class="group">Courses enabled for Sloodle</li>
+        <li class="group"><?= s(get_string('rezzer:controllers', 'sloodle'))?></li>
 	<?php 
 	foreach($courses as $course) { 
 		$cid = $course->id; 
@@ -86,8 +86,8 @@ $full = false;
 ?>
 <?php if ($full) { ?>
 	<li></li>
-        <li class="group">Add a course</li>
-        <li><a href="#addcontroller">Add a course</a></li>
+        <li class="group"><?= s(get_string('rezzer:addcontroller', 'sloodle'))?></li>
+        <li><a href="#addcontroller"></a></li>
 	<li></li>
 <?php } ?>
     </ul>
@@ -97,11 +97,11 @@ $full = false;
     <form data-parent="site_1" id="addcontroller" class="panel" title="Add a Course">
     <fieldset>
        <div class="row" style="height:60px;">
-          <label for="course_name" name="course_name">Name</label>
+          <label for="course_name" name="course_name"><?= s(get_string('rezzer:name', 'sloodle'))?></label>
           <input id="course_name" name="course_name" class="panel" style="width:80%; height:40px; margin:10px;">
        </div>
        <div class="row" style="height:60px;">
-          <label for="course">Course</label>
+          <label for="course"><?= s(get_string('rezzer:course'))?></label>
           <select id="course" class="az" name="course" style="height:40px; width:80%; margin:10px;">
 	  <option value="1">Japanese For Beginners</option>
         <option value="2">Spanish For Dummies</option>
@@ -135,8 +135,8 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 			}
 ?>
 	<li class="add_layout_above_me"></li>
-        <li class="group">Add a scene</li>
-        <li><a href="#addlayout_<?= intval($cid) ?>-<?= intval($contid) ?>">Add a scene</a></li>
+        <li class="group"><?= s(get_string('rezzer:addlayout', 'sloodle'))?></li>
+        <li><a href="#addlayout_<?= intval($cid) ?>-<?= intval($contid) ?>"><?= s(get_string('rezzer:addlayout', 'sloodle'))?></a></li>
     </ul>
 <?php 
 		}
@@ -150,16 +150,16 @@ function print_add_layout_forms( $courses, $controllers, $rezzeruuid ) {
 		$cid = $course->id;
 		foreach($controllers[$cid] as $contid => $cont) {
 ?>
-    <form data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" id="addlayout_<?= intval($cid)?>-<?= intval($contid) ?>" class="panel" title="Add a Scene to <?= htmlentities($course->fullname) ?>">
+    <form data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" id="addlayout_<?= intval($cid)?>-<?= intval($contid) ?>" class="panel" title="<?= s(get_string('rezzer:addlayout', 'sloodle'))?> <?= s($course->fullname) ?>">
 	<input type="hidden" name="courseid" value="<?= intval($cid)?>" />
-	<input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid)?>" />
+	<input type="hidden" name="rezzeruuid" value="<?= s($rezzeruuid)?>" />
 	<fieldset>
 	<div class="row" >
-		<label for="layoutname">Name</label>
+		<label for="layoutname"><?= s(get_string('rezzer:layoutname', 'sloodle'))?></label>
 		<input id="layoutname" name="layoutname" class="panel" style="width:80%; height:40px; margin:10px;">
 	</div>
 	</fieldset>
-	<span data-creating-text="Creating Scene" data-create-text="Create Scene" class="active_button create_layout_button" type="submit" href="#">Create Scene</span>
+	<span data-creating-text="<?= s(get_string('rezzer:creatingscene', 'sloodle'))?>" data-create-text="<?= s(get_string('rezzer:createscene','sloodle'))?>" class="active_button create_layout_button" type="submit" href="#"><?= s(get_string('rezzer:createscene','sloodle'))?></span>
     </form>
 <?php
 		}
@@ -192,11 +192,11 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 
 ?>
 			    <ul data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>" data-rez-mode="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-action-status="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-connection-status="disconnected">
-				<li class="group"><?= htmlentities( $layout->name ) ?></li>
+				<li class="group"><?= s( $layout->name ) ?></li>
 				<span id="set_configuration_status_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="button_goes_here_zone set_configuration_status"><?=get_string('layoutmanager:connectingtorezzer','sloodle') ?></span>
-				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button rez_all_objects">Rez All Objects</span>
+				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button rez_all_objects"><?= s(get_string('rezzer:rezallobjects', 'sloodle'))?></span>
 
-				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-generate-text="Import Moodle Activities for <?=htmlentities( $cn ) ?>" data-generating-text="Importing Moodle Activities" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout">Import Moodle Activities for <?=htmlentities( $cn ) ?></span>
+				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-generate-text="<?= s(get_string('rezzer:importmoodleactivities','sloodle', $cn )) ?>" data-generating-text="<?= s(get_string('rezzer:importingmoodleactivities', 'sloodle'))?>" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout"><?= s(get_string('rezzer:importmoodleactivities', 'sloodle', $cn )) ?></span>
 <?php
 				foreach($entriesbygroup as $group => $entries) {
 ?>
@@ -221,18 +221,18 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 
 					}
 ?>
-					<li class="after_group_<?=$group?>"><a href="#addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>">Add objects<!--: <?= get_string('objectgroup:'.$group,'sloodle') ?>--></a></li>
+					<li class="after_group_<?=$group?>"><a href="#addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?=s(get_string('rezzer:addobjects', 'sloodle'))?></a></li>
 					<li></li>
 <?php
 				}
 ?>
 
-				<span class="active_button sync_object_positions" style="width:98%" type="submit" href="#clonelayout">Save current positions</span>
+				<span class="active_button sync_object_positions" style="width:98%" type="submit" href="#clonelayout"><?= s(get_string('rezzer:savecurrentposition', 'sloodle'))?></span>
 				<br />
-				<span class="active_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="Deleted, derezzing objects" data-delete-text="Delete this Scene" data-deleting-text="Deleting Scene" style="float:right; width:40%" type="submit">Delete this scene</span>
+				<span class="active_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="<?= s(get_string('rezzer:deletedderezzingobjects', 'sloodle')) ?>" data-delete-text="<?= s(get_string('rezzer:deletelayout'))?>" data-deleting-text="<?= s(get_string('rezzer:deletinglayout','sloodle'))?>" style="float:right; width:40%" type="submit"><?= s(get_string('rezzer:deletelayout', 'sloodle'))?></span>
 				<span class="active_button clone_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-cloned-text="Clone this scene" data-cloning-text="Cloning scene" data-clone-text="Clone this scene" style="width:40%" type="submit" >Clone this scene</span>
 					
-				<span class="active_button rename_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-renamed-text="Rename this scene" data-rename-text="Rename scene" data-renaming-text="Renaming Scene" class="active_button" style="width:40%" type="submit" ><span class="rename_label">Rename this scene</span> <span class="rename_input"><input class="rename_layout_input" data-rename-input-layoutid="<?= intval($layout->id) ?>" value="<?= htmlentities( $layout->name ) ?>" /> <span class="rename_input_save_button">Rename</span></span></span>
+				<span class="active_button rename_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-renamed-text="<?= s(get_string('rezzer:renamelayout'))?>" data-rename-text="<?= s(get_string('rezzer:renamelayout','sloodle'))?>" data-renaming-text="<?= s(get_string('rezzer:renaminglayout'))?>" class="active_button" style="width:40%" type="submit" ><span class="rename_label"><?= s(get_string('rezzer:renamelayout','sloodle'))?></span> <span class="rename_input"><input class="rename_layout_input" data-rename-input-layoutid="<?= intval($layout->id) ?>" value="<?= s( $layout->name ) ?>" /> <span class="rename_input_save_button"><?=s(get_string('rezzer:renamebutton','sloodle'))?></span></span></span>
 
 			    </ul>
 
@@ -256,7 +256,7 @@ function print_rezzable_item_li( $e, $cid, $contid, $layout, $isrezzed) {
 					<li><a href="#<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?= intval($e->id) ?>"><?= htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
 	*/ ?>
 							<?php /* NB If you change this, you also need to change layout.js, which creates some of these dynamically. */ ?>
-							<li data-layoutentryid="<?= $e->id?>" id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item <?= ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= htmlentities($entryname) ?><span class="module_info"><?=htmlentities($modTitle)?></span><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
+							<li data-layoutentryid="<?= $e->id?>" id="layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>" class="rezzable_item <?= ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>-<?=intval( $e->id ) ?>"><?= s($entryname) ?><span class="module_info"><?=s($modTitle)?></span><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
 <?php
 }
 
@@ -264,7 +264,7 @@ function print_add_object_item_li( $object_title, $config, $cid, $contid, $layou
 	$object_title = preg_replace('/^SLOODLE /', '', $object_title);
 	$id = "linkto_addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
 ?>
-        <li id="<?=$id?>"><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>"><?= htmlentities($object_title) ?></a></li>
+        <li id="<?=$id?>"><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>"><?= s($object_title) ?></a></li>
 <?php 
 	return $id;
 
@@ -285,8 +285,8 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
 <?php 
 				foreach($objectconfigsbygroup as $group => $groupobjectconfigs) {
 ?>
-    <ul <?= $group == 'misc' ? 'class="object_group_misc"' : '' ?> data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" id="addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?>">
-        <li class="group">Add objects: <?= htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?></li>
+    <ul <?= $group == 'misc' ? 'class="object_group_misc"' : '' ?> data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" id="addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?=s(get_string('rezzer:addobjectsforgroup', 'sloodle', $group) ) ?>">
+        <li class="group"><?=s(get_string('rezzer:addobjectsforgroup', 'sloodle', $group) ) ?></li>
 <?php
 	foreach($groupobjectconfigs as $object_title => $config) {
 		print_add_object_item_li( $object_title, $config, $cid, $contid, $layout );
@@ -341,8 +341,8 @@ But once it's been added, it will be clone()d to make a form to update the objec
 function print_add_object_form( $config, $cid, $contid, $layout, $object_title, $rezzeruuid ) {
 	$id = "addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
 ?>
-<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="<?=$id?>" title="<?= htmlentities($object_title) ?>">
-<span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" data-adding-text="Adding <?= htmlentities( $object_title ) ?>" data-add-text="Add <?= htmlentities( $object_title ) ?>" class="active_button add_to_layout_button" target="_self" type="submit">Add <?= htmlentities( $object_title ) ?></span>
+<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="<?=$id?>" title="<?= s($object_title) ?>">
+<span data-updating-text="<?= s(get_string('rezzer:updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?>" data-adding-text="<?= s( get_string('rezzer:addingobject', 'sloodle', $object_title )) ?>" data-add-text="<?= s( get_string('rezzer:addobject', 'sloodle', $object_title )) ?>" class="active_button add_to_layout_button" target="_self" type="submit"><?= s( get_string('rezzer:addobject', 'sloodle', $object_title) )  ?></span>
 <input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid) ?>" />
 <input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities($config->group) ?>" />
@@ -384,7 +384,7 @@ not radio: <?=$ctrl->type?>
 <?php } ?>
 </fieldset>
 <?php } ?>
-<span data-delete-text="Delete <?= htmlentities($object_title) ?>" data-deleting-text="Deleting <?= htmlentities($object_title) ?>" class="active_button delete_layout_entry_button hiddenButton" style="width:40%; float:right" type="submit">Delete <?= htmlentities($object_title) ?></span>
+<span data-delete-text="<?= s(get_string('deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('deletingobject', 'sloodle', $object_title)) ?>" class="active_button delete_layout_entry_button hiddenButton" style="width:40%; float:right" type="submit"><?= s(get_string('deleteobject', 'sloodle', $object_title)) ?></span>
 </form>
 
 <br />
@@ -435,8 +435,8 @@ function print_config_form( $e, $config, $cid, $contid, $lid, $group, $rezzeruui
 	$id = "configure_layoutentryid_{$cid}-{$contid}-{$lid}-{$e->id}";
 
 ?>
-<form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="<?=$id?>" class="panel" title="<?= htmlentities($object_title) ?>">
-<span data-updating-text="Updating <?= htmlentities( $object_title ) ?>" data-update-text="Update <?= htmlentities( $object_title ) ?>" class="active_button update_layout_entry_button" target="_self" type="submit">Update <?= htmlentities( $object_title ) ?></span>
+<form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="<?=$id?>" class="panel" title="<?= s($object_title) ?>">
+<span data-updating-text="<?= s(get_string('updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('updateobject', 'sloodle', $object_title )) ?>" class="active_button update_layout_entry_button" target="_self" type="submit"><?= s(get_string('updateobject', 'sloodle', $object_title )) ?></span>
 <input type="hidden" name="layoutid" value="<?= intval($lid) ?>" />
 <input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid) ?>" />
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
@@ -478,7 +478,7 @@ not radio: <?=$ctrl->type?>
 </fieldset>
 <?php } ?>
 
-<span data-delete-text="Delete <?= htmlentities($object_title) ?>" data-deleting-text="Deleting <?= htmlentities($object_title) ?>" class="active_button delete_layout_entry_button" style="width:40%; float:right" type="submit">Delete <?= htmlentities($object_title) ?></span>
+<span data-delete-text="<?= s(get_string('deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('deletingobject', 'sloodle', $object_title)) ?>" class="active_button delete_layout_entry_button" style="width:40%; float:right" type="submit"><?= s(get_string('deleteobject', 'sloodle', $object_title)) ?></span>
 
 </form>
 
