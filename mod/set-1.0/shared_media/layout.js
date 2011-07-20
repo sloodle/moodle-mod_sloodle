@@ -67,6 +67,11 @@
 			pendingRequests[""+entryid] = new Date().getTime();	
 			itemspanjq.removeClass( 'waiting_to_rez' );
 			itemspanjq.addClass( 'rezzing' );
+
+			// TODO: Stop sharing layouts between controllers and kill this
+			$(".rezzable_item [data-layoutentryid='"+itemspanjq.attr('data-layoutentryid')+"']").removeClass( 'waiting_to_rez' );
+			$(".rezzable_item [data-layoutentryid='"+itemspanjq.attr('data-layoutentryid')+"']").addClass( 'rezzing' );
+
 			rez_layout_item( itemspanjq, entryid, controllerid, parentjq );
 		} else if ( itemspanjq.hasClass( 'waiting_to_derez' ) ) {
 			if (!pendingRequests[""+entryid]) {
@@ -75,6 +80,11 @@
 			pendingRequests[""+entryid] = new Date().getTime();	
 			itemspanjq.removeClass( 'waiting_to_derez' );
 			itemspanjq.addClass( 'derezzing' );
+
+			// TODO: Stop sharing layouts between controllers and kill this
+			$(".rezzable_item [data-layoutentryid='"+itemspanjq.attr('data-layoutentryid')+"']").removeClass( 'waiting_to_derez' );
+			$(".rezzable_item [data-layoutentryid='"+itemspanjq.attr('data-layoutentryid')+"']").addClass( 'derezzing' );
+
 			derez_layout_item( itemspanjq, entryid, controllerid, parentjq );
 		} else if ( itemspanjq.hasClass( 'waiting_to_sync' ) ) {
 			if (!pendingRequests[""+entryid]) {
@@ -83,6 +93,11 @@
 			pendingRequests[""+entryid] = new Date().getTime();	
 			itemspanjq.removeClass( 'waiting_to_sync' );
 			itemspanjq.addClass( 'syncing' );
+
+			// TODO: Stop sharing layouts between controllers and kill this
+			$(".rezzable_item [data-layoutentryid='"+itemspanjq.attr('data-layoutentryid')+"']").removeClass( 'waiting_to_sync' );
+			$(".rezzable_item [data-layoutentryid='"+itemspanjq.attr('data-layoutentryid')+"']").addClass( 'syncing' );
+
 			sync_layout_item( itemspanjq, entryid, controllerid );
 		}
 
@@ -780,6 +795,48 @@
 		
 	}
 
+	function refresh_form_options( frmjq ) {
+		var courseid = frmjq.attr('data-courseid');
+		var primname = frmjq.attr('data-primname');
+		$.getJSON(  
+			"refresh_options.php",  
+			{
+				courseid: courseid,
+				primname: primname,
+				ts: new Date().getTime()
+			},
+			function(json) {  
+				var result = json.result;
+				if (result == 'refreshed') {
+					var fields = json.fields;
+					for (var fn in fields) {
+						// This assumes we only have radios, not selects etc.
+						var ops = fields[fn];
+						var existing_ops = frmjq.find('.sloodle_config').find('input:radio');
+						for (var o in ops) {
+							if ( existing_ops.filter('[name='+fn+']').filter('[value='+o+']').length > 0 ) {
+								// already got it
+							} else {
+								var newinput = '<input type="radio" name="'+fn+'" value="'+o+'" />' + ops[o] + '&nbsp; &nbsp;';
+								var existing_op_items = existing_ops.filter('[name='+fn+']');
+								if (existing_op_items.length == 0) {
+									// not there yet - should have a placeholder instead
+									frmjq.find('.no_options_placeholder').filter('[data-fieldname='+fn+']').before(newinput);
+									frmjq.find('.no_options_placeholder').filter('[data-fieldname='+fn+']').remove();
+								} else {
+									existing_op_items.filter(':first').before( newinput );
+								}
+							}
+						}
+						// TODO: Should really remove old ones that no longer exist...
+					}
+				} else if (result == 'failed') {
+					alert('refresh failed');
+				}
+			}  
+		);  
+	}
+
 	function configure_set( layoutlinkjq ) {
 		var layoutjqid = layoutlinkjq.attr('href'); // looks like #layout_2-2-1
 		var parentjq = $(layoutjqid); // the "#" happens to be the same notation as that used for the jquery id selector
@@ -866,6 +923,10 @@
 
 		$().find('.populate_object_group').unbind('click').click( function() {
 			return refresh_misc_object_group( $(this).closest('ul') );
+		});
+
+		$('.refresh_config_button').unbind('click').click( function() {
+			refresh_form_options( $(this).closest('form') );	
 		});
 	}
 
@@ -960,6 +1021,10 @@
 			fromPage = document.getElementById( $('[selected*="true"]').attr('id') );
 			toPage   = document.getElementById( targetjq.attr('id') );
 			//targetjq.attr('selected','true'); // Select the target
+
+			if ( (targetjq.hasClass('add_object_form')) || (targetjq.hasClass('edit_object_form')) ) {
+				refresh_form_options( targetjq );
+			}
 
 			// Something went wrong - do the best we can, using jquery
 			if ( (fromPage == null) || (toPage == null) ) {

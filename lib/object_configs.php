@@ -60,6 +60,9 @@ class SloodleObjectConfig {
 	// ...but the objects will have to know how to report their own codes.
 	function ForObjectType($modname, $objcode = 'default') {
 
+		if ( !preg_match('/^[a-zA-Z0-9_-]+$/',$objcode) ) {
+			return false;
+		}
 		if ($objcode == '') {
 			$objcode = 'default';
 		}
@@ -127,8 +130,14 @@ class SloodleObjectConfig {
 		closedir($dh);
 
 		return $object_configs;
+		//usort( $object_configs, array('SloodleObjectConfig', 'object_config_cmp') );
+
 
         }
+
+	function object_config_cmp($a, $b) {
+		return $a->primname > $b->primname;
+	}
 
 	/*
 	Static function returning a list of names of objects that want to be notified about something happening on the server.
@@ -657,7 +666,7 @@ class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOptio
 
 	function SloodleConfigurationOptionCurrencyChoice( $fieldname, $title, $description, $default = '', $length = 8 ) {
 
-		if (!$currencies = sloodle_get_records('sloodle_currency_types') ) {
+		if ( !$currencies = SloodleCurrency::FetchAll() ) {
 			return false;
 		}
 
@@ -666,13 +675,15 @@ class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOptio
 			$options[$c->id] = $c->name;
 		}
 
+		$first_currency = array_shift($currencies);
+
 		$this->fieldname = $fieldname;
 		$this->title = $title;
 		$this->description = $description;
 		$this->size = $length;
 		$this->options = $options;
 		$this->max_length = $length;
-		$this->default= $default;
+		$this->default = $currencies[0]->id;
 		$this->type = 'radio';
 		$this->is_value_translatable = false;
 	}

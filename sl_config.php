@@ -130,7 +130,7 @@
 
 //---------------------------------------------------------------------
 
-    // Debugging contants 
+    // Debugging / development constants 
 
     /** The following will turn on logging of requests coming from LSL and responses going back */
     /*   
@@ -140,5 +140,12 @@
         ...so if you turn this on, be careful about who has access to the file it creates.
     */
     define('SLOODLE_DEBUG_REQUEST_LOG', '/tmp/sloodle_debug.log');
+
+    // TODO: Implement this:
+    /** The following tells objects that we want them to persist their config over resets, and copy it to new objects that are copied.
+    * This should usually be on, but if you're developing a set to share with other people, it's better to turn it off
+    * That way the objects you rez won't have your server details in them.
+    */
+    define('SLOODLE_ENABLE_OBJECT_PERSISTANCE', true);
 
 ?>

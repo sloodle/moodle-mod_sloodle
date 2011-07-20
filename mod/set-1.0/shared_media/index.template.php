@@ -78,7 +78,7 @@ $full = false;
 		if (isset($controllers[$cid])) { 
 			foreach($controllers[$cid] as $contid=>$cont) {
 ?>
-				<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?></a></li>
+				<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= s( $cn ) ?> <?= s( $cont->name ) ?></a></li>
 <?php
 			}
 		}
@@ -341,7 +341,7 @@ But once it's been added, it will be clone()d to make a form to update the objec
 function print_add_object_form( $config, $cid, $contid, $layout, $object_title, $rezzeruuid ) {
 	$id = "addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
 ?>
-<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="<?=$id?>" title="<?= s($object_title) ?>">
+<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="<?=$id?>" title="<?= s($object_title) ?>" data-primname="<?= s($config->primname)?>" data-courseid="<?=intval($cid)?>"  >
 <span data-updating-text="<?= s(get_string('rezzer:updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?>" data-adding-text="<?= s( get_string('rezzer:addingobject', 'sloodle', $object_title )) ?>" data-add-text="<?= s( get_string('rezzer:addobject', 'sloodle', $object_title )) ?>" class="active_button add_to_layout_button" target="_self" type="submit"><?= s( get_string('rezzer:addobject', 'sloodle', $object_title) )  ?></span>
 <input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid) ?>" />
 <input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
@@ -356,8 +356,8 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <fieldset>
 <div class="row">
 <label for="<?= 'sloodlemoduleid' ?>"><?= get_string($config->module_choice_message, 'sloodle') ?></label>
-<span class="sloodle_config">
-<?= $moduleoptionselect ? $moduleoptionselect : get_string($config->module_no_choices_message, 'sloodle') ?>
+<span class="sloodle_config data-fieldname="sloodlemoduleid">
+<?= $moduleoptionselect ? $moduleoptionselect : '<span class="no_options_placeholder" data-fieldname="sloodlemoduleid">'.get_string($config->module_no_choices_message, 'sloodle').'</span>' ?>
 </span>
 </div>
 </fieldset>
@@ -369,7 +369,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <?php $fieldname = $ctrl->fieldname; ?>
 <div class="row">
 <label for="<?= $fieldname ?>"><?= get_string($ctrl->title, 'sloodle') ?></label>
-<span class="sloodle_config">
+<span class="sloodle_config object_<?= s($config->object_code)?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>">
 <?php if ( ($ctrl->type == 'radio') || ($ctrl->type == 'yesno') ) { ?>
 <?php foreach($ctrl->options as $opn => $opv) { ?>
 <input type="radio" name="<?= $fieldname ?>" value="<?= $opn ?>" <?= $opn == $ctrl->default ? 'checked ' : '' ?>> <?= $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?> &nbsp; &nbsp; 
@@ -384,7 +384,10 @@ not radio: <?=$ctrl->type?>
 <?php } ?>
 </fieldset>
 <?php } ?>
-<span data-delete-text="<?= s(get_string('deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('deletingobject', 'sloodle', $object_title)) ?>" class="active_button delete_layout_entry_button hiddenButton" style="width:40%; float:right" type="submit"><?= s(get_string('deleteobject', 'sloodle', $object_title)) ?></span>
+<span data-delete-text="<?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('rezzer:deletingobject', 'sloodle', $object_title)) ?>" class="active_button delete_layout_entry_button hiddenButton" style="width:40%; float:right" type="submit"><?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?></span>
+
+<span data-refresh-text="<?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?>" data-updating-text="<?= s(get_string('rezzer:refreshingconfig', 'sloodle', $object_title)) ?>" class="active_button refresh_config_button" style="width:40%; float:right" type="submit"><?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?></span>
+
 </form>
 
 <br />
@@ -435,8 +438,8 @@ function print_config_form( $e, $config, $cid, $contid, $lid, $group, $rezzeruui
 	$id = "configure_layoutentryid_{$cid}-{$contid}-{$lid}-{$e->id}";
 
 ?>
-<form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="<?=$id?>" class="panel" title="<?= s($object_title) ?>">
-<span data-updating-text="<?= s(get_string('updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('updateobject', 'sloodle', $object_title )) ?>" class="active_button update_layout_entry_button" target="_self" type="submit"><?= s(get_string('updateobject', 'sloodle', $object_title )) ?></span>
+<form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="<?=$id?>" class="panel edit_object_form" title="<?= s($object_title) ?>" data-primname="<?= s($config->primname)?>" data-courseid="<?=intval($cid)?>">
+<span data-updating-text="<?= s(get_string('rezzer:updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?>" class="active_button update_layout_entry_button" target="_self" type="submit"><?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?></span>
 <input type="hidden" name="layoutid" value="<?= intval($lid) ?>" />
 <input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid) ?>" />
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
@@ -448,8 +451,8 @@ $moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemodu
 <fieldset>
 <div class="row">
 <label for="<?= $fieldname ?>"><?= get_string($config->module_choice_message, 'sloodle') ?></label>
-<span class="sloodle_config">
-<?= $moduleoptionselect ? $moduleoptionselect : get_string($config->module_no_choices_message, 'sloodle') ?>
+<span class="sloodle_config" data-courseid="<?=intval($cid)?>" data-fieldname="sloodlemoduleid" >
+<?= $moduleoptionselect ? $moduleoptionselect : '<span class="no_options_placeholder" data-fieldname="sloodlemoduleid">'.get_string($config->module_no_choices_message, 'sloodle').'</span>' ?>
 </span>
 </div>
 </fieldset>
@@ -462,7 +465,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemodu
 <?php 	$val = isset($lconfig[$fieldname]) ? $lconfig[$fieldname] : ''; ?>
 <div class="row">
 <label for="<?= $fieldname ?>"><?= get_string($ctrl->title, 'sloodle') ?></label>
-<span class="sloodle_config">
+<span class="sloodle_config object_<?= s($config->object_code)?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>" >
 <?php if ( ($ctrl->type == 'radio') || ($ctrl->type == 'yesno') ) { ?>
 <?php foreach($ctrl->options as $opn => $opv) { ?>
 <input type="radio" name="<?= $fieldname ?>" value="<?= $opn ?>" <?= $opn == $val ? 'checked ' : '' ?>> <?= $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?> &nbsp; &nbsp; 
@@ -478,7 +481,9 @@ not radio: <?=$ctrl->type?>
 </fieldset>
 <?php } ?>
 
-<span data-delete-text="<?= s(get_string('deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('deletingobject', 'sloodle', $object_title)) ?>" class="active_button delete_layout_entry_button" style="width:40%; float:right" type="submit"><?= s(get_string('deleteobject', 'sloodle', $object_title)) ?></span>
+<span data-delete-text="<?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('rezzer:deletingobject', 'sloodle', $object_title)) ?>" class="active_button delete_layout_entry_button" style="width:40%; float:right" type="submit"><?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?></span>
+
+<span data-refresh-text="<?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?>" data-updating-text="<?= s(get_string('rezzer:refreshingconfig', 'sloodle', $object_title)) ?>" class="active_button refresh_config_button" style="width:40%; float:right" type="submit"><?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?></span>
 
 </form>
 
