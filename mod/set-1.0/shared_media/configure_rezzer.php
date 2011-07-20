@@ -41,8 +41,8 @@ if ( !$rezzer->loadByUUID($rezzeruuid) ) {
 }
 
 // TODO: Make this check for a change in the site name, then remove the "true" to avoid pointless reconfiguration
-//if (true || ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {
-if ( ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {
+if (true || ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {
+//if ( ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {
 	$rezzer->controllerid = $controllerid;
 	if (!$rezzer->save()) {
 		error_output('Updating rezzer failed');

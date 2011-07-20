@@ -13,6 +13,9 @@
 
 	var timer; // Timer var used to coordinate the eventLoop, which checks for outstanding tasks and kicks them off.
 
+	var isRezzerConfigured = false;
+	var rezzerControllerID = null;
+	
 	function purgeRequestList() {
 	// TODO: Purge the request list of things that have timed out.
 	// That will cause the script to try them again next time they get their turn in the eventLoop.
@@ -173,6 +176,7 @@
 			parentjq.children('.delete_layout_button').show();
 		} else {
 			parentjq.children('.generate_standard_layout').hide(); // can't generate a layout if we already have entries
+alert('connection status for '+parentjq.attr('id')+' is '+parentjq.attr('data-connection-status'));
 			if (parentjq.attr('data-connection-status') == 'connected') {
 				parentjq.children('.set_configuration_status').hide();
 				if (parentjq.attr('data-action-status') == 'rezzed') {
@@ -468,7 +472,7 @@
 							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objectcode'], thisentry['moduletitle'], $(this) );
 						});
 					}
-					eventLoop( $('.layout_container_'+layoutid) );
+					eventLoop( buttonjq.closest('.layout_container_'+layoutid) );
 				} else if (result == 'failed') {
 					alert('Adding layout entry failed');
 					buttonjq.html( buttonjq.attr('data-generate-text') );
@@ -496,7 +500,7 @@
 				if (result == 'added') {
 					buttonjq.html( buttonjq.attr('data-add-text') );
 					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, frmjq);
-					eventLoop( $('.layout_container_'+layoutid) );
+					eventLoop( frmjq.closest('.layout_container_'+layoutid) );
 					//history.back();
 					backLevels( frmjq.attr('id'), 2 );
 					//history.go(-2);
@@ -541,7 +545,7 @@
 							$(this).remove();
 						}
 					});
-					eventLoop( $('.layout_container_'+layoutid) );
+					eventLoop( buttonjq.closest('.layout_container_'+layoutid) );
 					backLevels( frmjq.attr('id'), 1 );
 				} else { //if (result == 'failed') 
 					alert('Deleting layout entry failed');
@@ -843,6 +847,9 @@
 		var bits = parentjq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
 		var layoutid = bits.pop(); // pop this off - don't think we need it
 		var controllerid = bits.pop();
+		if ( isRezzerConfigured && ( rezzerControllerID == controllerid) ) {
+			return;
+		}
 		$.getJSON(  
 			"configure_rezzer.php",  
 			{
@@ -856,6 +863,7 @@
 					parentjq.attr('data-connection-status', 'connected');
 					update_buttons( parentjq );
 					refresh_misc_object_group( parentjq );
+					rezzerControllerID = controllerid;
 				} else if (result == 'failed') {
 					parentjq.children('.rez_all_objects').hide();	
 				}
