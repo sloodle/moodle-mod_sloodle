@@ -176,7 +176,6 @@
 			parentjq.children('.delete_layout_button').show();
 		} else {
 			parentjq.children('.generate_standard_layout').hide(); // can't generate a layout if we already have entries
-alert('connection status for '+parentjq.attr('id')+' is '+parentjq.attr('data-connection-status'));
 			if (parentjq.attr('data-connection-status') == 'connected') {
 				parentjq.children('.set_configuration_status').hide();
 				if (parentjq.attr('data-action-status') == 'rezzed') {
