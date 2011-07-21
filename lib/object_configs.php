@@ -168,7 +168,9 @@ class SloodleObjectConfig {
 	function AllAvailableAsArrayByGroup() {
 
 		$objectconfigsbygroup = array();
-		foreach(SloodleObjectConfig::AllAvailableAsArray() as $objname => $objconfig) {
+		$allconfigs = SloodleObjectConfig::AllAvailableAsArray();
+		ksort($allconfigs);
+		foreach($allconfigs as $objname => $objconfig) {
 			$group = $objconfig->group;
 			if (!isset($objectconfigsbygroup[$group])) {
 				$objectconfigsbygroup[$group] = array();
