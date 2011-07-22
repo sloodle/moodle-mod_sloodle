@@ -53,13 +53,23 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
 		$scoresql = "select userid as userid, sum(amount) as balance from {$prefix}sloodle_award_points p where p.roundid = {$roundid} and p.currencyid = {$currencyid} group by p.userid order by balance desc;";
 
-		$usersql = "select max(u.id) as userid, u.firstname as firstname, u.lastname as lastname, su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid={$contextid} group by u.id order by avname asc;";
+		$usersql = "select max(u.id) as userid, u.username as username, u.firstname as firstname, u.lastname as lastname, su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid={$contextid} group by u.id order by avname asc;";
 
 		$scores = sloodle_get_records_sql( $scoresql );
 		$students = sloodle_get_records_sql( $usersql);
 
 		$students_by_userid = array();
 		foreach($students as $student) {
+			// Make a moodle user object with enough info for isguestuser to tell us if they're a guest or not.
+			// Looking at the isguestuser() function, it looks like the userid and username should be enough to check this without needing any more db lookups.
+			// This may blow up in future versions if Moodle starts expecting a properly loaded moodle user object.
+			// When we drop < Moodle 2 support, we can start just passing the userid rather than a user object.
+			$mdluser = new stdClass();
+			$mdluser->id = $student->userid;
+			$mdluser->username = $student->username;
+			if (isguestuser($mdluser)) {
+				continue;	
+			}
 			$students_by_userid[ $student->userid ] = $student;
 		}
 
