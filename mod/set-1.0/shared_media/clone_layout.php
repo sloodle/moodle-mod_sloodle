@@ -57,11 +57,6 @@ if (!$layout->load( $cloneid )) {
 $layoutid = $cloneid;
 
 
-// Create a set of divs for the layout forms.
-// We do this on the server side to avoid a lot of hairy javascript html generation.
-// We'll pass it back in the AJAX response and let the create script slot it into the right places.
-// If there are multiple controllers for the same course, we may have multiple of these, so we'll make an array of them
-// NB The list item in the scenes list is still generated in the 
 
 // TODO: Lots of duplication with index.php - would be good to reduce it somehow.
 
@@ -96,47 +91,61 @@ $layoutid = $cloneid;
             }
         }
 
+
+
+
 	$courselayouts = array();
 
-        include_once(SLOODLE_LIBROOT.'/object_configs.php');
-        $object_configs = SloodleObjectConfig::AllAvailableAsArray();
-        $objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();
+
+	//$object_configs = SloodleObjectConfig::AllAvailableAsArrayByGroup();
+	$object_configs = SloodleObjectConfig::AllAvailableAsArray();
+	$objectconfigsbygroup  = SloodleObjectConfig::AllAvailableAsArrayByGroup();
+	if (!isset($objectconfigsbygroup['misc'])) {
+		$objectconfigsbygroup['misc'] = array(); // always make sure we have this group so that we can add misc objects added to the rezzer.
+	}
+//	include('object_configs.array.php');
 
         // Construct the list of course names
         $coursenames = array();
 	$layoutentries = array();
         foreach ($controllers as $cid => $ctrls) {
+
 		$sloodle_course = new SloodleCourse();
 		if (!$sloodle_course->load($cid)) {
 			continue;
 		}
 		$moodle_course = $sloodle_course->get_course_object();
-		$layouts = $sloodle_course->get_layouts();
-		// TODO: This is a bit inefficient if you have a lot of layouts.
-		// Would be better to just fetch the one we need
-		foreach($layouts as $l) {
-			if ($l->id != $layoutid) {
-				continue;
-			}
-			$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);
-                        $entriesbygroup = array('communication'=>array(), 'activity'=>array(), 'registration'=>array() );
+		$coursenames[$cid] = $moodle_course->fullname;
+		$courselayouts[$cid] = array();
 
-			foreach($entries as $e) {
-				$objectname = $e->name;
-				$grp = 'misc';
-				if (isset($object_configs[$objectname]->group)) {
-					$grp = $object_configs[$objectname]->group;
+		foreach($ctrls as $contid => $ctrl) {
+			$sloodle_course->ensure_at_least_one_layout('Scene ', $contid);
+			$layouts = $sloodle_course->get_layouts($contid);
+			$courselayouts[$cid][$contid] = array();
+			foreach($layouts as $l) {
+				$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);
+				$entriesbygroup = array('communication'=>array(), 'activity'=>array(), 'registration'=>array(), 'misc'=>array() );
+				foreach($entries as $e) {
+					$objectname = $e->name;
+					$grp = 'misc';
+					if (isset($object_configs[$objectname])) {
+						$grp = $object_configs[$objectname]->group;
+					}
+					if (!isset($entriesbygroup[ $grp ] )) {
+						$entriesbygroup[ $grp ] = array();
+					}
+					$entriesbygroup[ $grp ][] = $e;	
 				}
-				if (!isset($entriesbygroup[ $grp ] )) {
-					$entriesbygroup[ $grp ] = array();
-				}
-				$entriesbygroup[ $grp ][] = $e;	
+				$layoutentries[$l->id] = $entriesbygroup;
+				$courselayouts[$cid][$contid][] = $l;
 			}
-			$layoutentries[$l->id] = $entriesbygroup;
 		}
-                $courselayouts[$cid] = $layouts;
-                $coursenames[$cid] = $moodle_course->fullname;
+
         }
+
+	
+
+
 
 	include('index.template.php');
 
@@ -161,6 +170,7 @@ $content = array(
 	'layoutname' => $layoutname, // TODO: Get this from the object_configs
 	'layoutid' => $layoutid,
 	'courseid' => $courseid,
+	'controllerid' => $layout->controllerid,
 	'add_layout_lists' => $add_layout_lists,
 	'add_object_groups' => $add_object_groups,
 	'add_object_forms' => $add_object_forms,

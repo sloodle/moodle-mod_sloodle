@@ -413,10 +413,11 @@
 				var result = json.result;
 				var layoutid = json.layoutid;
 				var courseid = json.courseid;
+				var controllerid = json.controllerid;
 				var layoutname = json.layoutname;
 				if (result == 'added') {
 					buttonjq.html( buttonjq.attr('data-create-text') );
-					insert_layout_into_course_divs( layoutid, courseid, layoutname, frmjq);
+					insert_layout_into_course_divs( layoutid, courseid, controllerid, layoutname, frmjq);
 
 					$('#add_layout_lists_above_me').before(json.add_layout_lists);
 					$('#add_edit_object_forms_above_me').before(json.edit_object_forms);
@@ -439,8 +440,8 @@
 
 	}
 
-	function insert_layout_into_course_divs( layoutid, courseid, layoutname, frmjq ) {
-		$('.controllercourselayouts_'+courseid).each( function() {
+	function insert_layout_into_course_divs( layoutid, courseid, controllerid, layoutname, frmjq ) {
+		$('#controller_'+courseid+'-'+controllerid).each( function() {
 			var newformid = $(this).attr('data-id-prefix') + layoutid;
 			var newli = '<li data-layout-link-li-id="'+layoutid+'"><a class="layout_link" href="#' + newformid + '">'+layoutname+'</a></li>';
 			$(this).children('.add_layout_above_me').before( newli );
@@ -471,7 +472,7 @@
 							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objectcode'], thisentry['moduletitle'], $(this) );
 						});
 					}
-					eventLoop( buttonjq.closest('.layout_container_'+layoutid) );
+					eventLoop( $('.layout_container_'+layoutid) );
 				} else if (result == 'failed') {
 					alert('Adding layout entry failed');
 					buttonjq.html( buttonjq.attr('data-generate-text') );
@@ -499,7 +500,7 @@
 				if (result == 'added') {
 					buttonjq.html( buttonjq.attr('data-add-text') );
 					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, frmjq);
-					eventLoop( frmjq.closest('.layout_container_'+layoutid) );
+					eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
 					backLevels( frmjq.attr('id'), 2 );
 					//history.go(-2);
@@ -647,8 +648,9 @@
 					layoutid = json.layoutid;
 					var layoutname = json.layoutname;
 					var courseid = json.courseid;
+					var controllerid = json.controllerid;
 
-					insert_layout_into_course_divs( layoutid, courseid, layoutname, null);
+					insert_layout_into_course_divs( layoutid, courseid, controllerid, layoutname, null);
 
 					$('#add_layout_lists_above_me').before(json.add_layout_lists);
 					$('#add_edit_object_forms_above_me').before(json.edit_object_forms);
@@ -1043,7 +1045,7 @@
 
 			var parentid = targetjq.attr('data-parent');
 			if ( (parentid == '') || (parentid == null) ){
-				alert('Error: parent id not set in link to '+clickedid);
+				//alert('Error: parent id not set in link to '+clickedid);
 				return false;
 			}
 			$('#backButton').attr('href', '#'+parentid);

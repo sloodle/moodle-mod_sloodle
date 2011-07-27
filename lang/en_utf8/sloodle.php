@@ -562,9 +562,16 @@ $string['awards:group']='Group';
 $string['awards:round']='Round';  
 $string['awards:showallcontrollers']='Show points for whole site, not just this controller.';  
 
+$string['awards:questioncorrectplus']='When you get a question correct you get';
+$string['awards:questionincorrectminus']='When you get a question wrong you lose'; 
+
+$string['awards:startquizrequires']='To use object users must have:';
+$string['awards:finishquizplus']='For completing the quiz you get:';
+
 $string['awards:interactwithobjectplus']='Using this object gives you';  
-$string['awards:interactwithobjectminus']='Using this object costs you';  
-$string['awards:interactwithobjectrequires']='Using this object requires at least';
+$string['awards:interactwithobjectminus']='Using this object takes away:';  
+$string['awards:interactwithobjectrequires']='To use object users must have:';
+
 $string['awards:notenoughmessage']='Insufficient currency message';
 
 $string['awards:help:icurrency']='If you select Lindens, then your students can withdraw money using a stipend giver. On the otherhand, iPoints are non monetary points you can award your students!'; 

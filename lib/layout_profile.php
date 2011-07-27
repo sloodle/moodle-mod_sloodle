@@ -50,6 +50,7 @@
             $this->name = $r->name;
             $this->id = $r->id;
             $this->course = $r->course;
+            $this->controllerid = $r->controllerid;
 
             $this->originalentries = $this->get_entries($store = false);
 
@@ -221,6 +222,7 @@
             $clone = new SloodleLayout();
             $clone->name = $name;
             $clone->course = $this->course;
+            $clone->controllerid = $this->controllerid;
             if (!$cloneid = sloodle_insert_record('sloodle_layout', $clone)) {
                 return false;
             }

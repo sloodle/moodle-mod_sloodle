@@ -78,7 +78,7 @@ $full = false;
 		if (isset($controllers[$cid])) { 
 			foreach($controllers[$cid] as $contid=>$cont) {
 ?>
-				<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= s( $cn ) ?> <?= s( $cont->name ) ?></a></li>
+				<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= s( $cn ) ?> <?= s( $cont->name ) ?>:<?=$cid?>:<?= $contid?>:</a></li>
 <?php
 			}
 		}
@@ -124,13 +124,13 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 		}
 		foreach($controllers[$cid] as $contid => $cont) {
 ?>
-    <ul data-parent="site_1" id="controller_<?= intval($cid)?>-<?= intval($contid) ?>" title="<?= htmlentities( $cn ) ?> <?= htmlentities( $cont->name ) ?>" class="controllercourselayouts_<?= intval($cid)?>" data-id-prefix="layout_<?= intval($cid)?>-<?= intval($contid) ?>-">
+    <ul data-parent="site_1" id="controller_<?= intval($cid)?>-<?= intval($contid) ?>" title="<?= s( $cn ) ?> <?= s( $cont->name ) ?>" class="controllercourselayouts_<?= intval($cid)?>" data-id-prefix="layout_<?= intval($cid)?>-<?= intval($contid) ?>-">
         <li class="group">Scenes</li>
 <?php
-			$layouts = $courselayouts[ $cid ];
+			$layouts = $courselayouts[ $cid ][$contid];
 			foreach($layouts as $layout) {
 ?>
-        <li data-layout-link-li-id="<?= intval($layout->id) ?>" ><a class="layout_link" href="#layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities($layout->name) ?></a></li>
+        <li data-layout-link-li-id="<?= intval($layout->id) ?>" ><a class="layout_link" href="#layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities($layout->name) ?>:<?=$cid?>:<?=$contid?>:<?=$layout->controllerid?>:</a></li>
 <?php
 			}
 ?>
@@ -153,6 +153,7 @@ function print_add_layout_forms( $courses, $controllers, $rezzeruuid ) {
     <form data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" id="addlayout_<?= intval($cid)?>-<?= intval($contid) ?>" class="panel" title="<?= s(get_string('rezzer:addlayout', 'sloodle'))?> <?= s($course->fullname) ?>">
 	<input type="hidden" name="courseid" value="<?= intval($cid)?>" />
 	<input type="hidden" name="rezzeruuid" value="<?= s($rezzeruuid)?>" />
+	<input type="hidden" name="controllerid" value="<?= intval($contid)?>" />
 	<fieldset>
 	<div class="row" >
 		<label for="layoutname"><?= s(get_string('rezzer:layoutname', 'sloodle'))?></label>
@@ -183,8 +184,11 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 			continue;
 		}
 		foreach($controllers[$cid] as $contid => $cont) {
-			$layouts = $courselayouts[ $cid ];
+			$layouts = $courselayouts[ $cid ][$contid];
 			foreach($layouts as $layout) {
+				if ($layout->controllerid != $contid) {
+					continue;
+				}
 				$hasactiveobjects = $layout->has_active_objects_rezzed_by_rezzer( $rezzeruuid );
 				$entriesbygroup = $layoutentries[ $layout->id ];
 
@@ -279,7 +283,7 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
 			continue;
 		}
 		foreach($controllers[$cid] as $contid => $cont) {
-			$layouts = $courselayouts[ $cid ];
+			$layouts = $courselayouts[ $cid ][$contid];
 			foreach($layouts as $layout) {
 ?>
 <?php 
@@ -318,7 +322,7 @@ function print_add_object_forms($courses, $controllers, $courselayouts, $object_
 			if (!isset($courselayouts[ $cid ]) ) {
 				continue;
 			}
-			$layouts = $courselayouts[ $cid ];
+			$layouts = $courselayouts[ $cid ][$contid];
 			foreach($layouts as $layout) {
 				foreach($object_configs as $object_title => $config) {
 /*
@@ -405,7 +409,7 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
 		$cid = $course->id; 
 		$cn = $course->fullname; 
 		foreach($controllers[$cid] as $contid => $cont) {
-			$layouts = $courselayouts[ $cid ];
+			$layouts = $courselayouts[ $cid ][$contid];
 			foreach($layouts as $layout) {
 				$entriesbygroup = $layoutentries[ $layout->id ];
 				$lid = $layout->id;

@@ -278,7 +278,6 @@ body > .panel {
 .row  {
     width:100%;
     position: relative;
-    padding-left: 10px;
     min-height: 56px;
     border-bottom: 1px solid #999999;
     -webkit-border-radius: 0;
@@ -289,8 +288,10 @@ fieldset > .row:last-child {
     border-bottom: none !important;
     width:100%;
 }
+
 .row > label {
     float:left; 
+    padding-left:20px;
     width:50%
     margin: 0 0 0 14px;
     line-height: 42px;

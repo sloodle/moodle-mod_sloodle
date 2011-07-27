@@ -5,6 +5,19 @@
 .add_to_layout_button{ margin-top:10px; margin-bottom:10px; }
 
 
+.sloodle_config{
+	vertical-align:top;
+	padding:0px;
+	height:100%;
+}
+
+.sloodle_config input:text {
+	vertical-align:middle;
+	margin-top:1px;
+	margin-bottom:1px;
+	height: 47px;
+}
+
 .active_button {
     width: 97%;
     display: block;

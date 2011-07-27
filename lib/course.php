@@ -591,7 +591,7 @@
         /**
         * Gets SloodleLayout objects for all the layouts in the course.
         */
-        function get_layouts() {
+        function get_layouts($controllerid) {
             // Fetch the layout records
             $layoutrecs = sloodle_get_records('sloodle_layout', 'course', $this->course_object->id, 'name');
             $layouts = array();
@@ -599,6 +599,9 @@
             if (!$layoutrecs) return array();
 
             foreach ($layoutrecs as $r) {
+                if ($r->controllerid != $controllerid) {
+                    continue;
+                }
                 $layouts[] = new SloodleLayout($r);
             }
 
@@ -728,9 +731,9 @@
 
         // Make sure the course has at least one layout, creating one if necessary using the prefix $nameprefix
         // Returns true on success, false on failure
-	function ensure_at_least_one_layout($nameprefix) {
+	function ensure_at_least_one_layout($nameprefix, $controllerid) {
 
-            if ( count($this->get_layouts()) > 0 ) {
+            if ( count($this->get_layouts($controllerid)) > 0 ) {
                 return true;
             }
 
@@ -740,6 +743,7 @@
 
             $l = new SloodleLayout();
             $l->name = $layoutname;
+            $l->controllerid = $controllerid;
             $l->course = $this->course_object->id;
             return $l->insert();
 

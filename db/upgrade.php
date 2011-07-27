@@ -769,6 +769,18 @@ if ($result && $oldversion < 2011070900) {
 
     }
 
+    if ($result && $oldversion < 2011072301) {
+
+    /// Define field controllerid to be added to sloodle_layout
+        $table = new XMLDBTable('sloodle_layout');
+        $field = new XMLDBField('controllerid');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, null, null, 'timeupdated');
+
+    /// Launch add field controllerid
+        $result = $result && add_field($table, $field);
+    }
+
+
 return $result; 
 }
 

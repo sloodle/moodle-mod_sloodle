@@ -98,11 +98,11 @@
 	function load_by_course_module_id($cmid) {
 
             // Make sure the ID is valid
-            $id = (int)$id;
-            if ($id <= 0) return false;
+            $cmid = (int)$cmid;
+            if ($cmid <= 0) return false;
             
             // Fetch the course module data
-            if (!($this->cm = get_coursemodule_from_id('sloodle', $id))) {
+            if (!($this->cm = get_coursemodule_from_id('sloodle', $cmid))) {
                 sloodle_debug("Failed to load controler course module.<br>");
                 return false;
             }

@@ -132,32 +132,38 @@
         $coursenames = array();
 	$layoutentries = array();
         foreach ($controllers as $cid => $ctrls) {
+
 		$sloodle_course = new SloodleCourse();
 		if (!$sloodle_course->load($cid)) {
 			continue;
 		}
 		$moodle_course = $sloodle_course->get_course_object();
-		$sloodle_course->ensure_at_least_one_layout('Scene ');
-		$layouts = $sloodle_course->get_layouts();
-		foreach($layouts as $l) {
-			$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);
-                        $entriesbygroup = array('communication'=>array(), 'activity'=>array(), 'registration'=>array(), 'misc'=>array() );
-
-			foreach($entries as $e) {
-				$objectname = $e->name;
-				$grp = 'misc';
-				if (isset($object_configs[$objectname])) {
-					$grp = $object_configs[$objectname]->group;
-				}
-				if (!isset($entriesbygroup[ $grp ] )) {
-					$entriesbygroup[ $grp ] = array();
-				}
-				$entriesbygroup[ $grp ][] = $e;	
-			}
-			$layoutentries[$l->id] = $entriesbygroup;
-		}
-		$courselayouts[$cid] = $layouts;
 		$coursenames[$cid] = $moodle_course->fullname;
+		$courselayouts[$cid] = array();
+
+		foreach($ctrls as $contid => $ctrl) {
+			$sloodle_course->ensure_at_least_one_layout('Scene ', $contid);
+			$layouts = $sloodle_course->get_layouts($contid);
+			$courselayouts[$cid][$contid] = array();
+			foreach($layouts as $l) {
+				$entries = $sloodle_course->get_layout_entries_for_layout_id($l->id);
+				$entriesbygroup = array('communication'=>array(), 'activity'=>array(), 'registration'=>array(), 'misc'=>array() );
+				foreach($entries as $e) {
+					$objectname = $e->name;
+					$grp = 'misc';
+					if (isset($object_configs[$objectname])) {
+						$grp = $object_configs[$objectname]->group;
+					}
+					if (!isset($entriesbygroup[ $grp ] )) {
+						$entriesbygroup[ $grp ] = array();
+					}
+					$entriesbygroup[ $grp ][] = $e;	
+				}
+				$layoutentries[$l->id] = $entriesbygroup;
+				$courselayouts[$cid][$contid][] = $l;
+			}
+		}
+
         }
 
 	include('index.template.php');
