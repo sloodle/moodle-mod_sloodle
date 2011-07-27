@@ -5,10 +5,11 @@
     * This file defines the Sloodle Controller module sub-type.
     *
     * @package sloodle
-    * @copyright Copyright (c) 2008 Sloodle (various contributors)
+    * @copyright Copyright (c) 2008 - 2011 various contributors
     * @license http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
     *
     * @contributor Peter R. Bloomfield
+    * @contributor Edmund Edgar
     */
     
     
@@ -17,6 +18,21 @@
     /** The active object structure. */
     require_once(SLOODLE_LIBROOT.'/active_object.php');
     
+    /**
+    * The data structure of a controller is as follows:
+    *
+    * coursemodule
+    *  id 
+    *  instance - refers to the ID in the sloodle table 
+    *  
+    * sloodle
+    *  id
+    *
+    * sloodle_controller
+    *  id - ID of this record, redundant as it's already uniquely identified by sloodleid?
+    *  sloodleid - refers to the ID in the sloodle table  
+    *
+    */
     
     /**
     * Represents a Sloodle Controller, including data such as prim password.
@@ -60,15 +76,27 @@
         {
         }
         
-        
         /**
-        * Loads data from the database.
+        * DEPRECATED in an attempt to make the use of various IDs around the controller less baffling. Use load_by_course_module_id instead.
+        * Loads data from the database based on the course module id.
         * Note: even if the function fails, it may still have overwritten some or all existing data in the object.
-        * @param mixed $id The site-wide unique identifier for all modules. Type depends on VLE. On Moodle, it is an integer course module identifier ('id' field of 'course_modules' table)
+        * @param mixed $id The site-wide unique identifier for all modules. Course module identifier ('id' field of 'course_modules' table)
         * @return bool True if successful, or false otherwise
         */
         function load($id)
         {
+            return $this->load_by_course_module_id($id);
+        }
+        
+ 
+        /**
+        * Loads data from the database.
+        * Note: even if the function fails, it may still have overwritten some or all existing data in the object.
+        * @param mixed $id The site-wide unique identifier for all modules. Course module identifier ('id' field of 'course_modules' table)
+        * @return bool True if successful, or false otherwise
+        */
+	function load_by_course_module_id($cmid) {
+
             // Make sure the ID is valid
             $id = (int)$id;
             if ($id <= 0) return false;
@@ -97,8 +125,9 @@
             }
             
             return true;
-        }
-        
+
+	}
+
         /**
         * Updates the currently loaded entry in the database.
         * Note: the data *must* have been previously loaded using {@link load_from_db()}.
@@ -133,23 +162,46 @@
         }
     
         /**
+	* DEPRECATED - use get_course_module_id instead
         * Gets the site-wide unique identifier for this module.
-        * @return mixed Identifier. Type is dependent on VLE. On Moodle, it is an integer course module identifier.
+        * @return mixed Identifier representing the course module identifier.
         */
         function get_id()
         {
-            return $this->cm->id;
+            return $this->get_course_module_id();
         }
         
         /**
-        * Gets the identifier for controller (unique among all Sloodle controlers - may be the same as {@link get_id()} in some environments
-        * @return mixed Identifier. Type is dependent on VLE. On Moodle, it is an integer relating to the 'id' field of the 'sloodle_controller' table
+        * Gets the site-wide unique identifier for this module.
+        * @return mixed Identifier. Type is dependent on VLE. On Moodle, it is an integer course module identifier.
+        */
+        function get_course_module_id()
+        {
+            return $this->cm->id;
+        }
+ 
+        /**
+        * Gets the identifier for controller.
+	* DEPRECATED to make it less ambiguous how we're identifying controllers, since we have at least 3 different IDs that can refer to the same thing.
+	* If you need this, use get_controller_instance_id instead.
+	* TODO (Ed): We shouldn't really need to use this at all or even have it in the database, as the record was already uniquely identified by "sloodleid".
+        * @return mixed Identifier. 'id' field of the 'sloodle_controller' table
         */
         function get_controller_id()
         {
-            return $this->sloodle_controller_instance->id;
+            return $this->get_controller_instance_id();
         }
     
+        /**
+        * Gets the identifier for controller instance.
+	* NB Elsewhere when we have a variable called "sloodlecontrollerid", that refers to the course module ID, not the instance ID.
+        * @return mixed Identifier. 'id' field of the 'sloodle_controller' table
+        */
+        function get_controller_instance_id()
+        {
+            return $this->sloodle_controller_instance->id;
+        }
+
         /**
         * Gets the name of this controller.
         * @return string The name of this controller
