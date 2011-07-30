@@ -44,6 +44,11 @@ class SloodleObjectConfig {
 	// Needs to be filled from somewhere, eg. an object_config or layout_entry_config record
 	// For a newly created config, this will be null.
 	var $value = null;
+
+   	// If you want a bunch of successive options to be shown together on the same row
+	// ...you can set the same row_code for each one.
+  	// The default of '' will make the object get its own row.
+	var $row_code = '';
 		
 	// static function returning an object configuration for an object with the given name, or none if none is found
 	function ForObjectName($objname) {
@@ -60,12 +65,14 @@ class SloodleObjectConfig {
 	// ...but the objects will have to know how to report their own codes.
 	function ForObjectType($modname, $objcode = 'default') {
 
-		if ( !preg_match('/^[a-zA-Z0-9_-]+$/',$objcode) ) {
-			return false;
-		}
 		if ($objcode == '') {
 			$objcode = 'default';
 		}
+
+		if ( !preg_match('/^[a-zA-Z0-9_-]+$/',$objcode) ) {
+			return false;
+		}
+	
                 $definition_file = SLOODLE_DIRROOT.'/mod/'.$modname.'/object_definitions/'.$objcode.'.php';
 		if (!file_exists($definition_file)) {
 			return null;
@@ -457,16 +464,51 @@ class SloodleObjectConfig {
 		$configs = array();
 		
 		foreach($interactions as $interactionname => $interactionlabels) {
+
 			$deposit_points_fieldname      = 'sloodleawardsdeposit_numpoints_'.$interactionname;
 			$deposit_currency_fieldname    = 'sloodleawardsdeposit_currency_'.$interactionname;
+			$deposit_row_name = 'sloodleawardsdeposit_row_'.$interactionname;
+
 			$withdraw_points_fieldname   = 'sloodleawardswithdraw_numpoints_'.$interactionname;
 			$withdraw_currency_fieldname = 'sloodleawardswithdraw_currency_'.$interactionname;
+			$withdraw_row_name = 'sloodleawardswithdraw_row_'.$interactionname;
+
 			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabels[0], '', 0, 8);
-			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, 'awards:currency', '', '', 8);
-			$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
-			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'awards:currency', '', '', 8);
+			$configs[ $deposit_points_fieldname ]->row_name = $deposit_row_name;
+
+			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, '', '', '', 8);
+			$configs[ $deposit_currency_fieldname]->row_name = $deposit_row_name;
 			$configs[ $deposit_currency_fieldname ]->is_value_translatable = false;
+
+			$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
+			$configs[ $withdraw_points_fieldname ]->row_name = $withdraw_row_name;
+
+			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, '', '', '', 8);
+			$configs[ $withdraw_currency_fieldname ]->row_name = $withdraw_row_name;
 			$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
+
+		}
+
+		return $configs;
+
+	}
+
+	function awards_deposit_options( $interactions_to_labels ) {
+		
+		$configs = array();
+		foreach($interactions_to_labels as $interactionname => $interactionlabel) {
+
+			$deposit_points_fieldname      = 'sloodleawardsdeposit_numpoints_'.$interactionname;
+			$deposit_currency_fieldname    = 'sloodleawardsdeposit_currency_'.$interactionname;
+			$deposit_row_name = 'sloodleawardsdeposit_row_'.$interactionname;
+
+			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabel, '', 0, 8);
+			$configs[ $deposit_points_fieldname ]->row_name = $deposit_row_name;
+
+			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, '', '', '', 8);
+			$configs[ $deposit_currency_fieldname]->row_name = $deposit_row_name;
+			$configs[ $deposit_currency_fieldname ]->is_value_translatable = false;
+
 		}
 
 		return $configs;
@@ -489,14 +531,21 @@ class SloodleObjectConfig {
 			//$withdraw_currency_fieldname = 'sloodleawardswithdraw_currency_'.$interactionname;
 			$not_enough_message_fieldname = 'sloodleawardsrequire_notenoughmessage_'.$interactionname;
 
+			$require_points_row_name = 'sloodleawardsrequire_row_'.$interactionname;
+
 			$configs[ $require_points_fieldname ]    = new SloodleConfigurationOptionText( $require_points_fieldname, $interactionlabels[0], '', 0, 8);
-			$configs[ $require_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $require_currency_fieldname, 'awards:currency', '', '', 8);
+			$configs[ $require_points_fieldname ]->row_name = $require_points_row_name;
+
+			$configs[ $require_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $require_currency_fieldname, '', '', '', 8);
+			$configs[ $require_currency_fieldname ]->row_name = $require_points_row_name;
+			$configs[ $require_currency_fieldname ]->is_value_translatable = false;
+
 			$configs[ $not_enough_message_fieldname]   = new SloodleConfigurationOptionText( $not_enough_message_fieldname, 'awards:notenoughmessage', '', '', 120);
+			//$configs[ $not_enough_message_fieldname]->row_name = $require_points_row_name;
 
 			//$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
 			//$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'awards:currency', '', '', 8);
 
-			$configs[ $require_currency_fieldname ]->is_value_translatable = false;
 			//$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
 		}
 
@@ -529,6 +578,36 @@ class SloodleObjectConfig {
 			}
 		}
 
+	}
+
+	function field_set_row_groups() {
+
+		$fsgs = array();
+		foreach($this->field_sets as $n => $fs) {
+			$rowgroups = array();
+			$last_row_name = '';
+			foreach($fs as $fn => $ctrl) {
+				if ( ($ctrl->row_name == '') || ($ctrl->row_name != $last_row_name) ) { // make a new row
+					$rowgroups[]  = array($fn => $ctrl);
+				} else { // append this control to the last rowgroup
+					$lastrowgroup = array_pop($rowgroups);
+					$lastrowgroup[$fn] = $ctrl;
+					$rowgroups[] = $lastrowgroup;
+				}
+				$last_row_name = $ctrl->row_name;
+			}
+			$fsgs[$n] = $rowgroups;
+		}
+/*
+print "<hr>";
+var_dump($this->field_sets);
+print "<hr>";
+var_dump($fsgs);
+print "<hr>";
+exit;
+*/
+
+		return $fsgs;
 	}
 }
 

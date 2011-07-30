@@ -377,14 +377,18 @@
     // In theory we should be able to get this from the data we already have, but it seems complex...
     // The process_interactions allows us to award points if there is an instruction to do so in the object config.
 	$scorechange = floatval(optional_param( 'scorechange', 0, PARAM_TEXT));
+	if ($scorechange == 0) {
+		$scorechange = 1;
+	}
 	if (!is_null($sloodle->active_object)) {
 
-
+		$sloodle->active_object->process_interactions( 'SloodleModuleAwards', 'answerquestion', $scorechange, $sloodle->user->get_user_id() );
+		/*
 		if ($scorechange > 0) {
-			$sloodle->active_object->process_interactions( 'SloodleModuleAwards', 'default', 1, $sloodle->user->get_user_id() );
 		} else if ($scorechange < 0) {
 			//$sloodle->active_object->process_interactions( 'SloodleModuleAwards', 'answerincorrect', 1, $sloodle->user->get_user_id() );
 		}
+		*/
 		// TODO: Maybe we should set a side effect code here?
 	} 
 
