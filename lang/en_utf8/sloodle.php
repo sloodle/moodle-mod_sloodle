@@ -419,8 +419,8 @@ $string['sloodleversion'] = 'SLOODLE Version';
 $string['sloodle:staff'] = 'SLOODLE Staff member';
 $string['sloodle:objectauth'] = 'Authorise objects for SLOODLE access';
 $string['sloodle:userobjectauth'] = 'Authorise user objects for self';
-$string['sloodle:uselayouts'] = 'Use classroom layout profiles';
-$string['sloodle:editlayouts'] = 'Edit/delete classroom layout profiles';
+$string['sloodle:uselayouts'] = 'Rez sets of objects from pre-defined scenes';
+$string['sloodle:editlayouts'] = 'Control which objects to rez, and save them in scenes.';
 $string['sloodle:registeravatar'] = 'Register own avatar';
 $string['sloodle:distributeself'] = 'Distribute objects to own avatar';
 $string['sloodle:distributeothers'] = 'Distribute objects to other avatars';
@@ -567,6 +567,8 @@ $string['awards:questionincorrectminus']='When you get a question wrong you lose
 
 $string['awards:startquizrequires']='To use object users must have:';
 $string['awards:finishquizplus']='For completing the quiz you get:';
+
+$string['awards:answerquestionaward'] = 'Points per question';
 
 $string['awards:interactwithobjectplus']='Using this object gives you';  
 $string['awards:interactwithobjectminus']='Using this object takes away:';  
@@ -748,7 +750,7 @@ $string['rezzer:course'] = 'Course';
 $string['rezzer:addlayout'] = 'Add a scene';
 $string['rezzer:layoutname'] = 'Name';
 $string['rezzer:creatingscene'] = 'Creating Scene';
-$string['rezzer:createscene'] = 'Creating a Scene';
+$string['rezzer:createscene'] = 'Create a Scene';
 $string['rezzer:rezallobjects'] = 'Rez All Objects';
 $string['rezzer:derezallobjects'] = 'Derez All Objects';
 $string['rezzer:importmoodleactivities'] = 'Import Moodle Activities For {$a}';
