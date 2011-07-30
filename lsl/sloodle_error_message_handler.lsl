@@ -243,6 +243,16 @@ default {
             
             //TRANSLATE status code//
             string   trans = sloodle_get_error_string(statusCode);
+            if (trans == "") {
+                // Error code missing.
+		// In Sloodle 2, the script sending the error may send us a message to say to the user.
+		// For example, if you don't have enough points to use an object, there may be a user-defined message telling you that.
+                // If we intended to produce a message in the right language on the server side, we leave the error string undefined on purpose.
+                if (llGetListLength(fields) > 3) {
+                    trans = llList2String(fields,3);
+                }
+            }
+
             if (trans!=""){
                 if (method == SLOODLE_TRANSLATE_SAY)    llSay(0,"Error Message: "+trans);
                 else if (method==SLOODLE_TRANSLATE_IM) llInstantMessage(senderUuid,"Error Message: " + trans);
