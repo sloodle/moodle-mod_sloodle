@@ -269,6 +269,7 @@
         
         // Make sure the type value is stored in the database too
         $sloodle->course->controller->update_object_type($auth_obj->uuid, $usetype);
+	$auth_obj->type = $usetype;
     
         // Make sure the type exists
         $objectpath = SLOODLE_DIRROOT."/mod/$usetype";
