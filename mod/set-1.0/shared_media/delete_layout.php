@@ -35,6 +35,12 @@ if ($layout->load($layoutid)) {
 	}
 }
 
+$course_context = get_context_instance( CONTEXT_COURSE, $layout->course);
+if (!has_capability('mod/sloodle:uselayouts', $course_context)) {
+        error_output( 'Access denied');
+}
+
+
 $content = array(
 	'result' => 'deleted',
 	'layoutid' => $layoutid,

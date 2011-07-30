@@ -41,6 +41,17 @@ if ($layoutentry->load($layoutentryid)) {
 	$result = 'notfound';
 }
 
+$layout = new SloodleLayout();
+if (!$layout->load($layoutentry->layout)) {
+	error_output('Layout not found');
+}
+
+$course_context = get_context_instance( CONTEXT_COURSE, $layout->course);
+if (!has_capability('mod/sloodle:uselayouts', $course_context)) {
+        error_output( 'Access denied');
+}
+
+
 /*
 // FOR NOW: Leaving this for later
 // If we have a rezzer, derez any outstanding objects

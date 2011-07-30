@@ -50,7 +50,7 @@
 		$('li.derezzing span.rezzable_item_status').html('Derezzing');
 		$('li.configured span.rezzable_item_status').html('Ready');
 
-		$('li.syncing span.rezzable_item_positioning').html('Synced position');
+		$('li.syncing span.rezzable_item_positioning').html('Syncing position');
 		$('li.synced span.rezzable_item_positioning').html('Synced');
 		$('li.sync_failed span.rezzable_item_positioning').html('Sync failed');
 		$('li.waiting_to_sync span.rezzable_item_positioning').html('Waiting to sync');
@@ -497,6 +497,9 @@
 				var objectcode = json.objectcode;
 				var moduletitle = json.moduletitle;
 				var layoutentryid = json.layoutentryid;
+				if (layoutid == '') {
+					alert('error: missing layoutid after adding to layout');
+				}
 				if (result == 'added') {
 					buttonjq.html( buttonjq.attr('data-add-text') );
 					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, frmjq);
@@ -545,7 +548,7 @@
 							$(this).remove();
 						}
 					});
-					eventLoop( buttonjq.closest('.layout_container_'+layoutid) );
+					eventLoop( $('.layout_container_'+layoutid) );
 					backLevels( frmjq.attr('id'), 1 );
 				} else { //if (result == 'failed') 
 					alert('Deleting layout entry failed');

@@ -41,6 +41,17 @@ if (!$layoutid) {
 	error_output( 'Layout ID missing');
 }
 
+$layout = new SloodleLayout();
+if (!$layout->load($layoutid)) {
+	error_output( 'Layout not found');
+}
+
+$course_context = get_context_instance( CONTEXT_COURSE, $layout->course );
+if (!has_capability('mod/sloodle:editlayouts', $course_context)) {
+        error_output( 'Access denied');
+}
+
+
 $layoutentry = new SloodleLayoutEntry();
 $layoutentry->name = $objectname;
 $layoutentry->layout = $layoutid;

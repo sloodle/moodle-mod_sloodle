@@ -1,4 +1,15 @@
 <?php 
+function print_home_javascript() {
+?>
+<html>
+<head>
+<script language="JavaScript">
+window.home();
+</script>
+</head>
+</html>
+<?php
+}
 
 function print_html_top($loadfrom = '') { 
 ?>
@@ -25,11 +36,11 @@ function print_html_top($loadfrom = '') {
 <?php
 }
 
-function print_toolbar( $baseurl ) {
+function print_toolbar( $baseurl, $sitesURL ) {
 ?>
     <div class="toolbar">
         <h1 id="pageTitle"></h1>
-        <a id="backButton" class="button" href="#sitelist"><?= s(get_string('rezzer:avatarclassroom', 'sloodle')) ?></a>
+        <a id="backButton" class="button" href="#sitelist"><?= ( $sitesURL != '' ) ? s(get_string('rezzer:avatarclassroom', 'sloodle')) : '' ?></a>
         <a class="button" onclick="document.location.href = '<?= $baseurl.'&logout=1&ts='.time()?>'" href="<?= $baseurl.'&logout=1&ts='.time()?>"><?= s(get_string('rezzer:logout', 'sloodle')) ?></a>
     </div>
 <?php
@@ -39,7 +50,7 @@ function print_toolbar( $baseurl ) {
 // Never actually loaded - we intercept "sitelist" and use it to redirect to the api. site.
 function print_site_placeholder( $sitesURL ) {
 ?>
-	<div id="sitelist" data-parent-url="<?= $sitesURL ?>" title="<?= s(get_string('rezzer:avatarclassroom', 'sloodle'))?>"></div>
+	<div id="sitelist" data-parent-url="<?= $sitesURL ?>" title="<?= ( $sitesURL != '' ) ? s(get_string('rezzer:avatarclassroom', 'sloodle')) : '' ?>"></div>
 <?php
 }
 
@@ -78,7 +89,7 @@ $full = false;
 		if (isset($controllers[$cid])) { 
 			foreach($controllers[$cid] as $contid=>$cont) {
 ?>
-				<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= s( $cn ) ?> <?= s( $cont->name ) ?>:<?=$cid?>:<?= $contid?>:</a></li>
+				<li><a href="#controller_<?= intval($cid)?>-<?= intval($contid) ?>"><?= s( $cn ) ?> <?= s( $cont->name ) ?></a></li>
 <?php
 			}
 		}
@@ -130,7 +141,7 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 			$layouts = $courselayouts[ $cid ][$contid];
 			foreach($layouts as $layout) {
 ?>
-        <li data-layout-link-li-id="<?= intval($layout->id) ?>" ><a class="layout_link" href="#layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= htmlentities($layout->name) ?>:<?=$cid?>:<?=$contid?>:<?=$layout->controllerid?>:</a></li>
+        <li data-layout-link-li-id="<?= intval($layout->id) ?>" ><a class="layout_link" href="#layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?= s($layout->name) ?></a></li>
 <?php
 			}
 ?>
@@ -367,12 +378,15 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 </fieldset>
 <?php
 } ?>
-<?php foreach($config->field_sets as $fs) { ?>
+<?php foreach($config->field_set_row_groups() as $fsrg) { ?>
 <fieldset>
-<?php foreach($fs as $ctrl) { ?>
+<?php foreach($fsrg as $ctrls) { ?>
+<?php $ctrls_reversed = array_reverse($ctrls); ?>
+<?php $first_ctrl = array_shift($ctrls); ?>
+<div class="row" data-row-name="<?= $ctrl->row_name ?>" >
+<label for="<?= $fieldname ?>"><?= get_string($first_ctrl->title, 'sloodle') ?></label>
+<?php foreach($ctrls_reversed as $ctrl) { ?>
 <?php $fieldname = $ctrl->fieldname; ?>
-<div class="row">
-<label for="<?= $fieldname ?>"><?= get_string($ctrl->title, 'sloodle') ?></label>
 <span class="sloodle_config object_<?= s($config->object_code)?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>">
 <?php if ( ($ctrl->type == 'radio') || ($ctrl->type == 'yesno') ) { ?>
 <?php foreach($ctrl->options as $opn => $opv) { ?>
@@ -384,6 +398,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 not radio: <?=$ctrl->type?>
 <?php } ?>
 </span>
+<?php } ?>
 </div>
 <?php } ?>
 </fieldset>
@@ -462,13 +477,16 @@ $moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemodu
 </fieldset>
 <?php
 } ?>
-<?php foreach($config->field_sets as $fs) { ?>
+<?php foreach($config->field_set_row_groups() as $fs => $fsrg) { ?>
 <fieldset>
-<?php foreach($fs as $ctrl) { ?>
+<?php foreach($fsrg as $ctrls) { ?>
+<?php $ctrls_reversed = array_reverse($ctrls); ?>
+<?php $first_ctrl = array_shift($ctrls); ?>
+<div class="row" data-row-name="<?= $ctrl->row_name ?>" >
+<label for="<?= $fieldname ?>"><?= get_string($first_ctrl->title, 'sloodle') ?></label>
+<?php foreach($ctrls_reversed as $ctrl) { ?>
 <?php $fieldname = $ctrl->fieldname; ?>
 <?php 	$val = isset($lconfig[$fieldname]) ? $lconfig[$fieldname] : ''; ?>
-<div class="row">
-<label for="<?= $fieldname ?>"><?= get_string($ctrl->title, 'sloodle') ?></label>
 <span class="sloodle_config object_<?= s($config->object_code)?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>" >
 <?php if ( ($ctrl->type == 'radio') || ($ctrl->type == 'yesno') ) { ?>
 <?php foreach($ctrl->options as $opn => $opv) { ?>
@@ -480,6 +498,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemodu
 not radio: <?=$ctrl->type?>
 <?php } ?>
 </span>
+<?php } ?>
 </div>
 <?php } ?>
 </fieldset>

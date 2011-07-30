@@ -20,8 +20,7 @@ require_once(SLOODLE_LIBROOT.'/object_configs.php');
 $object_configs = SloodleObjectConfig::AllAvailableAsArray();
 
 if (!$USER->id) {
-	output( 'User not logged in' );
-	exit;
+	error_output( 'User not logged in' );
 }
 
 $rezzer = new SloodleActiveObject();

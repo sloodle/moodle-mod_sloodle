@@ -39,16 +39,25 @@
     require_once(SLOODLE_LIBROOT.'/layout_profile.php');
     require_once(SLOODLE_LIBROOT.'/active_object.php');
 
+    include('index.template.php');
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
 
         $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'&sloodleavname='.htmlentities($_REQUEST['sloodleavname']).'&sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&sloodleobjname='.htmlentities($_REQUEST['sloodleobjname']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
-	$sitesURL = 'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/'.$baseurl.'&ts='.time();
+
+	$sitesURL = '';
+	if (defined('SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL') && (SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL != '') ) {
+		$sitesURL = SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL.$baseurl.'&ts='.time();
+	}
 
 	if (isset($_GET['logout'])) {
-		require_logout();
-		header('Location: http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/'.$baseurl.'&ts='.time().'&logout');
-		exit;
+		if ( defined('SLOODLE_SHARED_MEDIA_LOGOUT_INCLUDE') && ( SLOODLE_SHARED_MEDIA_LOGOUT_INCLUDE != '' ) ) {
+			require(SLOODLE_SHARED_MEDIA_LOGOUT_INCLUDE);	
+		} else {
+			require_logout();
+			header('Location: '.$baseurl);
+			exit;
+		}
 	}
 
 	/*
@@ -57,12 +66,14 @@
 	*/
 
 	// TODO: What should this be? Probably not 1...
-	$course_context = get_context_instance( CONTEXT_COURSE, 1);
-	$can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
-	if (!$can_use_layouts) {
-		//include('../../../login/shared_media/index.php');
-		include('login.avatarclassroom.php');
-		//include('login.php');
+	//$can_edit_layouts = has_capability('mod/sloodle:editlayouts', $course_context);
+	if (!$USER || !$USER->id) {
+		if ( defined('SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE') && ( SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE != '' ) ) {
+			require(SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE);	
+		} else {
+			require_login();
+			exit;
+		}
 	}
 
 	// Register the set using URL parameters
@@ -91,7 +102,6 @@
 	$sites = $_REQUEST['sites'];
 	$hasSites = count($sites) > 0;
 
-	// REGULAR SLOODLE TODO: This should filter for courses the user has access to.
 	$courses = get_courses();
 	$coursesbyid = array();
 	foreach($courses as $course) {
@@ -107,6 +117,7 @@
             error(get_string('objectauthnocontrollers','sloodle'));
             exit();
         }
+
         foreach ($recs as $r) {
             // Fetch the course module
             $cm = get_coursemodule_from_instance('sloodle', $r->id);
@@ -118,7 +129,6 @@
         }
 
 	$courselayouts = array();
-
 
 	//$object_configs = SloodleObjectConfig::AllAvailableAsArrayByGroup();
 	$object_configs = SloodleObjectConfig::AllAvailableAsArray();
@@ -166,12 +176,11 @@
 
         }
 
-	include('index.template.php');
 
 	$full = false; 
 
 	print_html_top();
-	print_toolbar( $baseurl );
+	print_toolbar( $baseurl, $sitesURL );
 
 	print_site_placeholder( $sitesURL );
 	/*
@@ -183,7 +192,6 @@
 	print_controller_list( $courses, $controllers, $hasSites = false, $sitesURL); 
 	print_layout_list( $courses, $controllers, $courselayouts );
 	print_add_layout_forms( $courses, $controllers, $object_uuid );
-	print_html_bottom();
 
 	print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries, $object_uuid);
 	print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup );
@@ -192,122 +200,5 @@
 
 	print_html_bottom();
 
-
-
 exit;
-///// MOODLE-SPECIFIC /////
-    $course_context = get_context_instance(CONTEXT_COURSE, $sloodle->course->get_course_id());
-    $can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
-    $can_edit_layouts = has_capability('mod/sloodle:editlayouts', $course_context);
-///// END MOODLE-SPECIFIC /////
-
-    // If the user cannot use layouts at all, then we cannot do anything
-    if (!$can_use_layouts) {
-        $sloodle->response->quick_output(-301, 'USER_AUTH', 'User does not have permission to use layout profiles.', false);
-        exit();
-    }
-    
-    // Get the optional parameters
-    $sloodlelayoutname = $sloodle->request->optional_param('sloodlelayoutname');
-    $sloodlelayoutentries = $sloodle->request->optional_param('sloodlelayoutentries');
-    $sloodleadd = $sloodle->request->optional_param('sloodleadd', 'false');
-    if (strcasecmp($sloodleadd, 'true') == 0 || $sloodleadd == '1') $sloodleadd = true;
-    else $sloodleadd = false;
-    // Determine which mode we're in (0 = browse, 1 = query, 2 = update)
-    $mode = 0;
-    if ($sloodlelayoutname === null) $mode = 0;
-    else if ($sloodlelayoutentries === null) $mode = 1;
-    else $mode = 2;
-    
-    
-    // Enter the appropriate mode
-    switch ($mode) {
-    case 0:
-        // BROWSE MODE //
-        // Fetch the layouts in this course
-        $layouts = $sloodle->course->get_layout_names();
-        // Add one data line per layout
-        $sloodle->response->set_status_code(1);
-        $sloodle->response->set_status_descriptor('OK');
-        foreach ($layouts as $id => $name) {
-            $sloodle->response->add_data_line($name);
-        }
-        
-        break;
-        
-    case 1:
-        // QUERY MODE //
-        // Attempt to load the specified profile
-        $layout_entries = $sloodle->course->get_layout_entries($sloodlelayoutname);
-        if ($layout_entries === false) {
-            // Profile not found
-            $sloodle->response->set_status_code(-902);
-            $sloodle->response->set_status_descriptor('LAYOUT');
-            $sloodle->response->add_data_line('Named profile does not exist');
-        } else {
-            // Output one entry per line
-            $sloodle->response->set_status_code(1);
-            $sloodle->response->set_status_descriptor('OK');
-            foreach ($layout_entries as $le) {
-                $sloodle->response->add_data_line(array($le->name, $le->position, $le->rotation, $le->id));
-            }
-        }
-        
-        break;
-        
-    case 2:
-        // UPDATE MODE //
-        // Make sure the user has permission to edit profiles
-        if ($can_edit_layouts) {
-        } else {
-            $sloodle->response->set_status_code(-301);
-            $sloodle->response->set_status_descriptor('LAYOUT_PROFILE');
-            $sloodle->response->add_data_line('User does not have permission to edit layout profiles');
-        }
-        
-        // This array will store the new entries for our layout
-        $entries = array();
-        // Go through each line of incoming data
-        $lines = explode("\n", $sloodlelayoutentries);
-        foreach ($lines as $l) {
-            // Split the data into separate fields, and check that we have enough in this entry
-            $fields = explode("|", $l);
-            if (count($fields) < 3) continue;
-            // Construct an entry object
-            $entryobj = new SloodleLayoutEntry();
-            $entryobj->name = $fields[0];
-            $entryobj->position = $fields[1];
-            $entryobj->rotation = $fields[2];
-            $entryobj->objectuuid = $fields[3];
-            $entries[] = $entryobj;
-        }
-        
-        // Udpate the layout
-        if ($sloodle->course->save_layout($sloodlelayoutname, $entries, $sloodleadd)) {
-            $sloodle->response->set_status_code(1);
-            $sloodle->response->set_status_descriptor('OK');
-        } else {
-            $sloodle->response->set_status_code(-901);
-            $sloodle->response->set_status_descriptor('LAYOUT_PROFILE');
-            $sloodle->response->add_data_line('Failed to save new layout');
-        }
-
-	// TODO: Copy the object settings to the layouts table
-        
-        break;
-        
-    default:
-        // Unknown mode
-        $sloodle->response->set_status_code(-904);
-        $sloodle->response->set_status_descriptor('LAYOUT_PROFILE');
-        $sloodle->response->add_data_line('Error determining layout operation');
-        break;
-    }
-    
-    
-    // Render our output
-    sloodle_debug('<pre>'); // <- to help visualising output in a browser when debugging
-    $sloodle->response->render_to_output();
-    sloodle_debug('</pre>');
-    
 ?>
