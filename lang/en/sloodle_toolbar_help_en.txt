@@ -1,0 +1,94 @@
+Sloodle Toolbar v1.4
+============
+
+The Sloodle Toolbar v1.4 has 3 main features
+
+ - Writing to Moodle blog
+ - Classroom gestures
+ - Listing nearby avatars' Moodle names
+ 
+ 
+ ==========
+ * Compatibility *
+ ==========
+You require at least version 0.3 of the Sloodle module installed on your Moodle site to use Sloodle Toolbar v1.4. 
+ 
+ 
+==========
+* Basic Usage *
+==========
+
+HUD Device
+-------------
+The Toolbar is a HUD device (Heads-Up Display), which means it attaches to your interface like your inventory window, or mini-map. To make it appear, find the Toolbar in your inventory, right-click it, and select "Wear". It should appear at the top-centre of your screen. If not, then detach it (right-click and select "Detach from Yourself"), then right-click again, and select "Attach to HUD -> Top".
+
+Setting the Website
+----------------------
+The Toolbar needs to know which Moodle site to connect to. You can set this up in advance by right-cliking the Toolbar in your inventory, clicking "Properties", and entering the Moodle URL into the description field. The URL should start with "http" and should not have a trailing slash (/) at the end. Alternatively, if there is no description, then you will be asked to chat the URL when you first wear the Toolbar.
+
+If you want to change the website, then make sure you have changed the Description field (or left it blank), and *then* click the Reset button on the Toolbar. (The Reset button is the red square with a white cross through it).
+
+Authorising the Toolbar
+--------------------------
+When you first wear the Toolbar, it has to be authorised for your avatar and your Moodle site. It should attempt to connect to the Moodle site, then give you a URL to follow. Visit it, and log-in to Moodle. While you are doing this, the Toolbar will keep checking if you have completed the process (you can usually click on the Toolbar to speed it up). On the "Blog" part, you will see "Ready" when it has detected that you have authorised it.
+
+Toolbar Modes
+----------------
+The Toolbar has 2 main modes: blog, and classroom gesture. The currently active mode will be highlighted at the top-left. You can toggle between the modes by clicking these tabs.
+
+Hiding the Toolbar
+--------------------
+You can hide (or 'minimize') the Toolbar by clicking the square button containing a dash [-] at the top-right of the Toolbar. The Toolbar will mostly disappear, and be replaced by a small Sloodle icon (2 circles: one blue, one orange). Click that logo to make the Toolbar re-appear. Note: you cannot use the Toolbar features while it is minimized.
+ 
+ 
+========
+* Blogging *
+========
+This is the default mode of the Toolbar, and it lets you write a blog entry which gets written to your Moodle site. When the blog mode is active, you will see "Blog" highlighted at the top-left of the Toolbar, and a coloured display which should say "Ready".
+
+Note: if the display says "Not ready..." and doesn't change if you detach then re-attach the Toolbar, then your Toolbar has probably not yet been configured. Please see the Sloodle wiki for configuration instructions (http://slisweb.sjsu.edu/sl/index.php/Sloodle_Toolbar).
+
+Note: if the display says "Error" then something has gone wrong with your Toolbar. If you configured it, then please check to see that the Password is correct. You may touch the Toolbar to retry the setup process.
+
+
+To start blogging, click the button which says "Click Here to Start". The coloured display will show that your are writing the subject. Using ordinary chat, type in the subject for your blog entry, and press enter. Your text (or the first part of it) should appear written on the Toolbar.
+
+Next, the Toolbar expects you to type the body of your blog entry. Do this in the same way, using normal chat. However, this time you can type as many separate messages as you like until the blog is full (you can see the meter on the Toolbar fill up as you type more). For example, you could chat "hello" and press enter, then type "world" and press enter. Your blog would contain the text "hello world".
+
+When you have finished typing your blog entry, you can click "Save changes" to send the blog to Moodle. Alternatively, you can click "Cancel" at any time to cancel your entry.
+
+
+Advanced Features: Channel
+--------------------------------
+By default, the Toolbar expects you to write your blog entry on chat channel 0 (that is, normal public chat). This is sometimes not suitable in public surroundings, as you may disrupt other peoples' conversations, or you may not want others in-world to see what you are writing. You can change the chat channel very easily. Click the "Channel" button at the top-right of the Toolbar, and a menu will appear -- select channel 0, 1 or 2. (The display on the Toolbar will always show the current channel).
+
+To type a message on a different channel, start each chat message with a forward slash / followed by the channel number and a space. For example, to type the "hello world" example from before on channel 2, you would type the following messages:
+
+/2 hello
+/2 world
+
+You can change the chat channel at any time, except when the Toolbar is initialising itself, or when it is sending a blog entry to your Moodle site.
+
+
+Advanced Features: Visibility
+--------------------------------
+By default, the Toolbar writes posts with "Site" visibility. This means that anybody else registered on the Moodle site will be able to see your post. You can click on the visibility button to change this to "Public" (anybody on the Internet can see it), or "Private" (only you can see it).
+
+
+===============
+* Classroom Gestures *
+===============
+Classroom Gestures mode provides a series of common classroom animations, including raising your hand, clapping, or nodding your head. They are listed as a set of icons on the Toolbar -- click each icon to activate the gesture. Most gestures are 'single-click' (that is, you click the icon, and the gesture plays, then stops by itself).
+
+However, some gestures are 'toggled', meaning you click once to start the gesture, and click again to stop it. You can see that a gesture is toggled because its icon will become highlighted when you click it.
+
+
+========
+* AviLister *
+========
+You will see the "AviLister" button at the top-right of the Toolbar. Click it, and the Toolbar will scan for nearby avatars within a 48 metre radius (up to a maximum of 16 avatars at a time, due to SL limitations). It will send that list to your Moodle site, and for any avatars which are registered on it, will get back a list of the users' 'real' names (that is, names they registered in Moodle with it).
+
+It will display this information to you in private chat, showing first how many avatars it found, and then on each line it will show the avatar name followed by the Moodle name.
+
+TIP: If there are more than 2 or 3 avatars around you, then you might need to open your chat history to see all the names before they disappear!
+
