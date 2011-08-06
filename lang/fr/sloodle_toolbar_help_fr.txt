@@ -1,0 +1,85 @@
+Sloodle Toolbar v1.3
+============
+
+Sloodle Toolbar v1.3 a trois caractéristiques principales.
+
+ - Ecrire a un blog Moodle 
+ - Animations gestuelles.
+ - Lister les avatars proches avec leur nom enregistré sur Moodle*
+ 
+ (* = requiert Sloodle 0.21 sur le site Moodle)
+ 
+ 
+ ==========
+ * Compatibilité *
+ ==========
+Vous devez au moins avoir installé la version 0.2 du module Sloodle sur le site Moodle pour utiliser Sloodle Toolbar v1.3. Si vous souhaitez utiliser l'option "AviLister, vous aurez besoin de la version 0.21.
+
+ 
+==========
+* Usage Basique *
+==========
+
+Le dispositif HUD
+-------------
+Sloodle Toolbar est un dispositif HUD (Heads-Up Display), ce qui signifie qu'il s'attache à votre interface comme votre fenêtre d'inventaire, ou votre mini-map. Pour la faire apparaitre, trouvez la Sloodle Toolbar dans votre inventaire, faites un clic droit, et choisissez "Wear". Elle devrait apparaitre au centre de votre écran. Si ce n'est pas le cas, détachez la (clic droit et "Detach from Yourself"), puis clic droit et"Attach to HUD -> Top".
+
+Authentifier votre Avatar
+------------------------------
+Si la Sloodle Toolbar a été configurée correctement, elle est désormais attachée, et va essayer d'authentifier votre avatar. C'est à dire qu'elle va vous connecter au site Moodle, vérifier si votre avatar est lié à un compte Moodle, ou le lier si ce n'est pas le cas. Une boite de dialogue bleu devrait alors apparaitre en haut à droite de votre écran, et vous demander de visiter une URL. Suivez l'adresse, et loguez vous sur le site (utilisez votre nom d'utilisateur/mot de passe de Moodle), et votre avatar sera enregistré. Cette opération ne dois être effectuée qu'une seule fois pour chaque site Moodle.
+
+Barre d'Outils
+----------------
+Sloodle Toolbar has 2 modes principaux: Discussion, et animation gestuelle. Le mode actuel est en surbrillance en haut à gauche. Vous pouvez switcher entre ces deux modes en cliquant sur les onglets correspondant.
+
+Masquer la Barre d'Outils
+--------------------
+Vous pouvez masquer (ou 'minimiser') la barre d'outils en cliquant sur le bouton contenant un tiret[-] en haut à droite de la barre. Elle disparaitra, ne laissant qu'une petite icone Sloodle (2 cercles: un bleu, un orange). Cliquez sur ce logo pour la faire ré-apparaitre. Note: vous ne pouvez pas utiliser les options de la barre d'outils lorsqu'elle est minimisée.
+ 
+ 
+========
+* Blog *
+========
+C'est le mode par défaut de Sloodle Toolbar, il vous permet de poster un message qui s'écrit sur le site Moodle. Quand le mode blog est actif, vous verrez "Blog" en surbrillance en haut à gauche de la barre, et un rectangle coloré devrait dire "Pret".
+
+Note: S'il dit "Attente..." et ne change pas lorsque vous détachez et re-attachez la barre d'outils, c'est que celle-ci n'a probablement pas été configurée. Regardez alors le wiki de Sloodle pour les instructions de configuration (http://slisweb.sjsu.edu/sl/index.php/Sloodle_Toolbar).
+
+Note: S'il dit "Erreur" , quelque chose ne va pas avec la barre d'outils. Si vous l'avez configurée, vérifiez que le mot de passe est correct. Sinon vous devez remplacer la notecard de configuration, ou détacher et re-attacher la barre d'outils, pour essayer à nouveau le processus d'installation.
+
+
+Pour commencer à poster un message, cliquez sur le bouton "Click Here to Start". Le dispositif coloré certifiera que vous êtes bien en train d'écrire le sujet. En utiliser le chat courant, tapez le sujet de votre message et pressez entée. Votre texte (ou sa première partie) devrait apparaitre sur la barre d'outils.
+
+Puis, Sloodle Toolbar attend de vous que vous tapiez le texte du corps de votre message. Faites comme précédemment, en utiliser le chat courant. Cependant, cette fois vous pouvez taper autant de messages séparés que vous le souhaitez, jusqu'à ce que le nombre de caractères utilisés soit atteint (vous pouvez voir le compteur de la barre d'outils se remplir quand vous tapez). Par exemple, vous pouvez dire "hello" et presser entrée, puis taper "world" et presser une nouvelle fois entrée. Votre message contiendra le texte "hello world".
+
+Quand vous aurez fini de taper votre message, cliquez sur "Envoyer" pour l'envoyer au blog de Moodle. Vous pouvez également cliquer sur "Annuler" à tout moment pour l'annuler.
+
+Options Avancées:
+---------------------
+Par défaut, Sloodle Toolbar pense que vous voulez écrire votre message sur le channel 0 (le channel pour le chat public). Ce n'est parfois pas très agréable pour les personnes dans les alentours, vous pouvez déranger leur conversation, ou ne pas vouloir qu'ils puissent lire la votre. Vous pouvez changer ce channel très aisément. Cliquez le bouton "Channel" en haut à droite de Sloodle Toolbar, le menu apparait alors -- selectionnez le channel 0, 1 or 2. (Ce dispositif vous montrera constamment le channel utilisé).
+
+Pour entrer un message sur un channel différent, commencez chaque message par un slash / suivi du numéro de channel et d'un espace. Par exemple, pour écrire le "hello world" précédent sur le channel 2, vous devrez taper le message suivant:
+
+/2 hello
+/2 world
+
+Vous pouvez changer de channel à tout moment, excepté lors de l'initialisation de Sloodle Toolbar, ou lorsque votre message est envoyé à Moodle.
+
+
+===============
+* Animation Gestuelle *
+===============
+Le mode Animation Gestuelle apporte une série de gestes courants, incluant "lever la main", "applaudir", ou "faire non". Ils sont répartis en une série d'icones dans la barre d'outils -- cliquer sur une icone active la gestuelle correspondante. La plupart des animations nécessitent un "simple clic" (vous cliquez sur l'icone, l'animation s'active, puis s'arrète).
+
+Cependant, certaines animations tournent en boucle (toggled), vous devez alors cliquer dessus une première fois pour les activer et une seconde pour les désactiver. Vous pouvez vous apercevoir qu'une animation est "toggled" car son icone est mise en surbrillance lorsque vous cliquez dessus.
+
+
+========
+* AviLister *
+========
+Cette option a été introduite dans Sloodle 0.21, vous aurez donc besoin de cette version, ou d'une version supérieure de ce module pour l'utiliser.
+
+Vous devriez voir le bouton "AviLister" en haut à droite de Sloodle Toolbar. Cliquez dessus, et la barre d'outils va chercher des avatars à 48 mètres à la ronde (avec un maximun de 16 avatars à chaque fois, à cause des limitations de Second Life). Cela enverra les noms au site Moodle, et donnera une liste de noms des réels utilisateurs (c'est à dire les noms enregistrés dans Moodle) pour chaque avatar connu.
+
+Cela vous enverra les information dans un chat privé, vous montrant dabord combien d'avatars ont été trouvés, puis à chaque ligne sera associé le nom de l'avatar et le nom réel de l'utilisateur(enregistré sur Moodle).
+
+TIP: Si il y a plus de 2 ou 3 avatars autour de vous, vous aurez besoin d'ouvrir votre historique pour voir les noms avant qu'ils disparaissent!
