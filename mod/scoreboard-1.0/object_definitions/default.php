@@ -13,6 +13,7 @@ $sloodleconfig->field_sets = array(
 		//'sloodleshowallcontrollers' => new SloodleConfigurationOptionYesNo( 'sloodleshowallcontrollers', 'awards:showallcontrollers', 0 ), //feature disabled
                 'sloodlerefreshtime' => new SloodleConfigurationOptionText( 'sloodlerefreshtime', 'refreshtimeseconds', '', 600, 8 ),
 		'sloodlecurrencyid' => new SloodleConfigurationOptionCurrencyChoice( 'sloodlecurrencyid', 'awards:currency', '', '', 0), 
+                'sloodleobjecttitle' => new SloodleConfigurationOptionText( 'sloodleobjecttitle', 'awards:scoreboardtitle', '', 'Scoreboard', 40 ),
 	),
 	'accesslevel' => array(
                 'sloodleobjectaccesslevelctrl'  => $sloodleconfig->access_level_object_control_option()
