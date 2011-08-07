@@ -392,6 +392,7 @@ function doStop() {
 		//$('#backButton').show();
 	//	iui.animOn = true;
 		initialize_refresh_heartbeat();
+		preload_css_images();
 	});
 
 	function initialize_refresh_heartbeat() {
@@ -412,5 +413,21 @@ function doStop() {
 		setTimeout( 'refresh_heartbeat()', refreshtime * 1000);
 	}
 
+	function preload_css_images() {
+
+		var cssclass = null;
+		if (view_type == 'admin_view') {
+			cssclass = 'admin_preload';	
+                } else {
+			cssclass = 'user_preload';	
+		}
+
+		for (var i=0; i<10; i++) {
+			$('body').append( '<div class="'+cssclass+'"></div>' );
+		}
+
+		return true;
+
+	}
 
 

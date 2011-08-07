@@ -6,7 +6,9 @@ function print_html_top($loadfrom = '', $is_logged_in) {
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Scoreboard</title>
+<!--
 <style type="text/css" media="screen">@import "http://fonts.googleapis.com/css?family=Candal";</style>
+-->
 <style type="text/css" media="screen">@import "<?=$loadfrom?>scoreboard.css";</style>
 <script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
 <script type="application/x-javascript" src="../../../lib/jquery/jquery.ba-hashchange.min.js"></script>

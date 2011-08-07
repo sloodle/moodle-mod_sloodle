@@ -1,11 +1,12 @@
+@font-face {font-family: Candal; src: url(font/Candal.ttf); }
 div.scoreboard_top{
- background-image: url('images/scoreboard_top.png');
+ background-image: url(images/scoreboard_top.png);
  width:1000px;
  height:138px;
 }
 
 div.scoreboard_bottom{
- background-image: url('images/scoreboard_bottom.png');
+ background-image: url(images/scoreboard_bottom.png);
  width:1000px;
  height:56px;
  position:absolute;
@@ -22,6 +23,7 @@ span.scoreboard_title{
  font-weight: bold;
  font-size: 24px;
  font-family: 'Candal', 'Helvetica', sans-serif; 
+
 }
 span.new_round_button{
  position:absolute;
@@ -31,7 +33,7 @@ span.new_round_button{
  height:71px;
 }
 div.scoreboard_admin_main{
- background-image: url('images/scoreboard_admin_bg.png');
+ background-image: url(images/scoreboard_admin_bg.png);
  background-repeat: repeat-y;
  width:1000px;
  position:absolute;
@@ -39,7 +41,7 @@ div.scoreboard_admin_main{
 }
 
 div.scoreboard_admin_bottom{
- background-image: url('images/scoreboard_admin_bottom.png');
+ background-image: url(images/scoreboard_admin_bottom.png);
  width:1000px;
  height:23px;
  position:absolute;
@@ -53,7 +55,7 @@ span.score_change_section{
     color:grey; 
 }
 body{
-    background-image: url('images/scoreboard_bg.png');
+    background-image: url(images/scoreboard_bg.png);
     padding:0px;
     margin:0px;
 }
@@ -66,7 +68,7 @@ ul{
   font-weight: bold;
   font-size: 12px;
   color:black;
-  background-image: url('images/rowslice_admin.png');
+  background-image: url(images/rowslice_admin.png);
   width: 1000px;
   height: 48px;
   padding: 0px;
@@ -74,17 +76,17 @@ ul{
 }
 
 .admin_view > li.has_scores:hover{
-  background-image: url('images/rowslice_admin_hover.png');
+  background-image: url(images/rowslice_admin_hover.png);
 }
 
 .admin_view > li.has_scores.just_subtracted {
-  background-image: url('images/rowslice_admin_action_subtract.png');
+  background-image: url(images/rowslice_admin_action_subtract.png);
 }
 .admin_view > li.has_scores.deleting_scores{
-  background-image: url('images/rowslice_admin_action_subtract.png');
+  background-image: url(images/rowslice_admin_action_subtract.png);
 }
 .admin_view > li.has_scores.just_added {
-  background-image: url('images/rowslice_admin_action_add.png');
+  background-image: url(images/rowslice_admin_action_add.png);
 }
 
 .student_view > li.has_scores{
@@ -92,21 +94,21 @@ ul{
   font-weight: bold;
   font-size: 12px;
   color:black;
-  background-image: url('images/rowslice_user.png');
+  background-image: url(images/rowslice_user.png);
   width: 1000px;
   height: 48px;
   padding: 0px;
   margin:0px;
 }
 .student_view > li.has_scores:hover {
-  background-image: url('images/rowslice_user_hover.png');
+  background-image: url(images/rowslice_user_hover.png);
 }
 
 .student_view > li.has_scores.just_subtracted {
-  background-image: url('images/rowslice_user_subtract.png');
+  background-image: url(images/rowslice_user_subtract.png);
 }
 .student_view > li.has_scores.just_added {
-  background-image: url('images/rowslice_user_add.png');
+  background-image: url(images/rowslice_user_add.png);
 }
 
 
@@ -180,7 +182,7 @@ ul{
   font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
 }
 div.scoreboard_admin_main li.score_entry {
-  background-image: url('images/scoreboard_admin_bg.png');
+  background-image: url(images/scoreboard_admin_bg.png);
   width:1000px;
 }
 /*
@@ -193,7 +195,7 @@ div.scoreboard_admin_main li:nth-child(2n+2) {
 */
 
 div.scoreboard_admin_main li.above_no_scores{
- background-image: url('images/scoreboard_admin_top.png');
+ background-image: url(images/scoreboard_admin_top.png);
  width:1000px;
  height:23px;
 }
@@ -260,3 +262,19 @@ border:2px solid blue;
     width:60%;
     height:80px;
 }
+
+/*
+Preload images that show up on hover, interaction etc.
+Once the page has loaded, use JavaScript to add a bunch of elements
+The max number is hard-coded in scoreboard.js (initially used 10).
+If you add lots of images, you may need to increase it.
+*/
+.admin_preload:first { background: url(images/rowslice_admin_action_subtract.png) no-repeat -9999px -9999px; }
+.admin_preload:second { background: url(images/rowslice_admin_hover.png) no-repeat -9999px -9999px; }
+.admin_preload:third { background: url(images/rowslice_admin_action_subtract.png) no-repeat -9999px -9999px; }
+.admin_preload:fourth { background: url(images/rowslice_admin_action_subtract.png) no-repeat -9999px -9999px; }
+.admin_preload:fifth { background: url(images/rowslice_admin_action_add.png) no-repeat -9999px -9999px; }
+.user_preload:first { background: url(images/rowslice_user.png) no-repeat -9999px -9999px; }
+.user_preload:second { background: url(images/rowslice_user_hover.png) no-repeat -9999px -9999px; }
+.user_preload:third { background: url(images/rowslice_user_subtract.png) no-repeat -9999px -9999px; }
+.user_preload:fourth { background: url(images/rowslice_user_add.png) no-repeat -9999px -9999px; }
