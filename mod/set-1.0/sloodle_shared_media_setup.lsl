@@ -1,5 +1,5 @@
 /*********************************************
-*  Copyright (c) 2009 - 2012 various contributors (see below)
+*  Copyrght (c) 2009 various contributors (see below)
 *  Released under the GNU GPL 3.0
 *  This script can be used in your scripts, but you must include this copyright header as per the GPL Licence
 *  For more information about GPL 3.0 - see: http://www.gnu.org/copyleft/gpl.html
@@ -8,6 +8,7 @@
 *  http_in_config_requester
 *  Copyright:
 *  Paul G. Preibisch (Fire Centaur in SL) fire@b3dMultiTech.com  
+*
 *  Edmund Edgar (Edmund Earp in SL) ed@socialminds
 *
 *  This script will get an httpin url, open a shared media page allowing it to be used
@@ -15,9 +16,13 @@
 
 integer SLOODLE_CHANNEL_OBJECT_DIALOG                   = -3857343;//configuration channel
 integer SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL = -1639270089; //Object creator telling itself it wants to rez an object at a position (specified as key)
-
+ 
 string SLOODLE_EOF = "sloodleeof";
-string inventorystr = "";
+string inventorystr = ""; 
+
+integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER = -1639270111; // set the main shared media panel to the specified URL, accessible to the owner
+integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP = -1639270112; // set the main shared media panel to the specified URL, accessible to the group
+integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_ANYONE = -1639270114; // set the main shared media panel to the specified URL, accessible to anyone 
 
 sloodle_handle_command(string str) {
          if (str=="do:requestconfig")llResetScript();         
@@ -108,14 +113,13 @@ default {
                     // For avatar classroom use:    
                     //string url = "http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr // avatar classroom
                     
-                    url = "data:text/html,<div style=\"text-align:center;width:1000px;height:750px;margin-top:200px;font-size:200%\" ><form onsubmit=\"window.location=this.n.value+'"+path+"';return false;\">Moodle URL<br /><input style=\"height:60px;width:800px;margin:50px;\" type=\"text\" name=\"n\"><br /><input style=\":border:1px solid;width:200px;height:50px\" type=\"submit\" value=\"Submit\"></form></div>";
+                    url = "data:text/html,<body style=\"width:1000px;height:1000px;background-color:#595c67;color:white;font-weight:bold;\"><div style=\"position:relative;top:200px;text-align:center;width:1000px;height:750px;font-size:200%\" ><form onsubmit=\"v=this.n.value;if(v.substr(0, 4).toLowerCase()!='http'){v='http://'+v;}window.location=v+'"+path+"';return false;\">Moodle URL<br /><input style=\"height:60px;width:800px;margin:50px;\" type=\"text\" name=\"n\"><br /><input style=\":border:1px solid;width:200px;height:50px\" type=\"submit\" value=\"Submit\"></form></div></body>";
                 
                 }
                            
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER, url, NULL_KEY);
                 //llOwnerSay("got url URL_REQUEST_GRANTED"+"http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?httpinurl="+llEscapeURL(myUrl) + paramstr);
-                llClearPrimMedia(4);
-                llSetPrimMediaParams( 4, [ PRIM_MEDIA_CURRENT_URL, url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_GROUP ] );
-                llSetPrimMediaParams( 4, [ PRIM_MEDIA_HOME_URL, url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_GROUP ] );                
+              
                 state ready;
                 
           }
@@ -278,3 +282,5 @@ state rezz_and_reply
 }
 
 
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_object_creator.lsl

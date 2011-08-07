@@ -140,16 +140,16 @@ class SloodleSimpleLayoutRecipe extends SloodleLayoutRecipe {
 		$rowset = new SloodleLayoutRowSet();	
 
 		$leftrow  = new SloodleLayoutRow();
-		$leftrow->setPosition( $x = 1, $y = -5, $z = 1 );
-		$leftrow->setDimensions( $x = 10, $y = 0, $z = 0 );
-		$leftrow->setSpacing( $x = 2, $y = 0, $z = 0 );
+		$leftrow->setPosition( $x = -5, $y = 1, $z = 1 ); // make a row starting at the left of the rezzer
+		$leftrow->setDimensions( $x = 0, $y = 10, $z = 0 );
+		$leftrow->setSpacing( $x = 0, $y = -2, $z = 0 );
 		$leftrow->setDefaultRotation( "<0,0,0,0>" );
 		$rowset->addRow( $leftrow  );
 
 		$rightrow  = new SloodleLayoutRow();
-		$rightrow->setPosition( $x = 1, $y = 5, $z = 1 );
-		$rightrow->setDimensions( $x = 10, $y = 0, $z = 0 );
-		$rightrow->setSpacing( $x = 2, $y = 0, $z = 0 );
+		$rightrow->setPosition( $x = 5, $y = 1, $z = 1 ); // make a row starting at the right of the rezzer
+		$rightrow->setDimensions( $x = 0, $y = 10, $z = 0 );
+		$rightrow->setSpacing( $x = 0, $y = -2, $z = 0 );
 		$rightrow->setDefaultRotation( "<0,0,0,0>" );
 		$rowset->addRow( $rightrow  );
 

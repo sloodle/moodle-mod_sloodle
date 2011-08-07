@@ -20,6 +20,7 @@ $sloodleconfig->field_sets = array(
 		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(), 
 		'sloodleserveraccesslevel'     => $sloodleconfig->access_level_server_option(),
 	),
-        'awards' => $sloodleconfig->awards_deposit_options( array( 'answerquestion' => 'awards:answerquestionaward' ) )
+        //'awards' => array_merge( $sloodleconfig->awards_require_options(), $sloodleconfig->awards_deposit_options( array( 'answerquestion' => 'awards:answerquestionaward' ) ) )
+        'awards' => $sloodleconfig->awards_deposit_options( array( 'answerquestion' => 'awards:answerquestionaward' ) ) 
 );
 ?>

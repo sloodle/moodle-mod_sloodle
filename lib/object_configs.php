@@ -515,7 +515,7 @@ class SloodleObjectConfig {
 
 	}
 
-	function awards_pay_options( $interactions = null ) {
+	function awards_require_options( $interactions = null ) {
 
 		if ($interactions == null) {
 			//$interactions = array('default' => array('awards:interactwithobjectrequires', 'awards:interactwithobjectminus', 'awards:notenoughmessage') );
@@ -523,7 +523,7 @@ class SloodleObjectConfig {
 		}
 		$configs = array();
 		
-		foreach($interactions as $interactionname => $interactionlabels) {
+		foreach($interactions as $interactionname => $interactionlabel) {
 
 			$require_points_fieldname      = 'sloodleawardsrequire_numpoints_'.$interactionname;
 			$require_currency_fieldname    = 'sloodleawardsrequire_currency_'.$interactionname;
@@ -533,7 +533,7 @@ class SloodleObjectConfig {
 
 			$require_points_row_name = 'sloodleawardsrequire_row_'.$interactionname;
 
-			$configs[ $require_points_fieldname ]    = new SloodleConfigurationOptionText( $require_points_fieldname, $interactionlabels[0], '', 0, 8);
+			$configs[ $require_points_fieldname ]    = new SloodleConfigurationOptionText( $require_points_fieldname, $interactionlabel, '', 0, 8);
 			$configs[ $require_points_fieldname ]->row_name = $require_points_row_name;
 
 			$configs[ $require_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $require_currency_fieldname, '', '', '', 8);
@@ -764,7 +764,7 @@ class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOptio
 		$this->size = $length;
 		$this->options = $options;
 		$this->max_length = $length;
-		$this->default = $currencies[0]->id;
+		$this->default = $first_currency->id;
 		$this->type = 'radio';
 		$this->is_value_translatable = false;
 	}

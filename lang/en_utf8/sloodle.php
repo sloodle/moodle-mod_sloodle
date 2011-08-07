@@ -496,6 +496,7 @@ $string['xmlrpc:channel'] = 'XMLRPC Channel';
 $string['year'] = 'year';
 $string['years'] = 'years';
 $string['Yes'] = 'Yes';
+$string ['awards:scoreboardtitle']= 'Title';                      
 $string ['awards:viewgradesassociated']= 'Click here to view the grades associated with this SLOODLE Award';                      
 $string ['awards:stipendisfor']= 'Total Allocations:';
 $string ['awards:nostudents']= 'No Students Registered';

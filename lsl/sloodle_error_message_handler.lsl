@@ -24,9 +24,9 @@
 *
 *  This script is part of the SLOODLE Project see http://sloodle.org
 *
-*  Copywrite
-*  Paul G. Preibisch (Fire Centaur in SL)
-*  fire@b3dMultiTech.com  
+*  Copyright
+*  Paul G. Preibisch (Fire Centaur in SL) fire@b3dMultiTech.com  
+*  Edmund Edgar
 /**********************************************************************************************/
 integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
 list errorMessages;

@@ -596,7 +596,7 @@
 	function validate_requirements($interaction = 'default', $multiplier = 1) {
 
 	    if (!is_null($this->active_object)) {
-	        if ($error_message = $this->active_object->requirement_failures( 'SloodleModuleAwards', 'default', $multiplier, $this->user->get_user_id())) {
+	        if ($error_message = $this->active_object->requirement_failures( 'SloodleModuleAwards', $interaction, $multiplier, $this->user->get_user_id())) {
 	    	    $this->response->quick_output(-1001, 'AWARDS', $error_message, false);
 	            exit();
 	        }

@@ -55,7 +55,7 @@ if (!has_capability('mod/sloodle:editlayouts', $course_context)) {
 $layoutentry = new SloodleLayoutEntry();
 $layoutentry->name = $objectname;
 $layoutentry->layout = $layoutid;
-$layoutentry->position = "<2.0,0.0,2.0>"; // default: behind and above the set where it's easy to see
+$layoutentry->position = "<0,-1,1.5>"; // default: behind and above the set where it's easy to see
 $layoutentry->rotation = "<0.0,0.0,0.0,0.0>";
 
 foreach($configVars as $n=>$v) {

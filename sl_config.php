@@ -135,8 +135,8 @@
 
     /** The following will turn on logging of requests coming from LSL and responses going back */
     /*   
-        On a production server, this should usually be off ('').
-        Your web server user (usually apache or www-data) will need to be able to write to this file.
+        On a production server, this should usually be off ('') unless you're trying to trouble-shoot something.
+        If you do use it, your web server user (usually apache or www-data) will need to be able to write to this file.
         It will contain all data sent to and from the server by LSL scripts, including sensitive data like prim passwords
         ...so if you turn this on, be careful about who has access to the file it creates.
     */
@@ -166,8 +166,8 @@
 
     // Site list customization
     /**
-    * This allows you to have a back button on the shared media screen 
-    * Used in Avatar Classroom to provide a list of your sites so that you can switch between them or create a new one.
+    * This allows you to have a back button on the shared media screen to take you one level above the course/controller list.
+    * Used in Avatar Classroom to provide a list of your hosted Moodle sites so that you can switch between them or create a new one.
     * Probably not useful to anyone else.
     */
     //define('SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL', 'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/');

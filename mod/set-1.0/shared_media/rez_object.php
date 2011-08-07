@@ -72,7 +72,7 @@ $response->set_status_code(1);
 $response->set_status_descriptor('SYSTEM');
 $response->set_request_descriptor('REZ_OBJECT');
 $response->add_data_line(join('|', $possibleobjectnames)); // object names - rezzer will use the first one it has in its inventory
-$response->add_data_line('<1,0,1>'); // position
+$response->add_data_line('<0,-1,0>'); // position
 $response->add_data_line('<0,0,0>'); // rotation
 
 //create message - NB for some reason render_to_string changes the string by reference instead of just returning it.

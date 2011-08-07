@@ -245,3 +245,5 @@ state ready {
      }    
 }
 
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_rezzer_object.lsl

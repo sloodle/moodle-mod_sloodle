@@ -76,6 +76,12 @@
 		}
 	}
 
+	if ( !preg_match('/SecondLife/', $_SERVER['HTTP_USER_AGENT']) && !isset($_REQUEST['frame'] ) ) {
+		$baseurl .= '&frame=1';
+		echo '<html><body><div style="width:100%; text-align:center"><iframe width="1000" height="1000" src="'.$baseurl.'"></div></body></html>';
+		exit;
+	}
+
 	// Register the set using URL parameters
 	$ao = new SloodleActiveObject();
 	$object_uuid = required_param('sloodleobjuuid');
