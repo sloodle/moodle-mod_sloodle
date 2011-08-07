@@ -3,6 +3,8 @@
 	var refreshtime = 0;
 	var view_type = null;
 
+	var user_timeouts = {};
+
 	function refresh_changed_scores() {
 		$.getJSON(  
 			"refresh_changed_scores.php",  
@@ -17,18 +19,44 @@
 						var score = json.updated_scores[userid];
 						var changedscorejq = $('#student_score_'+userid);
 					
+						var just_edited_class = '';
+
 						// TODO: If missing, create
 						if (changedscorejq.size() == 0) {
 							changedscorejq = $('#student_score_0').clone();
-							 $('#scorelist').find('li.group').after(changedscorejq);
+							 $('#scorelist').find('li.below_scores').before(changedscorejq);
 							changedscorejq.attr('id', 'student_score_'+userid);
 							changedscorejq.find('.avatar_name').html( score.name_html );
 							changedscorejq.removeClass('dummy_item_template');
+							changedscorejq.removeClass('no_scores');
+							changedscorejq.addClass('has_scores');
+						} else {
+/*
+							var previous_score = parseInt(changedscorejq.find('.score_info').html());
+							if (previous_score != undefined) {
+								if (score > previous_score) {
+									just_edited_class= 'just_added';
+								} else if (score < previous_score) {
+									just_edited_class = 'just_subtracted';
+								}
+							}
+*/
 						}
 						changedscorejq.find('.score_info').html( score.balance );
 						if ( ( view_type != 'admin_view' ) && (!json.updated_scores[userid].has_scores) ){
 							changedscorejq.remove();
 						}
+
+/*
+						if ( ( view_type != 'admin_view' ) && (just_edited_class != '') ) {
+							changedscorejq.addClass(just_edited_class);
+							setTimeout( function() {
+								changedscorejq.removeClass(just_edited_class);
+								},
+								1500
+							);
+						}
+*/
 						update_position(changedscorejq);
 					}
 					//itemjq.removeClass('syncing').addClass("synced");
@@ -107,6 +135,39 @@
 			nextjq.after(changedscorejq);	
 		}
 
+		$('.no_scores').find('.avatar_name').unbind('click').click( function() {
+			return change_score($(this));
+		});
+
+		update_rank_numbers();
+//doPlay();
+	}
+/*
+function getPlayer(pid) {
+        var obj = document.getElementById(pid);
+        if (obj.doPlay) return obj;
+        for(i=0; i<obj.childNodes.length; i++) {
+                var child = obj.childNodes[i];
+                if (child.tagName == "EMBED") return child;
+        }
+}
+function doPlay(fname) {
+        var player=getPlayer("audio1");
+        player.play(fname);
+}
+function doStop() {
+        var player=getPlayer("audio1");
+        player.doStop();
+}
+*/
+
+
+	function update_rank_numbers() {
+		var i=1;
+		$('span.position_number').each( function() {
+			$(this).html(i);
+			i++;
+		});
 	}
 
 	function update_score_for_hash_change( hashval ) {
@@ -171,13 +232,16 @@
 		$().find('.score_change').unbind('click').click( function() {
 			return change_score($(this));
 		});
+		$('.no_scores').find('.avatar_name').unbind('click').click( function() {
+			return change_score($(this));
+		});
 		$().find('.user_score_delete_link').unbind('click').click( function() {
 			return delete_scores($(this));
 		});
 		$('#save_dirty_link').unbind('click').click( function() {
 			return save_dirty_scores();
 		});
-		$('.new_round_link').unbind('click').click( function() {
+		$('.new_round_button').unbind('click').click( function() {
 			return switch_to_new_round();
 		});
 		 //enable_slide_navigation();
@@ -214,29 +278,41 @@
 			}
 		); 
 
-
 	}
 
 	function change_score(changespanjq) {
 
-		var changeby = parseInt( changespanjq.attr('data-score-change') );	
+		var changeby = 0;
+		// Show links don't have a data-score-change attribute, but work with a value of 0
+		if (changespanjq.attr('data-score-change') != undefined) {
+			changeby = parseInt( changespanjq.attr('data-score-change') );	
+		}
 		var parentlijq = changespanjq.closest('li');
 		parentlijq.addClass('has_dirty_scores');
 		parentlijq.removeClass('no_scores');
 		parentlijq.addClass('has_scores');
 		parentlijq.attr('data-dirty-change', parseInt(parentlijq.attr('data-dirty-change')) + changeby);
 		parentlijq.find('.score_info').html( parseInt(parentlijq.find('.score_info').html()) + changeby );
+		var position_timeout = ( ( changeby == 0 ) ? 0 : 1000 ); // change by zero is showing previously undisplayed name - should do that right away
 		setTimeout( function() { 
 			update_position(parentlijq);
 			},
-			750
+			position_timeout	
 		);
-		parentlijq.addClass('just_edited');
-		setTimeout( function() { 
-				parentlijq.removeClass('just_edited');
-			}, 
-			1500	
-		);
+		var just_edited_class = '';
+		if (changeby >= 0) {
+			just_edited_class = 'just_added';
+		} else if (changeby < 0) {
+			just_edited_class = 'just_subtracted';
+		}
+		if (just_edited_class != '') {
+			parentlijq.addClass(just_edited_class);
+			setTimeout( function() { 
+					parentlijq.removeClass(just_edited_class);
+				}, 
+				1500	
+			);
+		}
 		
 
 		// TODO: Might be better to wait a few seconds then do this on a timer.

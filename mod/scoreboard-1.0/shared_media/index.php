@@ -5,7 +5,7 @@
     * This script is intended to be shown on the surface of the scoreboard.
     *
     */ 
-
+                  
     /**
     * @package sloodle
     * @copyright Copyright (c) 2011 various contributors (see below)
@@ -71,11 +71,11 @@ header('Pragma: public');
 	include('index.template.php');
 
 	print_html_top('', $is_logged_in);
-	print_toolbar( $baseurl, $is_logged_in );
+	//print_toolbar( $baseurl, $is_logged_in ) ;
 
-	print_site_placeholder( $sitesURL );
+//	print_site_placeholder( $sitesURL );
 //	print_round_list( $roundrecs );
-	print_score_list( 'scoreboard:allstudents', $student_scores, $object_uuid, $currency, $sao->roundid, $sao->refreshtime, $is_logged_in, $is_admin); 
+	print_score_list( 'scoreboard:allstudents', $student_scores, $object_uuid, $currency, $sao->roundid, $sao->refreshtime, $sao->objecttitle, $is_logged_in, $is_admin); 
 
 	print_html_bottom();
 

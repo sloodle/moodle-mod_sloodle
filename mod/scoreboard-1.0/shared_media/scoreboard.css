@@ -1,21 +1,254 @@
+div.scoreboard_top{
+ background-image: url('images/scoreboard_top.png');
+ width:1000px;
+ height:138px;
+}
+
+div.scoreboard_bottom{
+ background-image: url('images/scoreboard_bottom.png');
+ width:1000px;
+ height:56px;
+ position:absolute;
+ bottom:0px;
+}
+div.scoreboard_admin_top{
+}
+span.scoreboard_title{
+ color:white;
+ position:absolute;
+ top:60px;
+ left:60px;
+ width:600px;
+ font-weight: bold;
+ font-size: 24px;
+ font-family: 'Candal', 'Helvetica', sans-serif; 
+}
+span.new_round_button{
+ position:absolute;
+ top:50px;
+ left:800px;
+ width:169px;
+ height:71px;
+}
+div.scoreboard_admin_main{
+ background-image: url('images/scoreboard_admin_bg.png');
+ background-repeat: repeat-y;
+ width:1000px;
+ position:absolute;
+ bottom:79px;
+}
+
+div.scoreboard_admin_bottom{
+ background-image: url('images/scoreboard_admin_bottom.png');
+ width:1000px;
+ height:23px;
+ position:absolute;
+ bottom:56px;
+}
+
 span.score_change_section{
     float:right;
     margin-left: 20px;
     margin-right: 20px;
     color:grey; 
 }
-
-span.score_info{
-    float:right; 
-    margin-right:10px; 
-    color:grey; 
-    font-style:italic
+body{
+    background-image: url('images/scoreboard_bg.png');
+    padding:0px;
+    margin:0px;
 }
+ul{
+  margin:0px;
+  padding:0px;
+}
+.admin_view > li.has_scores{
+  list-style-type: none;
+  font-weight: bold;
+  font-size: 12px;
+  color:black;
+  background-image: url('images/rowslice_admin.png');
+  width: 1000px;
+  height: 48px;
+  padding: 0px;
+  margin:0px;
+}
+
+.admin_view > li.has_scores:hover{
+  background-image: url('images/rowslice_admin_hover.png');
+}
+
+.admin_view > li.has_scores.just_subtracted {
+  background-image: url('images/rowslice_admin_action_subtract.png');
+}
+.admin_view > li.has_scores.deleting_scores{
+  background-image: url('images/rowslice_admin_action_subtract.png');
+}
+.admin_view > li.has_scores.just_added {
+  background-image: url('images/rowslice_admin_action_add.png');
+}
+
+.student_view > li.has_scores{
+  list-style-type: none;
+  font-weight: bold;
+  font-size: 12px;
+  color:black;
+  background-image: url('images/rowslice_user.png');
+  width: 1000px;
+  height: 48px;
+  padding: 0px;
+  margin:0px;
+}
+.student_view > li.has_scores:hover {
+  background-image: url('images/rowslice_user_hover.png');
+}
+
+.student_view > li.has_scores.just_subtracted {
+  background-image: url('images/rowslice_user_subtract.png');
+}
+.student_view > li.has_scores.just_added {
+  background-image: url('images/rowslice_user_add.png');
+}
+
+
+.admin_view > li.has_scores span{
+  position: absolute; 
+  /*border:1px dashed red; */
+}
+.student_view > li.has_scores span{
+  position: absolute; 
+  /*border:1px dashed red; */
+}
+.admin_view > li.has_scores span.avatar_name{
+  text-transform:uppercase;
+  left:170px;
+  color: #ffd000;
+  font-family: 'Candal', 'Helvetica', sans-serif; 
+  margin-top:4px;
+  font-size: 24px;
+}
+.student_view > li.has_scores span.avatar_name{
+  text-transform:uppercase;
+  left:170px;
+  color: #ffd000;
+  font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
+  margin-top:4px;
+  font-size: 24px;
+}
+.admin_view > li.has_scores span.user_score_delete_link{
+  left:115px; 
+  width:49px;
+  margin-top:6px;
+  color:white;
+  height: 48px;
+}
+.admin_view > li.has_scores span.position_number{
+  left:70px; 
+  width:30px;
+  margin-top:4px;
+  color:black;
+  height: 48px;
+  font-size: 22px;
+  font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
+}
+.student_view > li.has_scores span.position_number{
+  left:70px; 
+  width:30px;
+  margin-top:4px;
+  color:black;
+  height: 48px;
+  font-size: 22px;
+  font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
+}
+.admin_view > li.has_scores span.score_info{
+  text-align:right;
+  margin-top:4px;
+  left:850px; 
+  font-weight: bold;
+  font-size: 22px;
+  color:white; 
+  width:80px; 
+  font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
+}
+.student_view > li.has_scores span.score_info{
+  text-align:right;
+  margin-top:4px;
+  left:850px; 
+  font-weight: bold;
+  font-size: 22px;
+  color:white; 
+  width:80px; 
+  font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
+}
+div.scoreboard_admin_main li.score_entry {
+  background-image: url('images/scoreboard_admin_bg.png');
+  width:1000px;
+}
+/*
+div.scoreboard_admin_main li:nth-child(2n+1) {
+  background-image: url('images/scoreboard_admin_bg.png');
+  width:1000px;
+}
+div.scoreboard_admin_main li:nth-child(2n+2) {
+}
+*/
+
+div.scoreboard_admin_main li.above_no_scores{
+ background-image: url('images/scoreboard_admin_top.png');
+ width:1000px;
+ height:23px;
+}
+div.scoreboard_admin_main li span{
+  position: absolute; 
+}
+div.scoreboard_admin_main li span.avatar_name{
+  font-weight: bold;
+  height: 48px;
+  font-family: 'Candal', sans-serif; 
+  color:black; 
+  left:100px;
+}
+/*
+div.scoreboard_admin_main li:nth-child(2n+1) span.avatar_name{
+  left:100px;
+}
+div.scoreboard_admin_main li:nth-child(2n+2) span.avatar_name{
+  left:400px;
+}
+*/
+div.scoreboard_admin_main li span.position_number{
+  display:none;
+}
+div.scoreboard_admin_main li span.score_info{
+  display:none;
+}
+div.scoreboard_admin_main li span.score_change{
+  display:none;
+}
+div.scoreboard_admin_main li span.show_link{
+  display:none;
+}
+div.scoreboard_admin_main li span.user_score_delete_link{
+  display:none;
+}
+
+span.score_change{
+  height:48px;
+  width:48px;
+}
+span.plus1{ left:444px; }
+span.plus5{ left:492px; }
+span.plus25{ left:540px; }
+span.plus100{ left:588px; }
+span.minus100{ left:636px; }
+span.minus25{ left:684px; }
+span.minus5{ left:732px; }
+span.minus1{ left:780px; }
 
 li.just_edited { background-color:yellow }
 li.deleting_scores { background-color:red }
 li.no_scores { background-color: #c0c0c0}
 li.no_scores .user_score_delete_link{ visibility:hidden}
+li.no_scores .avatar_name:hover{color:#ff0000 }
 li.has_scores .show_link{ visibility:hidden}
 .dummy_item_template{ visibility: hidden }
 

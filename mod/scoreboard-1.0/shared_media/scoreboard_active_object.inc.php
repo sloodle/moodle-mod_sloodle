@@ -6,6 +6,7 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 	var $refreshtime;
 	var $context;
 	var $courseid;
+	var $objecttitle;
 
 	function ForUUID($object_uuid) {
 
@@ -34,6 +35,7 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
 		$this->currencyid =  isset($configs['sloodlecurrencyid']) ? intval($configs['sloodlecurrencyid']) : 0; 
 		$this->refreshtime = isset($configs['sloodlerefreshtime']) ? intval($configs['sloodlerefreshtime']) : 60;
+		$this->objecttitle = isset($configs['sloodleobjecttitle']) ? $configs['sloodleobjecttitle'] : '';
 
 		$this->context = get_context_instance(CONTEXT_COURSE, $this->course->course_object->id);
 		$this->courseid = $this->course->course_object->id;
