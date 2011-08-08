@@ -41,10 +41,19 @@
 
         /**
         * The password of this object.
+	* Used for the server to check a message from the object is legitimate.
         * @var string
         * @access public
         */
         var $password = '';
+
+        /**
+        * The http-in password of this object.
+	* Used for the object to check a message from the server is legitimate.
+        * @var string
+        * @access public
+        */
+        var $httpinpassword= '';
 
         /**
         * The type of this object. This corresponds to the mod/ directory its linker lives in.
@@ -230,6 +239,7 @@
 		$response->set_status_code(1);
 		$response->set_status_descriptor('SYSTEM');
 		$response->set_request_descriptor('DEREZ');
+		$response->set_http_in_password($this->httpinpassword);
 		$response->add_data_line('do:derez');
 
 		//create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
@@ -323,7 +333,8 @@
                 $response->add_data_line( 'set:'.$n.'|'.$v );
             }//endforeach
             $response->set_status_code(1);
-            $response->set_status_descriptor('OK');
+            $response->set_status_descriptor('CONFIG');
+            $response->set_http_in_password($this->httpinpassword);
             $renderStr="";
             $response->render_to_string($renderStr);
             //curl send this to our object's httpinurl

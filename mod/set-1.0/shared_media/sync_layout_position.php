@@ -52,7 +52,20 @@ $failures = array();
 $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
 
 foreach($active_objects as $ao) {
-	$response = $ao->sendMessage('do:reportposition');
+
+	//build response string
+	$response = new SloodleResponse();
+	$response->set_status_code(1);
+	$response->set_status_descriptor('SYSTEM');
+	$response->set_request_descriptor('REPORT_POSITION');
+	$response->set_http_in_password($ao->httpinpassword);
+
+	//create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
+	$renderStr="";
+	$response->render_to_string($renderStr);
+
+	//$response = $ao->sendMessage('do:reportposition');
+	$response = $ao->sendMessage($renderStr);
 	//var_dump($response['result']);
 	if (preg_match('/^(<.*?>)\|(<.*?>)\|(.*?)$/', $response['result'], $matches)) {
 		$layoutentry->position = $matches[1];

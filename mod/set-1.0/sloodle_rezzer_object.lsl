@@ -22,13 +22,14 @@ vector rezzer_position_offset;
 rotation rezzer_rotation_offset;
 key rezzer_uuid;
 integer isconfigured = 0;
+integer http_in_password = 0;
 
 string myUrl;
 
 
 move_to_layout_position() {
     
-   // llOwnerSay("todo: move to position "+(string)rezzer_position_offset+", rot "+(string)rezzer_rotation_offset+ " in relation to rezzer "+(string)rezzer_uuid);   
+   // llOwnerSay("todo: move to position "+(string)rezzer_position_offset+", rot "+(string)rezzer_rotation_offset+ " in relation to rezzer "+(string)rezzer_uuid);
 
     list rezzerdetails = llGetObjectDetails( rezzer_uuid, [ OBJECT_POS, OBJECT_ROT ] );
     vector rezzerpos = llList2Vector( rezzerdetails, 0 );
@@ -124,13 +125,32 @@ default{
                // llOwnerSay("got url "+myUrl);
           } else if (method == "POST"){                            
                //this is where we receive data from from our server
-                llHTTPResponse(id, 200, "OK");                       
+                      
                 list lines;
                 lines = llParseStringKeepNulls( body, ["\n"], [] );
                 
+                list header_line;
+                header_line = llParseStringKeepNulls( llList2String(lines,0), ["|"], [] );
+                
+                // Position 10 should be the http_in_password
+                // This is set once on initial config.
+                // Once we've implemented object persistance, it should always be set.
+                if (http_in_password == 0) {
+                   // llOwnerSay("First time, setting http in password");                    
+                    http_in_password = (integer)llList2String(header_line, 10);
+                }
+                
+                if (http_in_password != (integer)llList2String(header_line, 10)) {
+                   // llOwnerSay("Ignoring message - password mismatch");
+                    llHTTPResponse(id, 401, "Unauthorized - HTTP-in password mismatch");  
+                    return;
+                }
+                
+                llHTTPResponse(id, 200, "OK");                 
+                
                 integer numlines = llGetListLength(lines);
                 integer i = 0;          
-                for (i=0; i < numlines; i++) {
+                for (i=1; i < numlines; i++) {
                     isconfigured = sloodle_handle_command(llList2String(lines, i));                
                 }                                                         
                 
@@ -209,11 +229,28 @@ state ready {
                //this is where we receive data from from our server
                 list lines;
                 lines = llParseStringKeepNulls( body, ["\n"], [] );
+
+                list header_line;
+                header_line = llParseStringKeepNulls( llList2String(lines,0), ["|"], [] );
                 
+                // Position 10 should be the http_in_password
+                // This is set once on initial config.
+                // Once we've implemented object persistance, it should always be set.
+                if (http_in_password == 0) {
+                   // llOwnerSay("First time, setting http in password");                    
+                    http_in_password = (integer)llList2String(header_line, 10);
+                }
+                
+                if (http_in_password != (integer)llList2String(header_line, 10)) {
+                   // llOwnerSay("Ignoring message - password mismatch");
+                    llHTTPResponse(id, 401, "Unauthorized - HTTP-in password mismatch");  
+                    return;
+                }
+                                             
                 integer numlines = llGetListLength(lines);
                 integer i = 0;   
               // llOwnerSay(body);
-                if (llList2String(lines,0) == "do:reportposition") {
+                if (llList2String(header_line,3) == "REPORT_POSITION") {
                     list rezzerdetails = llGetObjectDetails( rezzer_uuid, [ OBJECT_POS, OBJECT_ROT ] );
                     vector rezzerpos = llList2Vector( rezzerdetails, 0 );
                     rotation rezzerrot = llList2Rot( rezzerdetails, 1 );
@@ -224,7 +261,7 @@ state ready {
                        
                 llHTTPResponse(id, 200, "OK");                   
 
-                for (i=0; i < numlines; i++) {
+                for (i=1; i < numlines; i++) {
                     isconfigured = sloodle_handle_command(llList2String(lines, i));
                 }                                                         
                                 
@@ -247,3 +284,4 @@ state ready {
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_rezzer_object.lsl
+

@@ -158,6 +158,15 @@
         var $page_number = null;
         
         /**
+        * HTTP-In password
+        * Used when sending an http-in message to an object.
+	* Allows the object to confirm that we are authorized to talk to it.
+        * @var integer
+        * @access private
+        */
+        var $http_in_password= null;
+ 
+        /**
         * Data to render following the status line in the response.
         * This value can either be a scalar (single value, e.g. int, string, float), or an array.
         * If it is a single scalar, it is rendered as a single line.
@@ -430,7 +439,18 @@
                 $this->page_number = $par;
             }
         }
-        
+  
+        /**
+        * Accessor function to set member value {@link $tracking_code}
+        * @param mixed $par Any scalar value
+        * @return void
+        */
+        function set_http_in_password($pwd)
+        {
+            $this->http_in_password = $pwd;
+        }
+       
+
         /**
         * Accessor function to set member value {@link $data}. <b>Note: it is recommended that you use the {@link add_data_line()} and {@link clear_data()} functions instead of this.</b>
         * @param mixed $par Any scalar value, or a mixed array of scalars or scalar arrays, or null to clear it
@@ -548,6 +568,13 @@
             
             // We will step backwards through out list of fields, and as soon as one item is specified, all of them should be
             $showall = false;
+
+            // Status descriptor?
+            if ($showall || is_null($this->http_in_password) == false) {
+                $showall = true;
+                $str = $this->field_separator . $this->http_in_password. $str;
+            }
+
             // Make sure that if the page number is specified, that the total is as well
             if (is_null($this->page_number) xor is_null($this->page_total)) {
                 $this->_internal_validation_error("Sloodle - LSL response: script must specify both \"page_total\" *and* \"page_number\", or specify neither");
@@ -622,7 +649,7 @@
                 // Output the status code
                 $str = (string)$this->status_code . $str;
             }
-            
+                       
             
             // Has any data been specified?
             if (is_null($this->data) == false) {

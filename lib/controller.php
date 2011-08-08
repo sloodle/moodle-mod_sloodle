@@ -340,7 +340,7 @@
         * @param int $timestamp The timestamp of the object's registration, or null to use the current time.
         * @return int|bool The new authorisation ID if successful, or false if not
         */
-        function register_object($uuid, $name, $user, $password, $type = '', $timestamp = null)
+        function register_object($uuid, $name, $user, $password, $httpinpassword = '', $type = '', $timestamp = null)
         {
             // Use the current timestamp if necessary
             if ($timestamp == null) $timestamp = time();
@@ -358,6 +358,7 @@
                 $entry->name = $name;
                 $entry->userid = $userid;
                 $entry->password = $password;
+                $entry->httpinpassword = $httpinpassword;
                 $entry->type = $type;
                 $entry->timeupdated = $timestamp;
                 // Attempt to insert the entry
@@ -370,6 +371,7 @@
                 $entry->name = $name;
                 $entry->userid = $userid;
                 $entry->password = $password;
+                $entry->httpinpassword = $httpinpassword;
                 $entry->type = $type;
                 $entry->timeupdated = $timestamp;
                 // Attempt to update the database

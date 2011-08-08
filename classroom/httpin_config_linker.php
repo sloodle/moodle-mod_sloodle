@@ -63,7 +63,8 @@
 	// first time we way it
 	if(!$ao = SloodleActiveObject::loadByUUID( $childobjectuuid )) {
 		$primpassword = sloodle_random_web_password();
-		if ( !$authid = $controller->register_object($childobjectuuid, $objectname, $sloodle->user, $primpassword, $objecttype) ) {
+		$httpinpassword = sloodle_random_prim_password();
+		if ( !$authid = $controller->register_object($childobjectuuid, $objectname, $sloodle->user, $primpassword, $httpinpassword, $objecttype) ) {
 		    $sloodle->response->set_status_code(-217);//Could not save HTTP In URL for rezzed object
 		    $sloodle->response->set_status_descriptor('OBJECT_AUTH');
 		    $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 

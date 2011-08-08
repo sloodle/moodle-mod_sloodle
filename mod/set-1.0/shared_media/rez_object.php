@@ -66,14 +66,18 @@ if ( !$rezzer->loadByUUID($_REQUEST['rezzeruuid']) ) {
 	error_output('Could not load rezzer');
 }
 
+$rez_http_in_password = sloodle_random_prim_password();
+
 //build response string
 $response = new SloodleResponse();
 $response->set_status_code(1);
 $response->set_status_descriptor('SYSTEM');
 $response->set_request_descriptor('REZ_OBJECT');
+$response->set_http_in_password($rezzer->httpinpassword);
 $response->add_data_line(join('|', $possibleobjectnames)); // object names - rezzer will use the first one it has in its inventory
 $response->add_data_line('<0,-1,0>'); // position
 $response->add_data_line('<0,0,0>'); // rotation
+$response->add_data_line($rez_http_in_password); // This is set as the start parameter. As of 2011-08-08, this is ignored by the object at this point. When we do object persistance, it should be used to prevent people hijacking the object.
 
 //create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
 $renderStr="";
@@ -87,7 +91,7 @@ if (!( $reply['info']['http_code'] == 200 ) ) {
 
 $rezzed_object_uuid = $reply['result'];
 
-if ( !$authid = $controller->register_object($rezzed_object_uuid, $objectname, $sloodleuser, $primpassword, $config->modname) ) {
+if ( !$authid = $controller->register_object($rezzed_object_uuid, $objectname, $sloodleuser, $primpassword, $rez_http_in_password, $config->modname) ) {
 	error_output('Object registration failed');
 }
 

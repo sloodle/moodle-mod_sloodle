@@ -84,9 +84,11 @@
             $userid = $sloodle->course->controller->get_authorizing_user($pwdparts[0]);
             if ($userid) $sloodle->user->load_user($userid);
         }
+
+	$httpinpassword = sloodle_random_prim_password();
         
         // Authorise the object on the controller
-        $authid = $sloodle->course->controller->register_object($sloodleobjuuid, $sloodleobjname, $sloodle->user, $sloodleobjpwd, $sloodleobjtype);
+        $authid = $sloodle->course->controller->register_object($sloodleobjuuid, $sloodleobjname, $sloodle->user, $sloodleobjpwd, $httpinpassword, $sloodleobjtype);
         $alreadyconfigured = "0";
         if ($sloodlelayoutentryid > 0) {
             if ($sloodle->course->controller->configure_object_from_layout_entry($authid, $sloodlelayoutentryid)) {

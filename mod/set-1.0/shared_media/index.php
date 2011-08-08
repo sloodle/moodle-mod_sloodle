@@ -76,7 +76,7 @@
 		}
 	}
 
-	if ( !preg_match('/SecondLife/', $_SERVER['HTTP_USER_AGENT']) && !isset($_REQUEST['frame'] ) ) {
+	if (false && !preg_match('/SecondLife/', $_SERVER['HTTP_USER_AGENT']) && !isset($_REQUEST['frame'] ) ) {
 		$baseurl .= '&frame=1';
 		echo '<html><body><div style="width:100%; text-align:center"><iframe width="1000" height="1000" src="'.$baseurl.'"></div></body></html>';
 		exit;
@@ -90,6 +90,7 @@
 		$ao->userid = $USER->id;
 		$ao->uuid = $object_uuid;
 		$ao->httpinurl = required_param('httpinurl');
+		$ao->httpinpassword = sloodle_random_prim_password();
 		$ao->password = rand(100000,9999999999);
 		$ao->name = required_param('sloodleobjname');
 		$ao->type = 'set-1.0';
