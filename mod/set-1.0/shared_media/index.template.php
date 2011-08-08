@@ -147,7 +147,7 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 ?>
 	<li class="add_layout_above_me"></li>
         <li class="group"><?= s(get_string('rezzer:addlayout', 'sloodle'))?></li>
-        <li><a href="#addlayout_<?= intval($cid) ?>-<?= intval($contid) ?>"><?= s(get_string('rezzer:addlayout', 'sloodle'))?></a></li>
+        <li><a class="add_layout_link" href="#addlayout_<?= intval($cid) ?>-<?= intval($contid) ?>"><?= s(get_string('rezzer:addlayout', 'sloodle'))?></a></li>
     </ul>
 <?php 
 		}
@@ -162,6 +162,19 @@ function print_add_layout_forms( $courses, $controllers, $rezzeruuid ) {
 		foreach($controllers[$cid] as $contid => $cont) {
 ?>
     <form data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" id="addlayout_<?= intval($cid)?>-<?= intval($contid) ?>" class="panel" title="<?= s(get_string('rezzer:addlayout', 'sloodle'))?> <?= s($course->fullname) ?>">
+
+<div class="upper_button_zone">
+<span class="left_zone">
+                                <span class="title_text"><?= s( get_string('rezzer:createscene','sloodle')) ?></span>
+
+</span>
+<span class="right_zone">
+
+	<span data-creating-text="<?= s(get_string('rezzer:creatingscene', 'sloodle'))?>" data-create-text="<?= s(get_string('rezzer:createscenetitle','sloodle'))?>" class="control_button create_layout_button" type="submit" href="#"><?= s(get_string('rezzer:createscene','sloodle'))?></span>
+
+</span>
+</div>
+
 	<input type="hidden" name="courseid" value="<?= intval($cid)?>" />
 	<input type="hidden" name="rezzeruuid" value="<?= s($rezzeruuid)?>" />
 	<input type="hidden" name="controllerid" value="<?= intval($contid)?>" />
@@ -171,7 +184,6 @@ function print_add_layout_forms( $courses, $controllers, $rezzeruuid ) {
 		<input id="layoutname" name="layoutname" class="panel" style="width:80%; height:40px; margin:10px;">
 	</div>
 	</fieldset>
-	<span data-creating-text="<?= s(get_string('rezzer:creatingscene', 'sloodle'))?>" data-create-text="<?= s(get_string('rezzer:createscene','sloodle'))?>" class="active_button create_layout_button" type="submit" href="#"><?= s(get_string('rezzer:createscene','sloodle'))?></span>
     </form>
 <?php
 		}
@@ -207,11 +219,35 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 
 ?>
 			    <ul data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>" data-rez-mode="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-action-status="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-connection-status="disconnected">
-				<li class="group"><?= s( $layout->name ) ?></li>
-				<span id="set_configuration_status_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="button_goes_here_zone set_configuration_status"><?=get_string('layoutmanager:connectingtorezzer','sloodle') ?></span>
-				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="active_button rez_all_objects"><?= s(get_string('rezzer:rezallobjects', 'sloodle'))?></span>
 
-				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-generate-text="<?= s(get_string('rezzer:importmoodleactivities','sloodle', $cn )) ?>" data-generating-text="<?= s(get_string('rezzer:importingmoodleactivities', 'sloodle'))?>" data-layoutid="<?= intval($layout->id) ?>" class="active_button generate_standard_layout"><?= s(get_string('rezzer:importmoodleactivities', 'sloodle', $cn )) ?></span>
+
+				<li class="group"><?= s( $layout->name ) ?></li>
+
+<li class="upper_button_zone">
+<span class="left_zone">
+				<span class="title_text rename_input_text"><?= s( $layout->name) ?></span>
+				<span style="display:none" class="rename_input"><input size="20" maxlength="20" class="rename_layout_input" data-rename-input-layoutid="<?= intval($layout->id) ?>" value="<?= s( $layout->name ) ?>" /></span>
+			
+</span>
+
+<span class="right_zone">
+
+				<span class="control_button rename_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-renamed-text="<?= s(get_string('rezzer:renamelayout'))?>" data-rename-text="<?= s(get_string('rezzer:renamelayout','sloodle'))?>" data-renaming-text="<?= s(get_string('rezzer:renaminglayout'))?>" class="control_button" type="submit" ><?= s(get_string('rezzer:renamelayout','sloodle'))?></span>
+
+				<span class="control_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="<?= s(get_string('rezzer:deletedderezzingobjects', 'sloodle')) ?>" data-delete-text="<?= s(get_string('rezzer:deletelayout'))?>" data-deleting-text="<?= s(get_string('rezzer:deletinglayout','sloodle'))?>" type="submit"><?= s(get_string('rezzer:deletelayout', 'sloodle'))?></span>
+
+				<span class="control_button clone_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-cloned-text="<?= s(get_string('rezzer:clonelayout','sloodle'))?>" data-cloning-text="<?=s(get_string('rezzer:cloninglayout','sloodle'))?>" data-clone-text="<?=s(get_string('rezzer:clonelayout','sloodle'))?>" type="submit" ><?=s(get_string('rezzer:clonelayout','sloodle'))?></span>
+									
+				<span class="control_button sync_object_positions" data-freeze-text="<?= s(get_string('rezzer:savecurrentposition', 'sloodle'))?>" data-freezing-text="<?= s(get_string('rezzer:savingcurrentposition', 'sloodle'))?>" type="submit" href="#clonelayout"><?= s(get_string('rezzer:savecurrentposition', 'sloodle'))?></span>
+				<span class="control_button sync_object_positions_placeholder"></span>
+
+				<span id="set_configuration_status_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="control_button button_goes_here_zone set_configuration_status"></span>
+				<span id="rez_all_objects_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="big_control_button rez_all_objects"> &nbsp; <?= s(get_string('rezzer:rezallobjects', 'sloodle'))?></span>
+
+				<span id="generate_standard_layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" data-generate-text="<?= s(get_string('rezzer:importmoodleactivities','sloodle', $cn )) ?>" data-generating-text="<?= s(get_string('rezzer:importingmoodleactivities', 'sloodle'))?>" data-layoutid="<?= intval($layout->id) ?>" class="big_control_button generate_standard_layout"><?= s(get_string('rezzer:importmoodleactivities', 'sloodle', $cn )) ?></span>
+
+</span>
+</li>
 <?php
 				foreach($entriesbygroup as $group => $entries) {
 ?>
@@ -236,19 +272,11 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 
 					}
 ?>
-					<li class="after_group_<?=$group?>"><a href="#addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?=s(get_string('rezzer:addobjects', 'sloodle'))?></a></li>
+					<li class="after_group_<?=$group?>"><a class="add_object_link" href="#addobjectgroup_<?= $group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>"><?=s(get_string('rezzer:addobjects', 'sloodle'))?></a></li>
 					<li></li>
 <?php
 				}
 ?>
-
-				<span class="active_button sync_object_positions" style="width:98%" type="submit" href="#clonelayout"><?= s(get_string('rezzer:savecurrentposition', 'sloodle'))?></span>
-				<br />
-				<span class="active_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="<?= s(get_string('rezzer:deletedderezzingobjects', 'sloodle')) ?>" data-delete-text="<?= s(get_string('rezzer:deletelayout'))?>" data-deleting-text="<?= s(get_string('rezzer:deletinglayout','sloodle'))?>" style="float:right; width:40%" type="submit"><?= s(get_string('rezzer:deletelayout', 'sloodle'))?></span>
-				<span class="active_button clone_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-cloned-text="Clone this scene" data-cloning-text="Cloning scene" data-clone-text="Clone this scene" style="width:40%" type="submit" >Clone this scene</span>
-					
-				<span class="active_button rename_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-renamed-text="<?= s(get_string('rezzer:renamelayout'))?>" data-rename-text="<?= s(get_string('rezzer:renamelayout','sloodle'))?>" data-renaming-text="<?= s(get_string('rezzer:renaminglayout'))?>" class="active_button" style="width:40%" type="submit" ><span class="rename_label"><?= s(get_string('rezzer:renamelayout','sloodle'))?></span> <span class="rename_input"><input class="rename_layout_input" data-rename-input-layoutid="<?= intval($layout->id) ?>" value="<?= s( $layout->name ) ?>" /> <span class="rename_input_save_button"><?=s(get_string('rezzer:renamebutton','sloodle'))?></span></span></span>
-
 			    </ul>
 
 <?php
@@ -357,7 +385,24 @@ function print_add_object_form( $config, $cid, $contid, $layout, $object_title, 
 	$id = "addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
 ?>
 <form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="<?=$id?>" title="<?= s($object_title) ?>" data-primname="<?= s($config->primname)?>" data-courseid="<?=intval($cid)?>"  >
-<span data-updating-text="<?= s(get_string('rezzer:updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?>" data-adding-text="<?= s( get_string('rezzer:addingobject', 'sloodle', $object_title )) ?>" data-add-text="<?= s( get_string('rezzer:addobject', 'sloodle', $object_title )) ?>" class="active_button add_to_layout_button" target="_self" type="submit"><?= s( get_string('rezzer:addobject', 'sloodle', $object_title) )  ?></span>
+
+<div class="upper_button_zone">
+<span class="left_zone">
+                                <span class="title_text"><?= s( $object_title) ?></span>
+
+</span>
+<span class="right_zone">
+
+<span data-delete-text="<?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('rezzer:deletingobject', 'sloodle', $object_title)) ?>" class="control_button delete_layout_entry_button hiddenButton" type="submit"><?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?></span>
+
+<span data-refresh-text="<?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?>" data-refreshing-text="<?= s(get_string('rezzer:refreshingconfig', 'sloodle', $object_title)) ?>" class="control_button refresh_config_button" type="submit"><?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?></span>
+
+<span data-updating-text="<?= s(get_string('rezzer:updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?>" data-adding-text="<?= s( get_string('rezzer:addingobject', 'sloodle', $object_title )) ?>" data-add-text="<?= s( get_string('rezzer:addobject', 'sloodle', $object_title )) ?>" class="control_button add_to_layout_button" target="_self" type="submit"><?= s( get_string('rezzer:addobject', 'sloodle', $object_title) )  ?></span>
+
+</span>
+</div>
+
+
 <input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid) ?>" />
 <input type="hidden" name="objectname" value="<?= htmlentities($object_title) ?>" />
 <input type="hidden" name="objectgroup" value="<?= htmlentities($config->group) ?>" />
@@ -403,10 +448,6 @@ not radio: <?=$ctrl->type?>
 <?php } ?>
 </fieldset>
 <?php } ?>
-<span data-delete-text="<?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('rezzer:deletingobject', 'sloodle', $object_title)) ?>" class="active_button delete_layout_entry_button hiddenButton" style="width:40%; float:right" type="submit"><?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?></span>
-
-<span data-refresh-text="<?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?>" data-updating-text="<?= s(get_string('rezzer:refreshingconfig', 'sloodle', $object_title)) ?>" class="active_button refresh_config_button" style="width:40%; float:right" type="submit"><?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?></span>
-
 </form>
 
 <br />
@@ -458,7 +499,26 @@ function print_config_form( $e, $config, $cid, $contid, $lid, $group, $rezzeruui
 
 ?>
 <form data-parent="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($lid) ?>" id="<?=$id?>" class="panel edit_object_form" title="<?= s($object_title) ?>" data-primname="<?= s($config->primname)?>" data-courseid="<?=intval($cid)?>">
-<span data-updating-text="<?= s(get_string('rezzer:updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?>" class="active_button update_layout_entry_button" target="_self" type="submit"><?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?></span>
+
+
+<div class="upper_button_zone">
+<span class="left_zone">
+                                <span class="title_text"><?= s( $object_title) ?></span>
+
+</span>
+<span class="right_zone">
+
+
+<span data-delete-text="<?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('rezzer:deletingobject', 'sloodle', $object_title)) ?>" class="control_button delete_layout_entry_button" type="submit"><?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?></span>
+
+<span data-refresh-text="<?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?>" data-refreshing-text="<?= s(get_string('rezzer:refreshingconfig', 'sloodle', $object_title)) ?>" class="control_button refresh_config_button" type="submit"><?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?></span>
+
+<span data-updating-text="<?= s(get_string('rezzer:updatingobject', 'sloodle', $object_title )) ?>" data-update-text="<?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?>" class="control_button update_layout_entry_button" target="_self" type="submit"><?= s(get_string('rezzer:updateobject', 'sloodle', $object_title )) ?></span>
+
+</span>
+</div>
+
+
 <input type="hidden" name="layoutid" value="<?= intval($lid) ?>" />
 <input type="hidden" name="rezzeruuid" value="<?= htmlentities($rezzeruuid) ?>" />
 <input type="hidden" name="layoutentryid" value="<?= intval($e->id) ?>" />
@@ -503,11 +563,6 @@ not radio: <?=$ctrl->type?>
 <?php } ?>
 </fieldset>
 <?php } ?>
-
-<span data-delete-text="<?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?>" data-deleting-text="<?= s(get_string('rezzer:deletingobject', 'sloodle', $object_title)) ?>" class="active_button delete_layout_entry_button" style="width:40%; float:right" type="submit"><?= s(get_string('rezzer:deleteobject', 'sloodle', $object_title)) ?></span>
-
-<span data-refresh-text="<?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?>" data-updating-text="<?= s(get_string('rezzer:refreshingconfig', 'sloodle', $object_title)) ?>" class="active_button refresh_config_button" style="width:40%; float:right" type="submit"><?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?></span>
-
 </form>
 
 <br />

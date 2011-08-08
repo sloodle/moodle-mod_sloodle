@@ -113,22 +113,24 @@
 		if (actionStatus == 'rezzing') {
 			if ( ( parentjq.children('li.rezzing').length == 0 ) && ( parentjq.children('li.waiting_to_rez').length == 0 ) ) {
 				parentjq.attr('data-action-status', 'rezzed');
-				parentjq.children('.rez_all_objects').html('Derez all objects');
-				parentjq.children('.rez_all_objects').unbind('click');
-				parentjq.children('.rez_all_objects').click(function() {
+				parentjq.find('.rez_all_objects').html(' &nbsp; Derez all');
+				parentjq.find('.rez_all_objects').unbind('click');
+				parentjq.find('.rez_all_objects').click(function() {
 					start_derez_all(parentjq);
 				});
 				parentjq.children('.sync_object_positions').show();
+				parentjq.children('.sync_object_positions_placeholder').hide();
 			}
 		} else if (actionStatus == 'derezzing') {
 			if ( ( parentjq.children('li.derezzing').length == 0 ) && ( parentjq.children('li.waiting_to_derez').length == 0 ) ) {
 				parentjq.attr('data-action-status', 'derezzed');
-				parentjq.children('.rez_all_objects').html('Rez all objects');
-				parentjq.children('.rez_all_objects').unbind('click');
-				parentjq.children('.rez_all_objects').click(function() {
+				parentjq.find('.rez_all_objects').html('Rez all');
+				parentjq.find('.rez_all_objects').unbind('click');
+				parentjq.find('.rez_all_objects').click(function() {
 					start_rez_all(parentjq);
 				});
-				parentjq.children('.sync_object_positions').hide();
+				parentjq.find('.sync_object_positions').hide();
+				parentjq.find('.sync_object_positions_placeholder').show();
 			}
 		}
 
@@ -167,62 +169,66 @@
 	function update_buttons(parentjq) {
 		// If there are no objects to rez, show the generated button
 		if ( parentjq.children('.rezzable_item').length == 0 ) {
-			parentjq.children('.generate_standard_layout').show();
-			parentjq.children('.set_configuration_status').hide();
-			parentjq.children('.rez_all_objects').hide();
-			parentjq.children('.sync_object_positions').hide();
+			parentjq.find('.generate_standard_layout').show();
+			parentjq.find('.set_configuration_status').hide();
+			parentjq.find('.rez_all_objects').hide();
+			parentjq.find('.sync_object_positions').hide();
+			parentjq.find('.sync_object_positions_placeholder').show();
 
 			// allow layout deletion
 			parentjq.children('.delete_layout_button').show();
 		} else {
-			parentjq.children('.generate_standard_layout').hide(); // can't generate a layout if we already have entries
+			parentjq.find('.generate_standard_layout').hide(); // can't generate a layout if we already have entries
 			if (parentjq.attr('data-connection-status') == 'connected') {
-				parentjq.children('.set_configuration_status').hide();
+				parentjq.find('.set_configuration_status').hide();
 				if (parentjq.attr('data-action-status') == 'rezzed') {
-					parentjq.children('.sync_object_positions').show();
+					parentjq.find('.sync_object_positions').show();
+					parentjq.find('.sync_object_positions_placeholder').hide();
 
-					parentjq.children('.rez_all_objects').html('Derez all objects');
-					parentjq.children('.rez_all_objects').unbind('click');
-					parentjq.children('.rez_all_objects').click(function() {
+					parentjq.find('.rez_all_objects').html(' &nbsp; Derez all');
+					parentjq.find('.rez_all_objects').unbind('click');
+					parentjq.find('.rez_all_objects').click(function() {
 						start_derez_all(parentjq);
 					});
-					parentjq.children('.rez_all_objects').show();
+					parentjq.find('.rez_all_objects').show();
 
 					// allow layout deletion
-					parentjq.children('.delete_layout_button').hide();
+					parentjq.find('.delete_layout_button').hide();
 
 				} else if (parentjq.attr('data-action-status') == 'syncing') {
-					parentjq.children('.sync_object_positions').show();
+					parentjq.find('.sync_object_positions').show();
+					parentjq.find('.sync_object_positions_placeholder').hide();
 
-					parentjq.children('.rez_all_objects').html('Derez all objects');
-					parentjq.children('.rez_all_objects').unbind('click');
-					parentjq.children('.rez_all_objects').click(function() {
+					parentjq.find('.rez_all_objects').html(' &nbsp; Derez all');
+					parentjq.find('.rez_all_objects').unbind('click');
+					parentjq.find('.rez_all_objects').click(function() {
 						start_derez_all(parentjq);
 					});
-					parentjq.children('.rez_all_objects').show();
+					parentjq.find('.rez_all_objects').show();
 
 					// allow layout deletion
-					parentjq.children('.delete_layout_button').hide();
+					parentjq.find('.delete_layout_button').hide();
 
 				} else {
-					parentjq.children('.sync_object_positions').hide();
+					parentjq.find('.sync_object_positions').hide();
+					parentjq.find('.sync_object_positions_placeholder').show();
 
-					parentjq.children('.rez_all_objects').html('Rez all objects');
-					parentjq.children('.rez_all_objects').unbind('click');
-					parentjq.children('.rez_all_objects').click(function() {
+					parentjq.find('.rez_all_objects').html('Rez all');
+					parentjq.find('.rez_all_objects').unbind('click');
+					parentjq.find('.rez_all_objects').click(function() {
 						start_rez_all(parentjq);
 					});
-					parentjq.children('.rez_all_objects').show();
+					parentjq.find('.rez_all_objects').show();
 
 					// allow layout deletion
-					parentjq.children('.delete_layout_button').show();
+					parentjq.find('.delete_layout_button').show();
 
 				}
 			} else {
-				parentjq.children('.rez_all_objects').hide();
-				parentjq.children('.set_configuration_status').show();
-				parentjq.children('.sync_object_positions').hide();
-				parentjq.children('.delete_layout_button').show();
+				parentjq.find('.rez_all_objects').hide();
+				parentjq.find('.set_configuration_status').show();
+				parentjq.find('.sync_object_positions').hide();
+				parentjq.find('.delete_layout_button').show();
 			}
 		}
 	}
@@ -351,9 +357,9 @@
 
 		parentjq.children('li.rezzed').addClass( 'waiting_to_derez' );
 		parentjq.children('li.waiting_to_derez').removeClass('rezzed');
-		parentjq.children('.rez_all_objects').html('Stop derezzing objects');
-		parentjq.children('.rez_all_objects').unbind('click');
-		parentjq.children('.rez_all_objects').click(function() {
+		parentjq.find('.rez_all_objects').html('Stop derezzing objects');
+		parentjq.find('.rez_all_objects').unbind('click');
+		parentjq.find('.rez_all_objects').click(function() {
 			stop_derez_all(parentjq);	
 		});
 		eventLoop( parentjq );
@@ -367,9 +373,9 @@
 		parentjq.children('li.rezzing_failed').removeClass('rezzing_failed');
 		parentjq.children('li.derezzed').removeClass('derezzed');
 		parentjq.children('li.rezzable_item').not('li.rezzed').addClass( 'waiting_to_rez' );
-		parentjq.children('.rez_all_objects').html('Stop rezzing objects');
-		parentjq.children('.rez_all_objects').unbind('click');
-		parentjq.children('.rez_all_objects').click(function() {
+		parentjq.find('.rez_all_objects').html('Stop rezzing objects');
+		parentjq.find('.rez_all_objects').unbind('click');
+		parentjq.find('.rez_all_objects').click(function() {
 			stop_rez_all();	
 		});
 		eventLoop( parentjq );
@@ -384,7 +390,7 @@
 
 	function stop_derez_all(parentjq) {
 		parentjq.children('li.waiting_to_derez').addClass( 'rezzed' ).removeClass('waiting_to_derez');;
-		parentjq.children('.rez_all_objects').html('Derez all objects');
+		parentjq.children('.rez_all_objects').html(' &nbsp; Derez all');
 		parentjq.children('.rez_all_objects').unbind('click');
 		parentjq.children('.rez_all_objects').click(function() {
 			start_derez_all(parentjq);
@@ -394,7 +400,7 @@
 
 	function stop_rez_all(parentjq) {
 		parentjq.children('li.rezzable_item').removeClass( 'waiting_to_rez' );
-		parentjq.children('.rez_all_objects').html('Rez all objects');
+		parentjq.children('.rez_all_objects').html('Rez all');
 		parentjq.children('.rez_all_objects').unbind('click');
 		parentjq.children('.rez_all_objects').click(function() {
 			start_rez_all(parentjq);
@@ -594,7 +600,8 @@
 
 	function rename_layout( spanjq ) {
 
-		var inputjq = spanjq.find('.rename_layout_input');
+		var parentjq = spanjq.closest('ul');
+		var inputjq = parentjq.find('.rename_layout_input');
 		var newname = inputjq.val();
 		var layoutid = inputjq.attr('data-rename-input-layoutid');
 
@@ -619,8 +626,9 @@
 						$('h1#pageTitle').html(newname);
 					}
 
-					spanjq.find('.rename_label').show();
-					spanjq.find('.rename_input').hide();
+					parentjq.find('.rename_input').hide();
+					parentjq.find('.rename_input_text').html(newname);
+					parentjq.find('.rename_input_text').show();
 
 				} else {
 					alert('Rename failed');
@@ -803,9 +811,11 @@
 		
 	}
 
-	function refresh_form_options( frmjq ) {
+	function refresh_form_options( buttonjq) {
+		var frmjq = buttonjq.closest('form') 
 		var courseid = frmjq.attr('data-courseid');
 		var primname = frmjq.attr('data-primname');
+		buttonjq.html( buttonjq.attr('data-refreshing-text') );
 		$.getJSON(  
 			"refresh_options.php",  
 			{
@@ -841,6 +851,7 @@
 				} else if (result == 'failed') {
 					alert('refresh failed');
 				}
+				buttonjq.html( buttonjq.attr('data-refresh-text') );
 			}  
 		);  
 	}
@@ -913,24 +924,10 @@
 			update_labels($(this));
 		});
 
-		$('.rename_layout_button').find('.rename_input').hide();
+	//	$().find('.rename_input').hide();
 
-		//$('.rename_layout_button').children('.rename_label').click( function() {
-		/*
-		$('.rename_layout_button').click( function() {
-			$(this).find('.rename_label').hide();
-			$(this).find('.rename_layout_input').show();
-		});
-		*/
-		$('.rename_layout_button').each( function(){
-			var btn = $(this);
-			$(this).children('.rename_label').unbind('click').click( function() {
-				$(this).hide();
-				btn.find('.rename_input_save_button').unbind('click').click( function() {
-					rename_layout( btn );
-				});
-				btn.find('.rename_input').show();
-			});
+		$('.rename_layout_button').unbind('click').click( function(){
+			handle_rename_button_click($(this));
 		});
 
 		$().find('.populate_object_group').unbind('click').click( function() {
@@ -938,8 +935,20 @@
 		});
 
 		$('.refresh_config_button').unbind('click').click( function() {
-			refresh_form_options( $(this).closest('form') );	
+			refresh_form_options( $(this) );	
 		});
+	}
+
+	function handle_rename_button_click(btnjq) {
+		var parentjq = btnjq.closest('ul');
+		if ( btnjq.hasClass('shown_textbox') ) {
+			rename_layout( btnjq );
+			btnjq.removeClass('shown_textbox');
+		} else {
+			btnjq.addClass('shown_textbox');
+			parentjq.find('.rename_input_text').hide();
+			parentjq.find('.rename_input').show();
+		}
 	}
 
 	$(document).ready(function () {
