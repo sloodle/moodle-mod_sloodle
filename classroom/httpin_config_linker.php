@@ -61,7 +61,8 @@
 	// TODO: Refactor and move this stuff into activeobject
 
 	// first time we way it
-	if(!$ao = SloodleActiveObject::loadByUUID( $childobjectuuid )) {
+	$ao = new SloodleActiveObject();
+	if(!$ao->loadByUUID( $childobjectuuid )) {
 		$primpassword = sloodle_random_web_password();
 		$httpinpassword = sloodle_random_prim_password();
 		if ( !$authid = $controller->register_object($childobjectuuid, $objectname, $sloodle->user, $primpassword, $httpinpassword, $objecttype) ) {

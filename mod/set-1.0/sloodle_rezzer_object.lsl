@@ -16,21 +16,28 @@
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;//configuration channel
 integer SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL = -1639270089; //Object creator telling itself it wants to rez an object at a position (specified as key)
 
+string SLOODLE_HTTP_IN_REQUEST_LINKER = "/mod/sloodle/classroom/httpin_config_linker.php";
+string SLOODLE_HTTP_IN_UPDATE_LINKER = "/mod/sloodle/classroom/httpin_url_update_linker.php";
+
 string SLOODLE_EOF = "sloodleeof";
 
 vector rezzer_position_offset;
 rotation rezzer_rotation_offset;
 key rezzer_uuid;
 integer isconfigured = 0;
+integer has_position = 0;
 integer http_in_password = 0;
 
-string myUrl;
+string sloodlepwd = "";
+string sloodleserverroot = "";
+string sloodlecontrollerid = "";
 
+string myUrl;
+string persistent_config; 
 
 move_to_layout_position() {
     
-   // llOwnerSay("todo: move to position "+(string)rezzer_position_offset+", rot "+(string)rezzer_rotation_offset+ " in relation to rezzer "+(string)rezzer_uuid);
-
+    // llOwnerSay("todo: move to position "+(string)rezzer_position_offset+", rot "+(string)rezzer_rotation_offset+ " in relation to rezzer "+(string)rezzer_uuid);
     list rezzerdetails = llGetObjectDetails( rezzer_uuid, [ OBJECT_POS, OBJECT_ROT ] );
     vector rezzerpos = llList2Vector( rezzerdetails, 0 );
     rotation rezzerrot = llList2Rot( rezzerdetails, 1 );
@@ -41,18 +48,28 @@ move_to_layout_position() {
 
 // Configure by receiving a linked message from another script in the object
 // Returns TRUE if the object has all the data it needs
-integer sloodle_handle_command(string str) 
+integer sloodle_handle_command(string str, integer do_persist) 
 {
     list bits = llParseString2List(str,["|"],[]);
     integer numbits = llGetListLength(bits);
     
     if (numbits >= 1 ) {
         string name = llList2String(bits,0);
-        if (name == "set:position") {        
+            
+        string value1 = "";
+        string value2 = "";
+            
+        if (numbits > 1) value1 = llList2String(bits,1);
+        if (numbits > 2) value2 = llList2String(bits,2);
+
+        if (name == "set:sloodleserverroot") { sloodleserverroot = value1;
+        } else if (name == "set:sloodlepwd") { sloodlepwd = value1 + "|" + value2;
+        } else if (name == "set:sloodlecontrollerid") { sloodlecontrollerid = value1;
+        } else if (name == "set:position") {        
             rezzer_position_offset = (vector)llList2String(bits,1);
             rezzer_rotation_offset = (rotation)llList2String(bits,2);
             rezzer_uuid = llList2Key(bits,3);
-            return 1;
+            has_position = 1;
         } else if (name == "do:derez") {
             llDie();
         } else if ( (name=="do:requestconfig") || (name=="do:reset") ) {
@@ -67,12 +84,22 @@ integer sloodle_handle_command(string str)
             }
             // Give them a second to get started to avoid trying to configure them before they're ready.
             llSleep(1);
-            llResetScript(); 
+           
+            initialize();
+           
+        } else {
+            if (do_persist == 1) {
+                    persistent_config = persistent_config + "&" + name + "=" + value1;                     
+            }
         }
     } 
+    
+    if ( (sloodleserverroot != "") && (sloodlecontrollerid != "") && (sloodlepwd != "") ) {
+        isconfigured = 1;
+    }                                        
+    
     return isconfigured;
 }
-
 
 sloodle_tell_other_scripts(string msg, integer channel)
 {    
@@ -103,24 +130,92 @@ sloodle_tell_other_scripts(string msg, integer channel)
     
 }
 
+initialize() 
+{
+        llSetText("", <1.0, 1.0, 1.0>, 1.0);
+        
+        rezzer_position_offset = <0,0,0>;
+        rezzer_rotation_offset = <0,0,0,0>;
+        rezzer_uuid = NULL_KEY;
+        isconfigured = 0;
+        has_position = 0;
+        
+        // http_in_password = 0;
+        
+        llRequestURL();    
+}
+
+configure_from_persistent_config()
+{
+        
+    //llOwnerSay("got a persistent config, trying to use that");    
+    //send to httpin_config_linker
+    string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
+    body += "&sloodlepwd=" + sloodlepwd;
+    body += "&sloodleobjuuid=" + (string)llGetKey();
+    body += "&childobjectuuid=" + (string)llGetKey();
+    body += "&httpinurl=" + myUrl;
+    body += "&sloodleobjname=" + llGetObjectName();
+    body += persistent_config;
+    //llOwnerSay("requested config with body "+body); 
+    llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_REQUEST_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body+persistent_config);         
+}
+
+update_http_in_url()
+{
+        
+    //llOwnerSay("got a persistent config, trying to use that");    
+    //send to httpin_config_linker
+    string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
+    body += "&sloodlepwd=" + sloodlepwd;
+    body += "&sloodleobjuuid=" + (string)llGetKey();
+    body += "&httpinurl=" + myUrl;
+
+    //llOwnerSay("requested config with body "+body); 
+    llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_UPDATE_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);         
+}
+
+
 default{
-    state_entry() {    
+    
+    state_entry() {
+           
         llSleep(1.0);
-        llRequestURL();
+        initialize();
+        
     }
 
     on_rez(integer start_param) {
-        llSetText("", <1.0, 1.0, 1.0>, 1.0);        
-        llResetScript();
+
+        http_in_password = start_param;
+        
+        if (start_param > 0) {
+            sloodleserverroot = "";
+            sloodlecontrollerid = "";
+            sloodlepwd = "";
+            persistent_config = "";
+        }
+        
+        initialize();        
+
     }          
         
     http_request(key id, string method, string body){
+        
           if ((method == URL_REQUEST_GRANTED)){
                 myUrl=body;
-                //shout it out to the rezzer our httpinUrl
-                llRegionSay(SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL,myUrl);
+                //shout it out to the rezzer our httpinUrl                
+
+                if (persistent_config != "") {
+                    llOwnerSay("config from persistent");
+                    configure_from_persistent_config();
+                } else {
+                    llOwnerSay("no persistent, contacting rezzer");
+                    llRegionSay(SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL,myUrl);
+                    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL, myUrl, NULL_KEY);                    
+                }
                 
-                llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL, myUrl, NULL_KEY);
+                // If we have a persistent config, send that to the server
                 
                // llOwnerSay("got url "+myUrl);
           } else if (method == "POST"){                            
@@ -144,52 +239,97 @@ default{
                    // llOwnerSay("Ignoring message - password mismatch");
                     llHTTPResponse(id, 401, "Unauthorized - HTTP-in password mismatch");  
                     return;
-                }
+                }                
                 
                 llHTTPResponse(id, 200, "OK");                 
-                
+
+                string descriptor = "";
+                if (llGetListLength(header_line) > 1) descriptor = llList2String(header_line, 3);
+                integer do_persist = 1;   
+                if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") ) {
+                    // blow the existing config away and start again
+                    sloodleserverroot = "";
+                    sloodlecontrollerid = "";
+                    sloodlepwd = "";
+                    persistent_config = "";
+                    if (descriptor == "CONFIG_PERSISTENT") {
+                        do_persist = 1;                        
+                    }
+                }
+                                                                                                          
                 integer numlines = llGetListLength(lines);
-                integer i = 0;          
+                integer i = 1;          
                 for (i=1; i < numlines; i++) {
-                    isconfigured = sloodle_handle_command(llList2String(lines, i));                
+                    isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);                                 
                 }                                                         
-                
+                                
                 sloodle_tell_other_scripts(body,0);
                 // This is the end of the configuration data
                 llSleep(0.2);
                 sloodle_tell_other_scripts(SLOODLE_EOF, 0);
                 
-                if (isconfigured == 1) {
-                    move_to_layout_position();
+                if (isconfigured == 1) {   
+                    if (has_position == 1) {                                 
+                        move_to_layout_position();
+                    }
                     state ready;
                 }                
           }//endif
      }//http
      
      changed(integer change) {
-         if (change ==CHANGED_INVENTORY){         
-             llResetScript();
-         }
+
+        if ( (change & CHANGED_REGION_START) || (change & CHANGED_REGION ) ) {
+            //Request new URL
+            if (myUrl != "") {
+                llReleaseURL(myUrl);
+            }
+            llRequestURL();
+        }
+             
+        if (change ==CHANGED_INVENTORY){         
+            llResetScript();
+        }
+        
      }
 }
 
 state ready {    
-            
-    state_entry()
+
+    on_rez(integer start_param)
     {
+
+        http_in_password = start_param;
+                
+        if (start_param > 0) {
+            sloodleserverroot = "";
+            sloodlecontrollerid = "";
+            sloodlepwd = "";
+            persistent_config = "";
+        }
+                
+        state default;        
+        
+    }            
+                                    
+    state_entry()
+    {        
         // llOwnerSay("ready state");
-        llListen(232323, "", rezzer_uuid, "");        
+        // llOwnerSay(persistent_config);
+        llListen(232323, "", rezzer_uuid, "");   
     } 
 
     listen(integer channel, string name, key id, string message) {
     
-       // llOwnerSay(message);
+        // Listen to the rezzer telling us it's moved, and move accordingly.
+        
+        // llOwnerSay(message);
     
         list bits = llParseString2List( message, ["|"], [] );
         vector change_pos = (vector)llList2String( bits, 0 );
         rotation change_rot = (rotation)llList2String( bits, 1 );
         vector parent_pos = (vector)llList2String( bits, 2);
-       // llOwnerSay("got message" + message);       
+        // llOwnerSay("got message" + message);       
 
         // Apply the position changes first, then the rotation
         vector before_pos = llGetPos();
@@ -218,14 +358,17 @@ state ready {
 
         //  llGetPos() + vPosOffset * llGetRot(), ZERO_VECTOR, llGetRot()        
         
-    }
-    on_rez(integer start_param)
-    {
-        llResetScript();
-    }
+    }    
         
     http_request(key id, string method, string body){
-          if (method == "POST"){                            
+
+        if (method == URL_REQUEST_GRANTED){
+
+            myUrl=body;            
+            update_http_in_url();
+                
+        } else if (method == "POST"){                            
+          
                //this is where we receive data from from our server
                 list lines;
                 lines = llParseStringKeepNulls( body, ["\n"], [] );
@@ -258,28 +401,47 @@ state ready {
                     llHTTPResponse(id, 200, reply);
                     return;
                 }
-                       
-                llHTTPResponse(id, 200, "OK");                   
+           
+                
+                llHTTPResponse(id, 200, "OK");                 
 
+                string descriptor = "";
+                if (llGetListLength(header_line) > 1) descriptor = llList2String(header_line, 3);
+                integer do_persist = 1;   
+                if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") ) {
+                    // blow the existing config away and start again
+                    sloodleserverroot = "";
+                    sloodlecontrollerid = "";
+                    sloodlepwd = "";
+                    persistent_config = "";
+                    if (descriptor == "CONFIG_PERSISTENT") {
+                        do_persist = 1;                        
+                    }
+                }
+                                                               
                 for (i=1; i < numlines; i++) {
-                    isconfigured = sloodle_handle_command(llList2String(lines, i));
+                    isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);
                 }                                                         
                                 
                 sloodle_tell_other_scripts(body, 0);
                 // This is the end of the configuration data
                 llSleep(0.2);
                 sloodle_tell_other_scripts(SLOODLE_EOF, 0);
-                
-                                    
-                       
+                                                                       
           }//endif
      }//http
 
-     changed(integer change) {
-         if (change ==CHANGED_INVENTORY){         
-             llResetScript();
-         }
-     }    
+    // TODO: Need a changed event for region etc to get a new url
+    changed(integer change) {
+        if ( (change & CHANGED_REGION_START) || (change & CHANGED_REGION ) ) {
+            //Request new URL
+            if (myUrl != "") {
+                llReleaseURL(myUrl);
+            }
+            llRequestURL();
+        }
+    }         
+    
 }
 
 // Please leave the following line intact to show where the script lives in Subversion:
