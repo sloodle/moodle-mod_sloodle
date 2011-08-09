@@ -384,7 +384,6 @@
 	function start_sync_all(parentjq) {
 		parentjq.attr('data-action-status', 'syncing');
 		parentjq.children('li.rezzed').addClass( 'waiting_to_sync' );
-// TODO: Stop stuff
 		eventLoop( parentjq );
 	}
 
@@ -787,17 +786,17 @@
 			var editFrm = addfrmjq.clone(); 
 			editFrm.attr('id', 'configure_'+newElementID); 
 			editFrm.attr('data-parent', $(this).attr('id')); 
-			editFrm.children("input[name='layoutentryid']").val(layoutentryid);  // set the layoutentryid hidden field
+			editFrm.find("input[name='layoutentryid']").val(layoutentryid);  // set the layoutentryid hidden field
 			editFrm.attr('selected', ''); // Remove the selected property so that iui hides the form
-			editFrm.children('.add_to_layout_button').addClass('update_layout_entry_button').removeClass('add_to_layout_button');
-			editFrm.children('.update_layout_entry_button').html( editFrm.children('.update_layout_entry_button:first').attr('data-update-text') );
+			editFrm.find('.add_to_layout_button').addClass('update_layout_entry_button').removeClass('add_to_layout_button');
+			editFrm.find('.update_layout_entry_button').html( editFrm.find('.update_layout_entry_button:first').attr('data-update-text') );
 			editFrm.removeClass('addobject_layout_'+layoutid+'_'+objectcode);
 
 
 			// We keep a button hidden on the add form to use for deletion when it turns into an edit form
-			editFrm.children('.delete_layout_entry_button').removeClass('hiddenButton');
+			editFrm.find('.delete_layout_entry_button').removeClass('hiddenButton');
 			// Seems like the original click handler doesn't get created initially - maybe because it's hidden?
-			editFrm.children('.delete_layout_entry_button').unbind('click').click(function() {
+			editFrm.find('.delete_layout_entry_button').unbind('click').click(function() {
 				return delete_layout_configuration($(this));
 			});
 
