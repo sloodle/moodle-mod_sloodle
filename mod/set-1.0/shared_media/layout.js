@@ -176,7 +176,8 @@
 			parentjq.find('.sync_object_positions_placeholder').show();
 
 			// allow layout deletion
-			parentjq.children('.delete_layout_button').show();
+			parentjq.find('.delete_layout_button').show();
+			parentjq.find('.delete_layout_button_placeholder').hide();
 		} else {
 			parentjq.find('.generate_standard_layout').hide(); // can't generate a layout if we already have entries
 			if (parentjq.attr('data-connection-status') == 'connected') {
@@ -194,6 +195,7 @@
 
 					// allow layout deletion
 					parentjq.find('.delete_layout_button').hide();
+					parentjq.find('.delete_layout_button_placeholder').show();
 
 				} else if (parentjq.attr('data-action-status') == 'syncing') {
 					parentjq.find('.sync_object_positions').show();
@@ -208,6 +210,7 @@
 
 					// allow layout deletion
 					parentjq.find('.delete_layout_button').hide();
+					parentjq.find('.delete_layout_button_placeholder').show();
 
 				} else {
 					parentjq.find('.sync_object_positions').hide();
@@ -222,6 +225,7 @@
 
 					// allow layout deletion
 					parentjq.find('.delete_layout_button').show();
+					parentjq.find('.delete_layout_button_placeholder').hide();
 
 				}
 			} else {

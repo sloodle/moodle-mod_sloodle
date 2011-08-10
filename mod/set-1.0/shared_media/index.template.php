@@ -235,6 +235,7 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				<span class="control_button rename_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-renamed-text="<?= s(get_string('rezzer:renamelayout'))?>" data-rename-text="<?= s(get_string('rezzer:renamelayout','sloodle'))?>" data-renaming-text="<?= s(get_string('rezzer:renaminglayout'))?>" class="control_button" type="submit" ><?= s(get_string('rezzer:renamelayout','sloodle'))?></span>
 
 				<span class="control_button delete_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-deleted-text="<?= s(get_string('rezzer:deletedderezzingobjects', 'sloodle')) ?>" data-delete-text="<?= s(get_string('rezzer:deletelayout'))?>" data-deleting-text="<?= s(get_string('rezzer:deletinglayout','sloodle'))?>" type="submit"><?= s(get_string('rezzer:deletelayout', 'sloodle'))?></span>
+				<span class="control_button delete_layout_button_placeholder"></span>
 
 				<span class="control_button clone_layout_button" data-layoutid="<?= intval($layout->id) ?>" data-cloned-text="<?= s(get_string('rezzer:clonelayout','sloodle'))?>" data-cloning-text="<?=s(get_string('rezzer:cloninglayout','sloodle'))?>" data-clone-text="<?=s(get_string('rezzer:clonelayout','sloodle'))?>" type="submit" ><?=s(get_string('rezzer:clonelayout','sloodle'))?></span>
 									

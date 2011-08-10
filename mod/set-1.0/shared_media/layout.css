@@ -92,12 +92,13 @@
 	display:inline-block;
 	min-width:242px;
 	height:50px;
-	font-size:24px;	
+	font-size:18px;	
 	font-weight:bold;	
 	position:relative;
 	vertical-align:bottom;
-	text-align:center;
+	text-align:left;
 	padding-top:24px;
+	text-indent:96px;
 /*
 	padding-left:24px;
 */
@@ -147,8 +148,8 @@ span.module_info {
 input.rename_layout_input {
 	border: 1px solid black; 
 	font-size:28px; 
-	width:280px;
-	margin-top:20px;
+	width:280px !important;
+	margin-top:20px !important;
 }
 
 

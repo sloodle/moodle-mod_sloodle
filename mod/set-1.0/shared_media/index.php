@@ -95,7 +95,7 @@
 		$ao->name = required_param('sloodleobjname');
 		$ao->type = 'set-1.0';
 		$ao->save();
-	} else 	{
+	} else {
 		if ($httpinurl = optional_param( 'httpinurl', NULL, PARAM_RAW )) {
 			if ($ao->httpinurl != $httpinurl) {
 				$ao->httpinurl = $httpinurl;

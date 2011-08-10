@@ -333,7 +333,16 @@
                 $response->add_data_line( 'set:'.$n.'|'.$v );
             }//endforeach
             $response->set_status_code(1);
+
+	    /*
+	    If we send the object a CONFIG_PERSISTENT descriptor, it will keep the config and use it if re-rezzed or copied.
+	    This is set in sl_config.php.
+	    Normally this would be on, but if you're developing a set to give to other people, you want it off
+	    Otherwise it will use your server details, rather than getting new ones.
+	    */
+	    $request_descriptor = SLOODLE_ENABLE_OBJECT_PERSISTANCE ? 'CONFIG_PERSISTENT' : 'CONFIG';
             $response->set_status_descriptor('CONFIG');
+            $response->set_request_descriptor($request_descriptor);
             $response->set_http_in_password($this->httpinpassword);
             $renderStr="";
             $response->render_to_string($renderStr);
