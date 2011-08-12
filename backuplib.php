@@ -225,10 +225,10 @@
     function sloodle_ids($course)
     {
         global $CFG;
-        return sloodle_get_records_sql("
+        return sloodle_get_records_sql_params("
             SELECT s.id, s.course
             FROM {$CFG->prefix}sloodle s
-            WHERE s.course = '{$course}'
-        ");
+            WHERE s.course = ?
+        ", array($course));
     }
 ?>

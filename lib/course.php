@@ -715,9 +715,9 @@
             global $CFG;          
              $contextid = get_context_instance(CONTEXT_COURSE,$this->course_object->id);
              $cid=$contextid->id;
-             $sql= "SELECT distinct sl.*,sl.uuid as avuuid,u.id, u.firstname, u.lastname FROM {$CFG->prefix}user u INNER JOIN {$CFG->prefix}sloodle_users sl ON sl.userid=u.id INNER JOIN {$CFG->prefix}role_assignments ra ON ra.userid=u.id AND ra.contextid={$cid}";
+             $sql= "SELECT distinct sl.*,sl.uuid as avuuid,u.id, u.firstname, u.lastname FROM {$CFG->prefix}user u INNER JOIN {$CFG->prefix}sloodle_users sl ON sl.userid=u.id INNER JOIN {$CFG->prefix}role_assignments ra ON ra.userid=u.id AND ra.contextid=?";
              
-             $enrolledUsers = sloodle_get_records_sql($sql);
+             $enrolledUsers = sloodle_get_records_sql_params($sql, array($cid));
             //return $enrolledUsers
             return $enrolledUsers;
         }

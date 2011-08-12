@@ -332,7 +332,8 @@ class sloodle_view_user extends sloodle_base_view
             // Search entries
             $moodleuserdata = null;
             $LIKE = sloodle_sql_ilike();
-            $fullsloodleentries = sloodle_get_records_select('sloodle_users', "avname $LIKE '%{$this->searchstr}%' OR uuid $LIKE '%{$this->searchstr}%'", 'avname');
+            $params = array('%{$this->searchstr}%', '%{$this->searchstr}%');
+            $fullsloodleentries = sloodle_get_records_select('sloodle_users', "avname $LIKE ? OR uuid $LIKE ?", 'avname', $params);
             if (!$fullsloodleentries) $fullsloodleentries = array();
             $sloodleentries = array();
             // Eliminate entries belonging to avatars who are not in the current course

@@ -106,7 +106,7 @@
 
 		// Find the active round for the controller, or make one if there isn't one.
 		$timets = time();
-		$roundrecs = sloodle_get_records_select('sloodle_award_rounds', "controllerid = $controllerid AND ( (timestarted <= $timets ) OR (timestarted = 0) ) AND ( (timeended >= $timets ) OR (timeended = 0) ) ");
+		$roundrecs = sloodle_get_records_select_params('sloodle_award_rounds', "controllerid = ? AND ( (timestarted <= ? ) OR (timestarted = 0) ) AND ( (timeended >= ? ) OR (timeended = 0) ) ", array($controllerid, $timets, $timets));
 
 		$need_notify = false;
 
@@ -186,7 +186,7 @@
 			// ...where the scoreboard etc will register with Sloodle that it's interested in certain events.
 
 			// TODO: Figure out the round/controller filters
-			$user_point_total_recs = sloodle_get_records_sql( "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where currencyid=$currencyid and roundid=$roundid and userid=$userid;");
+			$user_point_total_recs = sloodle_get_records_sql_params( "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where currencyid=? and roundid=? and userid=?;", array($currencyid, $roundid, $userid));
 			if (!$user_point_total_recs && (count($user_point_total_recs) == 0 ) ) {
 				return false;
 			}
@@ -205,8 +205,8 @@
 		global $CFG;
 		$userid = intval($userid);
 		$currencyid = intval($currencyid);
-		$balancesql = "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where userid = {$userid} and currencyid = {$currencyid}";
-		$results = sloodle_get_records_sql( $balancesql );
+		$balancesql = "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where userid = ? and currencyid = ?";
+		$results = sloodle_get_records_sql_params( $balancesql, array($userid, $currencyid) );
 		if (!$results || ( count($results) == 0) ) {
   SloodleDebugLogger::log('DEBUG', "nothing found for $balancesql");
 			return 0;

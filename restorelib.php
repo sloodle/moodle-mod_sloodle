@@ -150,11 +150,11 @@
         global $CFG;
         $status = true;
         
-        $sloodles = sloodle_get_records_sql("
+        $sloodles = sloodle_get_records_sql_params("
             SELECT s.id, s.intro
             FROM {$CFG->prefix}sloodle s
-            WHERE s.course = {$restore->course_id}
-        ");
+            WHERE s.course = ?
+        ", array($restore->course_id) );
         
         if ($sloodles) {
             $i = 0;   //Counter to send some output to the browser to avoid timeouts

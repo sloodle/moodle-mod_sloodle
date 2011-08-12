@@ -53,12 +53,12 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 		$roundid = intval($this->roundid);
 		$currencyid = intval($this->currencyid);
 
-		$scoresql = "select userid as userid, sum(amount) as balance from {$prefix}sloodle_award_points p where p.roundid = {$roundid} and p.currencyid = {$currencyid} group by p.userid order by balance desc;";
+		$scoresql = "select userid as userid, sum(amount) as balance from {$prefix}sloodle_award_points p where p.roundid = ? and p.currencyid = ? group by p.userid order by balance desc;";
 
-		$usersql = "select max(u.id) as userid, u.username as username, u.firstname as firstname, u.lastname as lastname, su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid={$contextid} group by u.id order by avname asc;";
+		$usersql = "select max(u.id) as userid, u.username as username, u.firstname as firstname, u.lastname as lastname, su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid=? group by u.id order by avname asc;";
 
-		$scores = sloodle_get_records_sql( $scoresql );
-		$students = sloodle_get_records_sql( $usersql);
+		$scores = sloodle_get_records_sql_params( $scoresql, array($roundid, $currencyid) );
+		$students = sloodle_get_records_sql_params( $usersql, array($contextid) );
 
 		$students_by_userid = array();
 		foreach($students as $student) {

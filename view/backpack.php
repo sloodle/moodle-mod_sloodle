@@ -80,7 +80,7 @@ class sloodle_view_backpack extends sloodle_base_view
 
             //create controller so we can fetch active round
             $controller = new SloodleController();
-            $controller->load($controllerid);
+            $controller->load_by_course_module_id($controllerid);
             $roundid = $controller->get_active_roundid(true);
 
             //go through each currency and see if it has been set, if it has, we have to update each user who
@@ -159,7 +159,7 @@ class sloodle_view_backpack extends sloodle_base_view
         // Setup our list of tabs
         // We will always have a view option
 	$action = optional_param('action', "");                 
-	$contextid = get_context_instance(CONTEXT_COURSE,$this->course->id);
+	$context = get_context_instance(CONTEXT_COURSE,$this->course->id);
         echo "<br>";
         
         //print titles
@@ -190,25 +190,26 @@ class sloodle_view_backpack extends sloodle_base_view
 	$all_currencies = SloodleCurrency::FetchIDNameHash();
 	$active_currency_ids = array();
 
-	$contextid = get_context_instance(CONTEXT_COURSE,$this->course->id)->id;
+	$contextid = $context->id;
 	$courseid = $this->course->id;
+
 
 	$prefix = $CFG->prefix;
 		
         //build scoresql 
         $scoresql = "select max(p.id) as id, p.userid as userid, p.currencyid as currencyid, sum(amount) as balance
 		 from {$prefix}sloodle_award_points p inner join {$prefix}sloodle_award_rounds ro on ro.id=p.roundid 
-		 where ro.courseid = {$courseid} group by p.userid, p.currencyid order by balance desc;
+		 where ro.courseid = ? group by p.userid, p.currencyid order by balance desc;
 	";
-        $scores = sloodle_get_records_sql( $scoresql );
+        $scores = sloodle_get_records_sql_params( $scoresql, array( $courseid ) );
         
         //build usersql
         $usersql = "select max(u.id) as userid, u.firstname as firstname, u.lastname as lastname, 
 		su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id 
-		left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid={$contextid} 
+		left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid=?
 		group by u.id order by avname asc;
 	";
-        $students = sloodle_get_records_sql( $usersql);
+        $students = sloodle_get_records_sql_params( $usersql, array( $contextid ) );
         
         //create an array by userid
 	$students_by_userid = array();

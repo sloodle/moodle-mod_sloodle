@@ -626,8 +626,8 @@
                 global $CFG;
                 $sql = "SELECT u.id, u.username FROM ".$CFG->prefix."user u, ".$CFG->prefix."role_assignments r";
                  $sql .= " WHERE u.id = r.userid";
-                 $sql .= " AND r.contextid =".$courseid." AND u.id=".$USER->id;
-                return sloodle_get_records_sql($sql);
+                 $sql .= " AND r.contextid = ? AND u.id=?";
+                return sloodle_get_records_sql_params($sql, array($courseid, $USER->id));
         }
         /**
         * Is the current user enrolled in the specified course?

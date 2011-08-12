@@ -82,10 +82,9 @@
 	function has_active_objects_rezzed_by_rezzer( $rezzeruuid ) {
 
 		global $CFG;
-		$rezzeruuid = addslashes($rezzeruuid);
 		$layoutid = intval($this->id);
-		$select = "select count(*) as cnt from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_layout_entry le on a.layoutentryid=le.id where a.rezzeruuid='$rezzeruuid' and le.layout=$layoutid";
-		$recs = sloodle_get_records_sql( $select );
+		$select = "select count(*) as cnt from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_layout_entry le on a.layoutentryid=le.id where a.rezzeruuid=? and le.layout=?";
+		$recs = sloodle_get_records_sql_params( $select, array($rezzeruuid, $layoutid ));
 		if (!$recs) {
 			return false;
 		}
@@ -100,12 +99,14 @@
 		global $CFG;
 
 		$layoutid = intval($this->id);
-		$select = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_layout_entry le on a.layoutentryid=le.id where le.layout=$layoutid";
+		$select = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_layout_entry le on a.layoutentryid=le.id where le.layout=?";
+		$args = array($layoutid);
 		if ($rezzeruuid) {
 			$rezzeruuid = addslashes($rezzeruuid);
-			$select .= " and rezzeruuid='$rezzeruuid'";
+			$select .= " and rezzeruuid=?";
+			$args[] = $rezzeruuid;
 		}
-		$recs = sloodle_get_records_sql( $select );
+		$recs = sloodle_get_records_sql_params( $select, $args );
 		if (!$recs) {
 			return false;
 		}

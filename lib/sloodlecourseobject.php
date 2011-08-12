@@ -148,10 +148,10 @@ require_once(SLOODLE_DIRROOT.'/view/base/base_view_module.php');
             
            //get all the users from the users table in the moodle database that are members in this class   
            $sql = "select u.*, ra.roleid from ".$CFG->prefix."role_assignments ra, ".$CFG->prefix."context con, ".$CFG->prefix."course c, ".$CFG->prefix."user u ";
-           $sql .= " where ra.userid=u.id and ra.contextid=con.id and con.instanceid=c.id and c.id=".$this->cm->course;
+           $sql .= " where ra.userid=u.id and ra.contextid=con.id and con.instanceid=c.id and c.id=?";
            
            
-           $fullUserList = sloodle_get_records_sql($sql);          
+           $fullUserList = sloodle_get_records_sql_params($sql, array($this->cm->course));          
            return $fullUserList;                          
       }
   
@@ -178,15 +178,10 @@ require_once(SLOODLE_DIRROOT.'/view/base/base_view_module.php');
         $url_sloodleprofile = SLOODLE_WWWROOT."/view.php?_type=user&amp;id={$u->id}&amp;course={$this->courseId}";        
         return $url_sloodleprofile;
      }
-     function get_user_by_uuid($avuuid){
-         global $CFG;
-         //$sql='SELECT *  FROM '.$CFG->prefix.'sloodle_users WHERE `uuid`=\''.$avuuid.'\''; 
-         $avuuid = addslashes($avuuid);
-         $rec=sloodle_get_record_select('users','uuid',$avuuid);
-         if (empty($rec)) return null;       
-         return $rec;
-         
-     }
+
+     // There used to be a function here called get_user_by_uuid. 
+     // It looked obviously broken, and wasn't being used anywhere
+     // function get_user_by_uuid($avuuid)
   }
         
 ?>

@@ -139,7 +139,7 @@
         function get_latest_public_post()
         {
             // Attempt to fetch the data from the database
-            $rec = sloodle_get_records_select('post', "publishstate = 'public'", 'created DESC', '*', 0, 1);
+            $rec = sloodle_get_records_select_params('post', "publishstate = 'public'", array(), 'created DESC', '*', 0, 1);
             if (!$rec) return false;
             $post = new SloodleBlogPost();
             $post->load_data($rec[0]);
@@ -153,7 +153,7 @@
         function get_latest_site_post()
         {
             // Attempt to fetch the data from the database
-            $rec = sloodle_get_records_select('post', "publishstate = 'site' OR publishstate = 'public'", 'created DESC', '*', 0, 1);
+            $rec = sloodle_get_records_select_params('post', "publishstate = 'site' OR publishstate = 'public'", array(), 'created DESC', '*', 0, 1);
             if (!$rec) return false;
             $post = new SloodleBlogPost();
             $post->load_data($rec[0]);
@@ -174,7 +174,7 @@
             }
             // Attempt to fetch the data from the database
             $userid = (int)$user->get_user_id();
-            $rec = sloodle_get_records_select('post', "userid = $userid", 'created DESC', '*', 0, 1);
+            $rec = sloodle_get_records_select_params('post', "userid = ?", array($userid), 'created DESC', '*', 0, 1);
             if (!$rec) return false;
             $post = new SloodleBlogPost();
             $post->load_data($rec[0]);

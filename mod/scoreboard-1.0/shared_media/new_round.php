@@ -47,16 +47,6 @@
 
 	$updated_scores = $sao->get_student_scores(true);
 
-	/*
-	// TODO: Add round filter etc
-	$sql = "select max(u.userid) as userid, sum(p.amount) as balance, u.avname as avname from {$CFG->prefix}sloodle_award_points p left outer join {$CFG->prefix}sloodle_users u on p.userid=u.userid group by u.userid order by balance desc, avname asc;";
-	$updated_score_recs = sloodle_get_records_sql( $sql );
-	$updated_scores = array();
-	foreach($updated_score_recs as $score) {
-		$updated_scores[ $score->userid ] = $score;
-	}
-	*/
-
 	$result = 'started';
 
 	$content = array(

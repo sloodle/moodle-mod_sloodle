@@ -545,7 +545,7 @@
             $entry = sloodle_get_record('sloodle_active_object', 'uuid', $uuid);
             if (!$entry) return false;
             // Update the controller, user and time
-            $entry->controllerid = $this->get_id();
+            $entry->controllerid = $this->get_course_module_id();
             $entry->userid = $user->get_user_id();
             if (!empty($type)) $entry->type = $type;
             $entry->timeupdated = time();
@@ -564,7 +564,7 @@
             if (is_null($active_object)) {
                 return false;
             }
-            if ($active_object->controllerid != $this->get_id()) {
+            if ($active_object->controllerid != $this->get_course_module_id()) {
                 return false;
             }
 
@@ -587,7 +587,7 @@
         function get_authorizing_user($uuid)
         {
             // Attempt to find an entry for the object
-            $entry = sloodle_get_record('sloodle_active_object', 'controllerid', $this->get_id(), 'uuid', $uuid);
+            $entry = sloodle_get_record('sloodle_active_object', 'controllerid', $this->get_course_module_id(), 'uuid', $uuid);
             if (!$entry) return false;
             return (int)$entry->userid;
         }
@@ -659,22 +659,27 @@
         */
         function get_active_objects( $rezzeruuid = null, $layoutentryid = null ) {
 
-            $id = $this->get_id();
+            $id = $this->get_course_module_id();
             $aos = array();
             if (!$id) {
                return false;
             }
             $recs = array();
+ 
+            $params = array();
+            $select = 'controllerid = ?';
+            $params[] =intval($id);
 
-            $select = 'controllerid = '.intval($id);
             if ($rezzeruuid) {
-               $select .= " and rezzeruuid = '".addslashes($rezzeruuid)."'";
+               $select .= " and rezzeruuid = ?";
+               $params[] = $rezzeruuid;
             }
             if ($layoutentryid) {
-               $select .= " and layoutentryid = ".intval($layoutentryid);
+               $select .= " and layoutentryid = ?";
+               $params[] = intval($layoutentryid);
             }
 
-            $recs = sloodle_get_records_select('sloodle_active_object', $select);
+            $recs = sloodle_get_records_select_params('sloodle_active_object', $select, $params);
             if (!$recs) {
                 return false;        
             }
@@ -694,7 +699,7 @@
         */
         function get_active_roundid($force_create = false) {
  
-            $open_rounds = sloodle_get_records( 'sloodle_award_rounds', 'controllerid', $this->get_id() );
+            $open_rounds = sloodle_get_records( 'sloodle_award_rounds', 'controllerid', $this->get_course_module_id() );
             foreach($open_rounds as $or ) {
                 if ($or->timeended > 0) { // closed
                     continue;
@@ -754,7 +759,7 @@
             $round->timestarted = time();
             $round->timeended = 0;
             $round->name = '';
-            $round->controllerid = $this->get_id();
+            $round->controllerid = $this->get_course_module_id();
             $round->courseid = $courseid; // We specify this too so that you can delete the controller but keep the scores.
 
             if (!$roundid = sloodle_insert_record('sloodle_award_rounds', $round)) {
@@ -775,7 +780,7 @@
 
         function close_rounds_except( $roundid ) {
 
-            $open_rounds = sloodle_get_records( 'sloodle_award_rounds', 'controllerid', $this->get_id() );
+            $open_rounds = sloodle_get_records( 'sloodle_award_rounds', 'controllerid', $this->get_course_module_id() );
             foreach($open_rounds as $or ) {
                 if ($or->id == $roundid) {
                    continue;

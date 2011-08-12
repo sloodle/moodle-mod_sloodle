@@ -133,9 +133,9 @@
 
 
 // Get number for the next or unfinished attempt
-    if(!$attemptnumber = (int)sloodle_get_field_sql('SELECT MAX(attempt)+1 FROM ' .
-     "{$CFG->prefix}quiz_attempts WHERE quiz = '{$quiz->id}' AND " .
-     "userid = '{$USER->id}' AND timefinish > 0 AND preview != 1")) {
+    if(!$attemptnumber = (int)sloodle_get_field_sql_params('SELECT MAX(attempt)+1 FROM ' .
+     "{$CFG->prefix}quiz_attempts WHERE quiz = ? AND " .
+     "userid = ? AND timefinish > 0 AND preview != 1", array($quiz->id, $USER->id))) {
         $attemptnumber = 1;
     }
 
@@ -148,8 +148,8 @@
     // attempts: $quiz->attempts
     if ($limittoquestion == 0) $output[] = array('course',$course->id,$course->fullname);
 
-    $numberofpreviousattempts = sloodle_count_records_select('quiz_attempts', "quiz = '{$quiz->id}' AND " .
-        "userid = '{$USER->id}' AND timefinish > 0 AND preview != 1");
+    $numberofpreviousattempts = sloodle_count_records_select_params('quiz_attempts', "quiz = ? AND " .
+        "userid = ? AND timefinish > 0 AND preview != 1", array($quiz->id, $USER->id));
     if ($quiz->attempts and $numberofpreviousattempts >= $quiz->attempts) {
         $sloodle->response->quick_output(-10301, 'QUIZ', 'You do not have any attempts left', FALSE);
         exit();
@@ -176,7 +176,7 @@
             $numattempts = 0;
         }
         $timenow = time();
-        $lastattempt_obj = sloodle_get_record_select('quiz_attempts', "quiz = $quiz->id AND attempt = $numattempts AND userid = $USER->id", 'timefinish');
+        $lastattempt_obj = sloodle_get_record_select_params('quiz_attempts', "quiz = ? AND attempt = ? AND userid = $USER->id", array($quiz->id, $numattempts), 'timefinish');
         if ($lastattempt_obj) {
             $lastattempt = $lastattempt_obj->timefinish;
         }
@@ -246,9 +246,20 @@
     $pagelist = $questionlist;
     ///// END SLOODLE MODIFICATION /////
 
+    $questionlistids = explode(',', $questionlist);
+
     // add all questions that are on the submitted form
     if ($questionids) {
-        $questionlist .= ','.$questionids;
+        $questionlistids = array_merge($questionlistids, $questionids);
+    }
+  
+    $params = array($quiz->id);
+    $questioninstr = '';
+    $delim = '';
+    foreach($questionlistids as $qlid) {
+        $params[] = $qlid;
+        $questioninstr .= $delim.'?';
+        $delim = ','; 
     }
 
     if (!$questionlist) {
@@ -259,11 +270,11 @@
     $sql = "SELECT q.*, i.grade AS maxgrade, i.id AS instance".
            "  FROM {$CFG->prefix}question q,".
            "       {$CFG->prefix}quiz_question_instances i".
-           " WHERE i.quiz = '$quiz->id' AND q.id = i.question".
-           "   AND q.id IN ($questionlist)";
+           " WHERE i.quiz = ? AND q.id = i.question".
+           "   AND q.id IN ($questioninstr)";
 
     // Load the questions
-    if (!$questions = sloodle_get_records_sql($sql)) {
+    if (!$questions = sloodle_get_records_sql_params($sql, $params)) {
         $sloodle->response->quick_output(-10303, 'QUIZ', 'No questions found.', FALSE);
         exit();
     }
@@ -303,9 +314,9 @@
                    "  FROM {$CFG->prefix}question_states s,".
                    "       {$CFG->prefix}question_sessions n".
                    " WHERE s.id = n.newgraded".
-                   "   AND n.attemptid = '$lastattemptid'".
-                   "   AND n.questionid = '$i'";
-            if (!$laststate = sloodle_get_record_sql($sql)) {
+                   "   AND n.attemptid = ?".
+                   "   AND n.questionid = ?";
+            if (!$laststate = sloodle_get_record_sql_params($sql, array($lastattemptid, $i))) {
                 // Only restore previous responses that have been graded
                 continue;
             }
@@ -405,17 +416,25 @@
 
         // Find all the questions for this attempt for which the newest
         // state is not also the newest graded state
-        if ($closequestions = sloodle_get_records_select('question_sessions',
-         "attemptid = $attempt->uniqueid AND newest != newgraded", '', 'questionid, questionid')) {
+        if ($closequestions = sloodle_get_records_select_params('question_sessions',
+         "attemptid = ? AND newest != newgraded", array($attempt->uniqueid),'', 'questionid, questionid')) {
 
             // load all the questions
             $closequestionlist = implode(',', array_keys($closequestions));
+            $params = array($quiz->id);
+            $instr = '';
+            $delim = '';
+            foreach(array_keys($closequestions) as $cq) {
+                $params[] = $cq;
+                $instr .= $delim.'?';
+                $delim = ',';
+            }
             $sql = "SELECT q.*, i.grade AS maxgrade, i.id AS instance".
                    "  FROM {$CFG->prefix}question q,".
                    "       {$CFG->prefix}quiz_question_instances i".
-                   " WHERE i.quiz = '$quiz->id' AND q.id = i.question".
-                   "   AND q.id IN ($closequestionlist)";
-            if (!$closequestions = sloodle_get_records_sql($sql)) {
+                   " WHERE i.quiz = ? AND q.id = i.question".
+                   "   AND q.id IN ($instr)";
+            if (!$closequestions = sloodle_get_records_sql_params($sql, $params)) {
                 $sloodle->response->quick_output(-10303, 'QUIZ', 'Questions missing.', FALSE);
                 exit();
             }

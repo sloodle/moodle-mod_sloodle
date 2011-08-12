@@ -682,13 +682,15 @@
 		}
 		$instr = '';
 		$delim = '';
+		$params = array();
 		foreach($interested_object_names as $on) {
-			$instr .= $delim."'".addslashes($on)."'";
+			$params[] = $on;
+			$instr .= $delim.'?';
 			$delim = ',';
 		}
 		$controllerid = intval($controllerid);
 		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=$controllerid and a.httpinurl IS NOT NULL and a.name in ($instr);";
-		$recs = sloodle_get_records_sql($sql);
+		$recs = sloodle_get_records_sql_params($sql, $params);
 
 		$msg = "$success_code\n"; 
 		foreach($params as $n=>$v) {

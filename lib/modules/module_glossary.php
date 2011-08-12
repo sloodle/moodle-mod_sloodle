@@ -103,11 +103,18 @@
             
             // Construct a query
             $sql_like = sloodle_sql_ilike();
-            $termquery = "$sql_like '$term'";
-            if ($matchPartial) $termquery = "$sql_like '%$term%'";
+
+      	    $termparam = '';
+            if ($matchPartial) {
+		$termparam = "%$term%";
+	    } else {
+                $termparam = $term;
+	    }
+
             
             // Search concepts
-            $recs = sloodle_get_records_select('glossary_entries', "glossaryid = $glossaryid AND concept $termquery", 'concept');
+            $recs = sloodle_get_records_select_params('glossary_entries', "glossaryid = ? AND concept $sql_like ?", array($glossaryid, $termparam), 'concept');
+
             if (is_array($recs)) {
                 foreach ($recs as $r) {
                     $entries[$r->id] = new SloodleGlossaryEntry($r->id, $r->concept, $r->definition);
@@ -116,7 +123,7 @@
             
             // Search aliases
             if ($searchAliases) {
-                $recs = sloodle_get_records_select('glossary_alias', "alias $termquery");
+                $recs = sloodle_get_records_select_params('glossary_alias', "alias $sql_like ?", array($termparam));
                 // Go through each alias found
                 if (is_array($recs)) {
                     foreach ($recs as $r) {
@@ -133,7 +140,7 @@
             
             // Search definitions
             if ($searchDefinitions) {
-                $recs = sloodle_get_records_select('glossary_entries', "glossaryid = $glossaryid AND definition $sql_like '%$term%'", 'concept');
+                $recs = sloodle_get_records_select_params('glossary_entries', "glossaryid = ? AND definition $sql_like ?", array($glossaryid, "%$term%"), 'concept');
                 if (is_array($recs)) {
                     foreach ($recs as $r) {
                         if (!isset($entries[$r->id])) $entries[$r->id] = new SloodleGlossaryEntry($r->id, $r->concept, $r->definition);

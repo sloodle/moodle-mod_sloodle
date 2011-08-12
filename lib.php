@@ -377,12 +377,12 @@
         // Delete any pending user entries which have expired (more than 30 minutes old)
         $expirytime = time() - 1800;
         echo "Removing expired pending avatar entries...\n";
-        sloodle_delete_records_select('sloodle_pending_avatars', "timeupdated < $expirytime");
+        sloodle_delete_records_select_params('sloodle_pending_avatars', "timeupdated < ?", array($expirytime));
         
         // Delete any LoginZone allocations which have expired (more than 15 minutes old)
         $expirytime = time() - 900;
         echo "Removing expired LoginZone allocations...\n";
-        sloodle_delete_records_select('sloodle_loginzone_allocation', "timecreated < $expirytime");
+        sloodle_delete_records_select_params('sloodle_loginzone_allocation', "timecreated < ?", array($expirytime));
         
         // Fetch our configuration settings, if they exist
         $active_object_days = 7; // Give active objects a week by default
@@ -396,7 +396,7 @@
         $expirytime_auth = time() - (86400 * $active_object_days);
         $expirytime_unauth = time() - 3600;
         echo "Searching for expired active objects...\n";
-        $recs = sloodle_get_records_select('sloodle_active_object', "(((controllerid = 0 AND userid = 0) OR type = '') AND timeupdated < $expirytime_unauth) OR timeupdated < $expirytime_auth");
+        $recs = sloodle_get_records_select_params('sloodle_active_object', "(((controllerid = 0 AND userid = 0) OR type = '') AND timeupdated < ?) OR timeupdated < ?", array($expirytime_unauth, $expirytime_auth));
         if ($recs) {
             // Go through each object
             echo "Removing " . count($recs) . " expired active objects and associated configuration settings...\n";
@@ -413,7 +413,7 @@
         $expirytime_auth = time() - (86400 * $user_object_days);
         $expirytime_unauth = time() - 3600;
         echo "Deleting expired user objects...\n";
-        sloodle_delete_records_select('sloodle_user_object', "(authorised = 0 AND timeupdated < $expirytime_unauth) OR timeupdated < $expirytime_auth");
+        sloodle_delete_records_select_params('sloodle_user_object', "(authorised = 0 AND timeupdated < ?) OR timeupdated < ?", array( $expirytime_unauth, $expirytime_auth));
         
         // More stuff?
         //...

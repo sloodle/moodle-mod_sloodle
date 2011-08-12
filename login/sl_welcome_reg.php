@@ -90,7 +90,7 @@
 
     // This is a slightly dirty hack, but is needed just now to prevent multiple avatar registrations.
     // Delete any avatar belonging to this user, which doesn't match the one just registered.
-    sloodle_delete_records_select('sloodle_users', "userid = {$USER->id} AND uuid <> '{$sloodleuuid}'");
+    sloodle_delete_records_select_params('sloodle_users', "userid = ? AND uuid <> ?", array($USER->id, $sloodleuuid));
 
 /// /// END MOODLE-SPECIFIC /// ///
     

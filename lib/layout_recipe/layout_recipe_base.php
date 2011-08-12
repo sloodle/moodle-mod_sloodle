@@ -42,17 +42,19 @@ class SloodleLayoutRecipe {
 			$moduleObjectDefinitions[ $module ][] = $objdefn;
 		}
 
-		$instr = '';
 		$delim = '';
+		$params = array();
+		$instr = '';
 		foreach( $moduleObjectDefinitions as $module => $defns ) {
-			$instr .= $delim."'".addslashes( $module )."'"; 
+			$instr .= $delim.'?'; 
+			$params[] = $module;
 			$delim = ',';
 		}
 
 		global $CFG;
 		$sql = "select cm.id as id, cm.instance as instance, m.name as module_name from {$CFG->prefix}modules m inner join {$CFG->prefix}course_modules cm on m.id=cm.module where m.name in( $instr ) AND cm.visible = 1;";
 
-		$recs = sloodle_get_records_sql( $sql );
+		$recs = sloodle_get_records_sql_params( $sql, $params );
                 if (!$recs) {
                         return false;
                 }

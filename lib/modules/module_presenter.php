@@ -107,7 +107,7 @@
         function get_entry_urls()
         {
             // Search the database for entries
-            $recs = sloodle_get_records_select('sloodle_presenter_entry', "sloodleid = {$this->sloodle_instance->id}", 'ordering');
+            $recs = sloodle_get_records_select_params('sloodle_presenter_entry', "sloodleid = ? ", array($this->sloodle_instance->id), 'ordering');
             if (!$recs) return array();
             // Format it all nicely into a simple array
             $output = array();
@@ -168,7 +168,7 @@
             // Make sure we have valid ordering
             $this->validate_ordering();
             // Fetch the database records
-            $recs = sloodle_get_records_select('sloodle_presenter_entry', "sloodleid = {$this->sloodle_instance->id}", 'ordering');
+            $recs = sloodle_get_records_select_params('sloodle_presenter_entry', "sloodleid = ? ", array($this->sloodle_instance->id), 'ordering');
             if (!$recs) return array();
             // Construct the array of objects
             $output = array();

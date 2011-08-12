@@ -402,7 +402,7 @@ class SloodleObjectConfig {
 		$moduleid = $rec->id;
 
 		// Get all visible quizzes in the current course
-		$recs = sloodle_get_records_select('course_modules', "course = ".intval($courseid)." AND module = ".intval($moduleid)." AND visible = 1");
+		$recs = sloodle_get_records_select_params('course_modules', "course = ? AND module = ? AND visible = 1", array(intval($courseid), intval($moduleid)));
 		if (!$recs) {
 			return false;
 		    //error(get_string('noquizzes','sloodle'));
