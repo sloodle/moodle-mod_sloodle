@@ -176,7 +176,7 @@
             $numattempts = 0;
         }
         $timenow = time();
-        $lastattempt_obj = sloodle_get_record_select_params('quiz_attempts', "quiz = ? AND attempt = ? AND userid = $USER->id", array($quiz->id, $numattempts), 'timefinish');
+        $lastattempt_obj = sloodle_get_record_select_params('quiz_attempts', "quiz = ? AND attempt = ? AND userid = ?", array($quiz->id, $numattempts, $USER->id), 'timefinish');
         if ($lastattempt_obj) {
             $lastattempt = $lastattempt_obj->timefinish;
         }
