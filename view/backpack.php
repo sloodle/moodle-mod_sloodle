@@ -80,7 +80,9 @@ class sloodle_view_backpack extends sloodle_base_view
 
             //create controller so we can fetch active round
             $controller = new SloodleController();
-            $controller->load_by_course_module_id($controllerid);
+            if(!$controller->load_by_course_module_id($controllerid)) {
+              print_error('Could not load controller for '.$controllerid);
+            }
             $roundid = $controller->get_active_roundid(true);
 
             //go through each currency and see if it has been set, if it has, we have to update each user who
@@ -314,7 +316,8 @@ class sloodle_view_backpack extends sloodle_base_view
         }
 
         foreach ($recs as $controller){
-                $rowText.='<option name="controllerid" value="'.intval($controller->id).'">'.s($controller->name).'</option>';
+		$cm = get_coursemodule_from_instance('sloodle', $controller->id);
+                $rowText.='<option name="controllerid" value="'.intval($cm->id).'">'.s($controller->name).'</option>';
 	}
 	$rowText.='</select>';
 
