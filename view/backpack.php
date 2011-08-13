@@ -69,7 +69,6 @@ class sloodle_view_backpack extends sloodle_base_view
         if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
-
         //itemAdd form has been submitted
         if ($isItemAdd) {
 

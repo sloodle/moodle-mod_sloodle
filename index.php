@@ -18,6 +18,7 @@
     require_once('sl_config.php');
     /** Sloodle core library functionality */
     require_once(SLOODLE_DIRROOT.'/lib.php');
+    require_once(SLOODLE_DIRROOT.'/lib/io.php');
     
     // Fetch the course ID from request parameters
     $id = optional_param('id', 0, PARAM_INT);

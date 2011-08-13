@@ -439,9 +439,11 @@
         // Return true on success, false on fail
         public function loadByUUID( $uuid ) {
 
+		//SloodleDebugLogger::log('DEBUG', "loading for uuid :$uuid:");
             $rec = sloodle_get_record('sloodle_active_object','uuid',$uuid);
 
             if ($rec) {
+		//SloodleDebugLogger::log('DEBUG', "loaded for uuid :$uuid:");
                 $this->loadFromRecord($rec);
                 return true;
             }
@@ -612,6 +614,7 @@
 
 	public function process_interactions( $plugin_class, $interaction, $multiplier, $userid ) {
 
+		SloodleDebugLogger::log('DEBUG', "processing for :$plugin_class:$interaction:$multiplier:$userid:");
 		if ( !$userid = intval($userid) ) {
 			return false;
 		}
@@ -682,38 +685,46 @@
 		}
 		$instr = '';
 		$delim = '';
-		$params = array();
+		$queryparams = array(intval($controllerid));
 		foreach($interested_object_names as $on) {
-			$params[] = $on;
+			$queryparams[] = $on;
 			$instr .= $delim.'?';
 			$delim = ',';
 		}
-		$controllerid = intval($controllerid);
 		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=$controllerid and a.httpinurl IS NOT NULL and a.name in ($instr);";
-		$recs = sloodle_get_records_sql_params($sql, $params);
+		$recs = sloodle_get_records_sql_params($sql, $queryparams);
 
 		$msg = "$success_code\n"; 
-		foreach($params as $n=>$v) {
-			$msg .= $n.'|'.$v."\n"; // TODO: Is there some code we should be reusing somewhere for this? SloodleResponse?
-		}
+		
 
 		foreach($recs as $rec) {
 			$ao = new SloodleActiveObject();
 			$ao->loadFromRecord( $rec );
 
-			$msgtosend = $msg;
+			$response = new SloodleResponse();
+			$response->set_status_code($success_code);
+			$response->set_status_descriptor('AWARDS');
+			$response->set_request_descriptor('UPDATE_SCOREBOARD');
+			$response->set_http_in_password($ao->httpinpassword);
+
+			foreach($params as $n=>$v) {
+				$response->add_data_line($n.'|'.$v);
+			}
 
 			// We can set extra fields to allow the object to keep track of messages being sent.
 			// That way if a message fails to get delivered, the lastmessagesendtimestamp won't match what the object remembers
 			// ...and the object will know it needs to do something to catch up, like polling the server.
 			$ts = time();
 			if ($addtimestampparams) {
-				$msgtosend .= "lastmessagetimestamp|".$ao->lastmessagetimestamp."\n";
-				$msgtosend .= "messagetimestamp|".$ts."\n";
+				$response->add_data_line("lastmessagetimestamp|".$ao->lastmessagetimestamp);
+				$response->add_data_line("messagetimestamp|".$ts);
 			}
 
+			$renderStr="";
+			$response->render_to_string($renderStr);
+
 			// If this stuff fails, tough. We did our best.
-			if ($ao->sendMessage($msgtosend)) {
+			if ($ao->sendMessage($renderStr)) {
 				$ao->lastmessagetimestamp = time();
 				$ao->save();
 			}

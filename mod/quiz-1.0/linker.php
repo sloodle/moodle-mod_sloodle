@@ -243,13 +243,17 @@
     // For SLOODLE to work properly, it needs the entire list of questions at all times.
     // It ignores the "page" structure of a Moodle quiz.
     $questionlist = quiz_questions_in_quiz($attempt->layout);
+
     $pagelist = $questionlist;
     ///// END SLOODLE MODIFICATION /////
 
     $questionlistids = explode(',', $questionlist);
+    if ($questionids != '') {
+        $questionids = explode(',', $questionids);
+    }
 
     // add all questions that are on the submitted form
-    if ($questionids) {
+    if ($questionids && (count($questionids) > 0) ) {
         $questionlistids = array_merge($questionlistids, $questionids);
     }
   
@@ -262,7 +266,7 @@
         $delim = ','; 
     }
 
-    if (!$questionlist) {
+    if ( !$questionlistids || (count($questionlistids) == 0) ) {
         $sloodle->response->quick_output(-10303, 'QUIZ', 'No questions found.', FALSE);
         exit();
     }
@@ -271,10 +275,13 @@
            "  FROM {$CFG->prefix}question q,".
            "       {$CFG->prefix}quiz_question_instances i".
            " WHERE i.quiz = ? AND q.id = i.question".
-           "   AND q.id IN ($questioninstr)";
+           "   AND q.id IN ($questioninstr) ;";
 
     // Load the questions
-    if (!$questions = sloodle_get_records_sql_params($sql, $params)) {
+    $questions = sloodle_get_records_sql_params($sql, $params); 
+    if ( !$questions || (count($questions) == 0) ) {
+        $sloodle->response->quick_output(-10303, 'QUIZ', 'No questions found.'.$sql.join(':',$params), FALSE);
+exit;
         $sloodle->response->quick_output(-10303, 'QUIZ', 'No questions found.', FALSE);
         exit();
     }
@@ -345,6 +352,9 @@
 /// Process form data /////////////////////////////////////////////////
 
     if ($isnotify) {
+                SloodleDebugLogger::log('DEBUG', "in is notify");
+
+
 
         $responses = (object)$_REQUEST; // GET version of data_submitted (see lib/weblib) used in original web version
 
@@ -352,6 +362,7 @@
         $event = (array_key_exists('markall', $responses)) ? QUESTION_EVENTSUBMIT :
          ($finishattempt ? QUESTION_EVENTCLOSE : QUESTION_EVENTSAVE);
 
+                SloodleDebugLogger::log('DEBUG', "checked finish attempt");
         // Unset any variables we know are not responses
         unset($responses->id);
         unset($responses->q);
@@ -368,10 +379,10 @@
         // $actions is an array indexed by the questions ids
         $actions = question_extract_responses($questions, $responses, $event);
 
+                SloodleDebugLogger::log('DEBUG', "extracted");
         // Process each question in turn
 
-        $questionidarray = explode(',', $questionids);
-        foreach($questionidarray as $i) {
+        foreach($questionids as $i) {
             if (!isset($actions[$i])) {
                 $actions[$i]->responses = array('' => '');
             }
@@ -391,7 +402,10 @@
 	if ($scorechange == 0) {
 		$scorechange = 1;
 	}
+                SloodleDebugLogger::log('DEBUG', "active object check");
 	if (!is_null($sloodle->active_object)) {
+                SloodleDebugLogger::log('DEBUG', "quiz has an active object");
+
 
 		$sloodle->active_object->process_interactions( 'SloodleModuleAwards', 'answerquestion', $scorechange, $sloodle->user->get_user_id() );
 		/*
@@ -401,10 +415,14 @@
 		}
 		*/
 		// TODO: Maybe we should set a side effect code here?
+	} else {
+                SloodleDebugLogger::log('DEBUG', "quiz has no active object");
 	} 
 
 		
 
+    } else {
+	SloodleDebugLogger::log('DEBUG', 'quiz is not notify');
     }
 
 

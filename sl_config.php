@@ -8,10 +8,10 @@
     *
     */
 
-	// Pull in the main moodle config
-	// NB the following is necessary for when we pull in this config.php from a module under sloodle/mod
-	require_once (realpath(dirname(__FILE__) . "/" . "../../config.php"));
-	require_once (realpath(dirname(__FILE__) . "/" . "lib/db.php"));
+    // Pull in the main moodle config
+    // NB the following is necessary for when we pull in this config.php from a module under sloodle/mod
+    require_once (realpath(dirname(__FILE__) . "/" . "../../config.php"));
+    require_once (realpath(dirname(__FILE__) . "/" . "lib/db.php"));
     
     // Is this a linker script?
     if (defined('SLOODLE_LINKER_SCRIPT')) {
@@ -28,9 +28,9 @@
 //---------------------------------------------------------------------    
     
     /** The path for browsing to the root of the Sloodle folder. */
-	define('SLOODLE_WWWROOT', $CFG->wwwroot.'/mod/sloodle');
+    define('SLOODLE_WWWROOT', $CFG->wwwroot.'/mod/sloodle');
     /** The data path for the root of the Sloodle folder. */
-	define('SLOODLE_DIRROOT', $CFG->dirroot.'/mod/sloodle');
+    define('SLOODLE_DIRROOT', $CFG->dirroot.'/mod/sloodle');
     /** The data path for the root of the Sloodle library folder. */
     define('SLOODLE_LIBROOT', $CFG->dirroot.'/mod/sloodle/lib');
 	
@@ -39,6 +39,30 @@
 
     // The following tells us whether Moodle is at > version 2  or not. 
     define('SLOODLE_IS_ENVIRONMENT_MOODLE_2', ($CFG->version >= 2010060800) );
+
+
+//---------------------------------------------------------------------
+
+    /** General functionality. */
+    require_once(SLOODLE_LIBROOT.'/general.php');
+    /** Sloodle core library functionality */
+    require_once(SLOODLE_DIRROOT.'/lib.php');
+    /** Request and response functionality. */
+    require_once(SLOODLE_LIBROOT.'/io.php');
+    /** User functionality. */
+    require_once(SLOODLE_LIBROOT.'/user.php');
+    /** Course functionality. */
+    require_once(SLOODLE_LIBROOT.'/course.php');
+    /** Sloodle Controller functionality. */
+    require_once(SLOODLE_LIBROOT.'/controller.php');
+    /** Module functionality. */
+    require_once(SLOODLE_LIBROOT.'/modules.php');
+    /** Plugin management. */
+    require_once(SLOODLE_LIBROOT.'/plugins.php');
+    /** Active Objects config definitions. */
+    require_once(SLOODLE_LIBROOT.'/object_configs.php');
+    /** Active Objects and their definitions. */
+    require_once(SLOODLE_LIBROOT.'/active_object.php');
 
     
 //---------------------------------------------------------------------
@@ -142,10 +166,10 @@
     */
     define('SLOODLE_DEBUG_REQUEST_LOG', '/tmp/sloodle_debug.log');
 
-    // This hasn't yet been implemented.
     /** The following tells objects that we want them to persist their config over resets, and copy it to new objects that are copied.
+    * The object will try to use the persistent config if if doesn't get a start_param from the rezzer.
     * This should usually be on, but if you're developing a set to share with other people, it's better to turn it off
-    * That way the objects you rez won't have your server details in them.
+    * That way the objects you rez won't try to use your server if the start_param somehow fails, which seems to happen sometimes.
     * 
     */
     define('SLOODLE_ENABLE_OBJECT_PERSISTANCE', true);
@@ -171,6 +195,5 @@
     * Probably not useful to anyone else.
     */
     //define('SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL', 'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/');
-
 
 ?>

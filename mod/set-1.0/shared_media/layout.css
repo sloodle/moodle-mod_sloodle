@@ -11,11 +11,11 @@
 	height:100%;
 }
 
-.sloodle_config input:text {
-	vertical-align:middle;
-	margin-top:1px;
-	margin-bottom:1px;
-	height: 47px;
+.sloodle_config input[type=text] {
+	vertical-align:top !important;
+	margin-top:0px !important;
+	margin-top:0px !important;
+	height: 30px !important;
 }
 
 .upper_button_zone {
