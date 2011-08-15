@@ -11,6 +11,8 @@
     // Pull in the main moodle config
     // NB the following is necessary for when we pull in this config.php from a module under sloodle/mod
     require_once (realpath(dirname(__FILE__) . "/" . "../../config.php"));
+    @ini_set('display_errors', '0');
+
     require_once (realpath(dirname(__FILE__) . "/" . "lib/db.php"));
     
     // Is this a linker script?
