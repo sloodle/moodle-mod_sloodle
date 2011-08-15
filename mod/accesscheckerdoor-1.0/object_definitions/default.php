@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Access Checker Door';
-$sloodleconfig->object_code= 'accesscheckerdoor';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'accesscheckerdoor-1.0';
 $sloodleconfig->group      = 'registration';
 $sloodleconfig->show       = false;

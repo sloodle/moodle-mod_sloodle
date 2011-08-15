@@ -67,7 +67,7 @@ foreach($layout->get_entries() as $layoutentry) {
 	$addedentries[] = array(
 		'objectgroup' => $config->group,
 		'objectgrouptext' => get_string('objectgroup:'.$config->group, 'sloodle'), 
-		'objectcode' => $config->object_code, 
+		'objecttypelinkable' => $config->type_for_link(), 
 		'objectname' => preg_replace('/SLOODLE\s/', '', $layoutentry->name),
 		'moduletitle' => $modtitle,
 		'layoutid' => $layoutid,

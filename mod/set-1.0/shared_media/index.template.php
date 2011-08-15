@@ -306,9 +306,9 @@ function print_rezzable_item_li( $e, $cid, $contid, $layout, $isrezzed) {
 
 function print_add_object_item_li( $object_title, $config, $cid, $contid, $layout) {
 	$object_title = preg_replace('/^SLOODLE /', '', $object_title);
-	$id = "linkto_addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
+	$id = "linkto_addobject_{$cid}-{$contid}-{$layout->id}_{$config->type_for_link()}";
 ?>
-        <li id="<?=$id?>"><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->object_code?>"><?= s($object_title) ?></a></li>
+        <li id="<?=$id?>"><a href="#addobject_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>_<?= $config->type_for_link()?>"><?= s($object_title) ?></a></li>
 <?php 
 	return $id;
 
@@ -383,9 +383,9 @@ But once it's been added, it will be clone()d to make a form to update the objec
 }
 
 function print_add_object_form( $config, $cid, $contid, $layout, $object_title, $rezzeruuid ) {
-	$id = "addobject_{$cid}-{$contid}-{$layout->id}_{$config->object_code}";
+	$id = "addobject_{$cid}-{$contid}-{$layout->id}_{$config->type_for_link()}";
 ?>
-<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->object_code?>" id="<?=$id?>" title="<?= s($object_title) ?>" data-primname="<?= s($config->primname)?>" data-courseid="<?=intval($cid)?>"  >
+<form data-parent="addobjectgroup_<?= $config->group ?>_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?= intval($layout->id) ?>_<?= $config->type_for_link()?>" id="<?=$id?>" title="<?= s($object_title) ?>" data-primname="<?= s($config->primname)?>" data-courseid="<?=intval($cid)?>"  >
 
 <div class="upper_button_zone">
 <span class="left_zone">
@@ -433,7 +433,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <label for="<?= $fieldname ?>"><?= get_string($first_ctrl->title, 'sloodle') ?></label>
 <?php foreach($ctrls_reversed as $ctrl) { ?>
 <?php $fieldname = $ctrl->fieldname; ?>
-<span class="sloodle_config object_<?= s($config->object_code)?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>">
+<span class="sloodle_config object_<?= s($config->type_for_link())?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>">
 <?php if ( ($ctrl->type == 'radio') || ($ctrl->type == 'yesno') ) { ?>
 <?php foreach($ctrl->options as $opn => $opv) { ?>
 <input type="radio" name="<?= $fieldname ?>" value="<?= $opn ?>" <?= $opn == $ctrl->default ? 'checked ' : '' ?>> <?= $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?> &nbsp; &nbsp; 
@@ -548,7 +548,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemodu
 <?php foreach($ctrls_reversed as $ctrl) { ?>
 <?php $fieldname = $ctrl->fieldname; ?>
 <?php 	$val = isset($lconfig[$fieldname]) ? $lconfig[$fieldname] : ''; ?>
-<span class="sloodle_config object_<?= s($config->object_code)?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>" >
+<span class="sloodle_config object_<?= s($config->type_for_link())?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>" >
 <?php if ( ($ctrl->type == 'radio') || ($ctrl->type == 'yesno') ) { ?>
 <?php foreach($ctrl->options as $opn => $opv) { ?>
 <input type="radio" name="<?= $fieldname ?>" value="<?= $opn ?>" <?= $opn == $val ? 'checked ' : '' ?>> <?= $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?> &nbsp; &nbsp; 

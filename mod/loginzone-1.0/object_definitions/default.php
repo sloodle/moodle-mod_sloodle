@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE LoginZone';
-$sloodleconfig->object_code= 'loginzone';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'loginzone-1.0';
 $sloodleconfig->group      = 'registration';
 $sloodleconfig->show       = true;

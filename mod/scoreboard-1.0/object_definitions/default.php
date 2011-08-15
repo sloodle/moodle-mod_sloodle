@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Scoreboard';
-$sloodleconfig->object_code= 'scoreboard';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'scoreboard-1.0';
 $sloodleconfig->group      = 'activity';
 $sloodleconfig->show       = true;

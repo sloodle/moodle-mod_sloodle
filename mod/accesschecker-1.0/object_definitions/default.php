@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Access Checker';
-$sloodleconfig->object_code= 'access-checker';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'accesschecker-1.0';
 $sloodleconfig->group      = 'registration';
 $sloodleconfig->show       = false;

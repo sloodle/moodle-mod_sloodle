@@ -63,13 +63,25 @@ class SloodleObjectConfig {
 	// The optional objcode not used yet as of 2011-07-01
 	// In future it will allow the same linker to be shared by multiple objects
 	// ...but the objects will have to know how to report their own codes.
-	function ForObjectType($modname, $objcode = 'default') {
+	function ForObjectType($type) {
 
-		if ($objcode == '') {
+		$modname = null;
+		$objcode = null;
+
+		// Sloodle 2 object types look like modname/objectcode
+		// eg quiz-1.0/default
+		if (preg_match('/^(.*?)\/(.*?)$/', $type, $matches) ) {
+			$modname = $matches[1];
+			$objcode = $matches[2];
+		// Legacy types are just the name of the module, so we'll use the default definition.
+		} else {
+			$modname = $type;
 			$objcode = 'default';
 		}
-
 		if ( !preg_match('/^[a-zA-Z0-9_-]+$/',$objcode) ) {
+			return false;
+		}
+		if ( !preg_match('/^[a-zA-Z0-9_-]+$/',$modname) ) {
 			return false;
 		}
 	
@@ -80,6 +92,18 @@ class SloodleObjectConfig {
 		include($definition_file); // Will define a variable called $sloodleconfig
 		return $sloodleconfig;
 
+	}
+
+	function type() {
+
+		return $this->modname.'/'.$this->object_code;
+
+	}
+
+	// For anchors and things, we need a unique identifier to use internally, but with no slash in it.
+	function type_for_link() {
+		$t = preg_replace('/\//', '--', $this->type());
+		return preg_replace('/\./', '--', $t);
 	}
 
 	/*
@@ -609,6 +633,7 @@ exit;
 
 		return $fsgs;
 	}
+
 }
 
 // Represents a single entry or potential entry in an object configuration.

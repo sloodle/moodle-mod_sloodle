@@ -154,7 +154,7 @@
 			return null;
 		}
 		
-		return SloodleObjectConfig::ForObjectType( $this->type, $this->object_code );
+		return SloodleObjectConfig::ForObjectType( $this->type );
 
 	}
 
@@ -301,6 +301,7 @@
             $response->add_data_line(array('set:sloodlecoursename_full', $this->course->get_short_name()));
             $response->add_data_line(array('set:sloodlepwd', $this->uuid.'|'.$this->password)); // NB We need to prepend the UUID - otherwise Sloodle treats it like a prim password
             $response->add_data_line(array('set:sloodleserverroot', $CFG->wwwroot));
+            $response->add_data_line(array('set:sloodleobjtype', $this->type));
 	    if ($this->layoutentryid) {
 		    $response->add_data_line(array('set:position', $this->position, $this->rotation, $this->rezzeruuid));
 		    //$response->add_data_line(array('set:rezzeruuid', $this->rezzeruuid));

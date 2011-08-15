@@ -342,6 +342,8 @@
         */
         function register_object($uuid, $name, $user, $password, $httpinpassword = '', $type = '', $timestamp = null)
         {
+SloodleDebugLogger::log('DEBUG', "registering object with name $name and type $type");
+
             // Use the current timestamp if necessary
             if ($timestamp == null) $timestamp = time();
             // Extract the user ID, if available

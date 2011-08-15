@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Quiz Chair';
-$sloodleconfig->object_code= 'quiz';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'quiz-1.0';
 $sloodleconfig->module     = 'quiz';
 $sloodleconfig->module_choice_message = 'selectquiz';// TODO: There's some extra craziness to make sure we only have sloodle stuff

@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Password Reset';
-$sloodleconfig->object_code= 'passwordreset';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'pwreset-1.0';
 $sloodleconfig->group      = 'registration';
 $sloodleconfig->show       = true;

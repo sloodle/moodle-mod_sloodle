@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Demo Object';
-$sloodleconfig->object_code= 'demo';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'demo-1.0';
 $sloodleconfig->group      = 'misc';
 $sloodleconfig->show       = false;

@@ -91,7 +91,7 @@ if (!( $reply['info']['http_code'] == 200 ) ) {
 
 $rezzed_object_uuid = $reply['result'];
 
-if ( !$authid = $controller->register_object($rezzed_object_uuid, $objectname, $sloodleuser, $primpassword, $rez_http_in_password, $config->modname) ) {
+if ( !$authid = $controller->register_object($rezzed_object_uuid, $objectname, $sloodleuser, $primpassword, $rez_http_in_password, $config->type()) ) {
 	error_output('Object registration failed');
 }
 

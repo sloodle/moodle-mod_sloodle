@@ -477,8 +477,8 @@
 					for (entryi = 0; entryi<addedentries.length; entryi++) {
 						thisentry = addedentries[entryi];
 						//$('.layout_container_'+layoutid).each( function() {
-						$('.addobject_layout_'+layoutid+'_'+thisentry['objectcode']).each( function() {
-							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objectcode'], thisentry['moduletitle'], $(this) );
+						$('.addobject_layout_'+layoutid+'_'+thisentry['objecttypelinkable']).each( function() {
+							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objecttypelinkable'], thisentry['moduletitle'], $(this) );
 						});
 					}
 					eventLoop( $('.layout_container_'+layoutid) );
@@ -503,7 +503,7 @@
 				var objectgrouptext = json.objectgrouptext;
 				var objectname = json.objectname;
 				var layoutid = json.layoutid;
-				var objectcode = json.objectcode;
+				var objecttypelinkable = json.objecttypelinkable;
 				var moduletitle = json.moduletitle;
 				var layoutentryid = json.layoutentryid;
 				if (layoutid == '') {
@@ -511,7 +511,7 @@
 				}
 				if (result == 'added') {
 					buttonjq.html( buttonjq.attr('data-add-text') );
-					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, frmjq);
+					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objecttypelinkable, moduletitle, frmjq);
 					eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
 					backLevels( frmjq.attr('id'), 2 );
@@ -754,7 +754,7 @@
 		attach_event_handlers();
 	}
 
-	function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objectcode, moduletitle, addfrmjq ) {
+	function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objecttypelinkable, moduletitle, addfrmjq ) {
 
 		regexPtn = '^layout_.+-.+-'+layoutid+'$';
 		var re = new RegExp(regexPtn,"");
@@ -794,7 +794,7 @@
 			editFrm.attr('selected', ''); // Remove the selected property so that iui hides the form
 			editFrm.find('.add_to_layout_button').addClass('update_layout_entry_button').removeClass('add_to_layout_button');
 			editFrm.find('.update_layout_entry_button').html( editFrm.find('.update_layout_entry_button:first').attr('data-update-text') );
-			editFrm.removeClass('addobject_layout_'+layoutid+'_'+objectcode);
+			editFrm.removeClass('addobject_layout_'+layoutid+'_'+objecttypelinkable);
 
 
 			// We keep a button hidden on the add form to use for deletion when it turns into an edit form

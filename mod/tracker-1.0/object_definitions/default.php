@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Tracker - Button';
-$sloodleconfig->object_code= 'trackerbutton';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'tracker-1.0';
 $sloodleconfig->module     = 'sloodle';
 $sloodleconfig->module_choice_message = 'selecttracker';// TODO: There's some extra craziness to make sure we only have sloodle stuff

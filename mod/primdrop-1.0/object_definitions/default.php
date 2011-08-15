@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE PrimDrop';
-$sloodleconfig->object_code= 'primdrop';
+$sloodleconfig->object_code= 'default';
 $sloodleconfig->modname    = 'primdrop-1.0';
 $sloodleconfig->module     = 'assignment';
 $sloodleconfig->module_choice_message = 'selectassignment';
