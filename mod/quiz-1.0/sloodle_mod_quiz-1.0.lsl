@@ -31,21 +31,22 @@
         integer eof = FALSE; // Have we reached the end of the configuration data?
         
         integer SLOODLE_CHANNEL_AVATAR_DIALOG = 1001;
-        integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857353; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
+        integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
         integer SLOODLE_CHANNEL_AVATAR_IGNORE = -1639279999;
         
-        integer SLOODLE_CHANNEL_QUIZ_FETCH_FEEDBACK = -1639271101;
-        integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102;
-        integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103;
-        integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104;
-        integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105;
-        integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;
-        integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107;
+
+        integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102; //Tells us to start a quiz for the avatar, if possible.; Ordinary quiz chair will have a second script that detects and avatar sitting      on it and sends it. Awards-integrated version waits for a game ID to be set before doing this.
+        integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103; //Sent by main quiz script to tell UI scripts that quiz has started for avatar with key
+        integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104; //Sent by main quiz script to tell UI scripts that quiz has finished for avatar with key, with x/y correct in string
+        integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
+        integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;  //Sent by main quiz script to tell UI scripts that question has been answered by avatar with key. String contains selected option ID + "|" + option text + "|"
+        integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107; 
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUESTION = -1639271108;
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
         integer SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION = -1639271111;            
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112;                
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key.
+        integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
 
         integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
         integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
@@ -88,9 +89,10 @@
         * Params: method - SLOODLE_TRANSLATE_SAY, SLOODLE_TRANSLATE_IM etc
         * Params:  avuuid - this is the avatar UUID to that an instant message with the translated error code will be sent to
         * Params: status code - the status code of the error as on our wiki: http://slisweb.sjsu.edu/sl/index.php/Sloodle_status_codes
+        * Params: a message from the server to use if there is none listed in the linker script.        
         *******************************************************************************************************************************/
-        sloodle_error_code(string method, key avuuid,integer statuscode){
-                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST, method+"|"+(string)avuuid+"|"+(string)statuscode, NULL_KEY);
+        sloodle_error_code(string method, key avuuid,integer statuscode, string msg){
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST, method+"|"+(string)avuuid+"|"+(string)statuscode+"|"+(string)msg, NULL_KEY);
         }        sloodle_debug(string msg)
         {
             llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, null_key);
@@ -352,7 +354,7 @@
                 httpquizquery = null_key;
                 // Make sure the response was OK
                 if (status != 200) {
-                        sloodle_error_code(SLOODLE_TRANSLATE_SAY, NULL_KEY,status); //send message to error_message.lsl
+                        sloodle_error_code(SLOODLE_TRANSLATE_SAY, NULL_KEY,status, ""); //send message to error_message.lsl
                     state default;
                 }
                 
@@ -376,9 +378,15 @@
                     
                 } else if (statuscode <= 0) {
                     //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], null_key, "");
-                     sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode); //send message to error_message.lsl                 
+                    string msg;
+                    if (numlines > 1) {
+                        msg = llList2String(lines, 1);
+                    }
+                    sloodle_debug(msg);
+            
+                     sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode, msg); //send message to error_message.lsl                 
                     // Check if an error message was reported
-                    if (numlines > 1) sloodle_debug(llList2String(lines, 1));
+
                     state ready;
                     return;
                 }
@@ -469,13 +477,15 @@
                 
                 // Start from the beginning
                 active_question = 0;
+                 
+                llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR, (string)quizid+quizname, sitter );                 
                 llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, (string)llList2Integer(question_ids, active_question), sitter );
                 llSetTimerEvent( 10.0 ); // The other script should let us know that it's heard us and asked the question. If it doesn't, we'll keep on retrying until it hears us, if it ever does.
             }
             
             link_message(integer sender_num, integer num, string str, key id)
             {
-                if (num == SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR) {
+                if (num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR) {
                     
                     float scorechange = (integer)str;
                     
@@ -489,7 +499,7 @@
                     if(scorechange>0) num_correct++; // SAL added this
 
                     // Are we are at the end of the quiz?
-                    if ((active_question + 1) >= num_questions) {
+                    if (active_question >= num_questions) {
                         // Yes - finish off
                         finish_quiz();
                         // Do we want to repeat the quiz?
@@ -546,5 +556,7 @@
                 reinitialise();
             }
         }
+
+
 // Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/quiz-1.0/sloodle_mod_quiz-1.0.lsl 
+// SLOODLE LSL Script Subversion Location: mod/quiz-1.0/sloodle_mod_quiz-1.0.lsl

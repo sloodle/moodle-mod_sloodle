@@ -13,17 +13,18 @@
 
 integer SLOODLE_CHANNEL_OBJECT_DIALOG= -3857343;
 
-integer SLOODLE_CHANNEL_QUIZ_FETCH_FEEDBACK = -1639271101;
-integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102;
-integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103;
-integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104;
-integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105;
-integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;
-integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107;
+integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102; //Tells us to start a quiz for the avatar, if possible.; Ordinary quiz chair will have a second script that detects and avatar sitting on it and sends it. Awards-integrated version waits for a game ID to be set before doing this.
+integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103; //Sent by main quiz script to tell UI scripts that quiz has started for avatar with key
+integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104; //Sent by main quiz script to tell UI scripts that quiz has finished for avatar with key, with x/y correct in string
+integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
+integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;  //Sent by main quiz script to tell UI scripts that question has been answered by avatar with key. String contains selected option ID + "|" + option text + "|"
+integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107; 
 integer SLOODLE_CHANNEL_QUIZ_LOADED_QUESTION = -1639271108;
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
 integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
-integer SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION = -1639271111;
+integer SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION = -1639271111;            
+integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key.
+integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
 
 integer doPlaySound = 0;
 
@@ -86,7 +87,7 @@ default
     {
         if (num == SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION) {
             move_to_start( (vector)str );
-        } else if (num == SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR) {
+        } else if (num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR) {
             move_vertical( (float)str );
             play_sound( (float)str );   
         } else if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
@@ -101,5 +102,3 @@ default
     }
 }
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/quiz-1.0/sloodle_quiz_ui.lsl 
