@@ -58,7 +58,7 @@ function sloodle_get_records_sql_params($p1=null, $p2=null) {
 }
 
 
-function sloodle_get_records_select_params( $p1=null, $p2=null, $params, $p3, $p4 = '*', $p5 = null, $p6 = null) {
+function sloodle_get_records_select_params( $p1=null, $p2=null, $params, $p3=null, $p4 = '*', $p5 = null, $p6 = null) {
    if ( sloodle_do_use_db_object() ) {
       global $DB;
       return $DB->get_records_select($p1, $p2, $params, $p3, $p4, $p5, $p6); // get_records_select now has an option to pass in an array of params

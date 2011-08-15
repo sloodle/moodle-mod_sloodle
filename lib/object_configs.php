@@ -49,6 +49,8 @@ class SloodleObjectConfig {
 	// ...you can set the same row_code for each one.
   	// The default of '' will make the object get its own row.
 	var $row_code = '';
+	
+	var $row_name= '';
 		
 	// static function returning an object configuration for an object with the given name, or none if none is found
 	function ForObjectName($objname) {
@@ -608,14 +610,14 @@ class SloodleObjectConfig {
 			$rowgroups = array();
 			$last_row_name = '';
 			foreach($fs as $fn => $ctrl) {
-				if ( ($ctrl->row_name == '') || ($ctrl->row_name != $last_row_name) ) { // make a new row
+				if ( !isset($ctrl->row_name) || ( $ctrl->row_name == '') || ($ctrl->row_name != $last_row_name) ) { // make a new row
 					$rowgroups[]  = array($fn => $ctrl);
 				} else { // append this control to the last rowgroup
 					$lastrowgroup = array_pop($rowgroups);
 					$lastrowgroup[$fn] = $ctrl;
 					$rowgroups[] = $lastrowgroup;
 				}
-				$last_row_name = $ctrl->row_name;
+				$last_row_name = isset($ctrl->row_name) ? $ctrl->row_name : '';
 			}
 			$fsgs[$n] = $rowgroups;
 		}

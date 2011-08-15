@@ -162,15 +162,17 @@ class sloodle_view_user extends sloodle_base_view
         if (isguestuser()) error(get_string('noguestaccess', 'sloodle'));
         //add_to_log($this->course->id, 'course', 'view sloodle user', '', "{$this->course->id}");
         
-        // The "all" view should be only available to admins
-        if (strcasecmp($this->moodleuserid, 'all') == 0 && isadmin() == false) {
-            error(get_string('insufficientpermissiontoviewpage', 'sloodle'));
-            exit();
-        }
+        
         
         // We need to establish some permissions here
         $this->course_context = get_context_instance(CONTEXT_COURSE, $this->courseid);
         $this->system_context = get_context_instance(CONTEXT_SYSTEM);
+
+	// The "all" view should be only available to admins
+        if ( !has_capability('moodle/site:viewparticipants', $this->system_context) ){
+            error(get_string('insufficientpermissiontoviewpage', 'sloodle'));
+            exit();
+        }
         $this->viewingself = false;
         $this->canedit = false;
         // Is the user trying to view their own profile?
@@ -622,7 +624,8 @@ class sloodle_view_user extends sloodle_base_view
         // Display a link allowing admin users to add an avatar if this is a single avatar page
         if (!$allentries && !$searchentries)
         {
-            if (isadmin())
+
+            if ( has_capability('moodle/site:viewparticipants', $this->system_context) )
             {
                 echo "<p style=\"font-weight:bold;\">";
                 echo "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?_type=addavatar&amp;user={$this->moodleuserid}&amp;course={$this->courseid}\" title=\"".get_string('addavatarhere','sloodle')."\">";

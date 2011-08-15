@@ -264,8 +264,10 @@ class sloodle_view_users extends sloodle_base_view
         echo '</tr>';
         echo '</table>';
         
+
         // Provide some admin-only links
-        if (isadmin()) {
+	$system_context = get_context_instance(CONTEXT_SYSTEM);
+        if ( has_capability('moodle/site:viewparticipants', $system_context) ) {
             echo '<p>';
             
             /*
