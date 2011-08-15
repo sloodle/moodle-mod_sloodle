@@ -45,6 +45,13 @@ if ( !$layoutentry->load( $layoutentryid ) ) {
 	error_output( 'Layout Entry ID missing' );
 }
 
+
+$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
+        error_output( 'Access denied');
+}
+
+
 // TODO: Get actual object name via layoutentryid
 $objectname = $layoutentry->name;
 if ( !$objectname ) {

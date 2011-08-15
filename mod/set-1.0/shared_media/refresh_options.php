@@ -15,16 +15,18 @@ require_once(SLOODLE_LIBROOT.'/user.php');
 
 require_once '../../../lib/json/json_encoding.inc.php';
 
+$primname = optional_param('primname', NULL, PARAM_RAW);
+$courseid = optional_param('courseid', NULL, PARAM_INT);
+
 // TODO: What should this be? Probably not 1...
-$course_context = get_context_instance( CONTEXT_COURSE, 1);
+$course_context = get_context_instance( CONTEXT_COURSE, $courseid);
 $can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
 if (!$can_use_layouts) {
 	//include('../../../login/shared_media/index.php');
 	error_output( 'Not permitted' );
 }
 
-$primname = optional_param('primname', NULL, PARAM_RAW);
-$courseid = optional_param('courseid', NULL, PARAM_INT);
+
 
 if (!$config = SloodleObjectConfig::ForObjectName($primname)) {
 	error_output( 'Could not find object' );

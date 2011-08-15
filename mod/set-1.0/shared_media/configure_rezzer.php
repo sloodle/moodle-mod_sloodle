@@ -39,6 +39,12 @@ if ( !$rezzer->loadByUUID($rezzeruuid) ) {
 	error_output( 'Controller ID missing' );
 }
 
+$controller_context = get_context_instance( CONTEXT_MODULE, $rezzer->controllerid);
+if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
+        error_output( 'Access denied');
+}
+
+
 // TODO: Make this check for a change in the site name, then remove the "true" to avoid pointless reconfiguration
 if (true || ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {
 //if ( ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {

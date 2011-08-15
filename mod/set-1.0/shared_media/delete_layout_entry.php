@@ -46,10 +46,11 @@ if (!$layout->load($layoutentry->layout)) {
 	error_output('Layout not found');
 }
 
-$course_context = get_context_instance( CONTEXT_COURSE, $layout->course);
-if (!has_capability('mod/sloodle:uselayouts', $course_context)) {
+$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
         error_output( 'Access denied');
 }
+
 
 
 /*

@@ -35,11 +35,10 @@ if (!$courseid = $layout->course) {
 	error_output('Could not get courseid from layout');
 }
 
-$course_context = get_context_instance( CONTEXT_COURSE, $courseid);
-if (!has_capability('mod/sloodle:editlayouts', $course_context)) {
+$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
         error_output( 'Access denied');
 }
-
 
 $layoutname = $layout->name.' Copied '.date('Y-m-d H:i:s');
 if (!$cloneid = $layout->save_clone( $layoutname )) {

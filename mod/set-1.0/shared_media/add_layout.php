@@ -24,8 +24,8 @@ if (!$courseid) {
 	error_output( 'Course ID missing');
 }
 
-$course_context = get_context_instance( CONTEXT_COURSE, $courseid);
-if (!has_capability('mod/sloodle:editlayouts', $course_context)) {
+$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
 	error_output( 'Access denied');
 }
 

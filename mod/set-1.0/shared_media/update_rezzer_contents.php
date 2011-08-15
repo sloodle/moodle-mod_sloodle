@@ -43,6 +43,12 @@ if (!$courseid = $layout->course) {
 
 $controllerid = optional_param('controllerid', 0, PARAM_INT);
 
+$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
+        error_output( 'Access denied');
+}
+
+
 include('index.template.php');
 
 $html_list_items = array();

@@ -38,6 +38,13 @@ if ( !$rezzeruuid = optional_param( 'rezzeruuid', null, PARAM_SAFEDIR ) ) {
 	error_output('Could not load rezzer');
 }
 
+
+$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
+        error_output( 'Access denied');
+}
+
+
 $layoutentry = new SloodleLayoutEntry();
 if (!$layoutentry->load($layoutentryid)) {
         error_output( 'Could not load layout entry' );

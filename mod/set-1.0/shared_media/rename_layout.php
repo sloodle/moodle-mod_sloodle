@@ -13,12 +13,7 @@ require_once(SLOODLE_LIBROOT.'/user.php');
 
 require_once '../../../lib/json/json_encoding.inc.php';
 
-// TODO: What should this be? Probably not 1...
-$course_context = get_context_instance( CONTEXT_COURSE, 1);
-$can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
-if (!$can_use_layouts) {
-	exit;
-}
+
 
 $layoutid = optional_param('layoutid', 0, PARAM_INT);
 $layoutname = optional_param('layoutname', 0, PARAM_TEXT);
@@ -31,6 +26,12 @@ $layout = new SloodleLayout();
 if (!$layout->load( $layoutid )) {
 	error_output('Could not load layout');
 }
+
+$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
+        error_output( 'Access denied');
+}
+
 
 $layout->name = $layoutname;
 if (!$layout->update()) {

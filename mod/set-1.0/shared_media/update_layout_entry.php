@@ -52,17 +52,24 @@ foreach($configVars as $n=>$v) {
 	$layoutentry->set_config( $n, $v );
 }
 
-//var_dump($layoutentry);
-if (!$layoutentry->update()) {
-	error_output('Layout entry update failed');
-}
-
-
 // Send a reset to the object 
 $controller = new SloodleController();
 if (!$controller->load( $configVars['controllerid'] )) {
         error_output('Could not load controller');
 }
+
+
+$controller_context = get_context_instance( CONTEXT_MODULE, $configVars['controllerid']);
+if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
+        error_output( 'Access denied');
+}
+
+
+//var_dump($layoutentry);
+if (!$layoutentry->update()) {
+	error_output('Layout entry update failed');
+}
+
 
 $failures = array();
 $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );

@@ -35,6 +35,11 @@ if (!$controllerid  = optional_param( 'controllerid', 0, PARAM_INT) ) {
 	error_output( 'Controller ID missing' );
 }
 
+$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
+        error_output( 'Access denied');
+}
+
 if ( !$rezzeruuid = optional_param( 'rezzeruuid', null, PARAM_SAFEDIR ) ) {
 	error_output('Could not load rezzer');
 }
