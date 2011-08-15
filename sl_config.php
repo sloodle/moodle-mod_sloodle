@@ -164,7 +164,7 @@
         It will contain all data sent to and from the server by LSL scripts, including sensitive data like prim passwords
         ...so if you turn this on, be careful about who has access to the file it creates.
     */
-    define('SLOODLE_DEBUG_REQUEST_LOG', '/tmp/sloodle_debug.log');
+    define('SLOODLE_DEBUG_REQUEST_LOG', '');
 
     /** The following tells objects that we want them to persist their config over resets, and copy it to new objects that are copied.
     * The object will try to use the persistent config if if doesn't get a start_param from the rezzer.
