@@ -84,15 +84,15 @@
 
 	// Register the set using URL parameters
 	$ao = new SloodleActiveObject();
-	$object_uuid = required_param('sloodleobjuuid');
+	$object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
 	if (!$ao->loadByUUID($object_uuid)) {
 		$ao->controllerid = 0; // Hope that's OK...
 		$ao->userid = $USER->id;
 		$ao->uuid = $object_uuid;
-		$ao->httpinurl = required_param('httpinurl');
+		$ao->httpinurl = required_param('httpinurl', PARAM_RAW);
 		$ao->httpinpassword = sloodle_random_prim_password();
 		$ao->password = rand(100000,9999999999);
-		$ao->name = required_param('sloodleobjname');
+		$ao->name = required_param('sloodleobjname', PARAM_RAW);
 		$ao->type = 'set-1.0';
 		$ao->save();
 	} else {
@@ -106,7 +106,7 @@
 
 	// A list of all the sites the user has - gets passed by avatar classroom - won't be used for regular sloodle sites
 	// If supplied, adds an extra layer at the top above courses allowing you to switch between sites.
-	$sites = $_REQUEST['sites'];
+        $sites = ( isset($_REQUEST['sites']) && is_array($_REQUEST['sites']) ) ? $_REQUEST['sites'] : array();
 	$hasSites = count($sites) > 0;
 
 	$courses = get_courses();
