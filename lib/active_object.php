@@ -562,19 +562,15 @@
 
 	public function requirement_failures( $plugin_class, $interaction, $multiplier, $userid ) {
 
-		SloodleDebugLogger::log('DEBUG', 'in requirement_failures');
 		if ( !$userid = intval($userid) ) {
-		SloodleDebugLogger::log('DEBUG', 'userid missing');
 			return false;
 		}
 
 		if ( $multiplier == 0 ) {
-		SloodleDebugLogger::log('DEBUG', 'multiplier missing');
 			return false;
 		}
 
 		if (!class_exists($plugin_class)) {
-		SloodleDebugLogger::log('DEBUG', 'plugin class $plugin_class not found');
 			return false;
 		}
 
@@ -583,7 +579,6 @@
 		$relevant_configs = array();
 
 		$relevant_config_names = call_user_func(array($plugin_class, 'RequirementConfigNames'));
-		SloodleDebugLogger::log('DEBUG', 'found config names'.join(':', $relevant_config_names));
 
 		// TODO: It might be (marginally) more efficient to filter this for things we're interested in in the query.
 		$all_configs = sloodle_get_records('sloodle_object_config', 'object', $this->id);
@@ -598,24 +593,20 @@
 
 
 		if (count($relevant_configs) == 0) {
-		SloodleDebugLogger::log('DEBUG', 'no relevant configs');
 			// Nothing to do here
 			return false;
 		}
 
 		if (!$controllerid = intval($this->controllerid) ) {
-		SloodleDebugLogger::log('DEBUG', 'no controller id');
 			return false;
 		}
 
-		SloodleDebugLogger::log('DEBUG', 'about to call '.$plugin_class.'RequirementFailures');
 		return call_user_func_array( array($plugin_class, 'RequirementFailures'), array( $relevant_configs, $controllerid, $multiplier, $userid ));
 
 	}
 
 	public function process_interactions( $plugin_class, $interaction, $multiplier, $userid ) {
 
-		SloodleDebugLogger::log('DEBUG', "processing for :$plugin_class:$interaction:$multiplier:$userid:");
 		if ( !$userid = intval($userid) ) {
 			return false;
 		}
@@ -678,21 +669,22 @@
 
 		global $CFG;
 
-		$interested_object_names = SloodleObjectConfig::NamesOfObjectsRequiringNotification( $notification_action );
-		//$interested_object_names = array('SLOODLE Scoreboard');
-		if (count($interested_object_names) == 0) {
+		$interested_object_types = SloodleObjectConfig::TypesOfObjectsRequiringNotification( $notification_action );
+
+		//$interested_object_types = array('SLOODLE Scoreboard');
+		if (count($interested_object_types) == 0) {
 			// nobody cares, we're done..
 			return true;
 		}
 		$instr = '';
 		$delim = '';
 		$queryparams = array(intval($controllerid));
-		foreach($interested_object_names as $on) {
-			$queryparams[] = $on;
+		foreach($interested_object_types as $ot) {
+			$queryparams[] = $ot;
 			$instr .= $delim.'?';
 			$delim = ',';
 		}
-		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=$controllerid and a.httpinurl IS NOT NULL and a.name in ($instr);";
+		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=? and a.httpinurl IS NOT NULL and a.type in ($instr);";
 		$recs = sloodle_get_records_sql_params($sql, $queryparams);
 
 		$msg = "$success_code\n"; 
