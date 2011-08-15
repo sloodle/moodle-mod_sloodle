@@ -8,7 +8,7 @@
 //
 // Contributors:
 //  Peter R. Bloomfield
-//  Paul Preibisch - Fire Centaur in SL
+//
 
 // Can be supplied with 3 link messages for registration only, enrolment only, or both.
 // The avatar in question should be identified in the key value for all 3.
@@ -189,4 +189,4 @@ default
 }
 
 // Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/regenrolbooth-1.0/sloodle_manual_reg_enrol.lsl 
+// SLOODLE LSL Script Subversion Location: mod/regenrolbooth-1.0/sloodle_manual_reg_enrol.lsl
