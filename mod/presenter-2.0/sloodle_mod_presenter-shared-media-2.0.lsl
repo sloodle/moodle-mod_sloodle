@@ -148,7 +148,7 @@ update_image_display()
     // Make sure we have a valid slide number and valid data
     if (curslidenum < 1 || curslidenum > numslides) return;
     if (curslidetype == "" || curslidesource == "") return;
-    llOwnerSay(curslidetype);
+   // llOwnerSay(curslidetype);
     string showurl;
     if (curslidetype == "image/*") {
         // Wrap in an HTML page to force the scaling to happen right.
