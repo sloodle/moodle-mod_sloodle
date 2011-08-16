@@ -59,7 +59,7 @@ class sloodle_view_backpack extends sloodle_base_view
     {
         global $USER;
 
-        $userIds = optional_param('userIds', PARAM_INT);
+        $userIds = optional_param('userIds', 0, PARAM_INT);
         $id = required_param('id', PARAM_INT);
 
         //has itemAdd forum been submitted?
@@ -155,11 +155,11 @@ class sloodle_view_backpack extends sloodle_base_view
     {                                      
         global $CFG;      
         global $COURSE;
-        $view = optional_param('view', "");
+        $view = optional_param('view', "", PARAM_TEXT);
         
         // Setup our list of tabs
         // We will always have a view option
-	$action = optional_param('action', "");                 
+	$action = optional_param('action', "", PARAM_TEXT);                 
 	$context = get_context_instance(CONTEXT_COURSE,$this->course->id);
         echo "<br>";
         
@@ -170,17 +170,17 @@ class sloodle_view_backpack extends sloodle_base_view
 	echo '<span style="position:relative;font-size:36px;font-weight:bold;">';
         
         //print return to backpack icon
-        echo '<img align="center" src="'.$CFG->SLOODLE_WWWROOT.'lib/media/backpack64.png" width="48"/>';
+        echo '<img align="center" src="'.SLOODLE_WWWROOT.'lib/media/backpack64.png" width="48"/>';
         
         //print return to backpack title text
         echo s(get_string('backpacks:backpacks', 'sloodle'));
         echo '</span>';
         echo '<span style="float:right;">';
         echo '<a  style="text-decoration:none" href="'.$CFG->wwwroot.'/mod/sloodle/view.php?_type=currency&id='.$COURSE->id.'">';
-        echo s(get_string('currency:View Currencies', 'sloodle')).'<br>';
+        echo s(get_string('currency:viewcurrencies', 'sloodle')).'<br>';
         
         //print return to currencies icon
-        echo '<img src="'.$CFG->SLOODLE_WWWROOT.'lib/media/returntocurrencies.png"/></a>';
+        echo '<img src="'.SLOODLE_WWWROOT.'lib/media/returntocurrencies.png"/></a>';
         echo '</span>';
 	echo '</div>';
         echo '<br>';

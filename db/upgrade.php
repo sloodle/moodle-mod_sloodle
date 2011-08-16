@@ -478,6 +478,7 @@ function xmldb_sloodle_upgrade($oldversion=0) {
         $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
         $result = $result && create_table($table);           
 
+        $newCurrency = new stdClass();
         $newCurrency->name="Credits";
         if (sloodle_insert_record('sloodle_currency_types',$newCurrency))echo "Added Credits currency: OK<br>";
     }

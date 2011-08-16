@@ -83,7 +83,7 @@ class SloodleObjectConfig {
 		if ( !preg_match('/^[a-zA-Z0-9_-]+$/',$objcode) ) {
 			return false;
 		}
-		if ( !preg_match('/^[a-zA-Z0-9_-]+$/',$modname) ) {
+		if ( !preg_match('/^[a-zA-Z0-9_-]+\d+\.\d+$/',$modname) ) {
 			return false;
 		}
 	

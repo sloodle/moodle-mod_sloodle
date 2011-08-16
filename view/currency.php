@@ -69,7 +69,7 @@ class sloodle_view_currency extends sloodle_base_view
      {
 
 	//mode is for the different editing tasks of the currency screen (add, modify, delete)
-        $mode = optional_param('mode', PARAM_INT); 
+        $mode = optional_param('mode', "view", PARAM_TEXT); 
 
         switch($mode){
 
@@ -170,8 +170,8 @@ class sloodle_view_currency extends sloodle_base_view
     */
     function render()
     {                                      
-        $view = optional_param('view', "");
-        $mode= optional_param('mode', "allcurrencies");
+        $view = optional_param('view', "", PARAM_TEXT);
+        $mode= optional_param('mode', "allcurrencies", PARAM_TEXT);
         switch ($mode){
             case "allcurrencies": 
                 $this->render_all_currencies();
@@ -202,14 +202,14 @@ class sloodle_view_currency extends sloodle_base_view
            echo '<div style="position:relative ">';                                                                    
                                          
            echo '<span style="position:relative;font-size:36px;font-weight:bold;">';
-           echo '<img align="center" src="'.$CFG->SLOODLE_WWWROOT.'lib/media/vault48.png" width="48"/>';
+           echo '<img align="center" src="'.SLOODLE_WWWROOT.'lib/media/vault48.png" width="48"/>';
            echo get_string('currency:currencies', 'sloodle');
            echo '</span>';
            
                echo '<span style="float:right;">';
                echo '<a  style="text-decoration:none" href="'.$CFG->wwwroot.'/mod/sloodle/view.php?_type=backpack&id='.$COURSE->id.'">';
-               echo get_string('backpacks:View Backpacks', 'sloodle').'<br>';
-               echo '<img  src="'.$CFG->SLOODLE_WWWROOT.'lib/media/returnbackpacks.png"/></a>';
+               echo get_string('backpacks:viewbackpacks', 'sloodle').'<br>';
+               echo '<img  src="'.SLOODLE_WWWROOT.'lib/media/returnbackpacks.png"/></a>';
                echo '</span>';                                                                                                         
            
            echo '</div>';
@@ -256,7 +256,7 @@ class sloodle_view_currency extends sloodle_base_view
                       $editText.= "&id={$COURSE->id}";
                       $editText.= "\">";
                       
-                      $editText.="<img src=\"{$CFG->SLOODLE_LIBROOT}lib/media/settings.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".get_string('currencies:edit', 'sloodle')."\"/> ";
+                      $editText.="<img src=\"{SLOODLE_LIBROOT}lib/media/settings.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".get_string('currencies:edit', 'sloodle')."\"/> ";
                       $editText.= "</a>";
                     
                           $editText.= "&nbsp&nbsp";
@@ -267,7 +267,7 @@ class sloodle_view_currency extends sloodle_base_view
                           $editText.= "&mode=deletecurrency";
                           $editText.= "&id={$COURSE->id}";
                           $editText.= "\">";
-                          $editText.="<img src=\"{$CFG->SLOODLE_LIBROOT}lib/media/garbage.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".s(get_string('currencies:delete', 'sloodle'))."\"/> ";
+                          $editText.="<img src=\"{SLOODLE_LIBROOT}lib/media/garbage.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".s(get_string('currencies:delete', 'sloodle'))."\"/> ";
                           $editText.= "</a>";
                           $rowData[]=$editText;
                         
@@ -315,8 +315,8 @@ class sloodle_view_currency extends sloodle_base_view
                     
                    print_box_start('generalbox boxaligncenter center boxheightnarrow leftpara');
 
-                   print "<h2><img align=\"left\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/addnew.png\" width=\"48\"/> ";
-                   print s(get_string('currency:add new','sloodle'));
+                   print "<h2><img align=\"left\" src=\"{SLOODLE_WWWROOT}lib/media/addnew.png\" width=\"48\"/> ";
+                   print s(get_string('currency:addnew','sloodle'));
 		   print "</h2>";
                    
                    print_table($sloodletable);
@@ -337,8 +337,8 @@ class sloodle_view_currency extends sloodle_base_view
         echo "<br>";            
         //print header box
         print_box_start('generalbox boxaligncenter right boxwidthnarrow boxheightnarrow rightpara');
-        echo "<h1 ><img align=\"left\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
-        echo get_string('currency:confirm delete', 'sloodle')."</h1>";
+        echo "<h1 ><img align=\"left\" src=\"{SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
+        echo get_string('currency:confirmdelete', 'sloodle')."</h1>";
         print_box_end();
 
         //display all currencies
@@ -386,7 +386,7 @@ class sloodle_view_currency extends sloodle_base_view
         echo "<br>";            
         //print header box
         print_box_start('generalbox boxaligncenter center boxwidthnarrow boxheightnarrow leftpara');
-        echo "<h1 color=\"Red\"><img align=\"center\" src=\"{$CFG->SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
+        echo "<h1 color=\"Red\"><img align=\"center\" src=\"{SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
         echo get_string('currency:Edit Currency', 'sloodle')."</h1>";
         print_box_end();
 

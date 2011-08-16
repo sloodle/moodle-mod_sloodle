@@ -148,6 +148,15 @@ class sloodle_view_user extends sloodle_base_view
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
         $this->start = optional_param('start', 0, PARAM_INT);
         if ($this->start < 0) $this->start = 0;
+
+	// Moodle 2 rendering functions like to know the course.
+	// They get upset if you try to pass a course into print_footer() that isn't what they were expecting.
+	if ($this->course) {
+		global $PAGE;
+		if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
+			$PAGE->set_course($this->course);
+		}
+	}
     }
 
     /**
@@ -755,6 +764,7 @@ class sloodle_view_user extends sloodle_base_view
     */
     function print_footer()
     {
+
         print_footer($this->course);
     }
 
