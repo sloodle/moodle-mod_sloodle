@@ -684,6 +684,9 @@ class SloodleConfigurationOption {
 		}
 		$to = array();
 		foreach($this->options as $n=>$v) {
+			if ($v == '') {
+				$v = 'emptystring';
+			}
 			$to[$n] = get_string($v, 'sloodle');	
 		}
 		return $to;

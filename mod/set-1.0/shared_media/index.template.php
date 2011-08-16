@@ -418,7 +418,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <div class="row">
 <label for="<?= 'sloodlemoduleid' ?>"><?= $config->module_choice_message ? get_string($config->module_choice_message, 'sloodle') : ''?></label>
 <span class="sloodle_config data-fieldname="sloodlemoduleid">
-<?= $moduleoptionselect ? $moduleoptionselect : '<span class="no_options_placeholder" data-fieldname="sloodlemoduleid">'.$config->module_no_choices_message ? get_string($config->module_no_choices_message , 'sloodle') : ''.'</span>' ?>
+<?= $moduleoptionselect ? $moduleoptionselect : '<span class="no_options_placeholder" data-fieldname="sloodlemoduleid">'.( ( $config->module_no_choices_message != '' ) ? get_string($config->module_no_choices_message , 'sloodle') : '' ) .'</span>' ?>
 </span>
 </div>
 </fieldset>
@@ -430,7 +430,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <?php $ctrls_reversed = array_reverse($ctrls); ?>
 <?php $first_ctrl = array_shift($ctrls); ?>
 <div class="row" data-row-name="<?= isset($first_ctrl->row_name) ? $first_ctrl->row_name : '' ?>" >
-<label for="<?= isset($first_ctrl->fieldname) ? $first_ctrl->fieldname : '' ?>"><?= $first_ctrl->title ? s($first_ctrl->title) : ''?></label>
+<label for="<?= isset($first_ctrl->fieldname) ? $first_ctrl->fieldname : '' ?>"><?= $first_ctrl->title ? s(get_string($first_ctrl->title,'sloodle')) : ''?></label>
 <?php foreach($ctrls_reversed as $ctrl) { ?>
 <?php $fieldname = $ctrl->fieldname; ?>
 <span class="sloodle_config object_<?= s($config->type_for_link())?>" data-courseid="<?=intval($cid)?>" data-fieldname="<?=$fieldname?>">
@@ -532,7 +532,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemodu
 <div class="row">
 <label for="<?= isset($config->fieldname) ? $config->fieldname : '' ?>"><?= get_string($config->module_choice_message, 'sloodle') ?></label>
 <span class="sloodle_config" data-courseid="<?=intval($cid)?>" data-fieldname="sloodlemoduleid" >
-<?= $moduleoptionselect ? $moduleoptionselect : '<span class="no_options_placeholder" data-fieldname="sloodlemoduleid">'.get_string($config->module_no_choices_message, 'sloodle').'</span>' ?>
+<?= $moduleoptionselect ? $moduleoptionselect : '<span class="no_options_placeholder" data-fieldname="sloodlemoduleid">'.( ( $config->module_no_choices_message != '' ) ?  get_string($config->module_no_choices_message, 'sloodle') : '').'</span>' ?>
 </span>
 </div>
 </fieldset>

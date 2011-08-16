@@ -778,3 +778,4 @@ $string['rezzer:deleteobject'] = 'Delete';
 $string['rezzer:deletingobject'] = 'Deleting';
 $string['rezzer:refreshconfig'] = 'Refresh';
 $string['rezzer:refreshingconfig'] = 'Refreshing';
+$string['emptystring'] = ''; // Moodle 2 get_string gets upset if you try to give it an empty string.
