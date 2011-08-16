@@ -55,6 +55,7 @@
     } else {
         define('SLOODLE_DEBUG', false);
     }
+
     
     // Apply the effects of debug mode
     if (SLOODLE_DEBUG) {
@@ -71,6 +72,7 @@
         }
     }
     
+            @ini_set('display_errors', '0');
     /**
     * Outputs messages if in debug mode.
     * @uses SLOODLE_DEBUG
