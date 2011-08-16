@@ -154,7 +154,7 @@ class sloodle_view_course extends sloodle_base_view
         // Start the form (including a course ID hidden parameter)
         echo "<form action=\"view.php\" method=\"post\">\n";
         echo "<input type=\"hidden\" name=\"id\" value=\"{$this->course->id}\">\n";
-        echo "<input type=\"hidden\" name=\"type\" value=\"course\">\n";
+        echo "<input type=\"hidden\" name=\"_type\" value=\"course\">\n";
         
     // AUTO REGISTRATION //
         echo "<p>\n";
@@ -206,9 +206,9 @@ class sloodle_view_course extends sloodle_base_view
         }
         
         // Create a form
-        echo "<form action=\"view_course.php\" method=\"POST\">\n";
+        echo "<form action=\"view.php\" method=\"POST\">\n";
         echo "<input type=\"hidden\" name=\"id\" value=\"{$this->course->id}\">\n";
-        echo "<input type=\"hidden\" type=\"id\" value=\"course\">\n";
+        echo "<input type=\"hidden\" name=\"_type\" value=\"course\">\n";
         // Determine how many allocations there are for this course
         $allocs = sloodle_count_records('sloodle_loginzone_allocation', 'course', $this->course->id);
         echo get_string('pendingallocations','sloodle').': '.$allocs.'&nbsp;&nbsp;';
