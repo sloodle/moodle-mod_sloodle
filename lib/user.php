@@ -571,7 +571,7 @@
                 // Check if the user can view this course and is not a guest in it.
                 // (Note: the site course is always available to all users.)
                 $course_context = get_context_instance(CONTEXT_COURSE, $course->id);
-                if ($course->id == SITEID || (has_capability('mod/sloodle:courseparticipate', $course_context, $this->user_data->id) && !has_capability('moodle/legacy:guest', $course_context, $this->user_data->id, false))) {
+                if ($course->id == SITEID || (has_capability('mod/sloodle:courseparticipate', $course_context, $this->user_data->id) )) {
                     $sc = new SloodleCourse();
                     $sc->load($course);
                     $usercourses[] = $sc;
@@ -653,7 +653,7 @@
             
             // Check if the user can view the course, and does not simply have guest access to it
             // Allow the site course
-            return ($courseid == SITEID || (has_capability('mod/sloodle:courseparticipate', $context) && !has_capability('moodle/legacy:guest', $context, NULL, false)));
+            return ($courseid == SITEID || (has_capability('mod/sloodle:courseparticipate', $context) ));
         }
              
         
@@ -679,7 +679,7 @@
             load_all_capabilities();
             
             // Check if the user can view the course, does not simply have guest access to it, *and* is staff
-            return (has_capability('mod/sloodle:courseparticipate', $context) && !has_capability('moodle/legacy:guest', $context, NULL, false) && has_capability('mod/sloodle:staff', $context));
+            return (has_capability('mod/sloodle:courseparticipate', $context) && has_capability('mod/sloodle:staff', $context));
         }
         
         /**
@@ -714,7 +714,7 @@
             
             // Check if the user can view the course, and does not simply have guest access to it
             // (No point trying to enrol somebody if they are already enrolled!)
-            if (has_capability('mod/sloodle:courseparticipate', $context) && !has_capability('moodle/legacy:guest', $context, NULL, false)) return true;
+            if (has_capability('mod/sloodle:courseparticipate', $context) ) return true;
             
             // Make sure auto-registration is enabled for this site/course, and that the controller (if applicable) is enabled
             if (!$sloodle_course->check_autoreg()) return false;            
