@@ -496,17 +496,17 @@ class SloodleObjectConfig {
 			$withdraw_currency_fieldname = 'sloodleawardswithdraw_currency_'.$interactionname;
 			$withdraw_row_name = 'sloodleawardswithdraw_row_'.$interactionname;
 
-			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabels[0], '', 0, 8);
+			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabels[0] ? $interactionlabels[0] : '', '', 0, 8);
 			$configs[ $deposit_points_fieldname ]->row_name = $deposit_row_name;
 
-			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, '', '', '', 8);
+			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, 'emptystring', '', '', 8);
 			$configs[ $deposit_currency_fieldname]->row_name = $deposit_row_name;
 			$configs[ $deposit_currency_fieldname ]->is_value_translatable = false;
 
-			$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
+			$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1] ? $interactionlabels[1] : 'emptystring', '', 0, 8);
 			$configs[ $withdraw_points_fieldname ]->row_name = $withdraw_row_name;
 
-			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, '', '', '', 8);
+			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'emptystring', '', '', 8);
 			$configs[ $withdraw_currency_fieldname ]->row_name = $withdraw_row_name;
 			$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
 
@@ -525,10 +525,10 @@ class SloodleObjectConfig {
 			$deposit_currency_fieldname    = 'sloodleawardsdeposit_currency_'.$interactionname;
 			$deposit_row_name = 'sloodleawardsdeposit_row_'.$interactionname;
 
-			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabel, '', 0, 8);
+			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabel, 'emptystring', 0, 8);
 			$configs[ $deposit_points_fieldname ]->row_name = $deposit_row_name;
 
-			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, '', '', '', 8);
+			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, 'emptystring', '', '', 8);
 			$configs[ $deposit_currency_fieldname]->row_name = $deposit_row_name;
 			$configs[ $deposit_currency_fieldname ]->is_value_translatable = false;
 
@@ -556,10 +556,10 @@ class SloodleObjectConfig {
 
 			$require_points_row_name = 'sloodleawardsrequire_row_'.$interactionname;
 
-			$configs[ $require_points_fieldname ]    = new SloodleConfigurationOptionText( $require_points_fieldname, $interactionlabel, '', 0, 8);
+			$configs[ $require_points_fieldname ]    = new SloodleConfigurationOptionText( $require_points_fieldname, $interactionlabel, 'emptystring', 0, 8);
 			$configs[ $require_points_fieldname ]->row_name = $require_points_row_name;
 
-			$configs[ $require_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $require_currency_fieldname, '', '', '', 8);
+			$configs[ $require_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $require_currency_fieldname, 'emptystring', '', '', 8);
 			$configs[ $require_currency_fieldname ]->row_name = $require_points_row_name;
 			$configs[ $require_currency_fieldname ]->is_value_translatable = false;
 
