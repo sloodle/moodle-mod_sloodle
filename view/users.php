@@ -133,6 +133,17 @@ class sloodle_view_users extends sloodle_base_view
         $this->sloodleonly = optional_param('sloodleonly', false, PARAM_BOOL);
         $this->start = optional_param('start', 0, PARAM_INT);
         if ($this->start < 0) $this->start = 0;
+
+
+        // Moodle 2 rendering functions like to know the course.
+        // They get upset if you try to pass a course into print_footer() that isn't what they were expecting.
+        if ($this->course) {
+                global $PAGE;
+                if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
+                        $PAGE->set_course($this->course);
+                }
+        }
+
     }
 
     /**
@@ -229,7 +240,7 @@ class sloodle_view_users extends sloodle_base_view
         
         echo '<span style="font-weight:bold;">'.get_string('usersearch','sloodle').'</span><br/>';
         
-        echo '<input type="hidden" value="'.$this->courseid.'" name="course"/>';
+        echo '<input type="hidden" value="'.s($this->courseid).'" name="course"/>';
         echo '<input type="text" value="'.$this->searchstr.'" name="search" size="30" maxlength="30"/><br/>';
         
         echo '<input type="checkbox" value="true" name="sloodleonly"';
@@ -252,8 +263,8 @@ class sloodle_view_users extends sloodle_base_view
         echo '<span style="font-weight:bold;">'.get_string('avatarsearch','sloodle').'</span><br/>';
         
         echo '<input type="hidden" value="search" name="id"/>';
-        echo '<input type="hidden" value="'.$this->courseid.'" name="course"/>';
-        echo '<input type="text" value="'.$this->searchstr.'" name="search" size="30" maxlength="30"/><br/>';
+        echo '<input type="hidden" value="'.s($this->courseid).'" name="course"/>';
+        echo '<input type="text" value="'.s($this->searchstr).'" name="search" size="30" maxlength="30"/><br/>';
         echo '<br/><input type="submit" value="'.get_string('submit','sloodle').'" />';
         echo '</form>';
         echo '</td>';
@@ -300,18 +311,18 @@ class sloodle_view_users extends sloodle_base_view
             $userlist = array();
             // Filter it down to members of the course
             foreach ($fulluserlist as $ful) {
-                // Is this user on this course?
                 if (has_capability('moodle/course:view', $this->course_context, $ful->id)) {
                     // Copy it to our filtered list
                     $userlist[] = $ful;
-                }
+                } else {
+		}
             }
             
             
         } else {
             // Getting all users in a course
             // Display the name of the course
-            echo '<br/><span style="font-size:18pt; font-weight:bold;">'.$this->coursefullname.'</span><br/><br/>';
+            echo '<br/><span style="font-size:18pt; font-weight:bold;">'.s($this->coursefullname).'</span><br/><br/>';
             // Obtain a list of all Moodle users enrolled in the specified course
             $userlist = get_course_users($this->courseid, 'lastname, firstname', '', 'u.id, firstname, lastname');
         }
