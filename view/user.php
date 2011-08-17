@@ -350,7 +350,7 @@ class sloodle_view_user extends sloodle_base_view
             // Eliminate entries belonging to avatars who are not in the current course
             foreach ($fullsloodleentries as $fse) {
                 // Does the Moodle user have permission?
-                if (has_capability('moodle/course:view', $this->course_context, $fse->userid)) {
+                if (has_capability('mod/sloodle:courseparticipate', $this->course_context, $fse->userid)) {
                     // Copy it to our filtered list
                     $sloodleentries[] = $fse;
                 }

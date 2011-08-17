@@ -85,7 +85,7 @@ class sloodle_view_tracker extends sloodle_base_view_module
         //  but note that it is a deprecated function, and it only seems to return students.
         if (function_exists('get_users_by_capability'))
         {
-            $userlist = get_users_by_capability($this->course_context, 'moodle/course:view', 'u.id, u.firstname, u.lastname', 'u.firstname, u.lastname');
+            $userlist = get_users_by_capability($this->course_context, 'mod/sloodle:courseparticipate', 'u.id, u.firstname, u.lastname', 'u.firstname, u.lastname');
         }
         else
         {

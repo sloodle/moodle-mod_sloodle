@@ -147,7 +147,37 @@ $mod_sloodle_capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
-    )
+    ),
+
+    // Indicates that the user is involved in the course. Replaces pre-Moodle-2 course:view
+    'mod/sloodle:courseparticipate' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'legacy' => array(
+            'user' => CAP_ALLOW,
+            'guest' => CAP_PREVENT,
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'admin' => CAP_ALLOW
+        )
+    ),
+ 
+    // Indicates that the user is allowed to use a controller.
+    // Intended to replace courseparticipate where permissions can sensibly be set at the controller level.
+    'mod/sloodle:controllerparticipate' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'user' => CAP_ALLOW,
+            'guest' => CAP_PREVENT,
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'admin' => CAP_ALLOW
+        )
+    ),
+
 
 );
 

@@ -121,7 +121,7 @@
             
             //$users = get_course_users($this->cm->course); // Deprecated since 1.7. Hope this works instead:
             $context = get_context_instance(CONTEXT_COURSE, $this->cm->course);
-            $users = get_users_by_capability($context, 'moodle/course:view', 'u.id', '','','',array(), false);
+            $users = get_users_by_capability($context, 'mod/sloodle:courseparticipate', 'u.id', '','','',array(), false);
 
             // Determine how many people on the course have not yet answered
             if (!is_array($users)) $users = array();

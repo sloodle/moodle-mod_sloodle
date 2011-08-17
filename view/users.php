@@ -163,7 +163,7 @@ class sloodle_view_users extends sloodle_base_view
         $this->course_context = get_context_instance(CONTEXT_COURSE, $this->courseid);
         $this->system_context = get_context_instance(CONTEXT_SYSTEM);
         // Make sure the user has permission to view this course (but let anybody view the site course details)
-        if ($this->courseid != SITEID) require_capability('moodle/course:view', $this->course_context);
+        if ($this->courseid != SITEID) require_capability('mod/sloodle:courseparticipate', $this->course_context);
     }
 
     /**
@@ -214,7 +214,7 @@ class sloodle_view_users extends sloodle_base_view
         if (!$allcourses) $allcourses = array();
         foreach ($allcourses as $as) {
             // Is the user able to view this particular course?
-            if ($as->id == SITEID || has_capability('moodle/course:view', get_context_instance(CONTEXT_COURSE, $as->id))) {
+            if ($as->id == SITEID || has_capability('mod/sloodle:courseparticipate', get_context_instance(CONTEXT_COURSE, $as->id))) {
                 // Output this as an option
                 echo "<option value=\"{$as->id}\"";
                 if ($as->id == $this->courseid) echo "selected";
@@ -311,7 +311,7 @@ class sloodle_view_users extends sloodle_base_view
             $userlist = array();
             // Filter it down to members of the course
             foreach ($fulluserlist as $ful) {
-                if (has_capability('moodle/course:view', $this->course_context, $ful->id)) {
+                if (has_capability('mod/sloodle:courseparticipate', $this->course_context, $ful->id)) {
                     // Copy it to our filtered list
                     $userlist[] = $ful;
                 } else {
