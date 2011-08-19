@@ -44,7 +44,7 @@ integer sloodle_handle_command(string str)
     string SLOODLE_EOF="sloodleeof";
     if (numbits > 1) value1 = llList2String(bits,1);
     if (numbits > 2) value2 = llList2String(bits,2);
-    llSay(0,str);
+   
     if (name == "set:sloodleserverroot") sloodleserverroot = value1;
     else if (name == "set:sloodlepwd") {
         // The password may be a single prim password, or a UUID and a password
@@ -82,10 +82,14 @@ default
 {
     state_entry()
     {
-     llOwnerSay("Httpin_forwarder waiting for ready state");
+   // llOwnerSay("Httpin_forwarder waiting for config");
     }
+
+
+    // allow for reconfiguration without resetting
      link_message( integer sender_num, integer num, string str, key id)
     {
+          //  llOwnerSay("http-in forwarder got mesage"+str);
         // Check the channel
         if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
             // Split the message into lines
@@ -94,14 +98,14 @@ default
             integer i = 0;
             for (i=0; i < numlines; i++) {
                 isconfigured = sloodle_handle_command(llList2String(lines, i));
-        llSay(0,(string)isconfigured);
+       // llOwnerSay("got command "+llList2String(lines,i)+", configured is "+(string)isconfigured);
             }
             
             // If we've got all our data AND reached the end of the configuration data, then move on
             if (eof == TRUE) {
                 if (isconfigured == TRUE) {
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
-                    state ready;
+                     state ready;
                 } else {
                     // Go all configuration but, it's not complete... request reconfiguration
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
@@ -110,30 +114,47 @@ default
                 }
             }
         }
+    }                          
+    
+    on_rez(integer start_param) {
+        llResetScript();
     }
+    
 }
 
 state ready {
 
     
      state_entry()
-    {
-         llOwnerSay("Httpin_forwarder ready");
+    {        
+       // llOwnerSay("Httpin_forwarder ready");
          llListen( SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL, "", NULL_KEY, ""    );
     }
         
     listen( integer channel, string name, key id, string str){ 
         if (channel != SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL ) return;
+                
+      // llOwnerSay("got config request"+str);
         
-        if (!(llGetOwnerKey(id) == llGetOwner())) return;
+        if (llGetOwnerKey(id) != llGetOwner()) {
+
+      // llOwnerSay("returning: id of getowner is "+(string)llGetOwner()+" but object owner is "+(string)llGetOwnerKey(id));
+                            
+            return;
+        }
+
+     //  llOwnerSay("stilll here t"+str);
+        
+                            
 //send to httpin_config_linker
           string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
           body += "&sloodlepwd=" + sloodlepwd;
           body += "&sloodlemoduleid=" + (string)sloodlemoduleid;
           body += "&sloodleobjuuid=" + (string)llGetKey();
           body += "&childobjectuuid=" + (string)id;
-          body += "&httpinurl=" + str;    
-          httpchat = llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_REQUEST_LINKER+"?"+body, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);    
+          body += "&httpinurl=" + str;   
+//llOwnerSay("requested config with body "+body); 
+          httpchat = llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_REQUEST_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);    
    }
     http_response(key request_id, integer status, list metadata, string body) {
         // Split the data up into lines
@@ -162,4 +183,40 @@ state ready {
 
         
     }      
+
+    // allow for reconfiguration without resetting
+     link_message( integer sender_num, integer num, string str, key id)
+    {
+           // llOwnerSay(str);
+        // Check the channel
+        if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
+            // Split the message into lines
+            list lines = llParseString2List(str, ["\n"], []);
+            integer numlines = llGetListLength(lines);
+            integer i = 0;
+            for (i=0; i < numlines; i++) {
+                isconfigured = sloodle_handle_command(llList2String(lines, i));
+      //  llOwnerSay("got command "+llList2String(lines,i)+", configured is "+(string)isconfigured);
+            }
+            
+            // If we've got all our data AND reached the end of the configuration data, then move on
+            if (eof == TRUE) {
+                if (isconfigured == TRUE) {
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                } else {
+                    // Go all configuration but, it's not complete... request reconfiguration
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
+                    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
+                    eof = FALSE;
+                }
+            }
+        }
+    }                            
+    on_rez(integer start_param) {
+        llResetScript();
+    }        
 }
+
+
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_http_in_forwarder.lsl
