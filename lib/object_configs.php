@@ -790,6 +790,7 @@ class SloodleConfigurationOptionCurrencyChoice extends SloodleConfigurationOptio
 		$this->description = $description;
 		$this->size = $length;
 		$this->options = $options;
+		$this->no_option_text = 'nocurrencies';
 		$this->max_length = $length;
 		$this->default = $first_currency->id;
 		$this->type = 'radio';

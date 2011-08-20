@@ -45,6 +45,10 @@
 
         $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'&sloodleavname='.htmlentities($_REQUEST['sloodleavname']).'&sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&sloodleobjname='.htmlentities($_REQUEST['sloodleobjname']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
 
+	$hasCourses = false;
+	$hasControllers = false;
+	$hasControllersWithPermission = false;
+
 	$sitesURL = '';
 	if (defined('SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL') && (SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL != '') ) {
 		$sitesURL = SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL.$baseurl.'&ts='.time();
@@ -60,13 +64,6 @@
 		}
 	}
 
-	/*
-	$courseid = optional_param( 'courseid', 0, PARAM_INT );
-	$cmid = optional_param( 'cmid', 0, PARAM_INT );
-	*/
-
-	// TODO: What should this be? Probably not 1...
-	//$can_edit_layouts = has_capability('mod/sloodle:editlayouts', $course_context);
 	if (!$USER || !$USER->id) {
 		if ( defined('SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE') && ( SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE != '' ) ) {
 			require(SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE);	
@@ -114,6 +111,7 @@
 	foreach($courses as $course) {
 		$id = $course->id;
 		$coursesbyid[ $id ] = $course;
+	 	$hasCourses = true;
 	}
 
         // Get a list of controllers which the user is permitted to authorise objects on
@@ -121,17 +119,19 @@
         $recs = sloodle_get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
         // Make sure we have at least one controller
         if ($recs == false || count($recs) == 0) {
-            error(get_string('objectauthnocontrollers','sloodle'));
-            exit();
+        //    error(get_string('objectauthnocontrollers','sloodle'));
+         //   exit();
         }
 
         foreach ($recs as $r) {
             // Fetch the course module
             $cm = get_coursemodule_from_instance('sloodle', $r->id);
+	    $hasControllers = true;
             // Check that the person can authorise objects of this module
             if (has_capability('mod/sloodle:objectauth', get_context_instance(CONTEXT_MODULE, $cm->id))) {
                 // Store this controller
                 $controllers[$cm->course][$cm->id] = $r;
+		$hasControllersWithPermission = true;
             }
         }
 
@@ -196,12 +196,18 @@
 	}
 	*/
 
-	print_controller_list( $courses, $controllers, $hasSites = false, $sitesURL); 
+	print_controller_list( $courses, $controllers, $hasSites = false, $sitesURL, $hasCourses, $hasControllers, $hasControllersWithPermission); 
+
 	print_layout_list( $courses, $controllers, $courselayouts );
+
+
 	print_add_layout_forms( $courses, $controllers, $object_uuid );
 
 	print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries, $object_uuid);
+
 	print_layout_add_object_groups( $courses, $controllers, $courselayouts, $objectconfigsbygroup );
+
+
 	print_add_object_forms($courses, $controllers, $courselayouts, $object_configs, $object_uuid); 
 	print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries, $object_uuid); 
 

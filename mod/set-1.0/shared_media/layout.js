@@ -940,6 +940,9 @@
 		$('.refresh_config_button').unbind('click').click( function() {
 			refresh_form_options( $(this) );	
 		});
+		$('.reload_page_button').unbind('click').click( function() {
+			location.reload();
+		});
 	}
 
 	function handle_rename_button_click(btnjq) {

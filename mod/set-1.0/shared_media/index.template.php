@@ -75,13 +75,37 @@ function print_site_list( $sites ) {
 <?php 
 }
 
-function print_controller_list( $courses, $controllers, $hasSites, $sitesURL ) {
+function print_controller_list( $courses, $controllers, $hasSites, $sitesURL, $hasCourses, $hasControllers, $hasControllersWithPermission) {
 $hasSites = false;
 $full = false;
 ?>
 
     <ul id="site_1" data-parent="sitelist" title="<?= "http://".$_SERVER["SERVER_NAME"]?>" <?= $hasSites ? '' : ' selected="true"' ?> >
-        <li class="group"><?= s(get_string('rezzer:controllers', 'sloodle'))?></li>
+
+<div class="upper_button_zone">
+<span class="left_zone">
+
+	<span class="title_text"><?= s( get_string('rezzer:controllers','sloodle')) ?></span>
+</span>
+<span class="right_zone">
+
+
+<span class="control_button reload_page_button" type="submit"><?= s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?></span>
+
+</span>
+</div>
+
+
+	<?php if (!$hasControllersWithPermission) { ?>
+		<?php if (!$hasCourses) { ?>
+			<li><?=s(get_string('rezzer:nocourses','sloodle'))?></li>
+		<?php } else if (!$hasControllers) { ?>
+			<li><?=s(get_string('rezzer:nocontrollers','sloodle'))?></li>
+		<?php } else if (!$hasControllersWithPermission) { ?>
+			<li><?=s(get_string('rezzer:nocontrollerswithpermission','sloodle'))?></li>
+		<?php } ?>
+	<?php } ?>
+
 	<?php 
 	foreach($courses as $course) { 
 		$cid = $course->id; 
@@ -150,9 +174,11 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
         <li><a class="add_layout_link" href="#addlayout_<?= intval($cid) ?>-<?= intval($contid) ?>"><?= s(get_string('rezzer:addlayout', 'sloodle'))?></a></li>
     </ul>
 <?php 
+
 		}
 
 	}
+
 }
 
 
@@ -209,13 +235,17 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 		foreach($controllers[$cid] as $contid => $cont) {
 			$layouts = $courselayouts[ $cid ][$contid];
 			foreach($layouts as $layout) {
+
 				if ($layout->controllerid != $contid) {
 					continue;
 				}
+
 				$hasactiveobjects = $layout->has_active_objects_rezzed_by_rezzer( $rezzeruuid );
 				$entriesbygroup = $layoutentries[ $layout->id ];
 
+
 				$rezzed_entries = $layout->rezzed_active_objects_by_layout_entry_id( $rezzeruuid );
+
 
 ?>
 			    <ul data-parent="controller_<?= intval($cid)?>-<?= intval($contid) ?>" class="layout_container layout_container_<?= intval($layout->id) ?>" id="layout_<?= intval($cid)?>-<?= intval($contid) ?>-<?= intval($layout->id) ?>" title="<?= htmlentities( $layout->name ) ?>" data-rez-mode="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-action-status="<?= $hasactiveobjects ? 'rezzed' : 'unrezzed'?>" data-connection-status="disconnected">
@@ -441,7 +471,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <?php } else if ($ctrl->type == 'input') { ?>
 <input type="text" size="<?= $ctrl->size ?>" maxlength="<?= $ctrl->max_length ?>" name="<?= $fieldname ?>" value="<?= $ctrl->default ?>" /> 
 <?php } else { ?>
-not radio: <?=$ctrl->type?>
+<?=$ctrl->type?>
 <?php } ?>
 </span>
 <?php } ?>
@@ -557,7 +587,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemodu
 <?php } else if ($ctrl->type == 'input') {?>
 <input type="text" size="<?= $ctrl->size ?>" maxlength="<?= $ctrl->max_length ?>" name="<?= $fieldname ?>" value="<?= $val ?>" /> 
 <?php } else {?>
-not radio: <?=$ctrl->type?>
+<?=$ctrl->type?>
 <?php } ?>
 </span>
 <?php } ?>

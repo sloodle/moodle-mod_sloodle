@@ -741,6 +741,9 @@ $string['scoreboard:controlscoreboard'] = 'Control Scores';
 
 $string['rezzer:sloodlesetup'] = 'Setup';
 $string['rezzer:logout'] = 'Logout';
+$string['rezzer:nocourses'] = 'This site does not have any courses.';
+$string['rezzer:nocontrollers'] = 'To enable a course for sloodle, add a controller in Moodle, then hit "Refresh".';
+$string['rezzer:nocontrollerswithpermission'] = 'You do not have permission to set up any sloodle-enabled courses.';
 $string['rezzer:avatarclassroom'] = 'Avatar Classroom';
 $string['rezzer:addsite'] = 'Add a site';
 $string['rezzer:sites'] = 'Sites';

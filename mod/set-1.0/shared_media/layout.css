@@ -165,6 +165,7 @@ form {
 .set_configuration_status { background-image: url(images/rezzer_icon_loading.gif); }
 .add_to_layout_button{ background-image: url(images/rezzer_icon_add.png); }
 .refresh_config_button{ background-image: url(images/rezzer_icon_refresh.png); }
+.reload_page_button{ background-image: url(images/rezzer_icon_refresh.png); }
 .delete_layout_entry_button{ background-image: url(images/rezzer_icon_delete.png); }
 .update_layout_entry_button{ background-image: url(images/rezzer_icon_update.png); }
 .delete_layout_button{ background-image: url(images/rezzer_icon_layout_delete.png); }
