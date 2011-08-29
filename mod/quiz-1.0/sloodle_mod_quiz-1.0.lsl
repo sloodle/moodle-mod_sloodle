@@ -1,20 +1,20 @@
-// LSL script generated: mod.quiz-1.0.sloodle_mod_quiz-1.0.lslp Mon Aug 29 13:44:56 Tokyo Standard Time 2011
+// LSL script generated: mod.quiz-1.0.sloodle_mod_quiz-1.0.lslp Tue Aug 30 03:01:48 Tokyo Standard Time 2011
 /* Sloodle quiz chair
 
-	Copyright (c) 2006-9 Sloodle (various contributors)
+    Copyright (c) 2006-9 Sloodle (various contributors)
     Released under the GNU GPL
     
 
-	This files lists all the status codes we use for sloodle.
-	They have been written in LSL format so that you can plunk them into your source
-	code if needed. 
+    This files lists all the status codes we use for sloodle.
+    They have been written in LSL format so that you can plunk them into your source
+    code if needed. 
 
-	Contributors:
+    Contributors:
     Edmund Edgar
     Paul Preibisch
     
    
-	
+     
 */
       
         key null_key = NULL_KEY;
@@ -34,28 +34,23 @@
         integer isconfigured = FALSE;
         integer eof = FALSE;
         integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;
-       
- 
         integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102;
         integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103;
         integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104;
         integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105;
-        integer SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION = -1639271111;
         integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112;
         integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113;
-		integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_DEFAULT = -1639271114;
-		integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_READY = -1639271115;
-		integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_CHECK_QUIZ = -1639271116;
-		integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING = -1639271117;
-		integer SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE = -1639271118;
+        integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_DEFAULT = -1639271114;
+        integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_READY = -1639271115;
+        integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116;
+        integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING = -1639271117;
+        integer SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE = -1639271118;
+        integer SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR = -1639271119;
         integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
         integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
         string SLOODLE_EOF = "sloodleeof";
-        
         string sloodle_quiz_url = "/mod/sloodle/mod/quiz-1.0/linker.php";
-                        
         key httpquizquery = null_key;
-        
         float request_timeout = 20.0;
         
         // ID and name of the current quiz
@@ -70,11 +65,10 @@
 
         // Avatar currently using this cahir
         key sitter = null_key;
-        // The position where we started. The Chair will use this to get the lowest vertical position it used.
-        vector startingposition;
         
         // Stores the number of questions the user got correct on a given attempt
         integer num_correct = 0;
+        
         
         ///// TRANSLATION /////
         
@@ -100,15 +94,17 @@
 }sloodle_debug(string msg){
     llMessageLinked(LINK_THIS,DEBUG_CHANNEL,msg,null_key);
 }
-		/******************************************************************************************************************************
+        /******************************************************************************************************************************
         * clearUserQuizData- 
         * Description - resets the quiz chair data.  Used if a user jumps off a quiz chair.  Resets data for next user
         *******************************************************************************************************************************/
-		clearUserQuizData(){
+           clearUserQuizData(){
     (quizname = "");
     (question_ids = []);
     (num_questions = 0);
+    (num_correct = 0);
     (active_question = (-1));
+    (sitter == NULL_KEY);
     if (doRandomize) (question_ids = llListRandomize(question_ids,1));
 }
         // Configure by receiving a linked message from another script in the object
@@ -123,8 +119,12 @@
     if ((numbits > 2)) (value2 = llList2String(bits,2));
     if ((name == "set:sloodleserverroot")) (sloodleserverroot = value1);
     else  if ((name == "set:sloodlepwd")) {
-        if ((value2 != "")) (sloodlepwd = ((value1 + "|") + value2));
-        else  (sloodlepwd = value1);
+        if ((value2 != "")) {
+            (sloodlepwd = ((value1 + "|") + value2));
+        }
+        else  {
+            (sloodlepwd = value1);
+        }
     }
     else  if ((name == "set:sloodlecontrollerid")) (sloodlecontrollerid = ((integer)value1));
     else  if ((name == "set:sloodlemoduleid")) (sloodlemoduleid = ((integer)value1));
@@ -239,6 +239,7 @@
         state ready {
 
             state_entry() {
+        clearUserQuizData();
         llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_READY,llGetScriptName(),NULL_KEY);
     }
 
@@ -256,9 +257,8 @@
                 (sitter = null_key);
                 return;
             }
-            (startingposition = llGetPos());
             sloodle_translation_request(SLOODLE_TRANSLATE_SAY,[0],"starting",[llKey2Name(sitter)],null_key,"quiz");
-            state check_quiz;
+            state load_quiz_for_user;
         }
     }
 
@@ -270,12 +270,11 @@
         
         
         // Fetching the general quiz data from the server
-        state check_quiz {
+        state load_quiz_for_user {
 
             state_entry() {
-        llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_CHECK_QUIZ,"",NULL_KEY);
+        llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER,"",sitter);
         sloodle_translation_request(SLOODLE_TRANSLATE_SAY,[0],"fetchingquiz",[],null_key,"quiz");
-        clearUserQuizData();
         string body = ("sloodlecontrollerid=" + ((string)sloodlecontrollerid));
         (body += ("&sloodlepwd=" + sloodlepwd));
         (body += ("&sloodlemoduleid=" + ((string)sloodlemoduleid)));
@@ -369,7 +368,6 @@
 
             
             changed(integer change) {
-        llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION,((string)startingposition),sitter);
         reinitialise();
     }
 }
@@ -386,8 +384,7 @@
             state_entry() {
         llSetText("",<0.0,0.0,0.0>,0.0);
         (num_correct = 0);
-        llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING,"",NULL_KEY);
-        llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION,((string)startingposition),sitter);
+        llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING,"",sitter);
         if ((num_questions == 0)) {
             sloodle_debug("No questions - cannot run quiz.");
             state default;
@@ -401,7 +398,10 @@
 
             
             link_message(integer sender_num,integer num,string str,key id) {
-        if ((num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR)) {
+        if ((num == SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR)) {
+            state ready;
+        }
+        else  if ((num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR)) {
             float scorechange = ((integer)str);
             if ((sitter != id)) {
                 return;
@@ -447,12 +447,5 @@
                 llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_ASK_QUESTION,((string)llList2Integer(question_ids,active_question)),sitter);
             }
         }
-    }
-
-            
-            changed(integer change) {
-        llMessageLinked(LINK_SET,SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION,((string)startingposition),sitter);
-        clearUserQuizData();
-        state ready;
     }
 }
