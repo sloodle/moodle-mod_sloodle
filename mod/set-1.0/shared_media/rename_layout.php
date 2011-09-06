@@ -34,7 +34,7 @@ if (!has_capability('mod/sloodle:editlayouts', $controller_context)) {
 
 
 $layout->name = $layoutname;
-if (!$layout->update()) {
+if (!sloodle_update_record('sloodle_layout', $layout)) {
 	error_output('Could not save layout');
 }
 
