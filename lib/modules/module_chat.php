@@ -185,6 +185,12 @@
             $result = sloodle_insert_record('chat_messages', $rec);
             if (!$result) return false;
             
+	    if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+                $result = sloodle_insert_record('chat_messages_current', $rec);
+                if (!$result) return false;
+	    }
+
+
             if (!is_null($this->_session->active_object)) {
                  $this->_session->active_object->process_interactions( 'SloodleModuleAwards', 'default', 1, $userid ); 
                  // TODO: Maybe we should set a side effect code here?
