@@ -22,7 +22,6 @@
         integer doDialog = 1; // whether we should ask the questions using dialog rather than chat
         integer doPlaySound = 1; // whether we should play sound
         integer doRandomize = 1; // whether we should ask the questions in random order
-        
         string sloodleserverroot = "";
         integer sloodlecontrollerid = 0;
         string sloodlepwd = "";
@@ -30,10 +29,8 @@
         integer sloodleobjectaccessleveluse = 0; // Who can use this object?
         integer sloodleobjectaccesslevelctrl = 0; // Who can control this object?
         integer sloodleserveraccesslevel = 0; // Who can use the server resource? (Value passed straight back to Moodle)
-        
         integer isconfigured = FALSE; // Do we have all the configuration data we need?
         integer eof = FALSE; // Have we reached the end of the configuration data?
-        
         integer SLOODLE_CHANNEL_AVATAR_DIALOG = 1001;
         integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
         integer SLOODLE_CHANNEL_AVATAR_IGNORE = -1639279999;
@@ -47,7 +44,8 @@
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
         integer SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION = -1639271111;            
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_CHAT = -1639271125; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA CHAT.
+		integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG = -1639271126; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
         integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
         integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_DEFAULT = -1639271114; //mod quiz script is in state DEFAULT
         integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_READY = -1639271115; //mod quiz script is in state READY
@@ -55,7 +53,21 @@
         integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING = -1639271117; //mod quiz script is in state quizzing
         integer SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE= -1639271118; //user has tried to use the chair but doesnt have permission to do so.
         integer SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR = -1639271119; //Tells us to STOP a quiz for the avatar
-        integer SLOODLE_CHANNEL_QUIZ_UNSEAT_AVATAR = -1639271120;          
+        integer SLOODLE_CHANNEL_QUIZ_SUCCESS_NOTHING_MORE_TO_DO_WITH_AVATAR= -1639271122;
+		integer SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR= -1639271123;
+        integer SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION = -1639271121;  //
+		integer SLOODLE_CHANNEL_QUIZ_ERROR_ATTEMPTS_LEFT= -1639271123;  //
+		integer SLOODLE_CHANNEL_QUIZ_ERROR_NO_QUESTIONS= -1639271124;  //  		
+        ///// TRANSLATION /////
+        // Link message channels
+        integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
+        // Translation output methods
+        string SLOODLE_TRANSLATE_WHISPER = "whisper";               // 1 output parameter: chat channel number
+        string SLOODLE_TRANSLATE_SAY = "say";               // 1 output parameter: chat channel number
+        string SLOODLE_TRANSLATE_OWNER_SAY = "ownersay";    // No output parameters
+        string SLOODLE_TRANSLATE_DIALOG = "dialog";         // Recipient avatar should be identified in link message keyval. At least 2 output parameters: first the channel number for the dialog, and then 1 to 12 button label strings.
+        string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";      // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
+        string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
         integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
         integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
         integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
@@ -64,7 +76,7 @@
         string sloodle_quiz_url = "/mod/sloodle/mod/quiz-1.0/linker.php";
         key httpquizquery = null_key;
         float request_timeout = 20.0;
-        
+        string sloodlehttpvars;
         // ID and name of the current quiz
         integer quizid = -1;
         string quizname = "";
@@ -112,8 +124,6 @@
            num_correct=0;
            active_question = -1;
            sitter==NULL_KEY;
-           //re-randomize questions if dorandomize is set
-           if (doRandomize) question_ids = llListRandomize(question_ids, 1);                        
         }   
         // Configure by receiving a linked message from another script in the object
         // Returns TRUE if the object has all the data it needs
@@ -171,56 +181,19 @@
             //move_to_start(); // Taking this out here leaves the quiz chair at its final position until the user stands up.
             
             // Notify the server that the attempt was finished
-            string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
-            body += "&sloodlepwd=" + sloodlepwd;
-            body += "&sloodlemoduleid=" + (string)sloodlemoduleid;
-            body += "&sloodleuuid=" + (string)sitter;
-            body += "&sloodleavname=" + llEscapeURL(llKey2Name(sitter));
-            body += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
+            string body = sloodlehttpvars;
             body += "&finishattempt=1";
-            
             llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
             
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR, (string)num_correct + "/" + (string)num_questions, sitter);
             
         }
-        
-        // Reinitialise (e.g. after one person has finished an attempt)
-        reinitialise()
-        {
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], null_key, "");
-            llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:requestconfig", null_key);
-            llResetScript();
-        }
-        
-        
-        ///// TRANSLATION /////
-        
-        // Link message channels
-        integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
-        
-        // Translation output methods
-        string SLOODLE_TRANSLATE_WHISPER = "whisper";               // 1 output parameter: chat channel number
-        string SLOODLE_TRANSLATE_SAY = "say";               // 1 output parameter: chat channel number
-        string SLOODLE_TRANSLATE_OWNER_SAY = "ownersay";    // No output parameters
-        string SLOODLE_TRANSLATE_DIALOG = "dialog";         // Recipient avatar should be identified in link message keyval. At least 2 output parameters: first the channel number for the dialog, and then 1 to 12 button label strings.
-        string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";      // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
-        string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
-        
         // Send a translation request link message
-        
-        sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch)
-        {
-            
+        sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch){
             llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
         }
-        
         ///// ----------- /////
-        
-        
         ///// STATES /////
-        
-        // Waiting on initialisation
         default
         {
             state_entry()
@@ -241,7 +214,7 @@
                 doDialog = 1;
                 doPlaySound = 1;
                 doRandomize = 1;
-                //tell other scripts we are in the defualt state.
+                //tell other scripts we are in the default state.
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_DEFAULT,llGetScriptName(), NULL_KEY);
             }
             
@@ -290,7 +263,7 @@
                 // Clear existing data
                 clearUserQuizData();
                 //tell other scripts we are in the ready state                 
-                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_READY, llGetScriptName(), NULL_KEY);
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_READY, "", NULL_KEY);
                 // This is now handled by a separate poseball
                 // llSitTarget(<0,0,.5>, ZERO_ROTATION);
             }
@@ -313,7 +286,6 @@
                     }                
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(sitter)], null_key, "quiz");                                                     
                     state load_quiz_for_user;
-                    
                 }                
                 
             }
@@ -333,20 +305,14 @@
             {
                  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", sitter);
                 sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "fetchingquiz", [], null_key, "quiz");
-                
-               
-                             
-                
                 // Request the quiz data from Moodle
-                string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
-                body += "&sloodlepwd=" + sloodlepwd;
-                body += "&sloodlemoduleid=" + (string)sloodlemoduleid;
-                body += "&sloodleuuid=" + (string)sitter;
-                body += "&sloodleavname=" + llEscapeURL(llKey2Name(sitter));
-                body += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
-                
-                httpquizquery = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
-                
+                sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
+                sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
+                sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
+                sloodlehttpvars += "&sloodleuuid=" + (string)sitter;
+                sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
+                sloodlehttpvars += "&sloodleavname=" + llEscapeURL(llKey2Name(sitter));
+                httpquizquery = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], sloodlehttpvars);
                 llSetTimerEvent(0.0);
                 llSetTimerEvent((float)request_timeout);
             }
@@ -361,7 +327,11 @@
                 sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "httptimeout", [], null_key, "");
                 state ready;
             }
-            
+            link_message(integer sender_num, integer num, string str, key id) {
+            	if (num == SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR){
+                   state ready;
+                }
+            }
             http_response(key id, integer status, list meta, string body)
             {
                 
@@ -371,7 +341,8 @@
                 // Make sure the response was OK
                 if (status != 200) {
                         sloodle_error_code(SLOODLE_TRANSLATE_SAY, NULL_KEY,status, ""); //send message to error_message.lsl
-                    state default;
+                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", sitter);//todo add to dia
+                    state ready;//todo add to dia
                 }
                 
                 // Split the response into several lines
@@ -384,11 +355,13 @@
                 // Was it an error code?
                 if (statuscode == -10301) {
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft", [llKey2Name(sitter)], null_key, "");
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", sitter);//todo add to dia
                     state ready;
                     return;
                     
                 } else if (statuscode == -10302) {
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], null_key, "");
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", sitter);
                     state ready;
                     return;
                     
@@ -402,7 +375,7 @@
                       //Sloodle 2.0 Change - output custom errorcode to other scripts
                      sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode, msg); //send message to error_message.lsl                 
                     // Check if an error message was reported
-
+					llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", sitter);//add to dia
                     state ready;
                     return;
                 }
@@ -447,7 +420,8 @@
                 // Make sure we have all the data we need
                 if (quizname == "" || num_questions == 0) {
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], null_key, "quiz");
-                    state default;
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", sitter);//add to dia
+                    state ready;//todo add to dia
                     return;
                 }
                 
@@ -461,11 +435,7 @@
                 llResetScript();
             }
             
-            changed(integer change)
-            {
-                                                                        
-                reinitialise();
-            }
+            
         }
         
         
@@ -486,14 +456,20 @@
                 // Make sure we have some questions
                 if (num_questions == 0) {
                     sloodle_debug("No questions - cannot run quiz.");
-                    state default;
+					llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", sitter);//add to dia
+                    state ready;//todo add to dia
                     return;
                 }
                 
                 // Start from the beginning
                 active_question = 0;
-                llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR, (string)quizid+quizname, sitter );                 
-                llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, (string)llList2Integer(question_ids, active_question), sitter );
+                llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR, (string)quizid+"|"+quizname, sitter );
+                if (doDialog==1){ //1 = true
+                	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG, llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,sitter );//todo add to dia
+                }else                 
+                if (doDialog==0){ //0= false
+                	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_CHAT, llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,sitter );//todo add to dia
+                }                
                 llSetTimerEvent( 10.0 ); // The other script should let us know that it's heard us and asked the question. If it doesn't, we'll keep on retrying until it hears us, if it ever does.
             }
             
@@ -503,6 +479,13 @@
                    state ready;
                 }
                 else
+                if (num == SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION) {//TODO add to dia
+                	//send message it is done with avatar
+                	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", sitter );//TODO add to dia
+                	//go to state READY
+                	state ready;//todo add to dia
+                	
+                }else
                 if (num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR) {
                     
                     float scorechange = (integer)str;
@@ -522,15 +505,19 @@
                         finish_quiz();
                         // Do we want to repeat the quiz?
                         if (!doRepeat) {
-                        	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_UNSEAT_AVATAR, "", sitter );
-                        
+                        	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_SUCCESS_NOTHING_MORE_TO_DO_WITH_AVATAR, "", sitter );//TODO add to dia
                         }
                         
                         state quizzing;
                         return;
                     }
-                                                                                
-                    llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, (string)llList2Integer(question_ids, active_question), sitter );
+	                if (doDialog==1){ //1 = true
+	                	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG, llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,sitter );//todo add to dia
+	                }else                 
+	                if (doDialog==0){ //0= false
+	                	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_CHAT, llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,sitter );//todo add to dia
+	                }                                                             
+                    
                     
                 } else if (num == SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR) {
                     
@@ -559,8 +546,13 @@
             {       
                 llSetTimerEvent( 0.0 );         
                 if (active_question > -1) {
-                    llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, (string)llList2Integer(question_ids, active_question), sitter );
-                    llSetTimerEvent( 10.0 ); // The other script should let us know that it's heard us and answered the question. If it doesn't, we'll keep on retrying until it hears us, if it ever does.
+                   if (doDialog==1){ //1 = true
+                	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG, llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,sitter );//todo add to dia
+	               }else                 
+	               if (doDialog==0){ //0= false
+	               	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_CHAT, llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,sitter );//todo add to dia
+	               } 
+                   llSetTimerEvent( 10.0 ); // The other script should let us know that it's heard us and answered the question. If it doesn't, we'll keep on retrying until it hears us, if it ever does.
                 }
             }
             
@@ -568,8 +560,13 @@
             {
                 if ((active_question + 1) < num_questions) {
                     if (llDetectedKey(0) == sitter) {
-                        llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, (string)llList2Integer(question_ids, active_question), sitter );
-                    }
+                        if (doDialog==1){ //1 = true
+	                	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG, llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,sitter );//todo add to dia
+		                }else                 
+		                if (doDialog==0){ //0= false
+		                	llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_CHAT, llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,sitter );//todo add to dia
+		                } 
+	                 }
                 }
             }    
             
