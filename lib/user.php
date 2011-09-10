@@ -431,7 +431,7 @@
             $nameparts = explode(' ', $this->avatar_data->avname);
             $baseusername = strip_tags(stripslashes(implode('', $nameparts)));
             $username = $baseusername;
-            $conflict_moodle = record_exists('user', 'username', $username);
+            $conflict_moodle = sloodle_record_exists('user', 'username', $username);
             
             // If that didn't work, then try a few random variants (just a number added to the end of the name)
             $MAX_RANDOM_TRIES = 3;
@@ -444,7 +444,7 @@
                 // Construct a new username to try
                 $username = $baseusername . (string)$rnd_num;
                 // Check for conflicts
-                $conflict_moodle = record_exists('user', 'username', $username);
+                $conflict_moodle = sloodle_record_exists('user', 'username', $username);
                 
                 // Next attempt
                 $rnd_try++;
