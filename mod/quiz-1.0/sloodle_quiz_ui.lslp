@@ -30,6 +30,7 @@ integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_DEFAULT = -1639271114; //mod quiz scrip
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING = -1639271117; //mod quiz script is in state quizzing
 integer SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR = -1639271119; //Tells us to STOP a quiz for the avatar
 integer SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE= -1639271118; //user has tried to use the chair but doesnt have permission to do so.
+integer SLOODLE_CHANNEL_QUIZ_UNSEAT_AVATAR = -1639271120;  
 vector startingposition=<0,0,0>;
 integer doPlaySound = 0;
 key sitter;
@@ -108,7 +109,9 @@ default
 	}
     link_message(integer sender_num, integer num, string str, key id)
     {
-        
+        if (num==SLOODLE_CHANNEL_QUIZ_UNSEAT_AVATAR){
+        		llUnSit(id);
+        }else
         if (num == SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION) {
             move_to_start( startingposition );
         } else if (num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR) {
@@ -117,7 +120,8 @@ default
             move_vertical( (float)str );
             play_sound( (float)str );   
         }else if (num == SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING){
-             move_to_start( startingposition );    
+             move_to_start( startingposition );
+                 
         
         }else if (num==SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE){
             if (id!=NULL_KEY){
@@ -129,7 +133,7 @@ default
             list lines = llParseString2List(str, ["\n"], []);
             integer numlines = llGetListLength(lines);
             integer i = 0;
-            for (; i < numlines; i++) {
+            for (i=0; i < numlines; i++) {
                 sloodle_handle_command(llList2String(lines, i));
             }
         }
@@ -145,7 +149,9 @@ default
             	
             	
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR, "", sitter);
-                 move_to_start( startingposition );    
+                 move_to_start( startingposition );
+                     
+                 
             
             }
              
