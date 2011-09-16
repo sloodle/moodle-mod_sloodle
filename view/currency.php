@@ -202,14 +202,14 @@ class sloodle_view_currency extends sloodle_base_view
            echo '<div style="position:relative ">';                                                                    
                                          
            echo '<span style="position:relative;font-size:36px;font-weight:bold;">';
-           echo '<img align="center" src="'.SLOODLE_WWWROOT.'lib/media/vault48.png" width="48"/>';
+           echo '<img align="center" src="'.SLOODLE_WWWROOT.'/lib/media/vault48.png" width="48"/>';
            echo get_string('currency:currencies', 'sloodle');
            echo '</span>';
            
                echo '<span style="float:right;">';
                echo '<a  style="text-decoration:none" href="'.$CFG->wwwroot.'/mod/sloodle/view.php?_type=backpack&id='.$COURSE->id.'">';
                echo get_string('backpacks:viewbackpacks', 'sloodle').'<br>';
-               echo '<img  src="'.SLOODLE_WWWROOT.'lib/media/returnbackpacks.png"/></a>';
+               echo '<img  src="'.SLOODLE_WWWROOT.'/lib/media/returnbackpacks.png"/></a>';
                echo '</span>';                                                                                                         
            
            echo '</div>';

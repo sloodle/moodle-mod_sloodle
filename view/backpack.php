@@ -170,7 +170,7 @@ class sloodle_view_backpack extends sloodle_base_view
 	echo '<span style="position:relative;font-size:36px;font-weight:bold;">';
         
         //print return to backpack icon
-        echo '<img align="center" src="'.SLOODLE_WWWROOT.'lib/media/backpack64.png" width="48"/>';
+        echo '<img align="center" src="'.SLOODLE_WWWROOT.'/lib/media/backpack64.png" width="48"/>';
         
         //print return to backpack title text
         echo s(get_string('backpacks:backpacks', 'sloodle'));
@@ -180,7 +180,7 @@ class sloodle_view_backpack extends sloodle_base_view
         echo s(get_string('currency:viewcurrencies', 'sloodle')).'<br>';
         
         //print return to currencies icon
-        echo '<img src="'.SLOODLE_WWWROOT.'lib/media/returntocurrencies.png"/></a>';
+        echo '<img src="'.SLOODLE_WWWROOT.'/lib/media/returntocurrencies.png"/></a>';
         echo '</span>';
 	echo '</div>';
         echo '<br>';
@@ -297,10 +297,8 @@ class sloodle_view_backpack extends sloodle_base_view
         //create an extra row for the modify currency fields
         $row = array();
         $row[] = ' &nbsp; ';
-        $row[] = ' &nbsp; ';
-        foreach($all_currencies as $currencyid => $currencynames) {
-		$row[] = ' &nbsp; ';
-        }     
+        $row[] = "";
+        $row[]='<span class="bpheader">'.s(get_string('backpacks:selectcontroller', 'sloodle'))."</span>";
 
         //build select drop down for the controllers in the course that any point updates will be linked too
         $rowText='<select style="left:20px;text-align:left;" name="controllerid">';
