@@ -106,7 +106,7 @@ default
         llResetScript();
     }
     state_entry() {
-      startingposition = llGetPos();
+      
     
     }
     link_message(integer sender_num, integer num, string str, key id)
@@ -151,9 +151,8 @@ default
          if(change & (CHANGED_LINK)){
              sitter = llAvatarOnSitTarget();
             if (sitter!=NULL_KEY){
-                
+                startingposition = llGetPos();
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR, "", sitter);
-                move_to_start( startingposition );
             }else {
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR, "", sitter);
                 move_to_start( startingposition );
