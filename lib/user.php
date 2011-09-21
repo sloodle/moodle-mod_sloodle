@@ -691,6 +691,8 @@
         */
         function enrol($sloodle_course = null)
         {
+                SloodleDebugLogger::log('DEBUG', "in enrol()");
+
             global $USER, $CFG;
             // Attempt to log-in the user
             if (!$this->login()) return false;
@@ -732,21 +734,44 @@
                     }
                 }
             }
-            // Make sure the course is enrollable
-            if (!$course->enrollable ||
+
+            if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+
+                $plugins = enrol_get_plugins(true);
+                $enrolinstances = enrol_get_instances($course->id, true);
+                foreach($enrolinstances as $instance) {
+                    if (!isset($plugins[$instance->enrol])) {
+                        continue;
+                    }
+                    if ($instance->enrol === 'guest') {
+                        // blacklist known temporary guest plugins
+                        continue;
+                    }
+                    $plugin = $plugins[$instance->enrol];
+                    if ($plugin->show_enrolme_link($instance)) {
+                        $plugin->enrol_user($instance, $USER->id, $instance->roleid); // TODO: Moodle doesn't seem to want to tell us whether this worked or not. Maybe we could check somehow?
+                        add_to_log($course->id, 'sloodle', 'update', '', 'auto-enrolment');
+                        return true;
+                    }
+                }
+
+            } else {
+
+                SloodleDebugLogger::log('DEBUG', "Doing Moodle 1 enrolment checks");
+                // Make sure the course is enrollable
+                if (!$course->enrollable ||
                     ($course->enrollable == 2 && $course->enrolstartdate > 0 && $course->enrolstartdate > time()) ||
                     ($course->enrollable == 2 && $course->enrolenddate > 0 && $course->enrolenddate <= time())
-            ) {
-                return false;
+                ) {
+                    return false;
+                }
+
+                if (!enrol_into_course($course, $USER, 'manual')) return false;
+                add_to_log($course->id, 'sloodle', 'update', '', 'auto-enrolment');
+                return true;
+
             }
-            
-            // Finally, after all that, enrol the user
-            if (!enrol_into_course($course, $USER, 'manual')) return false;
-        
-            // Everything seems fine
-            // Log the auto-enrolment
-            add_to_log($course->id, 'sloodle', 'update', '', 'auto-enrolment');
-            return true;
+
         }
     
     
