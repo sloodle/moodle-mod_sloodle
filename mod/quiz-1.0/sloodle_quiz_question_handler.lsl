@@ -20,10 +20,12 @@
         integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
         integer doRepeat = 0; // whether we should run through the questions again when we're done
         integer doDialog = 1; // whether we should ask the questions using dialog rather than chat
-        integer MENU_CHANNEL;
+        integer menu_channel;
         string sloodlehttpvars;
         integer answerDialogListenHandler;
         integer answerChatListenHandler;
+        integer answerChatListenHandlerNonPublic;
+        
         integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
         integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;  //Sent by main quiz script to tell UI scripts that question has been answered by avatar with key. String contains selected option ID + "|" + option text + "|"
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107; 
@@ -131,9 +133,7 @@
         // Ask the current question
         ask_question() 
         {     
-                 
-            
-                 
+                                  
             // Are we using dialogs?
             if (doDialog == 1) {
                 
@@ -156,12 +156,20 @@
                         // Add a button for this option
                         qdialogoptions = qdialogoptions + [(string)qi];
                     }
-                // Present the dialog to the user
-                llDialog(sitter, qdialogtext, qdialogoptions, MENU_CHANNEL);
+                    // Present the dialog to the user
+                    answerDialogListenHandler = llListen(menu_channel, "", sitter, "");
+                    llDialog(sitter, qdialogtext, qdialogoptions, menu_channel);
                 }
             } else {
                 
                 // Ask the question via IM
+                llListenRemove(answerChatListenHandler); // cancel any existing listens before creating a new one
+                answerChatListenHandler = llListen(0, "", sitter, "");                
+                
+                // Listen on channel 111 to allow people to give answers without everyone else hearing them.                
+                llListenRemove(answerChatListenHandlerNonPublic); // cancel any existing listens before creating a new one
+                answerChatListenHandlerNonPublic = llListen(111, "", sitter, "");                
+                                
                 llInstantMessage(sitter, qtext);
                 // Offer the options via IM
                 integer x = 0;
@@ -190,14 +198,14 @@
                 if (num ==SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR){
                     llListenRemove(answerDialogListenHandler);
                     llListenRemove(answerChatListenHandler);
-                }
+                    llListenRemove(answerChatListenHandlerNonPublic);            
+                }                
                 else
                 if (num == SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING){
                     sitter=id;
-                    MENU_CHANNEL = random_integer(-90000,-900000);
-                    answerDialogListenHandler = llListen(MENU_CHANNEL, "", id, "");
-                    answerChatListenHandler = llListen(0, "", id, "");
-                    
+                
+                    llListenRemove(answerDialogListenHandler); // Cancel any existing listens
+                    menu_channel = random_integer(-90000,-900000);                                    
                 }
                 else
                 if (num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG||num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_CHAT) {//todo add to dia
@@ -225,7 +233,7 @@
                 // If using dialogs, then only listen to the dialog channel
                 
                 if (doDialog && ((qtype == "multichoice") || (qtype == "truefalse"))) {
-                    if (channel != MENU_CHANNEL) {
+                    if (channel != menu_channel) {
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "usedialogs", [llKey2Name(sitter)], sitter, "quiz");
                         return;
                     }
@@ -442,4 +450,3 @@
         }
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/quiz-1.0/sloodle_quiz_question_handler.lsl
-
