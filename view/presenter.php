@@ -810,7 +810,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
         //Send an alert on all errors
         ?>onError: function (a, b, c, d) {
          if (d.status == 404)
-            alert('Could not find upload script. Use a path relative to: '+'<?= getcwd() ?>');
+            alert('Could not find upload script. Use a path relative to: '+'<?php echo getcwd() ?>');
          else if (d.type === "HTTP")
             alert('error '+d.type+": "+d.status);
          else if (d.type ==="File Size")

@@ -44,7 +44,7 @@ if ($username && $password) {
 			</div>
 			<form method="POST" class="login_form">
 				<div class="username_container">	
-					<input type="text" name="username" value="<?= htmlentities($username) ?>" />				
+					<input type="text" name="username" value="<?php echo htmlentities($username) ?>" />				
 				</div>
 				<div class="password_container">	
 				<input type="password" name="password" value="" />				

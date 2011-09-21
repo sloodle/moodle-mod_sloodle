@@ -48,13 +48,13 @@
 		<?php if (count($errors) > 0) { ?>
 		<div class="row" >
 		<?php foreach($errors as $error) { ?>	
-			<?=htmlentities($error) ?>
+			<?php echo htmlentities($error) ?>
 		<?php } ?>
 		</div>
 		<?php } ?>
 		<div class="row" >
 			<label for="username">Username</label>
-			<input id="password" name="username" value="<?= htmlentities($username) ?>" class="panel" style="width:80%; height:40px; margin:10px;">
+			<input id="password" name="username" value="<?php echo  htmlentities($username) ?>" class="panel" style="width:80%; height:40px; margin:10px;">
 		</div>
 		<div class="row" >
 			<label for="password">Password</label>
