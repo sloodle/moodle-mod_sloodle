@@ -46,8 +46,10 @@
         $sloodle->timecreated = time();
         $sloodle->timemodified = time();
         
+	// Up until 2.0.8-alpha, we prefixed the type name on the instance name.
+	// We'll stop doing that, because we want teachers to be able to control how things show up on their course.
         // Prefix the full type name on the instance name
-        $sloodle->name = get_string("moduletype:{$sloodle->type}", 'sloodle') . ': ' . $sloodle->name;
+        // $sloodle->name = get_string("moduletype:{$sloodle->type}", 'sloodle') . ': ' . $sloodle->name;
             
         // Attempt to insert the new Sloodle record
         if (!$sloodle->id = sloodle_insert_record('sloodle', $sloodle)) {
@@ -76,19 +78,6 @@
             }
             break;
 
-        case SLOODLE_TYPE_AWARDS:
-            // Create the secondary table for this awards
-            
-            $sec_table->icurrency = (string)$sloodle->icurrency;            
-            $sec_table->maxpoints = (int)$sloodle->maxpoints;
-            if (!sloodle_insert_record('sloodle_awards', $sec_table)) {
-                $errormsg = get_string('failedaddsecondarytable', 'sloodle');
-            } else {
-                $result = TRUE;
-            }
-
-            break;
-                
         case SLOODLE_TYPE_DISTRIB:
             // Add in a default blank channel number and update time
             $sec_table->channel = '';
@@ -233,17 +222,6 @@
             //sloodle_update_record('sloodle_tracker', $tracker);
             break;
 
-        case SLOODLE_TYPE_AWARDS:
-            // Attempt to fetch the award record
-            $award = sloodle_get_record('sloodle_awards', 'sloodleid', $sloodle->id);
-            if (!$award) error(get_string('secondarytablenotfound', 'sloodle'));
-            // Add the updates values from the form
-            $award->assignmentid = (int)$sloodle->assignmentid;
-            $award->icurrency = (string)$sloodle->icurrency;       
-            $award->maxpoints = (int)$sloodle->maxpoints;
-
-            // Update the database
-            sloodle_update_record('sloodle_awards', $award);
         break;
 
             
@@ -314,10 +292,6 @@
             sloodle_delete_records('sloodle_activity_tracker', 'trackerid', $cmid);
         }
 
-        // Delete any awards and award transaction entries
-        sloodle_delete_records('sloodle_awards', 'sloodleid', $id);  
-        sloodle_delete_records('sloodle_award_trans', 'sloodleid', $id);
-        
         // ADD FURTHER MODULE TYPES HERE!
 
         return $result;
