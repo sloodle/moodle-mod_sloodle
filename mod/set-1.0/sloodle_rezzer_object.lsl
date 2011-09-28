@@ -168,7 +168,8 @@ configure_from_persistent_config()
     //llOwnerSay("requested config with body "+body); 
     //tell the server to initialize via httpin using the specified parameters.  Server will respond by sending an http response, AND the config via httpin, however
     //we will ingnore the http response, and instead, just use the httpin
-    llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_REQUEST_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body+persistent_config);         
+    llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_REQUEST_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body+persistent_config);
+             
 }
 
 update_http_in_url()
@@ -181,7 +182,8 @@ update_http_in_url()
     body += "&sloodleobjuuid=" + (string)llGetKey();
     body += "&httpinurl=" + myUrl;
     //llOwnerSay("requested config with body "+body); 
-    llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_UPDATE_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);         
+    llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_UPDATE_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
+    llShout(0,"Free mem: "+(string)llGetFreeMemory());         
 }
 sloodle_set_pos(vector targetposition){
     integer counter=0;
@@ -220,7 +222,7 @@ default{
     }          
         
     http_request(key id, string method, string body){
-        
+         llShout(0,"Free mem: "+(string)llGetFreeMemory());   
           if ((method == URL_REQUEST_GRANTED)){
 //llOwnerSay("got url");        
                 myUrl=body;
@@ -239,7 +241,8 @@ default{
                     //tell any other scripts our http-in
                     llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL, myUrl, NULL_KEY);                    
                 }
-          } else if (method == "POST"){                                          
+          } else if (method == "POST"){     
+          	                                     
                //this is where our object receives data from from our server via http-in
                       
                 list lines;
@@ -258,7 +261,8 @@ default{
                 
                 if (http_in_password != (integer)llList2String(header_line, 10)) {
                    // llOwnerSay("Ignoring message - password mismatch");
-                    llHTTPResponse(id, 401, "Unauthorized - HTTP-in password mismatch");  
+                    llHTTPResponse(id, 401, "Unauthorized - HTTP-in password mismatch");
+                      
                     return;
                 }                
                 
@@ -390,7 +394,7 @@ state ready {
     }    
         
     http_request(key id, string method, string body){
-
+llShout(0,"Free mem: "+(string)llGetFreeMemory());   
         if (method == URL_REQUEST_GRANTED){
 
             myUrl=body;            
@@ -433,10 +437,9 @@ state ready {
            
                 
                 llHTTPResponse(id, 200, "OK");                 
-
                 string descriptor = "";
+				integer do_persist = 1;
                 if (llGetListLength(header_line) > 1) descriptor = llList2String(header_line, 3);
-                integer do_persist = 1;   
                 if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") ) {
                     // blow the existing config away and start again
                     sloodleserverroot = "";
@@ -445,12 +448,14 @@ state ready {
                     persistent_config = "";
                     if (descriptor == "CONFIG_PERSISTENT") {
                         do_persist = 1;                        
+
                     }
                 }
-                                                               
-                for (i=1; i < numlines; i++) {
-                    isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);
-                }                                                         
+                if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") || (descriptor=="SYSTEM") ){
+					for (i=1; i < numlines; i++) {
+                    	isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);
+                	}
+                } 
                                 
                 sloodle_tell_other_scripts(body, 0);
                 // This is the end of the configuration data
