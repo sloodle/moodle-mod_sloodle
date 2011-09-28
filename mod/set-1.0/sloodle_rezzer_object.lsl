@@ -163,7 +163,7 @@ initialize()
 configure_from_persistent_config()
 {
         
-    llOwnerSay("got a persistent config, trying to use that");    
+    //llOwnerSay("got a persistent config, trying to use that");    
     //send to httpin_config_linker
     string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
     body += "&sloodlepwd=" + sloodlepwd;
