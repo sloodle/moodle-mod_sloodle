@@ -183,7 +183,7 @@ update_http_in_url()
     body += "&httpinurl=" + myUrl;
     //llOwnerSay("requested config with body "+body); 
     llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_UPDATE_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
-    llShout(0,"Free mem: "+(string)llGetFreeMemory());         
+             
 }
 sloodle_set_pos(vector targetposition){
     integer counter=0;
