@@ -242,7 +242,7 @@ default{
                     llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL, myUrl, NULL_KEY);                    
                 }
           } else if (method == "POST"){     
-          	                                     
+                                                   
                //this is where our object receives data from from our server via http-in
                       
                 list lines;
@@ -438,7 +438,7 @@ llShout(0,"Free mem: "+(string)llGetFreeMemory());
                 
                 llHTTPResponse(id, 200, "OK");                 
                 string descriptor = "";
-				integer do_persist = 1;
+                integer do_persist = 1;
                 if (llGetListLength(header_line) > 1) descriptor = llList2String(header_line, 3);
                 if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") ) {
                     // blow the existing config away and start again
@@ -452,9 +452,9 @@ llShout(0,"Free mem: "+(string)llGetFreeMemory());
                     }
                 }
                 if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") || (descriptor=="SYSTEM") ){
-					for (i=1; i < numlines; i++) {
-                    	isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);
-                	}
+                    for (i=1; i < numlines; i++) {
+                        isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);
+                    }
                 } 
                                 
                 sloodle_tell_other_scripts(body, 0);
