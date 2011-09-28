@@ -104,32 +104,14 @@
 
 		global $CFG;
 
-		// Find the active round for the controller, or make one if there isn't one.
-		$timets = time();
-		$roundrecs = sloodle_get_records_select_params('sloodle_award_rounds', "controllerid = ? AND ( (timestarted <= ? ) OR (timestarted = 0) ) AND ( (timeended >= ? ) OR (timeended = 0) ) ", array($controllerid, $timets, $timets));
-
-		$need_notify = false;
-
-		$round = null;
-		if ( $roundrecs || ( count($roundrecs) > 0 ) ) {
-			$round = array_pop($roundrecs);
-		} else {
-			$round = new stdClass();
-			$round->controllerid = $controllerid;
-			$round->timestarted = time();
-			$round->timeended = 0;
-			$round->name = '';
-			if ( !sloodle_insert_record('sloodle_award_rounds', $round) ) {
-				return false;
-			}
-		}
-
-		if (!$roundid = $round->id) {
+		$controller = new SloodleController();
+		if (!$controller->load_by_course_module_id($controllerid)) {
 			return false;
 		}
 
-  SloodleDebugLogger::log('DEBUG', "looking for relevant configs");
-  SloodleDebugLogger::log('DEBUG', join('::', array_keys($relevant_configs)));
+		if (!$roundid = $controller->get_active_roundid(true)) {
+			return false;
+		}
 
 		$time = time();
 
@@ -208,11 +190,11 @@
 		$balancesql = "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where userid = ? and currencyid = ?";
 		$results = sloodle_get_records_sql_params( $balancesql, array($userid, $currencyid) );
 		if (!$results || ( count($results) == 0) ) {
-  SloodleDebugLogger::log('DEBUG', "nothing found for $balancesql");
+			  //SloodleDebugLogger::log('DEBUG', "nothing found for $balancesql");
 			return 0;
 		}
 		$result = array_shift($results);
-  SloodleDebugLogger::log('DEBUG', "balance for sql $balancesql was ".$result->balance);
+		  //SloodleDebugLogger::log('DEBUG', "balance for sql $balancesql was ".$result->balance);
 
 		return $result->balance;
 
