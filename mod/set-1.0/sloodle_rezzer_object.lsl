@@ -18,6 +18,10 @@ integer SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL = -
 
 string SLOODLE_HTTP_IN_REQUEST_LINKER = "/mod/sloodle/classroom/httpin_config_linker.php";
 string SLOODLE_HTTP_IN_UPDATE_LINKER = "/mod/sloodle/classroom/httpin_url_update_linker.php";
+string SLOODLE_PING_LINKER = "/mod/sloodle/classroom/active_object_ping_linker.php";
+
+float PING_DELAY = 3600.0; // Number of seconds between pings. NB This is assumed to by 3600 by Active Object, which will stop trying to send http-in messages to objects older than that.
+float PING_RETRY_DELAY = 600.0; // Number of seconds to wait before retrying a failed ping.
 
 string SLOODLE_EOF = "sloodleeof";
 
@@ -34,6 +38,9 @@ string sloodlecontrollerid = "";
 
 string myUrl;
 string persistent_config; 
+
+integer is_pinging = 0;
+integer is_ping_retry = 0;
 
 move_to_layout_position() {
     
@@ -222,7 +229,6 @@ default{
     }          
         
     http_request(key id, string method, string body){
-         llShout(0,"Free mem: "+(string)llGetFreeMemory());   
           if ((method == URL_REQUEST_GRANTED)){
 //llOwnerSay("got url");        
                 myUrl=body;
@@ -349,7 +355,8 @@ state ready {
         // llOwnerSay(persistent_config);
         llListen(232323, "", rezzer_uuid, "");   
     
-        //llOwnerSay("persistent is now "+persistent_config);    
+        // Ping the server at a random interval of the normal ping delay, so the server doesn't get hit by all objects at once.
+        llSetTimerEvent( llFrand(PING_DELAY) ); 
     } 
 
     listen(integer channel, string name, key id, string message) {
@@ -392,9 +399,37 @@ state ready {
         //  llGetPos() + vPosOffset * llGetRot(), ZERO_VECTOR, llGetRot()        
         
     }    
-        
+
+    timer()
+    {
+        // Send our ping request
+        string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
+        body += "&sloodlepwd=" + sloodlepwd;
+        body += "&sloodleobjuuid=" + (string)llGetKey();
+        is_pinging = 1;
+        llHTTPRequest(sloodleserverroot + SLOODLE_PING_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
+    }
+
+    http_response( key request_id, integer status, list metadata, string body ){ 
+
+        is_pinging = 0;
+        if (status == 200) {
+            if (is_ping_retry == 1) {
+                // Reintroduce the randomness we may have lost if the server went down.
+                llSetTimerEvent(llFrand(PING_DELAY));
+            } else {
+                llSetTimerEvent(PING_DELAY);
+            }
+            is_ping_retry = 0;
+        } else {
+            is_ping_retry = 1;
+            llSetTimerEvent(PING_RETRY_DELAY);
+        } 
+
+    }
+                
     http_request(key id, string method, string body){
-llShout(0,"Free mem: "+(string)llGetFreeMemory());   
+
         if (method == URL_REQUEST_GRANTED){
 
             myUrl=body;            
@@ -438,7 +473,7 @@ llShout(0,"Free mem: "+(string)llGetFreeMemory());
                 
                 llHTTPResponse(id, 200, "OK");                 
                 string descriptor = "";
-                integer do_persist = 1;
+                integer do_persist = 0;
                 if (llGetListLength(header_line) > 1) descriptor = llList2String(header_line, 3);
                 if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") ) {
                     // blow the existing config away and start again
@@ -448,7 +483,6 @@ llShout(0,"Free mem: "+(string)llGetFreeMemory());
                     persistent_config = "";
                     if (descriptor == "CONFIG_PERSISTENT") {
                         do_persist = 1;                        
-
                     }
                 }
                 if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") || (descriptor=="SYSTEM") ){
@@ -495,4 +529,3 @@ state reinitialize {
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_rezzer_object.lsl
-
