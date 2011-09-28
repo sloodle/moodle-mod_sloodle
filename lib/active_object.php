@@ -684,7 +684,8 @@
 			$instr .= $delim.'?';
 			$delim = ',';
 		}
-		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=? and a.httpinurl IS NOT NULL and a.type in ($instr);";
+		$queryparams[] = time() - (3600+600); // Ping time and then some. All objects that are alive should have updated within this time.
+		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=? and a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? order by a.timeupdated desc;";
 		$recs = sloodle_get_records_sql_params($sql, $queryparams);
 
 		$msg = "$success_code\n"; 
@@ -717,9 +718,11 @@
 			$response->render_to_string($renderStr);
 
 			// If this stuff fails, tough. We did our best.
-			if ($ao->sendMessage($renderStr)) {
-				$ao->lastmessagetimestamp = time();
-				$ao->save();
+			if ($resarr = $ao->sendMessage($renderStr)) {
+				if($resarr['info']['http_code'] == 200){
+					$ao->lastmessagetimestamp = time();
+					$ao->save();
+				}
 			}
 		}
 
