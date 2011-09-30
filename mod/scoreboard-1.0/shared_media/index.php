@@ -75,7 +75,7 @@ header('Pragma: public');
 
 //	print_site_placeholder( $sitesURL );
 //	print_round_list( $roundrecs );
-	print_score_list( 'scoreboard:allstudents', $student_scores, $object_uuid, $currency, $sao->roundid, $sao->refreshtime, $sao->objecttitle, $is_logged_in, $is_admin); 
+	print_score_list( 'scoreboard:allstudents', $student_scores, $object_uuid, $currency, $sao->roundid, $is_admin?5:$sao->refreshtime, $sao->objecttitle, $is_logged_in, $is_admin); 
 
 	print_html_bottom();
 
