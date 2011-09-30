@@ -472,20 +472,22 @@ state ready {
            
                 
                 llHTTPResponse(id, 200, "OK");                 
-                string descriptor = "";
+                string status_descriptor = "";
+                string request_descriptor = "";                             
                 integer do_persist = 0;
-                if (llGetListLength(header_line) > 1) descriptor = llList2String(header_line, 3);
-                if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") ) {
+                if (llGetListLength(header_line) > 1) status_descriptor = llList2String(header_line, 1);
+                if (llGetListLength(header_line) > 2) request_descriptor = llList2String(header_line, 3);                
+                if ( (request_descriptor == "CONFIG_PERSISTENT") || (request_descriptor == "CONFIG") ) {
                     // blow the existing config away and start again
                     sloodleserverroot = "";
                     sloodlecontrollerid = "";
                     sloodlepwd = "";
                     persistent_config = "";
-                    if (descriptor == "CONFIG_PERSISTENT") {
+                    if (request_descriptor == "CONFIG_PERSISTENT") {
                         do_persist = 1;                        
                     }
                 }
-                if ( (descriptor == "CONFIG_PERSISTENT") || (descriptor == "CONFIG") || (descriptor=="SYSTEM") ){
+                if ( (status_descriptor == "CONFIG") || (status_descriptor=="SYSTEM") ){
                     for (i=1; i < numlines; i++) {
                         isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);
                     }
@@ -529,3 +531,4 @@ state reinitialize {
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_rezzer_object.lsl
+
