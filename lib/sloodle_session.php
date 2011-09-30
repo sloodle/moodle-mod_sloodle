@@ -596,14 +596,25 @@
 	function validate_requirements($interaction = 'default', $multiplier = 1) {
 
 	    if (!is_null($this->active_object)) {
-	        if ($error_message = $this->active_object->requirement_failures( 'SloodleModuleAwards', $interaction, $multiplier, $this->user->get_user_id())) {
-	    	    $this->response->quick_output(-1001, 'AWARDS', $error_message, false);
+	        $error_messages = $this->active_object->requirement_failures( $interaction, $multiplier, $this->user->get_user_id(), $this->user->get_avatar_uuid()); 
+                if(count($error_messages) > 0) { 
+	    	    $this->response->quick_output(-1001, 'AWARDS', join($error_messages,','), false);
 	            exit();
 	        }
 	    }
 
  	    return true;
          
+	}
+
+	function process_interaction($interaction = 'default', $multiplier = 1) {
+
+	    if (!is_null($this->active_object)) {
+	        return $this->active_object->process_interaction( $interaction, $multiplier, $this->user->get_user_id(), $this->user->get_avatar_uuid() );
+	    }
+
+ 	    return false;
+ 
 	}
         
         /**

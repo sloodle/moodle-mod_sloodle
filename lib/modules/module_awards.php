@@ -100,7 +100,7 @@
             return true;
         }
         
-	function ProcessInteractions( $relevant_configs, $controllerid, $multiplier, $userid ) {
+	function ProcessActions( $relevant_configs, $controllerid, $multiplier, $userid, $useruuid, $objuuid) {
 
 		global $CFG;
 
@@ -200,52 +200,66 @@
 
 	}
 
-	function RequirementFailures( $relevant_configs, $controllerid, $multiplier, $userid ) {
+	/*
+	Returns an array of error messages for requirements that haven't been satisfied.
+	...eg. If an object has been configured to require 3 gold coins, and the user doesn't have enough, it'll return a message saying you don't have enough gold coins. 
+	*/
+	function RequirementFailures( $relevant_configs, $controllerid, $multiplier, $userid, $useruuid ) {
 
-  SloodleDebugLogger::log('DEBUG', "in ProcessRequirements");
+  //SloodleDebugLogger::log('DEBUG', "in ProcessRequirements");
 		global $CFG;
 
 		$minimum_balances = array();
+
+		$failures = array();
 
 		if ( isset($relevant_configs['sloodleawardsrequire_numpoints']) && isset($relevant_configs['sloodleawardsrequire_currency']) ) {
 
 			$numpoints  = intval($relevant_configs['sloodleawardsrequire_numpoints']); 
 			$currencyid = intval($relevant_configs['sloodleawardsrequire_currency']);
 
-			if (!$currencyid) {
-				return false;
-			}
-
-			$minimum_balances[ $currencyid ] = $numpoints;
-			// Check the user's balance for that controller.
-
-  SloodleDebugLogger::log('DEBUG', "need $numpoints of currency $currencyid");
-
-		} else {
-
-  SloodleDebugLogger::log('DEBUG', "no relevant configs");
-		}
-
-
-		if (count($minimum_balances) == 0) {
-			return '';
-		}
-	
-		foreach($minimum_balances as $currencyid => $numpoints) {
-			if ( SloodleModuleAwards::UserCurrencyBalance($userid, $currencyid) < $numpoints ) {
-				if (isset($relevant_configs['sloodleawardsrequire_notenoughmessage']) && $relevant_configs['sloodleawardsrequire_notenoughmessage'] != '') {
-					return $relevant_configs['sloodleawardsrequire_notenoughmessage'];
-				} else {
-					return get_string('awards:notenoughcurrency', 'sloodle');
+			if ($currencyid && $numpoints) {
+				if ( SloodleModuleAwards::UserCurrencyBalance($userid, $currencyid) < $numpoints ) {
+					if (isset($relevant_configs['sloodleawardsrequire_notenoughmessage']) && $relevant_configs['sloodleawardsrequire_notenoughmessage'] != '') {
+						$failures = array_merge( $failures, array($relevant_configs['sloodleawardsrequire_notenoughmessage']));
+					} else {
+						$failures = array_merge( $failures, array(get_string('awards:notenoughcurrency', 'sloodle')) );
+					}
 				}
 			}
+
+		} 
+
+		if ( isset($relevant_configs['sloodleawardswithdraw_numpoints']) && isset($relevant_configs['sloodleawardswithdraw_currency']) ) {
+
+			$numpoints  = intval($relevant_configs['sloodleawardswithdraw_numpoints']); 
+			$currencyid = intval($relevant_configs['sloodleawardswithdraw_currency']);
+
+			if ($currencyid && $numpoints) {
+				if ( SloodleModuleAwards::UserCurrencyBalance($userid, $currencyid) < $numpoints ) {
+					if (isset($relevant_configs['sloodleawardswithdraw_notenoughmessage']) && $relevant_configs['sloodleawardswithdraw_notenoughmessage'] != '') {
+						$failures = array_merge( $failures, array($relevant_configs['sloodleawardswithdraw_notenoughmessage']));
+					} else {
+						$failures = array_merge( $failures, array(get_string('awards:notenoughcurrency', 'sloodle')) );
+					}
+				}
+			}
+
 		}
 
-		return '';
+		return $failures;
 
 	}
 	
-	function InteractionConfigNames() {
+	/*
+	An array of the names of config parameters that are understood by this module to mean it should do something.
+	Will have the name of the specific interaction appended to it.
+	eg. awards makes available an interaction config called "sloodleawardsdeposit_numpoints".
+	    The quiz would then have a config name=>value pair like sloodleawards_deposit_numpoints_answerquestion => 3 
+            Via the ActiveObject, the quiz will tell the awards module that answerquestion has happened to a particular user
+            ...and the awards module will give them the points.
+	*/
+	function ActionConfigNames() {
 		return array(
                         'sloodleawardsdeposit_numpoints',
                         'sloodleawardsdeposit_currency',
@@ -254,15 +268,40 @@
 		);
 	}
 
+	/*
+	An array of the names of config parameters that are understood by this module to check something before doing whatever it would normally do.
+	Will have the name of the specific interaction appended to it.
+	*/
 	function RequirementConfigNames() {
 		return array(
                         'sloodleawardsrequire_numpoints',
                         'sloodleawardsrequire_currency',
-                        //'sloodleawardswithdraw_numpoints',
-                        //'sloodleawardswithdraw_currency',
-			'sloodleawardsrequire_notenoughmessage'
+			'sloodleawardsrequire_notenoughmessage',
+                        'sloodleawardswithdraw_numpoints',
+                        'sloodleawardswithdraw_currency',
+			'sloodleawardswithdraw_notenoughmessage'
 		);
 	}
+
+        /**
+        * Gets the short type name of this instance.
+        * @return string
+        */
+        function get_type()
+        {
+            return 'awards';
+        }
+
+        /**
+        * Gets the full type name of this instance, according to the current language pack, if available.
+        * Note: should be overridden by sub-classes.
+        * @return string Full type name if possible, or the short name otherwise.
+        */
+        function get_type_full()
+        {
+            return get_string('modulename', 'awards');
+        }
+
 
 
 

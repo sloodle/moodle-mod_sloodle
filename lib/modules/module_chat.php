@@ -192,7 +192,7 @@
 
 
             if (!is_null($this->_session->active_object)) {
-                 $this->_session->active_object->process_interactions( 'SloodleModuleAwards', 'default', 1, $userid ); 
+                 $this->_session->active_object->process_events( 'default', 1, $userid ); 
                  // TODO: Maybe we should set a side effect code here?
             }
 

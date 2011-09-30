@@ -479,42 +479,6 @@ class SloodleObjectConfig {
 	Getting an answer wrong gives you [   ] of the currency [               ]
 	Getting an answer wrong costs you [   ] of the currency [               ]
 	*/
-	function awards_setting_options( $interactions = null ) {
-
-		if ($interactions == null) {
-			$interactions = array('default' => array('awards:interactwithobjectplus', 'awards:interactwithobjectminus') );
-		}
-		$configs = array();
-		
-		foreach($interactions as $interactionname => $interactionlabels) {
-
-			$deposit_points_fieldname      = 'sloodleawardsdeposit_numpoints_'.$interactionname;
-			$deposit_currency_fieldname    = 'sloodleawardsdeposit_currency_'.$interactionname;
-			$deposit_row_name = 'sloodleawardsdeposit_row_'.$interactionname;
-
-			$withdraw_points_fieldname   = 'sloodleawardswithdraw_numpoints_'.$interactionname;
-			$withdraw_currency_fieldname = 'sloodleawardswithdraw_currency_'.$interactionname;
-			$withdraw_row_name = 'sloodleawardswithdraw_row_'.$interactionname;
-
-			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabels[0] ? $interactionlabels[0] : '', '', 0, 8);
-			$configs[ $deposit_points_fieldname ]->row_name = $deposit_row_name;
-
-			$configs[ $deposit_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $deposit_currency_fieldname, 'emptystring', '', '', 8);
-			$configs[ $deposit_currency_fieldname]->row_name = $deposit_row_name;
-			$configs[ $deposit_currency_fieldname ]->is_value_translatable = false;
-
-			$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1] ? $interactionlabels[1] : 'emptystring', '', 0, 8);
-			$configs[ $withdraw_points_fieldname ]->row_name = $withdraw_row_name;
-
-			$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'emptystring', '', '', 8);
-			$configs[ $withdraw_currency_fieldname ]->row_name = $withdraw_row_name;
-			$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
-
-		}
-
-		return $configs;
-
-	}
 
 	function awards_deposit_options( $interactions_to_labels ) {
 		
@@ -523,6 +487,7 @@ class SloodleObjectConfig {
 
 			$deposit_points_fieldname      = 'sloodleawardsdeposit_numpoints_'.$interactionname;
 			$deposit_currency_fieldname    = 'sloodleawardsdeposit_currency_'.$interactionname;
+
 			$deposit_row_name = 'sloodleawardsdeposit_row_'.$interactionname;
 
 			$configs[ $deposit_points_fieldname ]    = new SloodleConfigurationOptionText( $deposit_points_fieldname, $interactionlabel, 'emptystring', 0, 8);
@@ -538,7 +503,7 @@ class SloodleObjectConfig {
 
 	}
 
-	function awards_require_options( $interactions = null ) {
+	function awards_require_options( $interactions_to_labels = null ) {
 
 		if ($interactions == null) {
 			//$interactions = array('default' => array('awards:interactwithobjectrequires', 'awards:interactwithobjectminus', 'awards:notenoughmessage') );
@@ -546,13 +511,11 @@ class SloodleObjectConfig {
 		}
 		$configs = array();
 		
-		foreach($interactions as $interactionname => $interactionlabel) {
+		foreach($interactions_to_labels as $interactionname => $interactionlabel) {
 
 			$require_points_fieldname      = 'sloodleawardsrequire_numpoints_'.$interactionname;
 			$require_currency_fieldname    = 'sloodleawardsrequire_currency_'.$interactionname;
-			//$withdraw_points_fieldname   = 'sloodleawardswithdraw_numpoints_'.$interactionname;
-			//$withdraw_currency_fieldname = 'sloodleawardswithdraw_currency_'.$interactionname;
-			$not_enough_message_fieldname = 'sloodleawardsrequire_notenoughmessage_'.$interactionname;
+			$not_enough_message_fieldname  = 'sloodleawardsrequire_notenoughmessage_'.$interactionname;
 
 			$require_points_row_name = 'sloodleawardsrequire_row_'.$interactionname;
 
@@ -564,17 +527,42 @@ class SloodleObjectConfig {
 			$configs[ $require_currency_fieldname ]->is_value_translatable = false;
 
 			$configs[ $not_enough_message_fieldname]   = new SloodleConfigurationOptionText( $not_enough_message_fieldname, 'awards:notenoughmessage', '', '', 120);
-			//$configs[ $not_enough_message_fieldname]->row_name = $require_points_row_name;
-
-			//$configs[ $withdraw_points_fieldname ]   = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabels[1], '', 0, 8);
-			//$configs[ $withdraw_currency_fieldname ] = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'awards:currency', '', '', 8);
-
-			//$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
 		}
 
 		return $configs;
 
 	}
+
+	function awards_withdraw_options( $interactions_to_labels = null ) {
+
+		if ($interactions == null) {
+			//$interactions = array('default' => array('awards:interactwithobjectwithdraws', 'awards:interactwithobjectminus', 'awards:notenoughmessage') );
+			$interactions = array('default' => array('awards:interactwithobjectwithdraws') );
+		}
+		$configs = array();
+		
+		foreach($interactions_to_labels as $interactionname => $interactionlabel) {
+
+			$withdraw_points_fieldname      = 'sloodleawardswithdraw_numpoints_'.$interactionname;
+			$withdraw_currency_fieldname    = 'sloodleawardswithdraw_currency_'.$interactionname;
+			$not_enough_message_fieldname  = 'sloodleawardswithdraw_notenoughmessage_'.$interactionname;
+
+			$withdraw_points_row_name = 'sloodleawardswithdraw_row_'.$interactionname;
+
+			$configs[ $withdraw_points_fieldname ]    = new SloodleConfigurationOptionText( $withdraw_points_fieldname, $interactionlabel, 'emptystring', 0, 8);
+			$configs[ $withdraw_points_fieldname ]->row_name = $withdraw_points_row_name;
+
+			$configs[ $withdraw_currency_fieldname ]  = new SloodleConfigurationOptionCurrencyChoice( $withdraw_currency_fieldname, 'emptystring', '', '', 8);
+			$configs[ $withdraw_currency_fieldname ]->row_name = $withdraw_points_row_name;
+			$configs[ $withdraw_currency_fieldname ]->is_value_translatable = false;
+
+			$configs[ $not_enough_message_fieldname]   = new SloodleConfigurationOptionText( $not_enough_message_fieldname, 'awards:notenoughmessage', '', '', 120);
+		}
+
+		return $configs;
+
+	}
+
 	function module_choice( $courseid ) {
 
 		if (!$this->module) {

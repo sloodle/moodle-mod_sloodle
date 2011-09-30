@@ -560,52 +560,85 @@
 	}
 
 
-	public function requirement_failures( $plugin_class, $interaction, $multiplier, $userid ) {
+	public function requirement_failures( $interaction, $multiplier, $userid, $useruuid) {
 
 		if ( !$userid = intval($userid) ) {
-			return false;
+			return array();
 		}
 
 		if ( $multiplier == 0 ) {
-			return false;
-		}
-
-		if (!class_exists($plugin_class)) {
-			return false;
-		}
-
-		// Find each of the tasks we have to handle for the interaction.
-		// This information is stored in the object config
-		$relevant_configs = array();
-
-		$relevant_config_names = call_user_func(array($plugin_class, 'RequirementConfigNames'));
-
-		// TODO: It might be (marginally) more efficient to filter this for things we're interested in in the query.
-		$all_configs = sloodle_get_records('sloodle_object_config', 'object', $this->id);
-		foreach($relevant_config_names as $configname) {
-			$fieldname = $configname.'_'.$interaction;
-			foreach($all_configs as $c) {
-				if ($c->name == $fieldname) {
-					$relevant_configs[ $configname] = $c->value;
-				}				
-			}
-		}
-
-
-		if (count($relevant_configs) == 0) {
-			// Nothing to do here
-			return false;
+			return array();
 		}
 
 		if (!$controllerid = intval($this->controllerid) ) {
-			return false;
+			return array();
 		}
 
-		return call_user_func_array( array($plugin_class, 'RequirementFailures'), array( $relevant_configs, $controllerid, $multiplier, $userid ));
+		$all_configs = sloodle_get_records('sloodle_object_config', 'object', $this->id);
+		if (count($all_configs) == 0) {
+			// Nothing to do here
+			return array();
+		}
+
+		$all_module_classes = sloodle_available_modules();
+		if (count($all_module_classes) == 0) {
+			return array();
+		}
+
+		$failures = array();
+
+		foreach($all_module_classes as $module_class) {
+
+			// Find each of the tasks we have to handle for the interaction.
+			// This information is stored in the object config
+			$relevant_configs = array();
+
+			if (!method_exists($module_class,'RequirementConfigNames')) {
+				continue;
+			}
+
+			$relevant_config_names = call_user_func(array($module_class, 'RequirementConfigNames'));
+			if (count($relevant_config_names) == 0) {
+				continue;
+			}
+
+			foreach($relevant_config_names as $configname) {
+				$fieldname = $configname.'_'.$interaction;
+				foreach($all_configs as $c) {
+					if ($c->name == $fieldname) {
+						$relevant_configs[ $configname] = $c->value;
+					}				
+				}
+			}
+
+			if (count($relevant_configs) == 0) {
+				// Nothing to do here
+				continue;
+			}
+
+			SloodleDebugLogger::log('DEBUG', "about to check RequirementFailures for $module_class, ".join($relevant_configs,':') );
+
+			$module_failures = call_user_func_array( array($module_class, 'RequirementFailures'), array( $relevant_configs, $controllerid, $multiplier, $userid, $this->uuid ));
+			SloodleDebugLogger::log('DEBUG', "done checking RequirementFailures for $module_class");
+
+			if($module_failures) {
+				$failures = array_merge($failures, $module_failures);
+			}
+		}
+		SloodleDebugLogger::log('DEBUG', "done checking all RequirementFailures ");
+
+		return $failures;
 
 	}
 
-	public function process_interactions( $plugin_class, $interaction, $multiplier, $userid ) {
+	/*
+	Modules (awards, tracker etc) may specify that they can handle certain kinds of events.
+	The object can be configred to trigger those events when particular interactions happen. 
+	For example, the awards module has an event called "sloodleawardsdeposit_numpoints".
+	If this is called, we should give the user that number of points.
+	*/
+	public function process_interaction( $interaction, $multiplier, $userid, $useruuid ) {
+
 
 		if ( !$userid = intval($userid) ) {
 			return false;
@@ -615,49 +648,68 @@
 			return false;
 		}
 
-		if (!class_exists($plugin_class)) {
-			return false;
-		}
-
-		// Find each of the tasks we have to handle for the interaction.
-		// This information is stored in the object config
-		$relevant_configs = array();
-
-		$relevant_config_names = call_user_func(array($plugin_class, 'InteractionConfigNames'));
-
-
-
-		/*
-		$relevant_config_names = array( 
-			'sloodleawardsdeposit_numpoints', 
-			'sloodleawardsdeposit_currency', 
-			'sloodleawardswithdraw_numpoints', 
-			'sloodleawardswithdraw_currency'
-		);
-		*/
-
-		// TODO: It might be (marginally) more efficient to filter this for things we're interested in in the query.
-		$all_configs = sloodle_get_records('sloodle_object_config', 'object', $this->id);
-		foreach($relevant_config_names as $configname) {
-			$fieldname = $configname.'_'.$interaction;
-			foreach($all_configs as $c) {
-				if ($c->name == $fieldname) {
-					$relevant_configs[ $configname] = $c->value;
-				}				
-			}
-		}
-
-
-		if (count($relevant_configs) == 0) {
-			// Nothing to do here
-			return true;
-		}
-
 		if (!$controllerid = intval($this->controllerid) ) {
 			return false;
 		}
+		$all_configs = sloodle_get_records('sloodle_object_config', 'object', $this->id);
+		if (count($all_configs) == 0) {
+			return true;
+		}
 
-		return call_user_func_array( array($plugin_class, 'ProcessInteractions'), array( $relevant_configs, $controllerid, $multiplier, $userid ));
+		$all_module_classes = sloodle_available_modules();
+
+		foreach($all_module_classes as $module_class) {
+
+			if (!class_exists($module_class)) {
+				continue;
+			}
+
+			if (!method_exists($module_class, 'ActionConfigNames')) {
+				continue;
+			} 
+
+			// Find each of the tasks we have to handle for the interaction.
+			// This information is stored in the object config
+			$relevant_configs = array();
+
+			$relevant_config_names = call_user_func(array($module_class, 'ActionConfigNames'));
+			if (count($relevant_config_names) == 0) {
+				continue;
+			}
+			/*
+			$relevant_config_names = array( 
+				'sloodleawardsdeposit_numpoints', 
+				'sloodleawardsdeposit_currency', 
+				'sloodleawardswithdraw_numpoints', 
+				'sloodleawardswithdraw_currency'
+			);
+			*/
+
+			foreach($relevant_config_names as $configname) {
+				$fieldname = $configname.'_'.$interaction;
+SloodleDebugLogger::log('DEBUG', "looking for confir $fieldname");
+				foreach($all_configs as $c) {
+					if ($c->name == $fieldname) {
+						$relevant_configs[ $configname] = $c->value;
+					}				
+				}
+			}
+
+			if (count($relevant_configs) == 0) {
+				// Nothing to do here
+				continue;
+			}
+
+			if (!method_exists($module_class, 'ProcessActions')) {
+				continue;
+			} 
+
+SloodleDebugLogger::log('DEBUG', "calling ProcessActions for $module_class");
+			call_user_func_array( array($module_class, 'ProcessActions'), array( $relevant_configs, $controllerid, $multiplier, $userid, $useruuid, $this->uuid ));
+
+		}
+
+		return true;
 
 	}
 

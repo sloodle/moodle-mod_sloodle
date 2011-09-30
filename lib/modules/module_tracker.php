@@ -24,6 +24,7 @@
     * Julio Lopez (SL: Julio Solo)
     * Michael Callaghan (SL: HarmonyHill Allen)
     * Kerri McCusker  (SL: Kerri Macchi)
+    * Edmund Edgar (SL: Edmund Earp)
     *
     * A project developed by the Serious Games and Virtual Worlds Group.
     * Intelligent Systems Research Centre.
@@ -73,7 +74,7 @@
         /**
         * Constructor
         */
-        function SloodleModuleTracker(&$_session)
+        function SloodleModuleTracker(&$_session = null)
         {
             $constructor = get_parent_class($this);
             parent::$constructor($_session);
@@ -396,6 +397,103 @@
         {
             return get_string('moduletype:'.SLOODLE_TYPE_TRACKER, 'sloodle');
         }
+
+	/*
+	Returns an array of error messages for requirements that haven't been satisfied.
+	...eg. If an object has been configured to require 3 gold coins, and the user doesn't have enough, it'll return a message saying you don't have enough gold coins. 
+	*/
+	function RequirementFailures( $relevant_configs, $controllerid, $multiplier, $userid, $useruuid, $objectuuid ) {
+
+		global $CFG;
+
+		if ( isset($relevant_configs['sloodletrackerrequire_taskcompleted']) ) {
+
+			$required_task = $relevant_configs['sloodletrackerrequire_taskcompleted']; 
+
+			if (!$required_task){
+				return false;
+			}
+
+		}
+
+		if ( !SloodleModuleTracker::UserHasCompleted($useruuid, $controllerid, $task) ) {
+			if (isset($relevant_configs['sloodletrackerrequire_tasknotcompletedmessage']) && $relevant_configs['sloodletrackerrequire_tasknotcompletedmessage'] != '') {
+				return $relevant_configs['sloodletrackerrequire_tasknotcompletedmessage'];
+			} else {
+				return get_string('tracker:requiredtasknotcompleted', 'sloodle');
+			}
+		}
+
+		return '';
+
+	}
+	
+	/*
+	An array of the names of config parameters that are understood by this module to mean it should do something.
+	Will have the name of the specific interaction appended to it.
+	eg. awards makes available an interaction config called "sloodleawardsdeposit_numpoints".
+	    The quiz would then have a config name=>value pair like sloodleawards_deposit_numpoints_answerquestion => 3 
+            Via the ActiveObject, the quiz will tell the awards module that answerquestion has happened to a particular user
+            ...and the awards module will give them the points.
+	*/
+	function ActionConfigNames() {
+		/*
+		return array(
+                        'sloodletrackersatisfy_taskcompleted'
+		);
+		*/
+	}
+
+	/*
+	An array of the names of config parameters that are understood by this module to check something before doing whatever it would normally do.
+	Will have the name of the specific interaction appended to it.
+	*/
+	function RequirementConfigNames() {
+		/*
+		return array(
+                        'sloodletrackerrequire_taskcompleted',
+			'sloodletrackerrequire_tasknotcompletedmessage'
+		);
+		*/
+	}
+
+	/*
+	Not yet implemented	
+	When we authorize an object, we should run this function for each module that has it allowing us to do whatever setup tasks the module defines.	
+	*/
+	function HandleObjectInitializationSteps( $relevant_configs, $active_object ) {
+
+		$taskname = isset($relevant_configs['sloodletrackersatisfy_taskcompleted']) ? $relevant_configs['sloodletrackersatisfy_taskcompleted'] : '';
+		$description = isset($relevant_configs['sloodletrackersatisfy_taskcompleteddescription']) ? $relevant_configs['sloodletrackersatisfy_taskcompleteddescription'] : '';
+		if ( isset($relevant_configs['sloodletrackersatisfy_taskcompleted']) ) {
+
+		}
+		SloodleModuleTracker::record_object($active_object->uuid,$active_object->name,$active_object->type,$active_object->controllerid,$description,$taskname);
+
+	}
+
+
+	function ProcessActions( $relevant_configs, $controllerid, $multiplier, $userid, $useruuid, $objectuuid) {
+
+		return true;
+
+		global $CFG;
+
+		$controller = new SloodleController();
+		if (!$controller->load_by_course_module_id($controllerid)) {
+			return false;
+		}
+
+		$time = time();
+
+		if ( isset($relevant_configs['sloodletrackersatisfy_taskcompleted']) ) {
+
+		}
+		
+		return true;
+
+	}
+
 
     }
 ?>

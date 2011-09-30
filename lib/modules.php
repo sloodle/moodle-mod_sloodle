@@ -49,6 +49,15 @@
             }
         }
     }
+
+    /*
+    Static method to return a list of available module types => module names.
+    Avoids having to use the global variable elsewhere.
+    */
+    function sloodle_available_modules() {
+        global $SLOODLE_MODULE_CLASS;
+        return $SLOODLE_MODULE_CLASS;
+    }
     
     
     /**

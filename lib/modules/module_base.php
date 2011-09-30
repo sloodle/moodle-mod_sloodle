@@ -84,7 +84,7 @@
         }
         
 
-    // Interaction handlers //
+    // Action handlers //
     // The following can be extended if your module wants to be notified when another module handles something.
     // ...based on configuration options set on the object in question.
     // Developed for Awards: eg. You want the quiz to tell you that somebody has got a quiz question right
@@ -96,8 +96,17 @@
 	* See SloodleModuleAwards for an example of how this is used.
 	* @return array
 	*/
-	function InteractionConfigNames() {
+	function ActionConfigNames() {
 	    return array();
+	}
+
+        /*
+        TODO: Not using this yet - will be used for tracker
+	* array $relevant_configs an array of actions that the object is interested in if the object does them
+	* object $active_object
+        */
+	function HandleObjectInitializationSteps( $relevant_configs, $active_object ) {
+	   return true;
 	}
 
 	/**
@@ -105,12 +114,15 @@
 	* param int $controllerid: ID of controller that called us
 	* param int $multiplier A number telling us the scale of the thing that happened.
 	* param int $userid ID of the user involved.
+	* param string $useruuid
+	* param string $objectuuid
 	* @ return false
 	*
 	*/
-        function ProcessInteractions( $relevant_configs, $controllerid, $multiplier, $userid ) {
+        function ProcessActions( $relevant_configs, $controllerid, $multiplier, $userid, $useruuid, $objectuuid ) {
 	    return true;
 	}
+
 
 
         

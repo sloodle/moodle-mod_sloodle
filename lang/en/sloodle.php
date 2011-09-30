@@ -572,7 +572,7 @@ $string['awards:finishquizplus']='For completing the quiz you get:';
 $string['awards:answerquestionaward'] = 'Points per question';
 
 $string['awards:interactwithobjectplus']='Using this object gives you';  
-$string['awards:interactwithobjectminus']='Using this object takes away:';  
+$string['awards:interactwithobjectminus']='Using this object costs:';  
 $string['awards:interactwithobjectrequires']='To use object users must have:';
 
 $string['awards:notenoughmessage']='Insufficient currency message';
@@ -595,6 +595,7 @@ $string ['secondlifetracker:notcompleted'] = 'Not Completed';
 $string ['secondlifetracker:time'] = 'Time';
 $string ['secondlifetracker:selecttracker'] = 'Select Tracker';
 $string ['secondlifetracker:notrackers'] = 'No trackers in your course';
+$string ['tracker:requiredtasknotcompleted'] = 'You need to complete another task before you can use this object.';
 
 $string['layoutpage'] = 'Layouts';
 $string['layoutmanager:nopermission'] = 'You do not have permission to edit layouts';

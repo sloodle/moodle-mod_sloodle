@@ -397,21 +397,21 @@ exit;
 
     // With post sloodle-2.0 quiz chairs, we should be told what happened to the score.
     // In theory we should be able to get this from the data we already have, but it seems complex...
-    // The process_interactions allows us to award points if there is an instruction to do so in the object config.
+    // The process_events allows us to award points if there is an instruction to do so in the object config.
 	$scorechange = floatval(optional_param( 'scorechange', 0, PARAM_TEXT));
 	if ($scorechange == 0) {
 		$scorechange = 1;
 	}
-                SloodleDebugLogger::log('DEBUG', "active object check");
+                //SloodleDebugLogger::log('DEBUG', "active object check");
 	if (!is_null($sloodle->active_object)) {
-                SloodleDebugLogger::log('DEBUG', "quiz has an active object");
+                //SloodleDebugLogger::log('DEBUG', "quiz has an active object");
 
+		$sloodle->process_interaction('answerquestion', $scorechange);
 
-		$sloodle->active_object->process_interactions( 'SloodleModuleAwards', 'answerquestion', $scorechange, $sloodle->user->get_user_id() );
 		/*
 		if ($scorechange > 0) {
 		} else if ($scorechange < 0) {
-			//$sloodle->active_object->process_interactions( 'SloodleModuleAwards', 'answerincorrect', 1, $sloodle->user->get_user_id() );
+			//$sloodle->active_object->process_events( 'SloodleModuleAwards', 'answerincorrect', 1, $sloodle->user->get_user_id() );
 		}
 		*/
 		// TODO: Maybe we should set a side effect code here?
