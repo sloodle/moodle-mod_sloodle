@@ -175,6 +175,12 @@
     */
     //define('SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL', 'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/');
 
+    /*
+    * Set this to true if you want the rezzer to automatically link its owner to the person logged in and using it in Moodle.
+    * This is used by Avatar Classroom. Will normally be off for regular sloodle.
+    */
+    define('SLOODLE_SHARED_MEDIA_AUTOLINK_REZZER_OWNER', false);
+
 
 //---------------------------------------------------------------------
 

@@ -38,6 +38,7 @@
     require_once(SLOODLE_LIBROOT.'/course.php');
     require_once(SLOODLE_LIBROOT.'/layout_profile.php');
     require_once(SLOODLE_LIBROOT.'/active_object.php');
+    require_once(SLOODLE_LIBROOT.'/user.php');
 
     include('index.template.php');
 //ini_set('display_errors', 1);
@@ -70,6 +71,17 @@
 		} else {
 			require_login();
 			exit;
+		}
+	}
+
+	if ( defined('SLOODLE_SHARED_MEDIA_AUTOLINK_REZZER_OWNER') && SLOODLE_SHARED_MEDIA_AUTOLINK_REZZER_OWNER ) {
+		$sloodleuuid = optional_param('sloodleuuid', '', PARAM_RAW);
+		$sloodleavname = optional_param('sloodleavname', '', PARAM_RAW);
+		if( ( $sloodleuuid != '' ) && ( $sloodleavname != '' ) ) {
+			$su = new SloodleUser();
+			if (!$su->load_avatar($sloodleuuid, $sloodleavname)) {
+				$su->add_linked_avatar($USER->id, $sloodleuuid, $sloodleavname);
+			}
 		}
 	}
 
