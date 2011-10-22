@@ -569,12 +569,10 @@ $string['awards:questionincorrectminus']='When you get a question wrong you lose
 $string['awards:startquizrequires']='To use object users must have:';
 $string['awards:finishquizplus']='For completing the quiz you get:';
 
-$string['awards:useobjectrequires']='To use object users must have:';
-
 $string['awards:answerquestionaward'] = 'Points per question';
 
 $string['awards:interactwithobjectplus']='Using this object gives you';  
-$string['awards:interactwithobjectminus']='Using this object takes away:';  
+$string['awards:interactwithobjectminus']='Using this object costs:';  
 $string['awards:interactwithobjectrequires']='To use object users must have:';
 
 $string['awards:notenoughmessage']='Insufficient currency message';
@@ -823,3 +821,5 @@ $string['misc:chalkboardtext'] = 'Text on the chalkboard:';
 $string['misc:twittersearchterm'] = 'Search term'; 
 $string['misc:twitterwalltitle'] = 'Title'; 
 $string['misc:twitterwallcaption'] = 'Caption'; 
+
+$string['sloodle:courseparticipate'] = 'Allow access to a course via SLOODLE (virtual worlds)';

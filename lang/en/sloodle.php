@@ -821,3 +821,5 @@ $string['misc:chalkboardtext'] = 'Text on the chalkboard:';
 $string['misc:twittersearchterm'] = 'Search term'; 
 $string['misc:twitterwalltitle'] = 'Title'; 
 $string['misc:twitterwallcaption'] = 'Caption'; 
+
+$string['sloodle:courseparticipate'] = 'Allow access to a course via SLOODLE (virtual worlds)';
