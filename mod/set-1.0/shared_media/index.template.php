@@ -468,6 +468,12 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <?php foreach($ctrl->options as $opn => $opv) { ?>
 <input type="radio" name="<?php echo  $fieldname ?>" value="<?php echo  $opn ?>" <?php echo  $opn == $ctrl->default ? 'checked ' : '' ?>> <?php echo  $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?> &nbsp; &nbsp; 
 <?php } ?>
+<?php } else if ($ctrl->type == 'select') { ?>
+<select name="<?php echo  $fieldname ?>">
+<?php foreach($ctrl->options as $opn => $opv) { ?>
+<option value="<?php echo  $opn ?>" <?php echo  $opn == $ctrl->default ? 'selected' : '' ?>> <?php echo  $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?></option>
+<?php } ?>
+</select>
 <?php } else if ($ctrl->type == 'input') { ?>
 <input type="text" size="<?php echo  $ctrl->size ?>" maxlength="<?php echo  $ctrl->max_length ?>" name="<?php echo  $fieldname ?>" value="<?php echo  $ctrl->default ?>" /> 
 <?php } else { ?>
@@ -584,6 +590,12 @@ $moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemodu
 <?php foreach($ctrl->options as $opn => $opv) { ?>
 <input type="radio" name="<?php echo  $fieldname ?>" value="<?php echo  $opn ?>" <?php echo  $opn == $val ? 'checked ' : '' ?>> <?php echo  $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?> &nbsp; &nbsp; 
 <?php } ?>
+<?php } else if ($ctrl->type == 'select') {?>
+<select name="<?php echo  $fieldname ?>">
+<?php foreach($ctrl->options as $opn => $opv) { ?>
+<option value="<?php echo  $opn ?>" <?php echo  $opn == $val ? 'selected' : '' ?>> <?php echo  $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?></option> 
+<?php } ?>
+</select>
 <?php } else if ($ctrl->type == 'input') {?>
 <input type="text" size="<?php echo  $ctrl->size ?>" maxlength="<?php echo  $ctrl->max_length ?>" name="<?php echo  $fieldname ?>" value="<?php echo  $val ?>" /> 
 <?php } else {?>
