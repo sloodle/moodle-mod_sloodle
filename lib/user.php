@@ -267,16 +267,22 @@
         
         /**
         * Loads the specified avatar from the database.
-        * @param mixed $id The ID of the avatar (type depends on VLE; integer for Moodle)
+        * @param mixed $id The Moodle User ID of the avatar 
         * @return bool True if successful, or false otherwise.
         * @access public
         */
-        function load_avatar_by_id($id)
+        function load_avatar_by_user_id($id)
         {
+
             // Make sure the ID is valid
-            if (!is_int($id) || $id <= 0) return false;
+	    $id = intval($id);
+	    if (!$id) {
+	        return false;
+	    }
+
             // Fetch the avatar data
-            $this->avatar_data = sloodle_get_record('sloodle_users', 'id', $id);
+            $this->avatar_data = sloodle_get_record('sloodle_users', 'userid', $id);
+
             if (!$this->avatar_data) {
                 $this->avatar_data = null;
                 return false;

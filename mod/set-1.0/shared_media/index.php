@@ -80,7 +80,9 @@
 		if( ( $sloodleuuid != '' ) && ( $sloodleavname != '' ) ) {
 			$su = new SloodleUser();
 			if (!$su->load_avatar($sloodleuuid, $sloodleavname)) {
-				$su->add_linked_avatar($USER->id, $sloodleuuid, $sloodleavname);
+				if (!$su->load_avatar_by_user_id(intval($USER->id))) {
+					$su->add_linked_avatar($USER->id, $sloodleuuid, $sloodleavname);
+				}
 			}
 		}
 	}
