@@ -65,12 +65,16 @@
 		}
 	}
 
-	if (!$USER || !$USER->id) {
+	if ( (!$USER || !$USER->id) || (function_exists('isguestuser') && isguestuser()) ) {
 		if ( defined('SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE') && ( SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE != '' ) ) {
 			require(SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE);	
 		} else {
-			require_login();
-			exit;
+			// If we have auto login guests on, we have to simulate a logout first
+			// ...before require_login will force a login.
+			if (function_exists('isguestuser') && isguestuser()) {
+				$USER = null;
+			}
+			require_login(null, false);
 		}
 	}
 

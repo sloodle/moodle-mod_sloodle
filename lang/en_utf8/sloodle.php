@@ -823,3 +823,4 @@ $string['misc:twitterwalltitle'] = 'Title';
 $string['misc:twitterwallcaption'] = 'Caption'; 
 
 $string['sloodle:courseparticipate'] = 'Allow access to a course via SLOODLE (virtual worlds)';
+$string['sloodle:controllerparticipate'] = 'Use activities under a SLOODLE controller';

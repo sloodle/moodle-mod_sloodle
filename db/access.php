@@ -59,6 +59,7 @@ $mod_sloodle_capabilities = array(
         'legacy' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -70,6 +71,7 @@ $mod_sloodle_capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -84,6 +86,7 @@ $mod_sloodle_capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -96,6 +99,7 @@ $mod_sloodle_capabilities = array(
         'legacy' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -106,6 +110,7 @@ $mod_sloodle_capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -121,6 +126,7 @@ $mod_sloodle_capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -134,6 +140,7 @@ $mod_sloodle_capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -146,6 +153,7 @@ $mod_sloodle_capabilities = array(
         'legacy' => array(
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -159,6 +167,7 @@ $mod_sloodle_capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
@@ -173,6 +182,7 @@ $mod_sloodle_capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
             'admin' => CAP_ALLOW
         )
     ),
