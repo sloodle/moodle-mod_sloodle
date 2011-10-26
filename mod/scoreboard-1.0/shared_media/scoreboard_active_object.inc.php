@@ -30,7 +30,7 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 		if ( isset($configs['sloodleroundid']) && $configs['sloodleroundid'] > 0) {
 			$this->roundid = intval($configs['sloodleroundid']);
 		} else {
-			$this->roundid = $this->course->controller->get_active_roundid();
+			$this->roundid = $this->course->controller->get_active_roundid($force_create = true);
 		}
 
 		$this->currencyid =  isset($configs['sloodlecurrencyid']) ? intval($configs['sloodlecurrencyid']) : 0; 
@@ -55,12 +55,23 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
 		$scoresql = "select userid as userid, sum(amount) as balance from {$prefix}sloodle_award_points p where p.roundid = ? and p.currencyid = ? group by p.userid order by balance desc;";
 
-		$usersql = "select max(u.id) as userid, u.username as username, u.firstname as firstname, u.lastname as lastname, su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid=? group by u.id order by avname asc;";
+		$usersql = "select max(u.id) as userid, u.username as username, su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id = ra.userid inner join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid=? group by u.id order by avname asc;";
 
 		$scores = sloodle_get_records_sql_params( $scoresql, array($roundid, $currencyid) );
 		$students = sloodle_get_records_sql_params( $usersql, array($contextid) );
 
 		$students_by_userid = array();
+
+		// Add any admin users that have avatars.
+		$admin_users = SloodleUser::SiteAdminUserIDsToAvatarNames();
+		foreach($admin_users as $userid => $avname) {
+			$rec = new stdClass();
+			$rec->avname = $avname;
+			$rec->userid = $userid;
+			$students_by_userid[$userid] = $rec;	
+		}
+
+
 		foreach($students as $student) {
 			// Make a moodle user object with enough info for isguestuser to tell us if they're a guest or not.
 			// Looking at the isguestuser() function, it looks like the userid and username should be enough to check this without needing any more db lookups.
@@ -72,8 +83,11 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 			if (isguestuser($mdluser)) {
 				continue;	
 			}
+			unset($student->username);
 			$students_by_userid[ $student->userid ] = $student;
 		}
+
+
 
 		// students with scores, in score order
 		$student_scores = array();
@@ -85,7 +99,7 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 			$student = $students_by_userid[ $userid ];
 			$student->has_scores = true;
 			$student->balance = $score->balance;
-			$student->name_html = ($student->avname != '') ? s($student->avname) : s($student->firstname.' '.$student->lastname);
+			$student->name_html = s($student->avname);
 			$student_scores[$userid] = $student;
 		}
 

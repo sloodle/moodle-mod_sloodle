@@ -90,8 +90,6 @@ var active_object_uuid = '<?php echo  htmlentities($active_object_uuid) ?>';
     <?php
 	$dummy_score = new stdClass();
 	$dummy_score->avname = '';
-	$dummy_score->firstname = '';
-	$dummy_score->lastname = '';
 	$dummy_score->userid = 0;
 	$dummy_score->has_scores = true;
     ?>
@@ -118,7 +116,7 @@ function render_score_li($score, $is_admin, $rank_number) {
        <li class="<?php echo  $score->has_scores ? 'has_scores' : 'no_scores' ?> score_entry" id="student_score_<?php echo  intval($score->userid) ?>" data-userid="<?php echo  intval($score->userid) ?>" data-dirty-change="0" data-last-clean-ts="0" >
 		<span class="position_number" ><?php echo $rank_number?></span>
 		<span class="user_score_delete_link" ></span>
-		 <span class="avatar_name"><?php echo  ( $score->avname != '' ) ? s( $score->avname ) : s($score->firstname.' '.$score->lastname) ?></span>
+		 <span class="avatar_name"><?php echo  s( $score->avname ) ?></span>
 	<?php 
 	if (true&&$is_admin) { 
 	?>
