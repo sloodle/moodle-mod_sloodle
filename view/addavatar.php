@@ -103,6 +103,15 @@ class sloodle_view_addavatar extends sloodle_base_view
         // Fetch the Moodle course data
         $courseid = optional_param('course', SITEID, PARAM_INT);
         if (!$this->course = sloodle_get_record('course', 'id', $courseid)) error('Could not find course.');
+
+	// Moodle 2 rendering functions like to know the course.
+	// They get upset if you try to pass a course into print_footer() that isn't what they were expecting.
+	if ($this->course) {
+		global $PAGE;
+		if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
+			$PAGE->set_course($this->course);
+		}
+	}
     }
 
     /**
