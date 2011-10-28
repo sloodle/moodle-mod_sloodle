@@ -167,6 +167,7 @@
             
             // Are we still lacking a valid user?
             if ((int)$userid <= 0) {
+
                 // Yes - user the guest user
                 $guest = guest_user();
                 if ($guest) $userid = $guest->id;
@@ -192,7 +193,7 @@
 
 
             if (!is_null($this->_session->active_object)) {
-                 $this->_session->active_object->process_events( 'default', 1, $userid ); 
+                 $this->_session->active_object->process_interaction( 'default', 1, $userid ); 
                  // TODO: Maybe we should set a side effect code here?
             }
 
