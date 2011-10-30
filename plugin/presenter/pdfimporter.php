@@ -362,16 +362,20 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         if (strpos($srcfile, "\"") !== false || strpos($destpath, "\"") !== false || strpos($destfile, "\"") !== false || strpos($destfileext, "\"") != false) error("Invalid file name -- please remove quotation marks from file names.");
 
         // Construct the conversion command
-		$cmd = "\"{$IMAGICK_CONVERT_PATH}\" -verbose \"{$srcfile}\" \"{$destpath}/{$destfile}-%d.{$destfileext}\"";
+		$srcfile_shell_clean = escapeshellarg($srcfile);
+		$destpath_shell_clean = escapeshellarg($destpath);
+		$destfile_shell_clean = escapeshellarg($destfile);
+		$destfileext_shell_clean = escapeshellarg($destfileext);
+		$cmd = "\"{$IMAGICK_CONVERT_PATH}\" -verbose \"{$srcfile_shell_clean}\" \"{$destpath_shell_clean}/{$destfile_shell_clean}-%d.{$destfileext_shell_clean}\"";
 		if (substr(php_uname(), 0, 7) == "Windows") $cmd = 'start /B "" '.$cmd; // Windows compatibility
 		
-        sloodle_debug(" Executing shell command: {$cmd}<br/>");
+		sloodle_debug(" Executing shell command: {$cmd}<br/>");
 		$output = array();
-        $result = exec($cmd, $output);
+        $result = @exec($cmd, $output);
         // If all the output is empty, then execution failed
         if (empty($result) && empty($output)) {
             sloodle_debug(" ERROR: execution of the shell command failed.<br/>");
-            echo "<hr><pre>"; print_r($output); echo "</pre><hr>";
+            //echo "<hr><pre>"; print_r($output); echo "</pre><hr>";
             return false;
         }
         
@@ -455,8 +459,8 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             return true;
         }
         // Attempt to load the extension, depending on OS.
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') @dl('php_magickwand.dll');
-        else @dl('magickwand.so');
+        if ( (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') && function_exists('dl')) @dl('php_magickwand.dll');
+        else if (function_exists('dl')) @dl('magickwand.so');
         // Check if MagickWand has been successfully loaded now.
         if (extension_loaded('magickwand'))
         {
@@ -473,13 +477,16 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             $checkLocs[] = $IMAGICK_CONVERT_PATH;
             $checkLocs[] = '/usr/bin/convert';
             $checkLocs[] = '/usr/local/bin/convert';
-			$checkLocs[] = 'convert';
-			$checkLocs[] = 'convert.exe';
+		// Edmund Edgar, 2011-10-30:
+		// Disabling this - I'm not happy with the security implications of trusting any file called "convert" or "convert.exe" in the web user's path.
+		// Uncomment if you're really sure you want to do this.
+		//	$checkLocs[] = 'convert';
+		//	$checkLocs[] = 'convert.exe';
             
             // Check for the presence of the ImageMagick convert program at each location
             foreach ($checkLocs as $loc) {
                 // Make sure it's a safe command
-                $cmd = escapeshellarg($loc.' -version');
+                $cmd = $loc.' -version';
                 // Attempt to execute it
                 $output = array();
                 @exec($cmd, $output);
@@ -532,10 +539,14 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
         {
             echo "Windows OS detected. Attempting to load 'php_magickwand.dll' extension dynamically.<br/>";
-            @dl('php_magickwand.dll');
+	    if(function_exists('dl')) {
+                @dl('php_magickwand.dll');
+	    }
         } else {
             echo "Attempting to load 'php_magickwand.so' extension dynamically.<br/>";
-            @dl('magickwand.so');
+	    if(function_exists('dl')) {
+                @dl('magickwand.so');
+	    }
         }
         // Check if MagickWand has been successfully loaded now.
         if (extension_loaded('magickwand'))
@@ -555,15 +566,18 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             $checkLocs[] = $IMAGICK_CONVERT_PATH;
             $checkLocs[] = '/usr/bin/convert';
             $checkLocs[] = '/usr/local/bin/convert';
-			$checkLocs[] = 'convert';
-			$checkLocs[] = 'convert.exe';
+	    // Edmund Edgar, 2011-10-30:
+		// Disabling this - I'm not happy with the security implications of trusting any file called "convert" or "convert.exe" in the web user's path.
+		// Uncomment if you're really sure you want to do this.
+		// $checkLocs[] = 'convert';
+		// $checkLocs[] = 'convert.exe';
             
             // Check for the presence of the ImageMagick convert program at each location
             foreach ($checkLocs as $loc) {
                 echo "<br/>Checking for program at location: \"{$loc}\"...<br/>";
             
                 // Make sure it's a safe command
-                $cmd = escapeshellarg($loc.' -version');
+                $cmd = $loc.' -version';
                 // Attempt to execute it
                 $output = array();
                 @exec($cmd, $output);
