@@ -944,6 +944,33 @@
             sloodle_delete_records('sloodle_user_object', 'avuuid', $this->get_avatar_uuid(), 'objuuid', $uuid);
         }
         
+	/*
+	Statuic function returning a hash of userids to avatar names of admin users.
+	This is useful if you want to know everyone who may be able to user a course
+	*/
+	function SiteAdminUserIDsToAvatarNames() {
+
+	   global $CFG;
+	   if (!$site_admin_list = $CFG->siteadmins) {
+	      return array();
+	   }
+	   $site_admin_ids = explode(',',$site_admin_list);
+	   if (count($site_admin_ids) == 0) {
+              return array();
+	   }
+
+	   // We'll just loop through them. In theory this could be more efficient, but there's probably only one site admin.
+	   $users = array();
+	   foreach($site_admin_ids as $id) {
+              if ($rec = sloodle_get_record('sloodle_users', 'userid', $id)) {
+                 $users[$rec->userid] = $rec->avname;
+              }
+	   }
+
+	   return $users;
+
+	}
+
     }
     
 
