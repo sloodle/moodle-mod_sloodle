@@ -364,6 +364,9 @@
         $user_object_days = 21; // Give user objects 3 weeks by default
         if (!empty($CFG->sloodle_user_object_lifetime)) $user_object_days = $CFG->sloodle_user_object_lifetime;
         
+	/*
+	// Edmund Edgar, 2011-11-25: Removing this for now as it'll break objects stored in user inventory with persistent configs.
+	// We may want to make some new settings for this, but we won't want to use the old ones.
         // Delete any active objects and session keys which have expired
         // Deletes any authorised objects which have not checked-in for more than X days (where X is specified in module config)
         // Deletes any unauthorised objects which have not checked-in for more than 1 hour
@@ -379,6 +382,7 @@
                 sloodle_delete_records('sloodle_active_object', 'id', $r->id);
             }            
         }
+	*/
         
         // Delete any user-authorised objects which have expired
         // (will eventually use custom expiry times, chosen in the configuration)
@@ -497,5 +501,17 @@ function sloodle_supports($feature) {
     }
 }
 
+/*
+function sloodle_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
+    global $CFG, $DB;
+var_dump($course);
+var_dump($cm);
+var_dump($context);
+var_dump($filearea);
+var_dump($args);
+exit;
+
+}
+*/
 
 ?>
