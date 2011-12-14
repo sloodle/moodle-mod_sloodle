@@ -1082,4 +1082,51 @@
         return min($upload_max_filesize, $post_max_size);
     }
 
+    /*
+    Used to sign a piece of data to ensure that data passed to the user was issued by us.
+    Made for the presenter image upload, where we can't use the session because the flash component that talks to the server won't pass a cookie.
+    */
+    function sloodle_signature($data) {
+    	global $CFG;
+
+        $salt = '';
+        if ( isset($CFG->sloodle_signature_salt) && ($CFG->sloodle_signature_salt != '' ) ) {
+            $salt = $CFG->sloodle_signature_salt;
+        } else {
+            $salt = random_string(40);
+            set_config('sloodle_signature_salt', $salt);
+        }
+
+        if (function_exists('hash_hmac')) {
+            return hash_hmac('sha256', $data, $salt);
+        }
+        return sloodle_custom_hmac('sha1', $data, $salt);
+    }
+
+    // From http://php.net/manual/en/function.hash-hmac.php
+    // For use if the php hash_hmac isn't available
+   function sloodle_custom_hmac($algo, $data, $key, $raw_output = false)
+   {
+       $algo = strtolower($algo);
+       $pack = 'H'.strlen($algo('test'));
+       $size = 64;
+       $opad = str_repeat(chr(0x5C), $size);
+       $ipad = str_repeat(chr(0x36), $size);
+
+       if (strlen($key) > $size) {
+           $key = str_pad(pack($pack, $algo($key)), $size, chr(0x00));
+       } else {
+           $key = str_pad($key, $size, chr(0x00));
+       }
+
+       for ($i = 0; $i < strlen($key) - 1; $i++) {
+           $opad[$i] = $opad[$i] ^ $key[$i];
+           $ipad[$i] = $ipad[$i] ^ $key[$i];
+       }
+
+       $output = $algo($opad.pack($pack, $algo($ipad.$data)));
+
+       return ($raw_output) ? pack($pack, $output) : $output;
+    }
+
 ?>

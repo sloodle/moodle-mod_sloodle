@@ -151,6 +151,9 @@ class sloodle_view_presenter extends sloodle_base_view_module
             require_js($CFG->wwwroot .'/mod/sloodle/lib/multiplefileupload/extra.js');
             require_js($CFG->wwwroot .'/lib/filelib.php');      
         }
+        if ( $this->presenter_mode == 'addfiles') {
+            require_js($CFG->wwwroot .'/mod/sloodle/lib/js/presenter_addfiles.js"');      
+	}
 
 
         // Should we process any incoming editing commands?
@@ -273,53 +276,6 @@ class sloodle_view_presenter extends sloodle_base_view_module
                 $this->presenter->edit_entry($sloodleentryid, $sloodleentryurl, $sloodleentrytype, $sloodleentryname, $sloodleentryposition);
                 $redirect = true;
             }
-            
-            /*//are we editing multiple files?  Mode: "Multiple edit"" is set as an input value when the multiple edit select field
-            // is submitted      
-            if (optional_param('mode')=='multiple edit')  {
-                //check what value was submitted from the select input
-                $multipleAction = optional_param('multipleProcessor');
-                $selectedSlides = $_REQUEST['selectedSlides'];   
-                if ($multipleAction=="Delete Selected") {
-                    //get all selected slides to trash                
-                    $slides = $this->presenter->get_slides();                        
-                    $deleted = get_string("presenter:deleted",'sloodle');
-                    $fromTheServer = get_string("presenter:fromtheserver",'sloodle');
-                    $feedback = "";
-                    foreach ($selectedSlides as $selectedSlide) {
-                        // REMOVED SOURCE FILE DELETION -- THIS IS UNSAFE UNLESS WE TRACK EXACTLY WHICH FILES WERE UPLOADED
-                        //get slide source so we can delete it from the server   
-                        foreach ($slides as $slide) {
-                           if ($slide->id==$selectedSlide) {
-                                //delete file
-                                $fileLocation = $CFG->dataroot;
-                                //here the $slide->source url has moodle's file.php handler in it
-                                //we must therefore convert the slide source into a real file path
-                                //do so by removing "file.php" from the file path string
-                                $floc = strstr($slide->source,"file.php");
-                                // Only continue if "file.php" was found -- no point trying to delete other files
-                                if ($floc !== false) {
-                                    //now delete "file.php" from the path
-                                    $floc = substr($floc,8,strlen($floc));
-                                    //now add this to the data route to finish re-creating the true file path
-                                    $fileLocation.=$floc;
-                                    //finally we can delete the file
-                                    unlink($fileLocation);
-                                }
-                                //build feedback string
-                                $feedback.=$deleted ." ". $slide->name ." ". $fromTheServer ."<br>";     
-                            }
-                        }
-                       //delete from database
-                       $this->presenter->delete_entry($selectedSlide);
-                    }
-                      
-                    // Store the feedback as a session variable for the next time the page is loaded
-                    $_SESSION['sloodle_presenter_feedback'] = $feedback;
-                    //set redirect so we go back to the edit tab
-                    $redirect = true;
-				}
-			}*/
             
             // Redirect back to the edit page -- this is used to get rid of intermediate parameters.
             if ($redirect && headers_sent() == false) {
@@ -704,8 +660,17 @@ class sloodle_view_presenter extends sloodle_base_view_module
     function render_add_files()
     {
         global $CFG;
+	global $USER;
 
 
+	/*
+	Normally Moodle would use the itemid for something that the image belongs to, eg. a forum post.
+	We don't really need one here - we have slides, but they are assigned after the file has been uploaded.
+	We'll set this parameter to a unique ID per upload page.
+	This will prevent clashes if you try to re-upload another file with the same name.
+	(The upload component expects to know what the name of the uploaded file will be, so we have to assign it before doing the upload.)
+	*/
+	$itemid = time();
 
         // Setup variables to store the data
         $entryid = 0;
@@ -769,160 +734,29 @@ class sloodle_view_presenter extends sloodle_base_view_module
     * @uses uploader.swf        - enables multiple file uploading     
     */   
     echo '<script type="text/javascript">';                                                           
-    echo 'var uploadWwwDir="'.$CFG->wwwroot.'/file.php/1/presenter/'.$this->cm->id.'/";';
-    echo ' var uploadArray = [];';
-    echo ' var qSize=0;';
-    echo 'var uploadLimit='.((integer)INI_GET('post_max_size')*1000000).';';
+    if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+	    echo 'var uploadWwwDir="'.$CFG->wwwroot.'/pluginfile.php/'.intval($this->cm->id).'/mod_sloodle/presenter/'.intval($itemid).'/'.'";'."\n";
+    } else {
+	    echo 'var uploadWwwDir="'.$CFG->wwwroot.'/file.php/1/presenter/'.intval($this->cm->id).'/";'."\n";
+    }
+    echo 'var uploadArray = [];'."\n";
+    echo 'var qSize=0;'."\n";
+    echo 'var uploadLimit='.((integer)INI_GET('post_max_size')*1000000).';'."\n";
 
-    echo ' var uploadArrayLen=0;';
-    echo ' var counter=0;';
-    echo ' var extension=\'\';';  
-    echo ' var tableData=\'\';';
-    
-    ?>
-    function startUpload(id){  ;
-        if (qSize < uploadLimit)
-            $('#fileInput').fileUploadStart();
-    }        <?php
-    // when DOM is fully loaded, JQuery ready function executes our code     
-    echo '$(document).ready(function() {';
-         
-        echo '$("#uploadButton").hide();';
-       echo '$(\'#fileInput\').fileUpload ({';       
-        echo "'uploader'  : 'lib/multiplefileupload/uploader.swf',";        
-        echo "'script'    : 'lib/multiplefileupload/upload.php',";
-         //sends moduleID:cm->id to upload.php upload handler
-        echo "'scriptData' : {'moduleId':'".$this->cm->id."'},";
-        //enable multiple uploads 
-        echo "'multi'     :  true,";
-        //set cancel button image
-        echo "'cancelImg' : 'lib/multiplefileupload/cancel.png',";
-        //set button text
-        echo "'buttonText': 'Select Files',";
-        //start uploading automatically after items are selected            
-        echo "'auto'      : false,";
-        //this folder variable is required, but in our case, not used because we set the upload folder in the upload.php upload handler
-        echo "'folder'    : 'uploads',";
-        //allowable file types (must also modify upload.php upload handler to accept these)
-        echo "'fileDesc'  : 'jpg;png;gif;htm;html;mov',";
-        //the allowable extensions in the file dialog view
-        echo "'fileExt'   :   '*.jpg;*.png;*.gif;*.htm;*.html;*.mov',";
-        //Send an alert on all errors
-        ?>onError: function (a, b, c, d) {
-         if (d.status == 404)
-            alert('Could not find upload script. Use a path relative to: '+'<?php echo getcwd() ?>');
-         else if (d.type === "HTTP")
-            alert('error '+d.type+": "+d.status);
-         else if (d.type ==="File Size")
-            alert(c.name+' '+d.type+' Limit: '+Math.round(d.sizeLimit/1024)+'KB');
-         else
-            alert('error '+d.type+": "+d.text);
-},        <?php
-        /*
-        * onAllComplete will trigger after all uploads are done
-        * When all uploaded, sort file names into alphabetical order
-        * 
-        */
-        echo "'onAllComplete': function() {";
-        //Files could have uploaded in a random order, therefore, lets sort the array of file names and display them alphabetically 
-        echo "uploadArray.sort();";  
-        //bind a variable fileDisplayArea to the tag <div id="filesUploaded"> so we can refer to it easily
-        echo 'var fileDisplayArea = $("#filesUploaded");';
-        //now append another div tag inside of it called fileTables - here we will put all fields for each item uploaded
-        //<dif id="fileTables></div> is necessary because everytime the user presses Select files button, we must delete all elements in the div and redisplay so that all items are sorted properly
-        echo 'fileDisplayArea.append($ (\'<div id="fileTables"></div>\'));';       
-        //bind a variable fileTables to the tag <div id="fileTables"> so we can refer to it easily
-        echo 'var jList = $( "#fileTables" );';   
-        //iterate through all files uploaded
-        echo '$.each(uploadArray,';
-        echo 'function( intIndex, objValue ){';
-              //get the extension of the uploaded file             
-              echo 'var start = objValue.length-4;';                                     
-              echo 'extension=objValue.substr(start,4);';
-              echo 'extension=extension.toLowerCase();';   
-              echo  'var fname = objValue.substr(0,objValue.length-4);';       
-             //Construct the Name row
-             //replace all spaces with underscores
-             echo  'tableData= \'<table ><tr><td width=100>Name:</td><td> <input type="text" id="filename"  name="filename[]" value="\'+fname.replace(\' \(\',\'_\(\').replace(\'\) \',\'\)_\').replace(\' \',\'_\').replace(\' \',\'_\')+\'" size="60" maxlength="255" /></td><td width="100">\';';                         
-             //Construct the Image row if this file is an image
-             echo 'if ((extension==\'.jpg\') || (extension==\'.gif\') || (extension==\'.png\')) {';                        
-                       echo 'tableData += \'<label>Type:</label><select name="ftype[]" id="type" size="1"><option name=""  value="">image</option></select></td></tr></table>\';';                                   
-                       echo 'tableData += \'<table ><tr><td><img src="\'+uploadWwwDir+objValue.replace(\' \(\',\'_\(\').replace(\'\) \',\'\)_\').replace(\' \',\'_\')+\'" width="100" height="100"></td></tr></table>\';';                           
-            echo  '}';
-            //Construct movie row if this is a movie
-            echo ' else if (extension==\'.mov\') {';
-                       echo 'tableData+=  \'<label>Type:</label><select name="" id="type" size="1"><option name="" value="">video</option></select></td></tr></table>\';';          
-                       //quicktime embed tag added
-                       //replace all spaces with underscores
-                       echo 'tableData += \'<table ><tr><td><embed src="\'+uploadWwwDir+objValue.replace(\' \(\',\'_\(\').replace(\'\) \',\'\)_\').replace(\' \',\'_\')+\'" width="100" height="100" autohref="false"></td></tr></table>\'';                       
-            echo  '}';
-            //Construct movie row if this is an htm or html page            
-            echo ' else if ((extension==\'.htm\') ||(extension==\'html\'))  {';
-                        echo 'tableData+= \'<label>Type:</label><select name="" id="type" size="1"><option name=""   value="">web</option></select></td></tr></table>\';';            
-            echo  '}'; 
-            //Now add the constructed row (tableData) to the list of fields                         
-            echo 'tableData+=\'<table ><tr><td width=100>Url:</td><td><input type="text"  id="fileurl" name="fileurl[]" value="\'+uploadWwwDir+objValue.replace(\' \(\',\'_\(\').replace(\'\) \',\'\)_\').replace(\' \',\'_\').replace(\' \',\'_\')+\'" size="60" maxlength="255" /></td></tr></table><HR>\';';                                                
-            //insert the table data into <div id="fileTables"></div>
-            echo 'jList.append($ (tableData));';
-            
-            
-            
-       echo ' });';                     
-            //insert a submit button into <div id="fileTables"></div>
-            echo  'jList.append($ (\'<input type="submit" value="'.$stradd.'" name="fileaddentry" />\'));';
-            echo ' $("#uploadButton").hide();';
-            echo ' $("#qSize").hide();';  
-            echo 'qSize=0;';
-        echo ' },';
-        ?>
-                'onSelect': function (event,queueID,fileObj){
-                   $("#qSize").show();
-              qSize += fileObj.size;
-               if (qSize > uploadLimit){
-                 $("#uploadButton").hide();
-                 $("#qSize").css("color","red");
-                 $("#qSize").text("Error: You have selected "+qSize+ " bytes to upload. Bulk upload size is limited to: "+uploadLimit);
-              } else 
-              { 
-                $("#uploadButton").show();
-                $("#qSize").css("color","blue");
-                $("#qSize").html(qSize+" bytes selected. <b>"+(uploadLimit-qSize) + "</b> bytes available to queue");
-              }
+    echo 'var uploadArrayLen=0;'."\n";
+    echo 'var counter=0;'."\n";
+    echo 'var extension=\'\';'."\n";  
+    echo 'var tableData=\'\';'."\n";
 
-        
-        },
-        
-               'onCancel': function (event,queueID,fileObj){
-              qSize -= fileObj.size;
-              
-              if (qSize > uploadLimit){
-                $("#uploadButton").hide();
-                $("#qSize").css("color","red");
-                $("#qSize").text("Error: You have selected "+qSize+ " bytes to upload. Bulk upload size is limited to: "+uploadLimit);
-              } else 
-              { 
-                $("#uploadButton").show();
-                $("#qSize").css("color","blue");
-                $("#qSize").html(qSize+" bytes selected. <b>"+(uploadLimit-qSize) + "</b> bytes available to queue");
-              }
-              
-        
-        },
-        <?php
-        /*
-        * onComplete will trigger after each upload is done
-        * When a file is uploaded, add it to the uploadArray array
-        * 
-        */  
-         echo "'onComplete': function(event, queueID, fileObj, response, data) {";
-         // add this file to our uploadArray            
-           echo "uploadArray[uploadArrayLen]=fileObj.name;";                                
-           echo "uploadArrayLen++;";         
-           //clear the fileTables div so we can re-display all files in proper order           
-           echo "$('#fileTables').remove();";  
-           echo "}   ";
-        echo" });   });";     
-        echo "</script>";
+    echo 'var cmid = '.intval($this->cm->id)."\n";
+    echo 'var itemid = '.intval($itemid)."\n";
+    echo "var stradd = '".s($stradd)."';\n";
+
+    $signeddata = date('Ymd').'-'.intval($USER->id).'-'.intval($this->cm->id).'-'.'presenter';
+    echo "var signeddata = '".s($signeddata)."';"."\n";
+    echo "var signature = '".s(sloodle_signature($signeddata))."';"."\n";
+
+	echo "</script>";
                  
         echo '<input type="file" name="fileInput" id="fileInput" />';
         //this div is where the uploaded files will be displayed

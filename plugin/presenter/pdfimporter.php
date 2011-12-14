@@ -212,6 +212,10 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     function import_file($presenter, $path, $name = '', $position = -1, $clientpath = '')
     {
         global $CFG;
+
+	$cmid = $presenter->cm->id;
+	// In Moodle 2, we make an itemid for the file api
+	$itemid = time();
         
         if (!file_exists($path)) error("Import file doesn't exist.");
 
@@ -219,7 +223,10 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         $this->check_compatibility();
 
         // PHP 4 doesn't support recursive creation of folders, so we need to do this the manual way
-        $dir_sitefiles = $CFG->dataroot.'/'.SITEID;
+
+	// For Moodle 2, we upload to a temporary directory, then use the file api to move to the relevant place.
+        $dir_sitefiles = SLOODLE_IS_ENVIRONMENT_MOODLE_2 ? $CFG->dataroot.'/temp/sloodle' : $CFG->dataroot.'/'.SITEID;
+        //$dir_sitefiles = $CFG->dataroot.'/'.SITEID;
         $dir_presenter = $dir_sitefiles.'/presenter';
         $dir_import = $dir_presenter.'/'.$presenter->cm->id;
         if (!file_exists($dir_sitefiles)) mkdir($dir_sitefiles);
@@ -231,7 +238,18 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         }
 
         // Construct the URL of the folder for viewing the files
-        $dir_view = $CFG->wwwroot.'/file.php/'.SITEID.'/presenter/'.$presenter->cm->id;
+        $dir_view = $CFG->wwwroot;
+	if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+		$dir_view .= '/pluginfile.php/'.intval($cmid).'/mod_sloodle/presenter/'.intval($itemid);
+	} else {
+		$dir_view .= '/file.php/'.SITEID.'/presenter/'.$presenter->cm->id;
+	}
+
+	// In Moodle 2, make a file path, as distinct to the temporary file saving location
+	$fileapipath = '';
+	if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+		$fileapipath = '/'.intval($cmid).'/mod_sloodle/presenter/'.intval($itemid).'/';
+	} 
 
         // Use the file name from the path if necessary
         if (empty($name)) {
@@ -246,8 +264,8 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         $ext = 'jpg';
 
         // Attempt each importing method in turn
-        $result = $this->_import_MagickWand($presenter, $path, $dir_import, $dir_view, $filebase, $ext, $name, $position);
-        if ($result === false) $result = $this->_import_ImageMagick($presenter, $path, $dir_import, $dir_view, $filebase, $ext, $name, $position);
+        $result = $this->_import_MagickWand($presenter, $path, $dir_import, $dir_view, $filebase, $ext, $name, $position, $itemid, $cmid, $fileapipath);
+        if ($result === false) $result = $this->_import_ImageMagick($presenter, $path, $dir_import, $dir_view, $filebase, $ext, $name, $position, $itemid, $cmid, $fileapipath);
 
         // Prepare a "Continue" link which takes us to edit mode
         $continueURL = $CFG->wwwroot."/mod/sloodle/view.php?id={$presenter->cm->id}&amp;mode=edit";
@@ -279,7 +297,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     * @return integer|bool If successful, an integer indicating the number of slides loaded is displayed. If the import does not (or cannot) work, then boolean false is returned.
     * @access private
     */
-    function _import_MagickWand($presenter, $srcfile, $destpath, $viewurl, $destfile, $destfileext, $destname, $position = -1)
+    function _import_MagickWand($presenter, $srcfile, $destpath, $viewurl, $destfile, $destfileext, $destname, $position = -1, $itemid = '', $cmid = '', $fileapipath = '')
     {
         global $CFG;
         // Only continue if the MagickWand extension is loaded (this is done by the check_compatibility function)
@@ -319,7 +337,17 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
                 sloodle_debug('OK.<br/>');
             }
 
-            // Add the entry to the Presenter
+            if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+                $registered = $this->_register_moodle_api_file( $page_filename, $itemid, $cmid, $fileapipath, "{$destfile}-{$pagenum}.{$destfileext}");
+                @unlink($page_filename);
+                if (!$registered) {
+                     return false;
+                }
+           }
+
+
+
+    // Add the entry to the Presenter
             sloodle_debug("  Adding slide \"{$page_slidename}\" to presentation at position {$page_position}... ");
             if (!$presenter->add_entry($page_slidesource, 'image', $page_slidename, $page_position)) {
                 sloodle_debug('failed.<br/>');
@@ -344,10 +372,11 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     * @param string $destfileext Extension for destination files, not including the dot. (e.g. "jpg" or "png").
     * @param string $destname Basic name to use for each imported slide. The page numbers will be appended automatically.
     * @param integer $position The position within the Presentation to add the new slides. Optional. Default is to put them at the end.
+    * @param string $itemid The item id - used to make a unique directory name to avoid naming clashes.
     * @return integer|bool If successful, an integer indicating the number of slides loaded is displayed. If the import does not (or cannot) work, then boolean false is returned.
     * @access private
     */
-    function _import_ImageMagick($presenter, $srcfile, $destpath, $viewurl, $destfile, $destfileext, $destname, $position = -1)
+    function _import_ImageMagick($presenter, $srcfile, $destpath, $viewurl, $destfile, $destfileext, $destname, $position = -1, $itemid = '', $cmid = '', $fileapipath = '')
     {
         global $IMAGICK_CONVERT_PATH;
 
@@ -363,10 +392,10 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
 
         // Construct the conversion command
 		$srcfile_shell_clean = escapeshellarg($srcfile);
-		$destpath_shell_clean = escapeshellarg($destpath);
-		$destfile_shell_clean = escapeshellarg($destfile);
-		$destfileext_shell_clean = escapeshellarg($destfileext);
-		$cmd = "\"{$IMAGICK_CONVERT_PATH}\" -verbose \"{$srcfile_shell_clean}\" \"{$destpath_shell_clean}/{$destfile_shell_clean}-%d.{$destfileext_shell_clean}\"";
+		$destpath_shell_clean = escapeshellarg($destpath.'/'.$destfile.'-');
+		$destfileext_shell_clean = escapeshellarg('.'.$destfileext);
+		//$cmd = "\"{$IMAGICK_CONVERT_PATH}\" -verbose \"{$srcfile_shell_clean}\" \"{$destpath_shell_clean}/{$destfile_shell_clean}-%d.{$destfileext_shell_clean}\"";
+		$cmd = "{$IMAGICK_CONVERT_PATH} -verbose {$srcfile_shell_clean} {$destpath_shell_clean}%d{$destfileext_shell_clean}";
 		if (substr(php_uname(), 0, 7) == "Windows") $cmd = 'start /B "" '.$cmd; // Windows compatibility
 		
 		sloodle_debug(" Executing shell command: {$cmd}<br/>");
@@ -396,6 +425,15 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             $page_slidename = "{$destname} (".($pagenum + 1).")";
             // Was this file created?
             if (file_exists($page_filename)) {
+
+		if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
+			$registered = $this->_register_moodle_api_file( $page_filename, $itemid, $cmid, $fileapipath, "{$destfile}-{$pagenum}.{$destfileext}"); 
+			@unlink($page_filename);
+			if (!$registered) {
+				return false;	
+			}
+		}
+
                 // Add it to the Presenter
                 $presenter->add_entry($page_slidesource, 'image', $page_slidename, $page_position);
                 $pagenum++;
@@ -407,6 +445,24 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         return $pagenum;
     }
     
+    function _register_moodle_api_file( $tempfile, $itemid, $cmid, $fileapipath, $filename ) {
+
+        $fs = get_file_storage();
+
+        $fileinfo = array(
+            'contextid' => $cmid, // ID of context
+            'component' => 'mod_sloodle',     // usually = table name
+            'filearea' => 'presenter',     // usually = table name
+            'itemid' => $itemid,               // usually = ID of row in table
+            'filepath' => $fileapipath,
+            'filename' => $filename
+        );
+
+        $fs->create_file_from_pathname( $fileinfo, $tempfile);
+
+	return true;
+
+    }
 
 
     /**

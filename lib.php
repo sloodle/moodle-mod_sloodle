@@ -501,17 +501,21 @@ function sloodle_supports($feature) {
     }
 }
 
-/*
 function sloodle_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
+
     global $CFG, $DB;
-var_dump($course);
-var_dump($cm);
-var_dump($context);
-var_dump($filearea);
-var_dump($args);
-exit;
+
+    $fs = get_file_storage();
+    $contextid = $context->id;
+    $component = 'mod_sloodle';
+    $itemid = $args[0];
+    $fullpath = "/$contextid/$component/$filearea/$itemid"."/".$context->id."/mod_sloodle/presenter/".$args[0]."/".$args[1];
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, false); 
 
 }
-*/
 
 ?>
