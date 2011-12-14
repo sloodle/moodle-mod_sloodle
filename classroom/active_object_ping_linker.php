@@ -36,20 +36,14 @@
     
     // Authenticate the request
     $sloodle = new SloodleSession();
+
+    // The access record happens when we authenticate.
+    // If it fails, it should error out and exit.
     $sloodle->authenticate_request();
+
     
-    // Get our additional parameter
-    $sloodleobjuuid = $sloodle->request->get_param('sloodleobjuuid', true);
-    
-    // Attempt to ping the object
-    if ($sloodle->course->controller->ping_object($sloodleobjuuid)) {
-        $sloodle->response->set_status_code(1);
-        $sloodle->response->set_status_descriptor('OK');
-    } else {
-        $sloodle->response->set_status_code(-103);
-        $sloodle->response->set_status_descriptor('SYSTEM');
-        $sloodle->response->add_data_line('Failed to ping active object.');
-    }
+    $sloodle->response->set_status_code(1);
+    $sloodle->response->set_status_descriptor('OK');
     
     // Output the response
     $sloodle->response->render_to_output();
