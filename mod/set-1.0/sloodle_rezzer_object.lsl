@@ -343,6 +343,7 @@ state ready {
             sloodlecontrollerid = "";
             sloodlepwd = "";
             persistent_config = "";
+            llSleep(2.0); // Give the rezzer time to register us. Seems to be an issue on OpenSim, where everything is faster than SL.
         }
                 
         state default;        
