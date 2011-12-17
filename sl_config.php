@@ -8,6 +8,14 @@
     *
     */
 
+    /*
+    Linker scripts don't maintain cookies.
+    We need to set NO_MOODLE_COOKIES to prevent Moodle from creating a new session on every request.
+    */
+    if (defined('SLOODLE_LINKER_SCRIPT')) {
+        define('NO_MOODLE_COOKIES', true);
+    }
+
     // Pull in the main moodle config
     // NB the following is necessary for when we pull in this config.php from a module under sloodle/mod
     require_once (realpath(dirname(__FILE__) . "/" . "../../config.php"));
