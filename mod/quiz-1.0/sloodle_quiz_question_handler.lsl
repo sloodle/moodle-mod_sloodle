@@ -14,8 +14,6 @@
         // When the student answers the question, it sends out a linked message with num SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR.
         // Note that it doesn't handle timeouts in case the user doesn't respond - all that should be done by the calling script.
         
-        // Memory-saving hacks!
-        key null_key = NULL_KEY;
         integer SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR = -1639271119; //Tells us to STOP a quiz for the avatar
         integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
         integer doRepeat = 0; // whether we should run through the questions again when we're done
@@ -47,8 +45,8 @@
         string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";      // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
         string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
         string sloodle_full_quiz_url;
-        key httpfetchquestionquery = null_key;
-        key feedbackreq = null_key;
+        key httpfetchquestionquery = NULL_KEY;
+        key feedbackreq = NULL_KEY;
         float request_timeout = 20.0;
         integer question_id = -1;
         // Text and type of the current and next question
@@ -60,7 +58,7 @@
         list opgrade = []; // Grades
         list opfeedback = []; // Feedback if this option is selected
         // Avatar currently using this cahir
-        key sitter = null_key; 
+        key sitter = NULL_KEY; 
 
                     
         ///// FUNCTIONS /////
@@ -77,7 +75,7 @@
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST, method+"|"+(string)avuuid+"|"+(string)statuscode, NULL_KEY);
         }        sloodle_debug(string msg)
         {
-            llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, null_key);
+            llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
         }        
         integer random_integer( integer min, integer max )
         {
@@ -266,7 +264,7 @@
                             // Notify the server of the response
                             notify_server(qtype, question_id, llList2String(opids, answer_num),scorechange);
                         } else {
-                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidchoice", [llKey2Name(sitter)], null_key, "quiz");
+                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidchoice", [llKey2Name(sitter)], NULL_KEY, "quiz");
                             ask_question();
                         }        
                      } else if (qtype == "shortanswer") {
@@ -300,7 +298,7 @@
                     
                     
                      else {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype], null_key, "quiz");
+                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype], NULL_KEY, "quiz");
                     }                
                     
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR, opid+"|"+answeroptext, sitter);    
@@ -332,7 +330,7 @@
             timer()
             {
                 // There has been a timeout of the HTTP request
-                sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "httptimeout", [], null_key, "");
+                sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "httptimeout", [], NULL_KEY, "");
                 llSetTimerEvent(0.0);
                 
                 if (question_id > -1) {
@@ -352,7 +350,7 @@
             
                 // Is this the response we are expecting?
                 if (request_id == httpfetchquestionquery) {                
-                    httpfetchquestionquery = null_key;
+                    httpfetchquestionquery = NULL_KEY;
                     llSetTimerEvent(0.0);
                 } else if (request_id != feedbackreq) {
                     return;
@@ -376,18 +374,18 @@
                 
                 // Was it an error code?
                 if (statuscode == -10301) {
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft", [llKey2Name(sitter)], null_key, "");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft", [llKey2Name(sitter)], NULL_KEY, "");
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_ATTEMPTS_LEFT, (string)question_id, sitter);//todo add to dia
                     return;
                     
                 } else if (statuscode == -10302) {
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], null_key, "");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], NULL_KEY, "");
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_QUESTIONS, (string)question_id, sitter);//todo add to dia
                     
                     return;
                     
                 } else if (statuscode <= 0) {
-                    //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], null_key, "");
+                    //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], NULL_KEY, "");
                      sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode); //send message to error_message.lsl
                     // Check if an error message was reported
                     if (numlines > 1) sloodle_debug(llList2String(lines, 1));
@@ -403,8 +401,7 @@
                 statusfields = [];
         
                 // Go through each line of the response
-                list thisline = [];
-                string rowtype = "";
+               
                 integer i = 0;
                 for (i = 1; i < numlines; i++) {
         
@@ -427,8 +424,8 @@
                             
                             // Make sure it's a valid question type
                             if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
-                                sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype], null_key, "quiz");
-                                sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], null_key, "");
+                                sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype], NULL_KEY, "quiz");
+                                sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], NULL_KEY, "");
                                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, sitter);//todo add to dia
                                 
                                 return;
