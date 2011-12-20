@@ -296,7 +296,7 @@ sloodle_show_object_dialog(key id, integer page, integer showcmd)
     
     
     // If the requested page number is invalid, then cap it
-    if (page < 0) page == 0;
+    if (page < 0) page = 0;
     else if (page >= numpages) page = numpages - 1;
     // Build our list of item buttons (up to a maximum of 9)
     list buttonlabels = [];
@@ -862,5 +862,6 @@ state shutdown
  
     
    
-   // Please leave the following line intact to show where the script lives in Subversion:
+// Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/distributor-1.0/sloodle_mod_distributor-1.0.lsl 
+
