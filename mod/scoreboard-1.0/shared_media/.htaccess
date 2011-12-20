@@ -1,0 +1,8 @@
+#/var/www/instantclassroom/sites/gershwinklata1/resources/moodledata/sloodle/static_cache/1951b901-cbfa-ee0f-47d9-1e95c8860e43/mod/scoreboard-1.0/default/refresh_changed_scores.json
+    RewriteEngine On  
+    RewriteCond %{QUERY_STRING} ^sloodleobjuuid=([a-z0-9-]*)$
+    RewriteCond /mod/sloodle/static_cache/%1/mod/scoreboard-1.0/default/refresh_changed_scores.json -f
+    #RewriteRule ^shared_media/refresh_changed_scores.php?sloodleobjuuid=(.*)&$ /tmp/test.html
+    #RewriteRule ^refresh_changed_scores\.php*$ /mod/sloodle/mod/scoreboard-1.0/shared_media/date.html
+    RewriteRule ^refresh_changed_scores\.php*$ /mod/sloodle/static_cache/%1/mod/scoreboard-1.0/default/refresh_changed_scores.json
+

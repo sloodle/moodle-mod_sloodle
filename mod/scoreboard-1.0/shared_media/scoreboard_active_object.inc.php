@@ -130,6 +130,8 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
                 sloodle_insert_record( 'sloodle_award_points', $award);
 
+                SloodleActiveObject::HandleObjectCacheCallbacks( 'awards_points_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
+
                 SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
 
 		return true;	

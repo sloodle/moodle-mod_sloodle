@@ -7,6 +7,7 @@ $sloodleconfig->group      = 'activity';
 $sloodleconfig->show       = true;
 $sloodleconfig->aliases    = array('SLOODLE 1.1 Scoreboard');
 $sloodleconfig->notify     = array('awards_points_change', 'awards_points_deletion', 'awards_points_round_change'); // If this happens on the server side, tell me about it.
+$sloodleconfig->cache_callback = array('awards_points_change', 'awards_points_deletion', 'awards_points_round_change'); // If this happens on the server side, call the cache function if appliable
 $sloodleconfig->field_sets = array( 
 	'generalconfiguration' => array(
 		//'sloodlegroupid' => new SloodleConfigurationOptionText( 'sloodlegroupid', 'awards:group', '', 0, 4 ), // feature disabled

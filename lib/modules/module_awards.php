@@ -175,7 +175,10 @@
 			$first_rec = array_shift($user_point_total_recs);
 			$balance = $first_rec->balance;
 
+			SloodleActiveObject::HandleObjectCacheCallbacks( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );
+
 			SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );
+
 		}
 		
 		return true;

@@ -96,6 +96,19 @@ class SloodleObjectConfig {
 
 	}
 
+
+	function cache_directory_suffix() {
+
+                return 'mod/'.$this->modname.'/'.$this->object_code;
+
+	}
+
+	function cache_include_path() {
+
+                return SLOODLE_DIRROOT.'/mod/'.$this->modname.'/cache_includes/'.$this->object_code.'.php';
+
+	}
+
 	function type() {
 
 		return $this->modname.'/'.$this->object_code;
@@ -194,6 +207,30 @@ class SloodleObjectConfig {
 		return $types;
 
 	}
+
+	/*
+	Static function returning a list of names of objects that want a cache generation include called, with that ObjectDefinition
+	@param string $notification_action The thing you want to be notified about.
+	*/
+	function TypesOfObjectsRequiringCacheCallbacks($notification_action) {
+
+		$defs = SloodleObjectConfig::AllAvailableAsArray();
+		$types = array();
+		foreach($defs as $def) {
+			if ( is_null($def->cache_callback) || !is_array($def->cache_callback) || count($def->cache_callback) == 0 ) {
+				continue;
+			}
+			if ( !isset( $notification_action[$def->cache_callback]) ) {
+				continue;
+			}
+			$types[] = $def->type();
+		}
+
+		return $types;
+
+	}
+
+
 
 	function AllAvailableAsArrayByGroup() {
 

@@ -151,7 +151,7 @@
         It will contain all data sent to and from the server by LSL scripts, including sensitive data like prim passwords
         ...so if you turn this on, be careful about who has access to the file it creates.
     */
-    define('SLOODLE_DEBUG_REQUEST_LOG', '');
+    define('SLOODLE_DEBUG_REQUEST_LOG', '/tmp/sloodle_debug');
 
     /** The following tells objects that we want them to persist their config over resets, and copy it to new objects that are copied.
     * The object will try to use the persistent config if if doesn't get a start_param from the rezzer.
@@ -159,7 +159,7 @@
     * That way the objects you rez won't try to use your server if the start_param somehow fails, which seems to happen sometimes.
     * 
     */
-    define('SLOODLE_ENABLE_OBJECT_PERSISTANCE', true);
+    //define('SLOODLE_ENABLE_OBJECT_PERSISTANCE', true);
 
 //---------------------------------------------------------------------
    
@@ -187,8 +187,18 @@
     * Set this to true if you want the rezzer to automatically link its owner to the person logged in and using it in Moodle.
     * This is used by Avatar Classroom. Will normally be off for regular sloodle.
     */
-    define('SLOODLE_SHARED_MEDIA_AUTOLINK_REZZER_OWNER', false);
+    define('SLOODLE_SHARED_MEDIA_AUTOLINK_REZZER_OWNER', true); 
 
+    
+    /*
+    *
+    * Set this to a web-writable directory if you want to keep a static cache of files that need to be served frequently.
+    * This is intended to be used for shared media surfaces that need to be displayed publicly to a lot of users simultaneously.
+    * This directory needs to be writable by the web server user, usually apache or www-data. 
+    * You can then use a mod_rewrite rule in an .htaccess or in the server config
+    *
+    */
+    define('SLOODLE_STATIC_CACHE_DIRROOT', $CFG->dataroot.'/sloodle/static_cache');
 
 //---------------------------------------------------------------------
 

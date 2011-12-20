@@ -687,7 +687,6 @@
 
 			foreach($relevant_config_names as $configname) {
 				$fieldname = $configname.'_'.$interaction;
-SloodleDebugLogger::log('DEBUG', "looking for confir $fieldname");
 				foreach($all_configs as $c) {
 					if ($c->name == $fieldname) {
 						$relevant_configs[ $configname] = $c->value;
@@ -704,12 +703,91 @@ SloodleDebugLogger::log('DEBUG', "looking for confir $fieldname");
 				continue;
 			} 
 
-SloodleDebugLogger::log('DEBUG', "calling ProcessActions for $module_class");
 			call_user_func_array( array($module_class, 'ProcessActions'), array( $relevant_configs, $controllerid, $multiplier, $userid, $useruuid, $this->uuid ));
 
 		}
 
 		return true;
+
+	}
+
+        function HandleObjectCacheCallbacks( $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) {
+
+		global $CFG;
+
+		// No cache dir defined, nothing to do.
+		if ( ( !defined('SLOODLE_STATIC_CACHE_DIRROOT') ) || ( SLOODLE_STATIC_CACHE_DIRROOT == '') ) {
+			return true;
+		}
+
+		$interested_object_types = SloodleObjectConfig::TypesOfObjectsRequiringCacheCallbacks( $notification_action );
+
+		//$interested_object_types = array('SLOODLE Scoreboard'=>[Object Definition]);
+		if (count($interested_object_types) == 0) {
+			// nobody cares, we're done..
+			return true;
+		}
+
+		$instr = '';
+		$delim = '';
+		$queryparams = array(intval($controllerid));
+		foreach($interested_object_types as $ot) {
+			$queryparams[] = $ot;
+			$instr .= $delim.'?';
+			$delim = ',';
+		}
+		$queryparams[] = time() - (3600+600); // Ping time and then some. All objects that are alive should have updated within this time.
+		$sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=? and a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? order by a.timeupdated desc;";
+		$recs = sloodle_get_records_sql_params($sql, $queryparams);
+
+
+		foreach($recs as $rec) {
+			$obj = new SloodleActiveObject();
+			$obj->loadFromRecord($rec);
+			$obj->handleCacheCallback( $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ); 
+		}
+
+		return true;
+
+	}
+
+	function handleCacheCallback( $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) {
+
+		if (!$def = $this->objectDefinition()) {
+			return false;
+		}
+
+		$cache_path = $def->cache_include_path();
+		if (!file_exists($cache_path)) {
+			return false;
+		}
+		include $cache_path;
+
+	}
+
+	function write_cache_output( $output, $filename ) {
+
+		if ( ( !defined('SLOODLE_STATIC_CACHE_DIRROOT') ) || ( SLOODLE_STATIC_CACHE_DIRROOT == '') ) {
+			return false;
+		}
+
+		if (!$def = $this->objectDefinition()) {
+			return false;
+		}
+
+		$cache_path = SLOODLE_STATIC_CACHE_DIRROOT.'/'.$this->uuid.'/'.$def->cache_directory_suffix();
+		if (!file_exists($cache_path)) {
+			if (!mkdir($cache_path, 0755, true)) {
+				return false;
+			}
+		}
+
+		$fp = fopen($cache_path.'/'.$filename, "w");
+		flock($fp,LOCK_SH); 
+		$written = fputs($fp, $output); 
+		fclose($fp);
+		
+		return $written;
 
 	}
 
@@ -728,6 +806,8 @@ SloodleDebugLogger::log('DEBUG', "calling ProcessActions for $module_class");
 			// nobody cares, we're done..
 			return true;
 		}
+
+
 		$instr = '';
 		$delim = '';
 		$queryparams = array(intval($controllerid));
@@ -742,6 +822,7 @@ SloodleDebugLogger::log('DEBUG', "calling ProcessActions for $module_class");
 
 		$msg = "$success_code\n"; 
 		
+		// Check if there's a function that allows us to create caching json
 
 		foreach($recs as $rec) {
 			$ao = new SloodleActiveObject();
