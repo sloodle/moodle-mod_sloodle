@@ -11,8 +11,6 @@
 //  Paul Preibisch - Fire Centaur in SL
 
 integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651; // this channel is used to send status codes for translation to the error_messages lsl script
-// Memory-saving hacks!
-key null_key = NULL_KEY;
 
 integer doRepeat = 0; // whether we should run through the questions again when we're done
 integer doDialog = 1; // whether we should ask the questions using dialog rather than chat
@@ -54,7 +52,7 @@ string SLOODLE_EOF = "sloodleeof";
 
 string sloodle_quiz_url = "/mod/sloodle/mod/quiz-1.0/linker.php";
 
-key httpquizquery = null_key;
+key httpquizquery = NULL_KEY;
 
 float request_timeout = 20.0;
 
@@ -91,7 +89,7 @@ list opgrade_next = []; // Grades
 list opfeedback_next = []; // Feedback if this option is selected
 
 // Avatar currently operating quiz
-key toucher = null_key;
+key toucher = NULL_KEY;
 // The lowest point of the char
 float lowestvector = 0.0; 
 
@@ -116,7 +114,7 @@ sloodle_error_code(string method, key avuuid,integer statuscode){
 
 sloodle_debug(string msg)
 {
-    llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, null_key);
+    llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
 }
 
 // Configure by receiving a linked message from another script in the object
@@ -319,8 +317,8 @@ finish_quiz()
 // Reinitialise (e.g. after one person has finished an attempt)
 reinitialise()
 {
-    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], null_key, "");
-    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:requestconfig", null_key);
+    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], NULL_KEY, "");
+    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:requestconfig", NULL_KEY);
     llResetScript();
 }
 
@@ -385,12 +383,12 @@ default
             // If we've got all our data AND reached the end of the configuration data, then move on
             if (eof == TRUE) {
                 if (isconfigured == TRUE) {
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], null_key, "");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
                     state ready;
                 } else {
                     // Go all configuration but, it's not complete... request reconfiguration
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], null_key, "");
-                    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", null_key);
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
+                    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
                     eof = FALSE;
                 }
             }
@@ -401,7 +399,7 @@ default
     {
         // Attempt to request a reconfiguration
         if (llDetectedKey(0) == llGetOwner()) {
-            llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:requestconfig", null_key);
+            llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:requestconfig", NULL_KEY);
         }
     }
 }
@@ -422,8 +420,8 @@ state ready
         // Make sure the given avatar is allowed to use this object
         if (toucher != llGetOwner()) {
             
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(toucher)], null_key, "");
-            toucher = null_key;
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(toucher)], NULL_KEY, "");
+            toucher = NULL_KEY;
             return;
             
         }
@@ -440,7 +438,7 @@ state ready
             if (message == "1") {
                 
                     // Start the quiz
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(toucher)], null_key, "quiz");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(toucher)], NULL_KEY, "quiz");
                     
                     // Make sure it's the owner who is the toucher.
                     // (Just makes sure nobody else touched the object just before the state change).
@@ -463,7 +461,7 @@ state check_quiz
 {
     state_entry()
     {
-        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "fetchingquiz", [], null_key, "quiz");
+        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "fetchingquiz", [], NULL_KEY, "quiz");
         
         // Clear existing data
         quizname = "";
@@ -508,7 +506,7 @@ state check_quiz
     
     timer()
     {
-        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "httptimeout", [], null_key, "");
+        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "httptimeout", [], NULL_KEY, "");
         state ready;
     }
     
@@ -516,7 +514,7 @@ state check_quiz
     {
         // Is this the response we are expecting?
         if (id != httpquizquery) return;
-        httpquizquery = null_key;
+        httpquizquery = NULL_KEY;
         // Make sure the response was OK
         if (status != 200) {
            sloodle_error_code(SLOODLE_TRANSLATE_SAY, NULL_KEY,status); //send message to error_message.lsl 
@@ -532,17 +530,17 @@ state check_quiz
         
         // Was it an error code?
         if (statuscode == -10301) {
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft", [llKey2Name(toucher)], null_key, "");
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft", [llKey2Name(toucher)], NULL_KEY, "");
             state ready;
             return;
             
         } else if (statuscode == -10302) {
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], null_key, "");
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], NULL_KEY, "");
             state ready;
             return;
             
         } else if (statuscode <= 0) {            
-            //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], null_key, "");
+            //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], NULL_KEY, "");
             sloodle_error_code(SLOODLE_TRANSLATE_SAY, NULL_KEY,statuscode); //send message to error_message.lsl            
             // Check if an error message was reported
             if (numlines > 1) sloodle_debug(llList2String(lines, 1));
@@ -589,13 +587,13 @@ state check_quiz
         
         // Make sure we have all the data we need
         if (quizname == "" || num_questions == 0) {
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], null_key, "quiz");
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], NULL_KEY, "quiz");
             state default;
             return;
         }
         
         // Report the status to the user
-        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "ready", [quizname], null_key, "quiz");
+        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "ready", [quizname], NULL_KEY, "quiz");
         state quizzing;
     }
     
@@ -751,7 +749,7 @@ state quizzing
     timer()
     {
         // There has been a timeout of the HTTP request
-        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "httptimeout", [], null_key, "");
+        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "httptimeout", [], NULL_KEY, "");
         llSetTimerEvent(0.0);
     }
     
@@ -781,7 +779,7 @@ state quizzing
     
         // Is this the response we are expecting?
         if (request_id != httpquizquery) return;
-        httpquizquery = null_key;
+        httpquizquery = NULL_KEY;
         llSetTimerEvent(0.0);
         // Make sure the response was OK
         if (status != 200) {
@@ -798,21 +796,21 @@ state quizzing
         
         // Was it an error code?
         if (statuscode == -331) {
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(toucher)], null_key, "");
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], null_key, "");
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(toucher)], NULL_KEY, "");
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], NULL_KEY, "");
             state default;
             return;
             
         } else if (statuscode == -10301) {
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft", [llKey2Name(toucher)], null_key, "");
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft", [llKey2Name(toucher)], NULL_KEY, "");
             return;
             
         } else if (statuscode == -10302) {
-            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], null_key, "");
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions", [], NULL_KEY, "");
             return;
             
         } else if (statuscode <= 0) {
-            //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], null_key, "");
+            //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], NULL_KEY, "");
             sloodle_error_code(SLOODLE_TRANSLATE_SAY, NULL_KEY,statuscode); //send message to error_message.lsl
             // Check if an error message was reported
             if (numlines > 1) sloodle_debug(llList2String(lines, 1));
@@ -823,8 +821,6 @@ state quizzing
         integer iscurrent = (active_question == requesting_question);
 
         // Go through each line of the response
-        list thisline = [];
-        string rowtype = "";
         integer i = 0;
         for (i = 0; i < numlines; i++) {
 
@@ -847,8 +843,8 @@ state quizzing
                     
                     // Make sure it's a valid question type
                     if (qtype_current != "multichoice") {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype_current], null_key, "quiz");
-                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], null_key, "");
+                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype_current], NULL_KEY, "quiz");
+                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], NULL_KEY, "");
                         state default;
                         return;
                     }
@@ -865,8 +861,8 @@ state quizzing
                     
                     // Make sure it's a valid question type
                     if (qtype_current != "multichoice") {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype_next], null_key, "quiz");
-                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], null_key, "");
+                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype", [qtype_next], NULL_KEY, "quiz");
+                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "resetting", [], NULL_KEY, "");
                         state default;
                         return;
                     }
@@ -912,3 +908,4 @@ state quizzing
 }
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/quiz_pile_on-1.0/sloodle_mod_quiz_pile_on-1.0.lsl 
+
