@@ -30,17 +30,19 @@ integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_DEFAULT = -1639271114; //mod quiz scrip
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING = -1639271117; //mod quiz script is in state quizzing
 integer SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR = -1639271119; //Tells us to STOP a quiz for the avatar
 integer SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE= -1639271118; //user has tried to use the chair but doesnt have permission to do so.
-integer SLOODLE_CHANNEL_QUIZ_UNSEAT_AVATAR = -1639271120;  
+integer SLOODLE_CHANNEL_QUIZ_SUCCESS_NOTHING_MORE_TO_DO_WITH_AVATAR= -1639271122;
+integer SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR= -1639271123;  
 vector startingposition=<0,0,0>;
 integer doPlaySound = 0;
+integer doRepeat = 0; // whether we should run through the questions again when we're done
 key sitter;
 move_to_start( vector startingposition )
 {
-	
-	
+    
+    
     vector position = llGetPos();
     if (startingposition==<0,0,0>){
-    	startingposition=position;
+        startingposition=position;
     }
     position.z = startingposition.z;
     
@@ -71,7 +73,7 @@ play_sound(float multiplier)
 {
     // Do nothing if sound is disabled
     if (doPlaySound == 0) {
-    	return;
+        return;
     }
     string sound_file;
     float volume;
@@ -93,30 +95,37 @@ play_sound(float multiplier)
             
     // Make sure the sound file exists, and then play it
     if (llGetInventoryType(sound_file) == INVENTORY_SOUND) {
-    	llTriggerSound(sound_file,multiplier);
-    	
+        llTriggerSound(sound_file,multiplier);
+        
     }
 }
 
 default
 {
-	on_rez(integer start_param) {
-		llResetScript();
-	}
-	state_entry() {
-	  startingposition = llGetPos();
-	
-	}
+    on_rez(integer start_param) {
+        llResetScript();
+    }
+    state_entry() {
+      
+    
+    }
     link_message(integer sender_num, integer num, string str, key id)
     {
-        if (num==SLOODLE_CHANNEL_QUIZ_UNSEAT_AVATAR){
-        		llUnSit(id);
+        
+        
+        if (num==SLOODLE_CHANNEL_QUIZ_SUCCESS_NOTHING_MORE_TO_DO_WITH_AVATAR){
+                    llUnSit(id);
+                    move_to_start( startingposition );
         }else
+        if (num==SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR){
+                    llUnSit(id);
+                    move_to_start( startingposition );
+        }else        
         if (num == SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION) {
             move_to_start( startingposition );
         } else if (num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR) {
-        	
-        	
+            
+            
             move_vertical( (float)str );
             play_sound( (float)str );   
         }else if (num == SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING){
@@ -142,16 +151,11 @@ default
          if(change & (CHANGED_LINK)){
              sitter = llAvatarOnSitTarget();
             if (sitter!=NULL_KEY){
-            	
+                startingposition = llGetPos();
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR, "", sitter);
-                move_to_start( startingposition );
             }else {
-            	
-            	
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR, "", sitter);
-                 move_to_start( startingposition );
-                     
-                 
+                move_to_start( startingposition );
             
             }
              
@@ -160,3 +164,6 @@ default
     }
 }
 
+
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: mod/quiz-1.0/sloodle_quiz_ui.lsl
