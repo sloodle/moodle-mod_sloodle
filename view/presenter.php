@@ -411,7 +411,9 @@ class sloodle_view_presenter extends sloodle_base_view_module
 
             // Display a direct link to the media
             echo "<p>";
-           print_string('trydirectlink', 'sloodle', $currententry->source);
+            print '<a href="'.$slideplugin->get_absolute_url($currententry->source).'">';
+            print_string('trydirectlink', 'sloodle');
+            print "</a>";
             echo "</p>\n";
             echo "</div>";
     
