@@ -53,48 +53,51 @@ default {
 
     state_entry() {
         llSetText("",RED,1.0);
-        (toggle = (-1));
+        toggle = (-1);
         llSetTexture("btn_reset_cancel",FACE);
         llOffsetTexture(0,BTN_RESET_OFFSET,FACE);
         llSetObjectName("btn:Reset");
-        (facilitators += llStringTrim(llToLower(llKey2Name(llGetOwner())),STRING_TRIM));
+        facilitators += llStringTrim(llToLower(llKey2Name(llGetOwner())),STRING_TRIM);
     }
 
    touch_start(integer d) {
         llTriggerSound("click",1.0);
         if ((toggle == (-1))) {
-            (toggle *= (-1));
+            toggle *= (-1);
             llOffsetTexture(0,BTN_CANCEL_OFFSET,FACE);
             llSetObjectName("btn:Cancel");
             llSetTimerEvent(1);
         }
         else  {
-            (toggle *= (-1));
+            toggle *= (-1);
             llSetColor(WHITE,FACE);
             llOffsetTexture(0,BTN_RESET_OFFSET,FACE);
             llSetText("",RED,1.0);
             llSetTimerEvent(0);
             llSetObjectName("btn:Reset");
-            (counter = 0);
+            counter = 0;
         }
     }
 
   timer() {
-        (counter++);
+        counter++;
         vector color;
-        if ((llGetColor(FACE) == YELLOW)) (color = RED);
-        else  (color = YELLOW);
+        if ((llGetColor(FACE) == YELLOW)) {
+            color = RED;
+        } else {
+            color = YELLOW;
+        }
         llSetText((("(" + ((string)(TIME_LIMIT - counter))) + ")"),color,1.0);
         llSetColor(color,FACE);
         if ((counter >= TIME_LIMIT)) {
             llSetTimerEvent(0.0);
             llOffsetTexture(0,BTN_RESET_OFFSET,FACE);
             llSetObjectName("btn:Reset");
-            (toggle *= (-1));
+            toggle *= (-1);
             llSetText("",RED,1.0);
             llSetColor(WHITE,FACE);
             llMessageLinked(LINK_SET,SLOODLE_CHANNEL_OBJECT_DIALOG,"do:reset",NULL_KEY);
-            (counter = 0);
+            counter = 0;
         }
         else  llTriggerSound("beepbeep",0.2);
     }
@@ -110,3 +113,4 @@ default {
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/rezzer_reset_btn.lsl 
+
