@@ -12,7 +12,11 @@
 integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651; // this channel is used to send status codes for translation to the error_messages lsl script
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;
 integer SLOODLE_CHANNEL_AVATAR_DIALOG = 1001;
-
+integer SLOODLE_AWARDS_POINTS_CHANGE_NOTIFICATION= 10601;
+integer SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_SET_ADMIN_URL_CHANNEL= -1639271128; // This is the channel that the scoreboard shouts out its admin URL
+integer SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_CHANGE_ADMIN_URL_CHANNEL= -1639271129; // This is the channel that the scoreboard shouts out its admin URL WHEN It has changed due to a region event (lost its url etc)
+integer SLOODLE_SCOREBOARD_CONNECT_HUD= -1639271130; // channel which gets sent a linked message by the connect a hud button when it is touched.
+ 
 string SLOODLE_EOF = "sloodleeof";
 
 string SLOODLE_OBJECT_TYPE = "chat-1.0";
@@ -57,6 +61,11 @@ string SLOODLE_TRANSLATE_DIALOG = "dialog";         // Recipient avatar should b
 string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";      // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";  // 2 output parameters: colour <r,g,b>, and alpha value
 string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
+integer MENU_CHANNEL; //random channel used for dialogs
+integer listenHandle;
+string paramstr;
+string view_url;
+string admin_url;
 
 // Send a translation request link message
 sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch)
@@ -68,7 +77,15 @@ sloodle_translation_request(string output_method, list output_params, string str
 
 
 ///// FUNCTIONS /////
+integer randInt(integer n)
+{
+     return (integer)llFrand(n + 1);
+}
 
+integer randIntBetween(integer min, integer max)
+{
+    return min + randInt(max - min);
+}
 sloodle_error_code(string method, key avuuid,integer statuscode)
 {
     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST, method+"|"+(string)avuuid+"|"+(string)statuscode, NULL_KEY);
@@ -109,35 +126,30 @@ handle_points_notification(string str) {
     lastmessagetimestamp = messagetimestamp;
  
 }
-    
+//update screen    
 update_media(string hash) {
     
-    string paramstr;
-    paramstr = "&sloodleobjuuid=" + (string)llGetKey();
-    
-    string view_url = sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr + hash;
-    string admin_url =  sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr + "&mode=admin" + hash;
-    
-//   llOwnerSay("updating media "+view_url);
-                          
-    llSetPrimMediaParams( 1, [ PRIM_MEDIA_CURRENT_URL, view_url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_ANYONE ] );
-    llSetPrimMediaParams( 1, [ PRIM_MEDIA_HOME_URL,  view_url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_ANYONE ] );  
-    
+    string url = view_url+hash;
+    llSetPrimMediaParams( 1, [     PRIM_MEDIA_CURRENT_URL, url,
+                                PRIM_MEDIA_HOME_URL,  url, 
+                                PRIM_MEDIA_AUTO_ZOOM, TRUE, 
+                                PRIM_MEDIA_AUTO_PLAY, TRUE, 
+                                PRIM_MEDIA_PERMS_INTERACT, 
+                                PRIM_MEDIA_PERM_ANYONE ] );  
     // setup the control screen
     integer media_control;
     if ( sloodleobjectaccesslevelctrl == 0 ) media_control = PRIM_MEDIA_PERM_ANYONE;
     else if ( sloodleobjectaccesslevelctrl == 2 ) media_control = PRIM_MEDIA_PERM_GROUP;
     else media_control = PRIM_MEDIA_PERM_OWNER;
     
-    // send a message to update the admin screen, which is on another prim.
-    llMessageLinked( LINK_ALL_OTHERS, media_control, admin_url, NULL_KEY );    
-
+    
 }
 
 // Configure by receiving a linked message from another script in the object
 // Returns TRUE if the object has all the data it needs
 integer sloodle_handle_command(string str) 
 {
+
        // llOwnerSay(str);
     list bits = llParseString2List(str,["|"],[]);
     integer numbits = llGetListLength(bits);
@@ -169,12 +181,17 @@ integer sloodle_handle_command(string str)
 }
 
 // Default state - waiting for configuration
+integer face=4;
 default
 {
+    on_rez( integer param)
+    {
+       llResetScript();
+    }
     state_entry()
     {
      
-        llClearPrimMedia(4);    
+        llClearPrimMedia(face);    
     
         // Starting again with a new configuration
         isconfigured = FALSE;
@@ -217,7 +234,8 @@ default
                     eof = FALSE;
                 }
             }
-        } 
+        }
+        
     }
     
     touch_start(integer num_detected)
@@ -233,12 +251,17 @@ state ready
 {
     on_rez( integer param)
     {
-        state default;
+       llResetScript();
     }    
     
     state_entry()
-    {           
-        update_media("");                              
+    {  
+       llClearPrimMedia(face);  
+        paramstr = "&sloodleobjuuid=" + (string)llGetKey();
+        view_url= sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr;
+        admin_url =  sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr + "&mode=admin";
+        update_media("");
+                                      
     }
     
     state_exit()
@@ -246,20 +269,10 @@ state ready
         llSetTimerEvent(0.0);
     } 
         
-    touch_start( integer total_number)
-    {
-
-    }
+ 
     
-    listen( integer channel, string name, key id, string message)
-    {
+   
 
-    }
-
-    timer()
-    {
-
-    }
     
     link_message( integer sender_num, integer num, string str, key id)
     {
@@ -273,9 +286,16 @@ state ready
                 isconfigured = sloodle_handle_command(llList2String(lines, i));
             }
             
-        } else if (num == 10601) { // Awards points change notification
+        } else if (num == SLOODLE_AWARDS_POINTS_CHANGE_NOTIFICATION) { // Awards points change notification
             handle_points_notification( str );
-        }
+
+        }else
+        if (num == SLOODLE_SCOREBOARD_CONNECT_HUD){
+               llOwnerSay("Transmitting Scoreboard UUID to Owner's HUD");
+               llRegionSay(SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_SET_ADMIN_URL_CHANNEL, (string)admin_url+"|"+(string)id+"|"+(string)llGetKey());
+               llShout(SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_SET_ADMIN_URL_CHANNEL,(string)admin_url+"|"+(string)id+"|"+(string)llGetKey());
+        
+        } 
     } 
     
     
