@@ -51,3 +51,5 @@ integer SLOODLE_OBJECT_INTERACTION_SHOUT_COMMAND= -1639271134; //channel interac
 integer SLOODLE_OBJECT_BLINK= -1639271135; //linked message channel to tell a prim to blink
 integer SLOODLE_OBJECT_GIVE_POINTS= -1639271136; //linked message channel to tell an object to give points
 integer SLOODLE_LOAD_CURRENT_URL= -1639271137; //send message to shared media to open url that it is currently displaying in a browser.
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: lib/lsl/sloodle_status_codes.lsl.lsl 
