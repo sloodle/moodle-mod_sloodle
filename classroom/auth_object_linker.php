@@ -22,6 +22,7 @@
     //  sloodleobjuuid = the UUID of the object being authorised
     //  sloodleobjname = the name of the object being authorised
     //  sloodleobjpwd = a password for the new object
+    //  sloodlehttpinurl = an http-in url we can use to talk to the new object
     //
     // The following parameters are optional:
     //
@@ -69,6 +70,7 @@
     $sloodleobjpwd = $sloodle->request->required_param('sloodleobjpwd');
     $sloodleobjtype = $sloodle->request->optional_param('sloodleobjtype', '');
     $sloodlecloneconfig = $sloodle->request->optional_param('sloodlecloneconfig', ''); // uuid of an object whose config we want to clone. combined with a layout id of 0. used for rezzing a mothership from a set
+    $sloodlehttpinurl = $sloodle->request->optional_param('sloodlehttpinurl','');
 
     // When the set rezzes an item from a layout, it can pass this parameter saying what layout entry the object represented.
     // We'll use that to auto-configure the object based on the layout entry configurations.
@@ -85,7 +87,7 @@
             if ($userid) $sloodle->user->load_user($userid);
         }
 
-	$httpinpassword = sloodle_random_prim_password();
+	    $httpinpassword = sloodle_random_prim_password();
         
         // Authorise the object on the controller
         $authid = $sloodle->course->controller->register_object($sloodleobjuuid, $sloodleobjname, $sloodle->user, $sloodleobjpwd, $httpinpassword, $sloodleobjtype);
@@ -119,7 +121,7 @@ $alreadyconfigured = $result;
         }
     } else {
         // Create a new unauthorised entry
-        $authid = $sloodle->course->controller->register_unauth_object($sloodleobjuuid, $sloodleobjname, $sloodleobjpwd, $sloodleobjtype);
+        $authid = $sloodle->course->controller->register_unauth_object($sloodleobjuuid, $sloodleobjname, $sloodleobjpwd, $sloodleobjtype, null, $sloodlehttpinurl, $httpinpassword);
         if ($authid != 0) {
             $sloodle->response->set_status_code(1);
             $sloodle->response->set_status_descriptor('OK');

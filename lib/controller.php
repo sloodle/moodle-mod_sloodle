@@ -478,7 +478,7 @@ SloodleDebugLogger::log('DEBUG', "registering object with name $name and type $t
         * @param int $timestamp The timestamp of the object's registration, or null to use the current time.
         * @return int|bool The integer ID of the active object entry, or false if not
         */
-        function register_unauth_object($uuid, $name, $password, $type = '', $timestamp = null)
+        function register_unauth_object($uuid, $name, $password, $type = '', $timestamp = null, $httpinurl = null, $httpinpassword = null)
         {
             // Use the current timestamp if necessary
             if ($timestamp == null) $timestamp = time();
@@ -494,6 +494,8 @@ SloodleDebugLogger::log('DEBUG', "registering object with name $name and type $t
                 $entry->userid = 0;
                 $entry->password = $password;
                 $entry->type = $type;
+                $entry->httpinurl = $httpinurl;
+                $entry->httpinpassword = $httpinpassword;
                 $entry->timeupdated = $timestamp;
                 // Attempt to insert the entry
                 $entry->id = sloodle_insert_record('sloodle_active_object', $entry);
@@ -507,6 +509,8 @@ SloodleDebugLogger::log('DEBUG', "registering object with name $name and type $t
                 $entry->type = $type;
                 $entry->userid = 0;
                 $entry->timeupdated = $timestamp;
+                $entry->httpinurl = $httpinurl;
+                $entry->httpinpassword = $httpinpassword;
                 // Attempt to update the database
                 if (!sloodle_update_record('sloodle_active_object', $entry)) return false;
             }

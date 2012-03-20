@@ -189,6 +189,14 @@
     */
     define('SLOODLE_SHARED_MEDIA_AUTOLINK_REZZER_OWNER', false);
 
+     /*
+     This can be defined to cause the rezzer screen to fetch the initial object config from another site.
+     It is used in Avatar Classroom to allow the initial setup to be done via the avatar classroom site, before we know which site they want to connect to.
+     The UUID of the object will be appended to this URL, and the service will be expected to return a JSON representation of the active object.
+     See mod/set-1.0/shared_media/index.php to see how this is used.
+     */
+     //define('SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE', '');
+
 
 //---------------------------------------------------------------------
 

@@ -41,10 +41,80 @@
     require_once(SLOODLE_LIBROOT.'/user.php');
 
     include('index.template.php');
+
+    $object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
+    $objname = '';
+    $httpinurl = '';
+    $sloodleobjuuid = '';
+    $sloodleavname = '';
+
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
 
-        $baseurl = 'index.php?sloodleuuid='.htmlentities($_REQUEST['sloodleuuid']).'&sloodleavname='.htmlentities($_REQUEST['sloodleavname']).'&sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&sloodleobjname='.htmlentities($_REQUEST['sloodleobjname']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
+    // Prior to 2012-03-07, we put a whole bunch of parameters in the URL.
+    // This turned out to have issues with URLs getting too long, 
+    // ...so we changed it to have the rezzer send them direct to the server
+    // ...where they were saved in the active_objects table. 
+    // For backwards compatibility, we'll keep using the old method if you pass us the full list of parameters.
+    $baseurl = 'index.php?sloodleobjuuid='.$object_uuid;
+
+    if (isset($_REQUEST['sloodleavname'])) {
+
+        // Old method
+        // Deprecated - can remove when no more alpha users are expected
+
+        $baseurl = 'index.php?sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&sloodleavname='.htmlentities($_REQUEST['sloodleavname']).'&sloodleobjuuid='.htmlentities($_REQUEST['sloodleobjuuid']).'&sloodleobjname='.htmlentities($_REQUEST['sloodleobjname']).'&httpinurl='.htmlentities($_REQUEST['httpinurl']);
+
+        $httpinurl = optional_param('httpinurl', NULL, PARAM_RAW);
+        $objname = required_param('sloodleobjname', PARAM_RAW);
+
+		$sloodleobjuuid = optional_param('sloodleobjuuid', '', PARAM_RAW);
+		$sloodleavname = optional_param('sloodleavname', '', PARAM_RAW);
+
+    } else {
+
+        // We should have an active object record. 
+        $ao = new SloodleActiveObject();
+        $sloodleuser = new SloodleUser();
+        $sloodleuser->user_data = $USER;
+
+        if ( $ao->loadByUUID($object_uuid) ) {
+
+                $object_uuid = $ao->uuid;
+                $httpinurl = $ao->httpinurl;
+                $objname = $ao->name;
+
+        } else {
+             
+            // For Avatar Classroom, the rezzer config may have been stored on the avatar classroom server.
+            // This URL should already have a parameter name and an =, if required.
+            // NB This will fail on PHP < 5.
+            if (defined('SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE') && (SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE!= '') ) {
+
+                // Initializing curl
+                $ch = curl_init( SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE.$_REQUEST['sloodleobjuuid'] );
+                $options = array(
+                    CURLOPT_RETURNTRANSFER => true,
+                );
+                curl_setopt_array( $ch, $options );
+                if ($result = curl_exec($ch)) {
+                    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    if ($http_code == 200) {
+                        $ao_obj = json_decode($result);
+                        $object_uuid = $ao_obj->uuid;
+                        $httpinurl = $ao_obj->httpinurl;
+                        $objname = $ao_obj->name;
+                    } else {
+
+                    }
+                } else {
+
+                }
+            }
+
+        }
+
+    }
 
 	$hasCourses = false;
 	$hasControllers = false;
@@ -79,13 +149,11 @@
 	}
 
 	if ( defined('SLOODLE_SHARED_MEDIA_AUTOLINK_REZZER_OWNER') && SLOODLE_SHARED_MEDIA_AUTOLINK_REZZER_OWNER ) {
-		$sloodleuuid = optional_param('sloodleuuid', '', PARAM_RAW);
-		$sloodleavname = optional_param('sloodleavname', '', PARAM_RAW);
-		if( ( $sloodleuuid != '' ) && ( $sloodleavname != '' ) ) {
+		if( ( $sloodleobjuuid != '' ) && ( $sloodleavname != '' ) ) {
 			$su = new SloodleUser();
-			if (!$su->load_avatar($sloodleuuid, $sloodleavname)) {
+			if (!$su->load_avatar($sloodleobjuuid, $sloodleavname)) {
 				if (!$su->load_avatar_by_user_id(intval($USER->id))) {
-					$su->add_linked_avatar($USER->id, $sloodleuuid, $sloodleavname);
+					$su->add_linked_avatar($USER->id, $sloodleobjuuid, $sloodleavname);
 				}
 			}
 		}
@@ -99,19 +167,19 @@
 
 	// Register the set using URL parameters
 	$ao = new SloodleActiveObject();
-	$object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
-	if (!$ao->loadByUUID($object_uuid)) {
+    if (!$ao->loadByUUID($object_uuid)) {
+
 		$ao->controllerid = 0; // Hope that's OK...
 		$ao->userid = $USER->id;
 		$ao->uuid = $object_uuid;
-		$ao->httpinurl = required_param('httpinurl', PARAM_RAW);
+		$ao->httpinurl = $httpinurl;
 		$ao->httpinpassword = sloodle_random_prim_password();
 		$ao->password = rand(100000,9999999999);
-		$ao->name = required_param('sloodleobjname', PARAM_RAW);
+		$ao->name = $objname;
 		$ao->type = 'set-1.0';
 		$ao->save();
 	} else {
-		if ($httpinurl = optional_param( 'httpinurl', NULL, PARAM_RAW )) {
+		if ($httpinurl) {
 			if ($ao->httpinurl != $httpinurl) {
 				$ao->httpinurl = $httpinurl;
 				$ao->save();
