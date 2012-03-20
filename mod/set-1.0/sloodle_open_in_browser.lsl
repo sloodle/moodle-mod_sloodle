@@ -1,4 +1,3 @@
-// LSL script generated: mod.set-1.0.rezzer_shared_media_open_in_browser_btn.lslp Tue Nov 15 15:49:28 Tokyo Standard Time 2011
 /*
 *  Part of the Sloodle project (www.sloodle.org)
 *
@@ -21,37 +20,39 @@
 *
 *  All scripts must maintain this copyrite information, including the contributer information listed
 *
-
+*  Contributors:
+*  Paul Preibisch
 *
 *  DESCRIPTION
-*  This button will send a message to the shared_media screen to open the current_url in a users browser
-*  Contributors:
+* Contributors:
 *  Edmund Edgar
 *  Paul Preibisch
 */
 
 
-
-integer SLOODLE_LOAD_CURRENT_URL = -1639271137;
+integer FACE = 4;
+integer counter=0;
+integer SLOODLE_LOAD_CURRENT_URL= -1639271137; //send message to shared media to open url that it is currently displaying in a browser.
 
 default {
-
     on_rez(integer start_param) {
         llResetScript();
     }
-
     state_entry() {
     }
-
-   touch_start(integer d) {
-        integer j;
-        for ((j = 0); (j < d); (j++)) {
-            if ((llDetectedKey(j) != llGetOwner())) return;
-            llTriggerSound("click",1.0);
-            llMessageLinked(LINK_SET,SLOODLE_LOAD_CURRENT_URL,"",llDetectedKey(j));
-        }
-    }
-}
+   touch_start(integer d){
+              
+             
+              integer j;
+              
+              for (j=0;j<d;j++){
+                  if (llDetectedKey(j)!=llGetOwner()) return;
+                   llTriggerSound("click", 1.0);//
+                  llMessageLinked(LINK_SET, SLOODLE_LOAD_CURRENT_URL, "", llDetectedKey(j));
+              }
+  }//TOUCH
+}//default
+        
 
 // Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/set-1.0/rezzer_shared_media_open_in_browser_btn.lsl 
+// SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_open_in_browser.lsl 

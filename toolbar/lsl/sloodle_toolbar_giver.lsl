@@ -1,21 +1,29 @@
+integer CHAT_CHANNEL;
 
-
+//just returns a random integer - used for setting channels
+integer random_integer( integer min, integer max ){
+  return min + (integer)( llFrand( max - min + 1 ) );
+}
 default
 {
     state_entry()
     {
-        llSetText("Click to get your FREE SLOODLE Toolbar", <0.,1.0,0.>, 0.9);
+        llSetText("Click to get your FREE SLOODLE Toolbar", <0,0,1>, 100);
+        CHAT_CHANNEL= random_integer(80000,90000);
+        llListen(CHAT_CHANNEL,"", "","");
+        llSay(0, "Hello, Please click on the Tool Bar Giver Prim to get your FREE SLOODLE Toolbar!");
     }
-    
-    on_rez(integer param)
-    {
-        llResetScript();
-    }
-    
+
     touch_start(integer total_number)
     {
-        llGiveInventory(llDetectedKey(0), "Sloodle Lite Toolbar v1.4");
-        llGiveInventory(llDetectedKey(0), "Sloodle Toolbar v1.4");
+        llDialog(llDetectedKey(0), "Please select a Toolbar", ["Toolbar 1.4","Toolbar Lite","Help"], CHAT_CHANNEL);
+        
+    }
+    listen(integer channel, string name, key id, string message) {
+        if (channel == CHAT_CHANNEL)
+            if (message=="Toolbar 1.4") llGiveInventory(id, "Sloodle Toolbar v1.4");
+            else if (message=="Toolbar Lite") llGiveInventory(id, "Sloodle Lite Toolbar v1.4");
+            else if (message=="Help") llGiveInventory(id, "SLOODLE TOOLBAR RELEASE NOTES");
     }
 }
 

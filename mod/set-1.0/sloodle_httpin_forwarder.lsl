@@ -172,7 +172,7 @@ state ready {
                 llOwnerSay("Could not save HTTP In URL for rezzed object "+llKey2Name(objKey));
             }else
             if (statuscode == -218) {
-                llOwnerSay("child object not found "+llKey2Name(objKey));
+                llOwnerSay("This rezzer did not recognize "+llKey2Name(objKey));
             }else
             if (statuscode == -219) {
                 llOwnerSay("Sending configuration to object via HTTP-in URL failed "+llKey2Name(objKey));
@@ -217,6 +217,5 @@ state ready {
     }        
 }
 
-
 // Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_http_in_forwarder.lsl
+// SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_httpin_forwarder.lsl
