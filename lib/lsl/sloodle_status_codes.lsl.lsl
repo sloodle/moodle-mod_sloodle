@@ -43,6 +43,7 @@ integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG = -1639271126; // Tells the que
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_SHARED_MEDIA = -1639271127; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA SHARED MEDIA.
 integer SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_SET_ADMIN_URL_CHANNEL= -1639271128; // This is the channel that the scoreboard shouts out its admin URL
 integer SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_CHANGE_ADMIN_URL_CHANNEL= -1639271129; // This is the channel that the scoreboard shouts out its admin URL WHEN It has changed due to a region event (lost its url etc)
+integer SLOODLE_CHANNEL_SCOREBOARD_UPDATE_COMPLETE = 1639271140; // This is the channel that represents the number of the linked mesage providing the scoreboard with complete text ready for display.
 integer SLOODLE_SCOREBOARD_CONNECT_HUD= -1639271130; // channel which gets sent a linked message by the connect a hud button when it is touched.
 integer SLOODLE_SCOREBOARD_CONNECT_HUD_REGION_SAY= -1639271131; // broadcast to the region by the scoreboard when a user presses the connect scoreboard button
 integer SLOODLE_OBJECT_INTERACTION= -1639271132; //channel interaction objects speak on
