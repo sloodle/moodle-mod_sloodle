@@ -175,7 +175,11 @@
 			$first_rec = array_shift($user_point_total_recs);
 			$balance = $first_rec->balance;
 
+            // This sends a single points change notification to an object.
+            // It's used by the shared media scoreboard to prompt a re-fetch of score data.
 			SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );
+
+
 		}
 		
 		return true;
@@ -261,10 +265,10 @@
 	*/
 	function ActionConfigNames() {
 		return array(
-                        'sloodleawardsdeposit_numpoints',
-                        'sloodleawardsdeposit_currency',
-                        'sloodleawardswithdraw_numpoints',
-                        'sloodleawardswithdraw_currency'
+            'sloodleawardsdeposit_numpoints',
+            'sloodleawardsdeposit_currency',
+            'sloodleawardswithdraw_numpoints',
+            'sloodleawardswithdraw_currency'
 		);
 	}
 
@@ -274,11 +278,11 @@
 	*/
 	function RequirementConfigNames() {
 		return array(
-                        'sloodleawardsrequire_numpoints',
-                        'sloodleawardsrequire_currency',
-			'sloodleawardsrequire_notenoughmessage',
-                        'sloodleawardswithdraw_numpoints',
-                        'sloodleawardswithdraw_currency',
+            'sloodleawardsrequire_numpoints',
+            'sloodleawardsrequire_currency',
+            'sloodleawardsrequire_notenoughmessage',
+            'sloodleawardswithdraw_numpoints',
+            'sloodleawardswithdraw_currency',
 			'sloodleawardswithdraw_notenoughmessage'
 		);
 	}
@@ -304,6 +308,97 @@
 
 
 
+        /*
+        Prepare a page full of scoreboard results and send it to the specified active objects.
+        This was originally designed for the zztext scoreboard.
+        If it finds a config parameter called sloodleactivepage it will limit to that page.
+        */
+        function PageScoreMessage( $aoarr, $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) {
 
-    }
+            global $CFG;
+
+            if (count($aoarr) == 0) {
+                return true;
+            }
+
+
+            $roundid = $params['roundid'];
+            $currencyid = $params['currencyid'];
+            $currencyname = '';
+
+            if ($currencyid) {
+                // Ge the name of the currency
+                $currency_recs = sloodle_get_records_sql_params( "select id, name as currency_name from {$CFG->prefix}sloodle_currency_types where id = ?;", array($currencyid));
+                $currency_rec = array_shift($currency_recs);
+                $currencyname = $currency_rec->currency_name;
+            }
+
+            $user_point_total_recs = sloodle_get_records_sql_params( "select p.userid as userid, sum(amount) as balance, su.avname as avname, su.uuid as uuid from {$CFG->prefix}sloodle_award_points p inner join {$CFG->prefix}sloodle_users su on p.userid=su.userid where currencyid=? and roundid=? group by userid order by balance desc;", array($currencyid, $roundid));
+
+            foreach($aoarr as $ao) {
+
+                $response = new SloodleResponse();
+                $response->set_status_code($success_code);
+                $response->set_status_descriptor('NOTIFICATION');
+                $response->set_request_descriptor('NOTIFICATION');
+                $response->set_http_in_password($ao->httpinpassword);
+
+                $def = $ao->objectDefinition();
+                $linesperpage = 10;
+                if ( isset($def->fixed_parameters) && isset($def->fixed_parameters['linesperpage']) ) {
+                    $linesperpage = $def->fixed_parameters['linesperpage'];
+                }
+                $charactersperline = 40;
+                if ( isset($def->fixed_parameters) && isset($def->fixed_parameters['charactersperline']) ) {
+                    $charactersperline = $def->fixed_parameters['charactersperline'];
+                }
+
+                $page = $ao->config_value( 'sloodleactivepage' );
+                if (!$page) {
+                    $page = 1;
+                }
+
+                $scoreboardtitle= $ao->config_value('sloodleobjecttitle');
+
+                /*
+                foreach($params as $n=>$v) {
+                    $response->add_data_line($n.'|'.$v);
+                }
+                */
+
+                $num_pages = ceil( count($user_point_total_recs) / $linesperpage );
+                $response->add_data_line("status|$page|$num_pages|$scoreboardtitle||$currencyid|$currencyname");
+
+                $offset = ( ($page-1) * $linesperpage );
+                $page_points = array_slice( $user_point_total_recs, $offset, $linesperpage );
+                foreach($page_points as $up) {
+                    $uuid = $up->uuid;
+                    $avname = $up->avname;  
+                    $score = $up->balance;
+                    $availablechars = $charactersperline - ( strlen($score) + 1 ); // leave room for a space folowed by the score
+                    $displayavname = substr($avname, 0, $availablechars); // truncate the name if it's too long to fit.
+                    $displayavname = str_pad( $displayavname, $availablechars, " ");
+                    $displayline = $displayavname." ".$score;
+                    $response->add_data_line("$uuid|$avname|$score|$displayline"); 
+                }
+
+                $renderStr="";
+                $response->render_to_string($renderStr);
+
+                // If this stuff fails, tough. We did our best.
+                if ($resarr = $ao->sendMessage($renderStr)) {
+                    if($resarr['info']['http_code'] == 200){
+                        $ao->lastmessagetimestamp = time();
+                        $ao->save();
+                    }
+                }
+
+            }
+
+            return true;
+
+        }
+
+
+}
 ?>

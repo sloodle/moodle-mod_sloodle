@@ -741,10 +741,32 @@
 
             $msg = "$success_code\n"; 
             
+            $callback_objects = array();
 
             foreach($recs as $rec) {
+
                 $ao = new SloodleActiveObject();
                 $ao->loadFromRecord( $rec );
+
+                /*
+                If we just have a notify message specified, send a simple NOTIFICATION saying what just happened.
+                If we want to trigger something more substantial, we should have a notify_callback defined.
+                This means we'll want to pass control to a function specified in the object's definition.
+                We'll do these in bulk later, so that if there are a lot of objects that all require the same message they can be done together.
+                */
+                $def = $ao->objectDefinition();
+                if ( isset($def->notify_callbacks) && isset($def->notify_callbacks[$notification_action]) ) {
+                    $callback = $def->notify_callbacks[$notification_action];
+                    if (!isset($callback_objects[ $callback] )) {
+                        $callback_objects[ $callback ] = array();
+                    }
+                    $callback_objects[ $callback ][] = $ao;
+                    continue;
+                }
+
+                /*
+                There's no callback specified for this object, so just send it a simple message.
+                */
 
                 $response = new SloodleResponse();
                 $response->set_status_code($success_code);
@@ -775,6 +797,15 @@
                         $ao->save();
                     }
                 }
+            }
+
+            SloodleDebugLogger::log('DEBUG', "calling callbacs for ".count($callback_objects)." callbacks");
+            if (count($callback_objects) > 0) {
+                foreach($callback_objects as $callback => $aoarr) {
+
+                SloodleDebugLogger::log('DEBUG', "calling callback $callback for ".count($aoarr)." objects");
+                    call_user_func_array( $callback, array( $aoarr, $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) );
+                } 
             }
 
             return true;
