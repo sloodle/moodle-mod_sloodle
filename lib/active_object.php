@@ -158,7 +158,7 @@
         }
 
         //sends a curl message to our objects httpinurl
-        public function sendMessage($msg){
+        public function sendMessage($msg, $async = false){
 
             SloodleDebugLogger::log('HTTP-IN', $msg);
 
@@ -791,7 +791,7 @@
                 $response->render_to_string($renderStr);
 
                 // If this stuff fails, tough. We did our best.
-                if ($resarr = $ao->sendMessage($renderStr)) {
+                if ($resarr = $ao->sendMessage($renderStr, true)) {
                     if($resarr['info']['http_code'] == 200){
                         $ao->lastmessagetimestamp = time();
                         $ao->save();

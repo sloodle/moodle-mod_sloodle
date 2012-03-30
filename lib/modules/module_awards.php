@@ -338,7 +338,8 @@
             foreach($aoarr as $ao) {
 
                 $response = new SloodleResponse();
-                $response->set_status_code($success_code);
+                //$response->set_status_code($success_code);
+                $response->set_status_code(1639271140);
                 $response->set_status_descriptor('NOTIFICATION');
                 $response->set_request_descriptor('NOTIFICATION');
                 $response->set_http_in_password($ao->httpinpassword);
@@ -379,14 +380,14 @@
                     $displayavname = substr($avname, 0, $availablechars); // truncate the name if it's too long to fit.
                     $displayavname = str_pad( $displayavname, $availablechars, " ");
                     $displayline = $displayavname." ".$score;
-                    $response->add_data_line("$uuid|$avname|$score|$displayline"); 
+                    $response->add_data_line("$uuid|$score|$displayline"); 
                 }
 
                 $renderStr="";
                 $response->render_to_string($renderStr);
 
                 // If this stuff fails, tough. We did our best.
-                if ($resarr = $ao->sendMessage($renderStr)) {
+                if ($resarr = $ao->sendMessage($renderStr, true)) {
                     if($resarr['info']['http_code'] == 200){
                         $ao->lastmessagetimestamp = time();
                         $ao->save();
