@@ -39,54 +39,54 @@ $extraParams = ($rezzeruuid == $childobjectuuid) ? array() : array( 'sloodlerezz
 
 if ($childobjectuuid == $rezzeruuid) {
 
-// configs come from a notecard
-$configs = array();
-$configs['sloodlecontrollerid'] = $controllerid;
-foreach($_POST as $n=>$v) {
-    if (preg_match('/^set\:(.*)$/', $n, $matches) ) {
-        $configs[ $matches[1] ] = $v;
+    // configs come from a notecard
+    $configs = array();
+    $configs['sloodlecontrollerid'] = $controllerid;
+    foreach($_POST as $n=>$v) {
+        if (preg_match('/^set\:(.*)$/', $n, $matches) ) {
+            $configs[ $matches[1] ] = $v;
+        }
     }
-}
-$objecttype = isset($configs['sloodleobjtype']) ? $configs['sloodleobjtype'] : 'unknown';
+    $objecttype = isset($configs['sloodleobjtype']) ? $configs['sloodleobjtype'] : 'unknown';
 
-// This is an object trying to register itself with a notecard.
-// Go ahead an do it - it has a legitimate prim password or it would have been stopped already.
-$controller = new SloodleController();
-if (!$controller->load( $controllerid )) {
-    $sloodle->response->set_status_code(-217);//Could not save HTTP In URL for rezzed object
-    $sloodle->response->set_status_descriptor('OBJECT_AUTH');
-    $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
-}
-
-// TODO: Refactor and move this stuff into activeobject
-
-// first time we way it
-$ao = new SloodleActiveObject();
-if(!$ao->loadByUUID( $childobjectuuid )) {
-    $primpassword = sloodle_random_web_password();
-    $httpinpassword = sloodle_random_prim_password();
-    if ( !$authid = $controller->register_object($childobjectuuid, $objectname, $sloodle->user, $primpassword, $httpinpassword, $objecttype) ) {
+    // This is an object trying to register itself with a notecard.
+    // Go ahead an do it - it has a legitimate prim password or it would have been stopped already.
+    $controller = new SloodleController();
+    if (!$controller->load( $controllerid )) {
         $sloodle->response->set_status_code(-217);//Could not save HTTP In URL for rezzed object
         $sloodle->response->set_status_descriptor('OBJECT_AUTH');
         $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
     }
-} else {
-    $authid = $ao->id;
-    // already got it - clean out old configs
-    sloodle_delete_records('sloodle_object_config', 'object', $authid); 
-}
 
-if (count($configs) > 0) {
-    foreach($configs as $n => $v) {
-        $config->id = null;
-        $config->object = $authid;
-        $config->name = $n;
-        $config->value = $v;
-        if (!sloodle_insert_record('sloodle_object_config',$config)) {
-            $ok = false;
+    // TODO: Refactor and move this stuff into activeobject
+
+    // first time we way it
+    $ao = new SloodleActiveObject();
+    if(!$ao->loadByUUID( $childobjectuuid )) {
+        $primpassword = sloodle_random_web_password();
+        $httpinpassword = sloodle_random_prim_password();
+        if ( !$authid = $controller->register_object($childobjectuuid, $objectname, $sloodle->user, $primpassword, $httpinpassword, $objecttype) ) {
+            $sloodle->response->set_status_code(-217);//Could not save HTTP In URL for rezzed object
+            $sloodle->response->set_status_descriptor('OBJECT_AUTH');
+            $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
+        }
+    } else {
+        $authid = $ao->id;
+        // already got it - clean out old configs
+        sloodle_delete_records('sloodle_object_config', 'object', $authid); 
+    }
+
+    if (count($configs) > 0) {
+        foreach($configs as $n => $v) {
+            $config->id = null;
+            $config->object = $authid;
+            $config->name = $n;
+            $config->value = $v;
+            if (!sloodle_insert_record('sloodle_object_config',$config)) {
+                $ok = false;
+            }
         }
     }
-}
 
 }
 
