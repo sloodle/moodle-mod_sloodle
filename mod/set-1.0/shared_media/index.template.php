@@ -90,7 +90,7 @@ $full = false;
 <span class="right_zone">
 
 
-<span class="control_button reload_page_button" type="submit"><?php echo  s(get_string('rezzer:refreshconfig', 'sloodle', $object_title)) ?></span>
+<span class="control_button reload_page_button" type="submit"><?php echo  s(get_string('rezzer:refreshconfig', 'sloodle', "")) ?></span>
 
 </span>
 </div>
@@ -183,8 +183,10 @@ function print_layout_list( $courses, $controllers, $courselayouts ) {
 
 
 function print_add_layout_forms( $courses, $controllers, $rezzeruuid ) {
+    if (count($courses) > 0) {
 	foreach($courses as $course) {
 		$cid = $course->id;
+        if ( (isset($controllers[$cid]) ) && (count($controllers[$cid]) > 0) ) {
 		foreach($controllers[$cid] as $contid => $cont) {
 ?>
     <form data-parent="controller_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>" id="addlayout_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>" class="panel" title="<?php echo  s(get_string('rezzer:addlayout', 'sloodle'))?> <?php echo  s($course->fullname) ?>">
@@ -213,7 +215,9 @@ function print_add_layout_forms( $courses, $controllers, $rezzeruuid ) {
     </form>
 <?php
 		}
+        }
 	}
+    }
 }
 
 function print_html_bottom() {
@@ -262,9 +266,9 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 
 <span class="right_zone">
 
-				<span class="control_button rename_layout_button" data-layoutid="<?php echo  intval($layout->id) ?>" data-renamed-text="<?php echo  s(get_string('rezzer:renamelayout'))?>" data-rename-text="<?php echo  s(get_string('rezzer:renamelayout','sloodle'))?>" data-renaming-text="<?php echo  s(get_string('rezzer:renaminglayout'))?>" class="control_button" type="submit" ><?php echo  s(get_string('rezzer:renamelayout','sloodle'))?></span>
+				<span class="control_button rename_layout_button" data-layoutid="<?php echo  intval($layout->id) ?>" data-renamed-text="<?php echo  s(get_string('rezzer:renamelayout', 'sloodle'))?>" data-rename-text="<?php echo  s(get_string('rezzer:renamelayout','sloodle'))?>" data-renaming-text="<?php echo  s(get_string('rezzer:renaminglayout', 'sloodle'))?>" class="control_button" type="submit" ><?php echo  s(get_string('rezzer:renamelayout','sloodle'))?></span>
 
-				<span class="control_button delete_layout_button" data-layoutid="<?php echo  intval($layout->id) ?>" data-deleted-text="<?php echo  s(get_string('rezzer:deletedderezzingobjects', 'sloodle')) ?>" data-delete-text="<?php echo  s(get_string('rezzer:deletelayout'))?>" data-deleting-text="<?php echo  s(get_string('rezzer:deletinglayout','sloodle'))?>" type="submit"><?php echo  s(get_string('rezzer:deletelayout', 'sloodle'))?></span>
+				<span class="control_button delete_layout_button" data-layoutid="<?php echo  intval($layout->id) ?>" data-deleted-text="<?php echo  s(get_string('rezzer:deletedderezzingobjects', 'sloodle')) ?>" data-delete-text="<?php echo  s(get_string('rezzer:deletelayout', 'sloodle'))?>" data-deleting-text="<?php echo  s(get_string('rezzer:deletinglayout','sloodle'))?>" type="submit"><?php echo  s(get_string('rezzer:deletelayout', 'sloodle'))?></span>
 				<span class="control_button delete_layout_button_placeholder"></span>
 
 				<span class="control_button clone_layout_button" data-layoutid="<?php echo  intval($layout->id) ?>" data-cloned-text="<?php echo  s(get_string('rezzer:clonelayout','sloodle'))?>" data-cloning-text="<?php echo s(get_string('rezzer:cloninglayout','sloodle'))?>" data-clone-text="<?php echo s(get_string('rezzer:clonelayout','sloodle'))?>" type="submit" ><?php echo s(get_string('rezzer:clonelayout','sloodle'))?></span>
@@ -498,15 +502,20 @@ Configuration form for each
 */
 function print_edit_object_forms($courses, $controllers, $courselayouts, $object_configs, $layoutentries, $rezzeruuid) {
 
+    if (count($courses) > 0) {
 	foreach($courses as $course) {
 		$cid = $course->id; 
 		$cn = $course->fullname; 
+        if ( ( isset($controllers[$cid]) ) && (count($controllers[$cid]) > 0) ) {
 		foreach($controllers[$cid] as $contid => $cont) {
 			$layouts = $courselayouts[ $cid ][$contid];
+            if (count($layouts) > 0) {
 			foreach($layouts as $layout) {
 				$entriesbygroup = $layoutentries[ $layout->id ];
 				$lid = $layout->id;
+                if (count($entriesbygroup) > 0) {
 				foreach($entriesbygroup as $group => $entries) {
+                    if (count($entries) > 0) {
 					foreach($entries as $e) {
 						$entryname = $e->name;	
 						$config = $object_configs[$entryname]; // TODO: Merge in the layout entries
@@ -514,13 +523,18 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
 						print_config_form( $e, $config, $cid, $contid, $lid, $group, $rezzeruuid );
 						
 					}
+                    }
 				}
+                }
 ?>
 <span id="add_configuration_above_me_layout_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>"></span>
 <?php
 			}
+            }
 		}
+        }
 	}
+    }
 ?>
 <span id="add_edit_object_forms_above_me"></span>
 <?php
@@ -562,7 +576,7 @@ function print_config_form( $e, $config, $cid, $contid, $lid, $group, $rezzeruui
 <input type="hidden" name="controllerid" value="<?php echo  intval($contid) ?>" />
 <input type="hidden" name="objectgroup" value="<?php echo  htmlentities( get_string('objectgroup:'.$group, 'sloodle' ) ) ?>" />
 <?php if ($config->module) { 
-$moduleoptionselect = $config->course_module_select( $cid, $lconfig['sloodlemoduleid'] ); 
+$moduleoptionselect = $config->course_module_select( $cid, isset($lconfig['sloodlemoduleid']) ? $lconfig['sloodlemoduleid'] : ''); 
 ?>
 <fieldset>
 <div class="row">

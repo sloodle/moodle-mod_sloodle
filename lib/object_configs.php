@@ -265,7 +265,7 @@ class SloodleObjectConfig {
 
 		// We need a url-safe version of the name
 		// J-query seems to choke on something, even if it's url-encoded.
-		$encoded_name = ereg_replace("[^A-Za-z0-9]", "", $name); // Strip non-alphanumeric characters to give us a human-readable name
+		$encoded_name = preg_replace("/[^a-zA-Z0-9]/", "", $name);
   		$encoded_name .= '_'.md5($name); // Append an md5sum of the original name to avoid collisions in case someone has "My Object" and "MyObject".
 
 		$sloodleconfig = new SloodleObjectConfig();
@@ -505,9 +505,10 @@ class SloodleObjectConfig {
 
 	function awards_require_options( $interactions_to_labels = null ) {
 
-		if ($interactions == null) {
+		if ($interactions_to_labels == null) {
 			//$interactions = array('default' => array('awards:interactwithobjectrequires', 'awards:interactwithobjectminus', 'awards:notenoughmessage') );
-			$interactions = array('default' => array('awards:interactwithobjectrequires') );
+			//$interactions_to_labels = array('default' => array('awards:interactwithobjectrequires') );
+			$interactions_to_labels = array('default' => 'awards:interactwithobjectrequires' );
 		}
 		$configs = array();
 		
@@ -535,9 +536,9 @@ class SloodleObjectConfig {
 
 	function awards_withdraw_options( $interactions_to_labels = null ) {
 
-		if ($interactions == null) {
+		if ($interactions_to_labels == null) {
 			//$interactions = array('default' => array('awards:interactwithobjectwithdraws', 'awards:interactwithobjectminus', 'awards:notenoughmessage') );
-			$interactions = array('default' => array('awards:interactwithobjectwithdraws') );
+			$interactions_to_labels = array('default' => 'awards:interactwithobjectwithdraws' );
 		}
 		$configs = array();
 		

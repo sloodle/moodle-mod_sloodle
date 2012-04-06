@@ -64,7 +64,7 @@ $result = 'configured';
 
 $content = array(
 	'result' => $result,
-	'error' => $error,
+	'error' => '',
 );
 
 $rand = rand(0,10);

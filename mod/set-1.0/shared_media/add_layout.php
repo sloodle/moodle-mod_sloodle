@@ -130,7 +130,7 @@ if (!$layoutid = $layout->insert()) {
 	include('index.template.php');
 
 	ob_start();
-        print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries);
+        print_layout_lists( $courses, $controllers, $courselayouts, $layoutentries, $rezzeruuid);
 	$add_layout_lists = ob_get_clean();
 
 	ob_start();

@@ -74,7 +74,7 @@ class SloodleLayoutRecipe {
 						$instance = sloodle_get_record($cm->module_name, 'id', $cm->instance);
 					}
 					foreach($defn->module_filters as $n => $v) {
-						if ($instance->$n != $v) {
+						if ( (!isset($instance->n)) || ($instance->$n != $v) ) {
 							$skip = true;
 							break;
 						}

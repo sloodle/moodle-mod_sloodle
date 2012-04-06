@@ -125,6 +125,44 @@
         */
         var $rotation = null;
 
+        /**
+        * The ID of the controller the object is attached to
+        * @var string
+        * @access public
+        */
+        var $controllerid = null;
+
+        /**
+        * The ID of the user  who rezzed the object
+        * @var string
+        * @access public
+        */
+        var $userid= null;
+
+        /**
+        * The media key that prompts a shared media screen for the object
+        * Intended for if we need a shared media non-public identifier.
+        * Not yet in use as of 2012-04-06
+        * @var string
+        * @access public
+        */
+        var $mediakey = null;
+
+        /**
+        * The date of the last successful message sent to the object
+        * Not yet in use as of 2012-04-06
+        * @var string
+        * @access public
+        */
+        var $lastmessagetimestamp = null;
+
+
+
+
+
+
+
+
         var $response = null;
 
 
@@ -157,10 +195,87 @@
 
         }
 
-        //sends a curl message to our objects httpinurl
-        public function sendMessage($msg, $async = false){
+        /*
+        Queues an object 
+        */
+        function queue($address, $task, $msg, $ttr = 30, $clear = false) {
+
+            require_once(SLOODLE_LIBROOT.'/beanstalk/Beanstalk.php');
+
+            $tube = 'sloodle-'.$task.'-'.md5($address);
+            //$tube = 'default';
+            //$tube = md5($address);
+
+            /*
+            $sbhost = ( defined(SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST) && SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST ) ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST : '127.0.0.1';
+            $sbport = ( defined(SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PORT) && SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PORT ) ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PORT : 11300;
+            $sbtimeout = ( defined(SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_TIMEOUT) && SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_TIMEOUT ) ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_TIMEOUT : 1;
+            $sbpersistent = ( defined(SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PERSISTENT) && SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PERSISTENT ) ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PERSISTENT : true;
+            $sbconfig = array(
+               'persistent' => $sbpersistent,
+               'host' => $sbhost,
+               'port' => $sbport,
+               'timeout' => $sbtimeout
+            );
+            */
+
+            //$sb = new Socket_Beanstalk( $sbconfig );
+            $sb = new Socket_Beanstalk();
+            if (!$sb->connect()) {
+                return false;
+            }
+
+            $sb->choose($tube);
+
+            // Jobs will be handled more-or-less first-in, first-out, unless superseced by a new job and cleared.
+            // 
+            $priority = time();
+            $msg = $address."\n".$msg;
+
+            if (!$pid = $sb->put($priority, 0, $ttr, $msg)) {
+                return false;
+            }
+
+            // Delete all jobs with an early pid than the one we just put in there.
+            if ($clear) {
+                while ($job = $sb->peekReady()) {
+                    if ($job['id'] >= $pid) {
+                        break;
+                    }
+                    $sb->delete($job['id']);
+                }
+            }
+            exit;
+
+            return true;
+            
+        }
+
+        // Returns true if the install has a functioning method for queuing messages to be sent asynchronously.
+        // As of 2012-03-30, this will be a message queue using Beanstalk.
+        // In future we may do a more Moodle-standard mysql queue, plus a cron like chatd.php
+        function isQueueActive() {
+
+            if ( defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK') && (SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK != '') ) {
+                return true;
+            }
+
+            return false;
+
+        }
+
+        // sends a curl message to our objects httpinurl
+        // If async is set, if possible it will be queued for sending later.
+        public function sendMessage($msg, $async = false, $replaceQueued = false){
 
             SloodleDebugLogger::log('HTTP-IN', $msg);
+
+            if ($async && $this->isQueueActive()) {
+//$this->httpinurl
+                if ($this->queue($this->httpinurl, 'NOTIFICATION', $msg, 3, $replaceQueued)) {
+                    return array('info'=>null, 'result'=>'QUEUED');
+                }
+            }
 
             $ch = curl_init();    // initialize curl handle
             curl_setopt($ch, CURLOPT_URL, $this->httpinurl ); // set url to post to
@@ -245,9 +360,13 @@
             $renderStr="";
             $response->render_to_string($renderStr);
             //send message to httpinurl
-            $reply = $this->sendMessage($renderStr);
-            if ( !( $reply['info']['http_code'] == 200 ) ) {
-                return false;
+
+            $async = false;
+            $reply = $this->sendMessage($renderStr, $async, $async);
+            if (!$async) {
+                if ( !( $reply['info']['http_code'] == 200 ) ) {
+                    //return false;
+                }
             }
 
             return $this->delete();
@@ -286,7 +405,7 @@
         * @var $extraParameters array()
         *
         */
-        public function sendConfig( $extraParameters = NULL ){//inside active_object.php
+        public function sendConfig( $extraParameters = NULL, $async = false ){//inside active_object.php
 
             global $CFG;
             //construct the body
@@ -348,8 +467,8 @@
             $response->render_to_string($renderStr);
             //curl send this to our object's httpinurl
 
+            return $this->sendMessage( $renderStr, $async, $async );
 
-            return $this->sendMessage( $renderStr );
         }
 
         // Deletes a record from the active object table.
@@ -791,7 +910,7 @@
                 $response->render_to_string($renderStr);
 
                 // If this stuff fails, tough. We did our best.
-                if ($resarr = $ao->sendMessage($renderStr, true)) {
+                if ($resarr = $ao->sendMessage($renderStr, true, true)) {
                     if($resarr['info']['http_code'] == 200){
                         $ao->lastmessagetimestamp = time();
                         $ao->save();
@@ -856,6 +975,16 @@
             return ( $this->objectDefinition() != null );
             
         }
+
+        function uuids_of_children_missing_since($ts) {
+            $sql = "select uuid from {$CFG->prefix}sloodle_active_object where rezzeruuid=? and timeupdated > ? order by a.timeupdated asc;";
+            $recs = sloodle_get_records_sql_params($sql, array($this->uuid, $ts));
+            $uuids = array();
+            if ( ($recs) && (count($recs) > 0) ) {
+//TODOqueryparams
+            }
+        }
+
     }
 
 ?>

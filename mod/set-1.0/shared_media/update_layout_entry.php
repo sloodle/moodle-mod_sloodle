@@ -43,12 +43,14 @@ if (!$layoutentry->load($layoutentryid)) {
 }
 
 foreach($configVars as $n=>$v) {
-	if (preg_match('/[^A-Za-z0-9_-/', $v)) {
+    /*
+	if (preg_match('/[^A-Za-z0-9_-]/', $v)) {
 		error_output( 'Illegal characters in config value');
 	}
-	if (preg_match('/[^A-Za-z0-9_-/', $n)) {
+	if (preg_match('/[^A-Za-z0-9_-]/', $n)) {
 		error_output( 'Illegal characters in config name');
 	}
+    */
 	$layoutentry->set_config( $n, $v );
 }
 
@@ -74,22 +76,24 @@ if (!$layoutentry->update()) {
 $failures = array();
 $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
 
-foreach($active_objects as $ao) {
-	if ($ao->configure_for_layout() || true) {
-		$response = $ao->refreshConfig();
-		sleep(1);
-		$response2 = $ao->sendConfig();
-	} 
-	// No error handling here - if it breaks, just carry on.
+if (count($active_objects) > 0) {
+    foreach($active_objects as $ao) {
+        if ($ao->configure_for_layout() || true) {
+            $response = $ao->refreshConfig();
+            sleep(1);
+            $response2 = $ao->sendConfig();
+        } 
+        // No error handling here - if it breaks, just carry on.
 
-        //var_dump($response['result']);
-/*
-        if (preg_match('/^(<.*?>)\|(<.*?>)\|(.*?)$/', $response['result'], $matches)) {
-                $layoutentry->position = $matches[1];
-                $layoutentry->rotation = $matches[2];
-                $saved = $layoutentry->update();
-        }
-*/
+            //var_dump($response['result']);
+    /*
+            if (preg_match('/^(<.*?>)\|(<.*?>)\|(.*?)$/', $response['result'], $matches)) {
+                    $layoutentry->position = $matches[1];
+                    $layoutentry->rotation = $matches[2];
+                    $saved = $layoutentry->update();
+            }
+    */
+    }
 }
 
 if (!$moduletitle = $layoutentry->get_course_module_title()) {

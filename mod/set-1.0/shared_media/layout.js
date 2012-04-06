@@ -5,7 +5,7 @@
 	var pendingRequests = new Object(); // A list of entries that we've made a request for, and the timestamp in milliseconds when we made them
 	var numPendingRequests = 0; // Should correspond to the number of elements in pendingRequests
 
-	var maxPendingRequests = 2; // Max outstanding requests we should have at one time. NB if requests time out but still return, there may be more outstanding.
+	var maxPendingRequests = 5; // Max outstanding requests we should have at one time. NB if requests time out but still return, there may be more outstanding.
 
 	var statusPollingInterval= 5; // How often we should poll the server for activeobject updates
 

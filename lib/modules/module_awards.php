@@ -387,7 +387,7 @@
                 $response->render_to_string($renderStr);
 
                 // If this stuff fails, tough. We did our best.
-                if ($resarr = $ao->sendMessage($renderStr, true)) {
+                if ($resarr = $ao->sendMessage($renderStr, true, true)) {
                     if($resarr['info']['http_code'] == 200){
                         $ao->lastmessagetimestamp = time();
                         $ao->save();

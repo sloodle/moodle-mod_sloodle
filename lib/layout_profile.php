@@ -127,6 +127,7 @@
 
 		$aos = $this->rezzed_active_objects( $rezzeruuid );
 		$aohash = array();
+        if (is_array($aos) && count($aos) > 0) {
 		foreach($aos as $ao) {
 			$leid = $ao->layoutentryid;
 			if (!isset($aohash[ $leid ])) {
@@ -134,6 +135,7 @@
 			} 
 			$aohash[ $leid ][] = $ao;
 		}
+        }
 		return $aohash;
 
 	}

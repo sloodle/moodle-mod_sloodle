@@ -121,6 +121,7 @@ $alreadyconfigured = $result;
         }
     } else {
         // Create a new unauthorised entry
+	    $httpinpassword = sloodle_random_prim_password();
         $authid = $sloodle->course->controller->register_unauth_object($sloodleobjuuid, $sloodleobjname, $sloodleobjpwd, $sloodleobjtype, null, $sloodlehttpinurl, $httpinpassword);
         if ($authid != 0) {
             $sloodle->response->set_status_code(1);

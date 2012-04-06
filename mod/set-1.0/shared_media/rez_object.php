@@ -106,6 +106,17 @@ if (!$controller->configure_object_from_layout_entry($authid, $layoutentryid, $r
 	error_output('Configuration from layout entry failed');
 }
 
+// The object may have registered itself and its URL before we got here.
+// In that case, send it its config.
+// TODO: This uses more db hits than it should - it would be better if register_object returned the object, not just its ID.
+$ao = new SloodleActiveObject();
+if ($ao->loadByUUID($rezzed_object_uuid)) {
+    if ($ao->httpinurl) {
+        $extraParams = array('sloodlerezzeruuid' => $rezzer->uuid);
+        $ao->sendConfig($extraParams, $async = true);
+    }
+}
+
 $result = 'rezzed';
 $error = '';
 

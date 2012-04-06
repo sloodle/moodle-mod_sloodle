@@ -16,6 +16,8 @@ require_once(SLOODLE_LIBROOT.'/layout_profile.php');
 require_once(SLOODLE_LIBROOT.'/active_object.php');
 require_once(SLOODLE_LIBROOT.'/user.php');
 
+$error = '';
+
 if (!$USER->id) {
 	output( 'User not logged in' );
 	exit;
