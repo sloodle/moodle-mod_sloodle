@@ -24,7 +24,7 @@ $sloodleconfig->field_sets = array(
                 'sloodlerefreshtime' => new SloodleConfigurationOptionText( 'sloodlerefreshtime', 'refreshtimeseconds', '', 600, 8 ),
                 'sloodlecurrencyid' => new SloodleConfigurationOptionCurrencyChoice( 'sloodlecurrencyid', 'awards:currency', '', '', 0), 
                 'sloodleobjecttitle' => new SloodleConfigurationOptionText( 'sloodleobjecttitle', 'awards:scoreboardtitle', '', 'Scoreboard', 40 ),
-//                'sloodleactivepage' => new SloodleConfigurationOptionText( 'sloodleactivepage', 'activepage', '', 1, 2 ),
+                'sloodleactivepage' => new SloodleConfigurationOptionText( 'sloodleactivepage', 'activepage', '', 1, 2 ),
 	),
 	'accesslevel' => array(
                 'sloodleobjectaccesslevelctrl'  => $sloodleconfig->access_level_object_control_option()
@@ -35,7 +35,7 @@ $sloodleconfig->field_sets = array(
 // In this case the code in our callback, SloodleModuleAwards::PageScoreMessage, needs to know this stuff.
 $sloodleconfig->fixed_parameters = array(
     //'maxlinesperpage' => 15, // How many lines are shown if we have more than one page full of scores
-    'maxlinesperpage' => 15, // How many lines are shown if we have more than one page full of scores
+    'linesperpage' => 2, // How many lines are shown if we have more than one page full of scores
     'charactersperline' => 40, // How many lines are shown if we have more than one page full of scores
 );
 ?>
