@@ -1,28 +1,45 @@
 <?php 
 function print_html_top($loadfrom = '', $is_logged_in) { 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    ?>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <title>Scoreboard</title>      
+    <!--                                                
+    <style type="text/css" media="screen">@import "http://fonts.googleapis.com/css?family=Candal";</style>
+    -->
+    <style type="text/css" media="screen">@import "<?php echo $loadfrom?>scoreboard.css";</style>
+    
+    <script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
+    <script type="application/x-javascript" src="../../../lib/jquery/jquery.ba-hashchange.min.js"></script>
+    <link type="text/css" href="../../../lib/jquery/css/ui-darkness/jquery-ui-1.8.18.custom.css" rel="Stylesheet" />
+    <script type="text/javascript" src="../../../lib/jquery/js/jquery-ui-1.8.18.custom.min.js"></script>
+    <script type="text/javascript" src="../../../lib/jquery/js/jquery.jscrollpane.min.js"></script>
+    <link type="text/css" href="../../../lib/jquery/css/jquery.jscrollpane.css" rel="stylesheet" media="all" />
+    <script type="text/javascript" src="../../../lib/jquery/js/jquery.mousewheel.js"></script>
+    
+    <script type="application/x-javascript" src="scoreboard.js?ts=<?php echo  time() ?>"></script>
+    <script type="text/javascript">
+	    var rezzer_uuid  = '<?php echo  htmlentities($_REQUEST['sloodleobjuuid']) ?>';
+	    var do_full_updates = <?php echo  $is_logged_in ? 'true' : 'false' ?>; 
+    </script>
+    </head>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Scoreboard</title>
-<!--
-<style type="text/css" media="screen">@import "http://fonts.googleapis.com/css?family=Candal";</style>
--->
-<style type="text/css" media="screen">@import "<?php echo $loadfrom?>scoreboard.css";</style>
-<script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
-<script type="application/x-javascript" src="../../../lib/jquery/jquery.ba-hashchange.min.js"></script>
-<script type="application/x-javascript" src="scoreboard.js?ts=<?php echo  time() ?>"></script>
-<script type="text/javascript">
-	var rezzer_uuid  = '<?php echo  htmlentities($_REQUEST['sloodleobjuuid']) ?>';
-	var do_full_updates = <?php echo  $is_logged_in ? 'true' : 'false' ?>; 
+    <body>
+     <script>
+    $(function() {
+        $( "#tabs" ).tabs();
+     
+         $('#scorelist_scrollpane').jScrollPane();
+          <?php if ($is_admin) { ?>   
+          $('#admin_scrollpane').jScrollPane();
+          <?php }?>   
+    });         
+    
 </script>
-</head>
-
-<body>
-
-<div class="wrapper">
-<?php
+    <div class="wrapper">
+    <?php
 }
 
 function print_round_list($rounds) {
@@ -34,7 +51,7 @@ function print_round_list($rounds) {
 
 <?php
 }
-
+     
 function print_score_list( $group_name, $student_scores, $active_object_uuid, $currency, $roundid, $refreshtime, $objecttitle, $is_logged_in, $is_admin ) {
 ?>
 <script>
@@ -47,45 +64,34 @@ var active_object_uuid = '<?php echo  htmlentities($active_object_uuid) ?>';
 		<span class="new_round_button"><input type="image" alt="New Round" width="169" height="71" src="images/new_round.png"</span>
 		<?php } ?>
 	</div>
-
-        <div style="display:none" class="group divider above_scores"><?php echo  s(get_string($group_name, 'sloodle')) ?> <? $is_admin ? s(get_string('scoreboard:displayedonscreen', 'sloodle')) : '' ?> - <?php echo  s($currency->name) ?></div>
-    <ul id="scorelist" class="<?php echo  $is_admin ? 'admin_view' : 'student_view' ?>" data-refresh-seconds="<?php echo intval($refreshtime) ?>" data-parent="roundlist" title="Scores" selected="true">
-        
-	<?php
-	$ranki = 1;
-	foreach($student_scores as $score) { 
-		if ($score->has_scores) {
-			render_score_li($score, $is_admin, $ranki); 
-			$ranki++;
-		}
-	}
-	?>
-	<li style="display:none" class="divider below_scores"></li>
-    </ul>
-
-
-<?php if ($is_admin) { ?>
-	<div class="scoreboard_admin_main">
-
+    <?php if ($is_admin) { ?>  
+       <div id="tabs">
+       
     <ul>
-        <li class="group divider above_no_scores"></li>
-	<?php
-	foreach($student_scores as $score) { 
-		if (!$score->has_scores) {
-			render_score_li($score, $is_admin, 0); 
-		}
-	}
-	?>
+        <li><a href="#tabs-1">Scores</a></li>
+        <li><a href="#tabs-2">Add Players</a></li>
     </ul>
-    <ul style="display:none" >
-	<li class="divider end below_no_scores"></li>
-<?php /*
-        <li class="group"><?php echo  s(get_string('scoreboard:controlscoreboard', 'sloodle')) ?></li>
-	<li class="new_round_link"><?php echo  s(get_string('scoreboard:newround', 'sloodle')) ?></li>
-*/ ?>
-    </ul>
+    <div id="tabs-1">
+    
+    <?php }?> 
+        <div style="display:none" class="group divider above_scores"><?php echo  s(get_string($group_name, 'sloodle')) ?> <? $is_admin ? s(get_string('scoreboard:displayedonscreen', 'sloodle')) : '' ?> - <?php echo  s($currency->name) ?></div>
+        <div id="scorelist_scrollpane">
+        <ul id="scorelist" class="<?php echo  $is_admin ? 'admin_view' : 'student_view' ?>" data-refresh-seconds="<?php echo intval($refreshtime) ?>" data-parent="roundlist" title="Scores" selected="true">
+        
+	        <?php             
+	        $ranki = 1;
+	        foreach($student_scores as $score) { 
+		        if ($score->has_scores) {
+			        render_score_li($score, $is_admin, $ranki); 
+			        $ranki++;
+		        }
+	        }
+	        ?>
+	        <li style="display:none" class="divider below_scores"></li>
+        </ul>       
 
-<?php } ?>
+
+
 
     <?php
 	$dummy_score = new stdClass();
@@ -96,18 +102,47 @@ var active_object_uuid = '<?php echo  htmlentities($active_object_uuid) ?>';
     <ul style="display:none" class="dummy_item_template" id="dummy_score_ul"> 
 	<?php render_score_li( $dummy_score, $is_admin ); ?>
     </ul>
-
+    </div>
+  </div>
+<?php if ($is_admin) { ?>  
+ <div id="tabs-2">
+<?php }?>  
 
 <?php if ($is_admin) { ?>
 
+      <?php if ($is_admin) { ?>
+      <div id="admin_scrollpane">
+    <div class="scoreboard_admin_main">
 
-	</div>
+    <ul>
+        <li class="group divider above_no_scores"></li>
+    <?php
+    foreach($student_scores as $score) { 
+        if (!$score->has_scores) {
+            render_score_li($score, $is_admin, 0); 
+        }
+    }
+    ?>                   
+    </ul>
+    <ul style="display:none" >
+    <li class="divider end below_no_scores"></li>
+<?php /*
+        <li class="group"><?php echo  s(get_string('scoreboard:controlscoreboard', 'sloodle')) ?></li>
+    <li class="new_round_link"><?php echo  s(get_string('scoreboard:newround', 'sloodle')) ?></li>
+*/ ?>            
+    </ul>
+    </div>
+    </div>
+<?php } ?>
+	
 
 	<div class="scoreboard_admin_bottom"></div>
 <?php } ?>
 
-	<div class="scoreboard_bottom"></div>
-
+	 <?php if ($is_admin) { ?>  
+     </div>   
+     </div>
+    <?php }?>  
 <?php 
 }
 
