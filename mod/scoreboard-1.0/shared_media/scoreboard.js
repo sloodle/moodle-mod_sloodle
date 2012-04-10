@@ -2,7 +2,18 @@
 	var last_update = 0; // Millisecond TS for when we last polled the server for active object changes
 	var refreshtime = 0;
 	var view_type = null;
-
+    
+    var scorelist_scrollpane = $('#scorelist_scrollpane');
+    var admin_scrollpane = $('#admin_scrollpane');
+    
+    var scorelist_scrollpane_api; 
+   
+    
+    var admin_scrollpane_api;
+   
+    
+    
+      
 	var user_timeouts = {};
 
 	function refresh_changed_scores() {
@@ -70,6 +81,7 @@
 	}
 
 	function update_position(changedscorejq) {
+      
 		var balance = parseInt( changedscorejq.find('.score_info').html() );
 		var has_scores = changedscorejq.hasClass('has_scores');
 		var prevjq;
@@ -134,13 +146,20 @@
 			}
 			nextjq.after(changedscorejq);	
 		}
-
+    if (scorelist_scrollpane_api){
+        scorelist_scrollpane_api.reinitialise();    
+    }
+    if (admin_scrollpane_api){
+        admin_scrollpane_api.reinitialise();
+    }
+    
 		$('.no_scores').find('.avatar_name').unbind('click').click( function() {
 			return change_score($(this));
 		});
 
 		update_rank_numbers();
 //doPlay();
+
 	}
 /*
 function getPlayer(pid) {
@@ -249,7 +268,7 @@ function doStop() {
 	}
 
 	function delete_scores(changespanjq) {
-
+   
 		var parentlijq = changespanjq.closest('li');
 		parentlijq.addClass('deleting_scores');
 
@@ -277,7 +296,7 @@ function doStop() {
 				}
 			}
 		); 
-
+          
 	}
 
 	function change_score(changespanjq) {
@@ -372,7 +391,7 @@ function doStop() {
 				}
 			}
 		); 
-
+                                                                 
 	}
 
 	function handle_save_error(useridscorehash) {
@@ -388,30 +407,48 @@ function doStop() {
 	}
 
 	$(document).ready(function () {
+        var settings = {
+        
+        contentWidth:50,
+        verticalDragMinHeight: 20,
+        verticalDragMaxHeight: 20,
+        horizontalDragMinWidth: 20,
+        horizontalDragMaxWidth: 20
+    };
+          if (scorelist_scrollpane){
+        console.log("scorelist_scrollpane initialized");
+        scorelist_scrollpane.jScrollPane(settings);
+        scorelist_scrollpane_api = scorelist_scrollpane.data('jsp');
+    }
+    if(admin_scrollpane){
+        console.log("admin initialized");
+        admin_scrollpane.jScrollPane(settings);
+        admin_scrollpane_api = scorelist_scrollpane.data('jsp');
+    }
 		attach_event_handlers();
 		//$('#backButton').show();
 	//	iui.animOn = true;
 		initialize_refresh_heartbeat();
 		preload_css_images();
 	});
-
-	function initialize_refresh_heartbeat() {
-		refreshtime = $('#scorelist').attr('data-refresh-seconds');
-		if (refreshtime == 0) {
-			return false;
-		}
-		// To avoid everyone hitting the server at the same time, start on a random fraction of the normal refresh interval.
-		var firsttimer = ( Math.random() * refreshtime * 1000 );
-		setTimeout( 'refresh_heartbeat()', firsttimer);
-	}
-
-	function refresh_heartbeat() {
-		if (refreshtime == 0) {
-			return false;
-		}
-		refresh_changed_scores();
-		setTimeout( 'refresh_heartbeat()', refreshtime * 1000);
-	}
+   function refresh_heartbeat() {
+            if (refreshtime == 0) {
+                return false;
+            }
+            refresh_changed_scores();
+            setTimeout( 'refresh_heartbeat()', refreshtime * 1000);
+   }
+	
+    function initialize_refresh_heartbeat() {
+        
+        refreshtime = $('#scorelist').attr('data-refresh-seconds');
+        if (refreshtime == 0) {
+            return false;
+        }
+        // To avoid everyone hitting the server at the same time, start on a random fraction of the normal refresh interval.
+        var firsttimer = ( Math.random() * refreshtime * 1000 );
+        setTimeout( 'refresh_heartbeat()', firsttimer);
+    }
 
 	function preload_css_images() {
 

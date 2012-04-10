@@ -14,6 +14,11 @@ div.scoreboard_bottom{
 }
 div.scoreboard_admin_top{
 }
+div#tabs {
+    margin-left: 40px;
+    width: 920px;
+    padding-bottom:15px;
+}
 span.scoreboard_title{
  color:white;
  position:absolute;
@@ -36,16 +41,16 @@ div.scoreboard_admin_main{
  background-image: url(images/scoreboard_admin_bg.png);
  background-repeat: repeat-y;
  width:1000px;
- position:absolute;
+
  bottom:79px;
 }
 
 div.scoreboard_admin_bottom{
  background-image: url(images/scoreboard_admin_bottom.png);
- width:1000px;
+ width:880px;
  height:23px;
  position:absolute;
- bottom:56px;
+ 
 }
 
 span.score_change_section{
@@ -69,7 +74,7 @@ ul{
   font-size: 12px;
   color:black;
   background-image: url(images/rowslice_admin.png);
-  width: 1000px;
+  width: 880px;
   height: 48px;
   padding: 0px;
   margin:0px;
@@ -80,13 +85,13 @@ ul{
 }
 
 .admin_view > li.has_scores.just_subtracted {
-  background-image: url(images/rowslice_admin_action_subtract.png);
+  background-image: url(images/rowslice_admin_hover_subtract.png);
 }
 .admin_view > li.has_scores.deleting_scores{
-  background-image: url(images/rowslice_admin_action_subtract.png);
+  background-image: url(images/rowslice_admin_hover_subtract.png);
 }
 .admin_view > li.has_scores.just_added {
-  background-image: url(images/rowslice_admin_action_add.png);
+  background-image: url(images/rowslice_admin_hover_add.png);
 }
 
 .student_view > li.has_scores{
@@ -122,7 +127,7 @@ ul{
 }
 .admin_view > li.has_scores span.avatar_name{
   text-transform:uppercase;
-  left:170px;
+  left:130px;
   color: #ffd000;
   font-family: 'Candal', 'Helvetica', sans-serif; 
   margin-top:4px;
@@ -137,14 +142,14 @@ ul{
   font-size: 24px;
 }
 .admin_view > li.has_scores span.user_score_delete_link{
-  left:115px; 
+  left:70px; 
   width:49px;
   margin-top:6px;
   color:white;
   height: 48px;
 }
 .admin_view > li.has_scores span.position_number{
-  left:70px; 
+  left:30px; 
   width:30px;
   margin-top:4px;
   color:black;
@@ -152,6 +157,13 @@ ul{
   font-size: 22px;
   font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
 }
+#scorelist_scrollpane{
+    width: 100%;
+    
+    height: 200px;  !important;
+    overflow: auto; !important;
+}
+
 .student_view > li.has_scores span.position_number{
   left:70px; 
   width:30px;
@@ -164,7 +176,7 @@ ul{
 .admin_view > li.has_scores span.score_info{
   text-align:right;
   margin-top:4px;
-  left:850px; 
+  left:790px; 
   font-weight: bold;
   font-size: 22px;
   color:white; 
@@ -182,8 +194,11 @@ ul{
   font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
 }
 div.scoreboard_admin_main li.score_entry {
-  background-image: url(images/scoreboard_admin_bg.png);
-  width:1000px;
+    background-image: url("images/scoreboard_admin_bg.png");
+    display: inline-block;
+    height: 20px;
+    list-style-type: none;
+    width: 880px;
 }
 /*
 div.scoreboard_admin_main li:nth-child(2n+1) {
@@ -196,7 +211,8 @@ div.scoreboard_admin_main li:nth-child(2n+2) {
 
 div.scoreboard_admin_main li.above_no_scores{
  background-image: url(images/scoreboard_admin_top.png);
- width:1000px;
+ width:880px;
+ list-style: none;
  height:23px;
 }
 div.scoreboard_admin_main li span{
@@ -237,14 +253,14 @@ span.score_change{
   height:48px;
   width:48px;
 }
-span.plus1{ left:444px; }
-span.plus5{ left:492px; }
-span.plus25{ left:540px; }
-span.plus100{ left:588px; }
-span.minus100{ left:636px; }
-span.minus25{ left:684px; }
-span.minus5{ left:732px; }
-span.minus1{ left:780px; }
+span.plus1{ left:400px; }
+span.plus5{ left:448px; }
+span.plus25{ left:496px; }
+span.plus100{ left:544px; }
+span.minus100{ left:592px; }
+span.minus25{ left:640px; }
+span.minus5{ left:688px; }
+span.minus1{ left:736px; }
 
 li.just_edited { background-color:yellow }
 li.deleting_scores { background-color:red }
