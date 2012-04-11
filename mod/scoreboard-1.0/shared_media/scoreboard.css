@@ -157,11 +157,35 @@ ul{
   font-size: 22px;
   font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
 }
-#scorelist_scrollpane{
-    width: 100%;
-    
-    height: 200px;  !important;
-    overflow: auto; !important;
+#admin_scrollpane .jspContainer,#scorelist_scrollpane .jspContainer{
+    width: 970px !important;
+}
+.jspTrack,.jspDrag{
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px; 
+}
+.jspDrag{
+    background-color: #F6CD00 !important;
+}
+.jspTrack{
+    background-color: red !important;
+}
+
+.jspVerticalBar{
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 16px;
+    background:black !important;
+     
+}
+
+#admin_scrollpane,#scorelist_scrollpane{
+    width: 100% !important;;
+    height: 730px !important;
+    overflow: auto !important; 
 }
 
 .student_view > li.has_scores span.position_number{
