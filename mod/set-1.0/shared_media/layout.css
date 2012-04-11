@@ -162,7 +162,7 @@ form {
 .generate_standard_layout { background-image: url(images/rezzer_icon_import.png); }
 .rez_all_objects{ background-image: url(images/rezzer_icon_rez_all.png); }
 .derez_all_objects{ background-image: url(images/rezzer_icon_derez_all.png); }
-.set_configuration_status { background-image: url(images/rezzer_icon_loading.gif); }
+.set_configuration_status { background-image: url(images/rezzer_icon_loading.gif); background-repeat:repeat-y; background-position:right; }
 .add_to_layout_button{ background-image: url(images/rezzer_icon_add.png); }
 .refresh_config_button{ background-image: url(images/rezzer_icon_refresh.png); }
 .reload_page_button{ background-image: url(images/rezzer_icon_refresh.png); }

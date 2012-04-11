@@ -276,7 +276,7 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				<span class="control_button sync_object_positions" data-freeze-text="<?php echo  s(get_string('rezzer:savecurrentposition', 'sloodle'))?>" data-freezing-text="<?php echo  s(get_string('rezzer:savingcurrentposition', 'sloodle'))?>" type="submit" href="#clonelayout"><?php echo  s(get_string('rezzer:savecurrentposition', 'sloodle'))?></span>
 				<span class="control_button sync_object_positions_placeholder"></span>
 
-				<span id="set_configuration_status_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" class="control_button button_goes_here_zone set_configuration_status"></span>
+				<span id="set_configuration_status_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" class="big_control_button button_goes_here_zone set_configuration_status"></span>
 				<span id="rez_all_objects_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" class="big_control_button rez_all_objects"> &nbsp; <?php echo  s(get_string('rezzer:rezallobjects', 'sloodle'))?></span>
 
 				<span id="generate_standard_layout_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" data-generate-text="<?php echo  s(get_string('rezzer:importmoodleactivities','sloodle', $cn )) ?>" data-generating-text="<?php echo  s(get_string('rezzer:importingmoodleactivities', 'sloodle'))?>" data-layoutid="<?php echo  intval($layout->id) ?>" class="big_control_button generate_standard_layout"><?php echo  s(get_string('rezzer:importmoodleactivities', 'sloodle', $cn )) ?></span>
