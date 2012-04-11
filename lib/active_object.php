@@ -245,7 +245,6 @@
                     $sb->delete($job['id']);
                 }
             }
-            exit;
 
             return true;
             
@@ -354,6 +353,7 @@
             $response->set_status_descriptor('SYSTEM');
             $response->set_request_descriptor('DEREZ');
             $response->set_http_in_password($this->httpinpassword);
+            $response->set_return_url();
             $response->add_data_line('do:derez');
 
             //create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
@@ -556,14 +556,14 @@
 
         // Load data for the specified UUID
         // Return true on success, false on fail
-        public function loadByUUID( $uuid ) {
+        public function loadByUUID( $uuid, $lazy = false ) {
 
             //SloodleDebugLogger::log('DEBUG', "loading for uuid :$uuid:");
             $rec = sloodle_get_record('sloodle_active_object','uuid',$uuid);
 
             if ($rec) {
                 //SloodleDebugLogger::log('DEBUG', "loaded for uuid :$uuid:");
-                $this->loadFromRecord($rec);
+                $this->loadFromRecord($rec, $lazy);
                 return true;
             }
 
@@ -571,7 +571,7 @@
 
         }
 
-        public function loadFromRecord($rec) {
+        public function loadFromRecord($rec, $lazy = false) {
 
            $this->id = $rec->id;
            $this->controllerid = $rec->controllerid;
@@ -592,8 +592,10 @@
 
            // TODO: This is probably mostly not needed.
            // We should fetch this lazily when we need the course name or whatever it is we want here.
-           $this->course = new SloodleCourse();
-           $this->course->load_by_controller($this->controllerid);
+           if ($this->controllerid && !$lazy) {
+               $this->course = new SloodleCourse();
+               $this->course->load_by_controller($this->controllerid);
+           }
 
            return true;
 
@@ -976,13 +978,39 @@
             
         }
 
-        function uuids_of_children_missing_since($ts) {
-            $sql = "select uuid from {$CFG->prefix}sloodle_active_object where rezzeruuid=? and timeupdated > ? order by a.timeupdated asc;";
-            $recs = sloodle_get_records_sql_params($sql, array($this->uuid, $ts));
+        function uuids_of_children_missing_since($oldestts, $youngestts) {
+
+            global $CFG;
+            $sql = "select id, uuid from {$CFG->prefix}sloodle_active_object where rezzeruuid=? and timeupdated > ? and timeupdated < ? order by timeupdated asc;";
+            $recs = sloodle_get_records_sql_params($sql, array($this->uuid, $oldestts, $youngestts));
             $uuids = array();
             if ( ($recs) && (count($recs) > 0) ) {
-//TODOqueryparams
+                foreach($recs as $rec) {
+                    $uuids[] = $rec->uuid;
+                }
             }
+            return $uuids;
+        }
+
+        function layoutentryids_to_uuids_of_currently_rezzed($layoutid) {
+
+            global $CFG;
+            $sql = "select id, layoutentryid, uuid from {$CFG->prefix}sloodle_active_object where rezzeruuid=? order by timeupdated asc;";
+            $sql = "select ao.id as id, ao.layoutentryid as layoutentryid, ao.uuid as uuid from mdl_sloodle_active_object ao inner join mdl_sloodle_layout_entry le on ao.layoutentryid=le.id where ao.rezzeruuid=? and le.layout=? order by timeupdated desc";
+            $recs = sloodle_get_records_sql_params($sql, array($this->uuid, $layoutid));
+            $layoutentryhash = array();
+            if ( ($recs) && (count($recs) > 0) ) {
+                foreach($recs as $rec) {
+                    $leid = $rec->layoutentryid;
+                    $uuid = $rec->uuid;
+                    if (!isset($layoutentryhash[ $leid ] )){
+                        $layoutentryhash[$leid] = array();
+                    }
+                    $layoutentryhash[$leid][] = $rec->uuid;
+                }
+            }
+            return $layoutentryhash;
+
         }
 
     }

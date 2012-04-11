@@ -160,12 +160,23 @@
         /**
         * HTTP-In password
         * Used when sending an http-in message to an object.
-	* Allows the object to confirm that we are authorized to talk to it.
-        * @var integer
+        * Allows the object to confirm that we are authorized to talk to it.
+        * @var string 
         * @access private
         */
         var $http_in_password= null;
+     
+        /**
+        * Return URL
+        * Used when sending a one-way message, where you want a reply to be sent somewhere.
+        * This is intended to be used in situations where we can't make http-in reqests to the grid
+        * ...and we instead queue them on the server and have a process in SL/OpenSim to pass them on.
+        * @var string
+        * @access private
+        */
+        var $return_url = null;
  
+
         /**
         * Data to render following the status line in the response.
         * This value can either be a scalar (single value, e.g. int, string, float), or an array.
@@ -441,7 +452,7 @@
         }
   
         /**
-        * Accessor function to set member value {@link $tracking_code}
+        * Accessor function to set member value {@link $http_in_password}
         * @param mixed $par Any scalar value
         * @return void
         */
@@ -449,7 +460,19 @@
         {
             $this->http_in_password = $pwd;
         }
+   
+        /**
+        * Accessor function to set member value {@link $return_url}
+        * @param mixed $par Any scalar value
+        * @return void
+        */
+        function set_return_url($url)
+        {
+            $this->return_url = $url;
+        }
        
+
+     
 
         /**
         * Accessor function to set member value {@link $data}. <b>Note: it is recommended that you use the {@link add_data_line()} and {@link clear_data()} functions instead of this.</b>
@@ -569,7 +592,13 @@
             // We will step backwards through out list of fields, and as soon as one item is specified, all of them should be
             $showall = false;
 
-            // Status descriptor?
+            // return url
+            if ($showall || is_null($this->return_url) == false) {
+                $showall = true;
+                $str = $this->field_separator . $this->return_url. $str;
+            }
+
+            // HTTP In Password?
             if ($showall || is_null($this->http_in_password) == false) {
                 $showall = true;
                 $str = $this->field_separator . $this->http_in_password. $str;

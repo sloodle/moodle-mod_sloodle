@@ -2,6 +2,7 @@
 //	var actionStatus = 'unrezzed'; // The state of the page. Goes to 'rezzed' when you hit the 'rez' button. 
 
 	var timeoutMilliseconds = 30000; // How long until we give up waiting and try again. NB even after this a response may still show up, so we need to be able to handle it.
+	var heartbeatMilliseconds = 9000; // We do automatic refreshes to see if anything has changed in-world. This decides how often.
 	var pendingRequests = new Object(); // A list of entries that we've made a request for, and the timestamp in milliseconds when we made them
 	var numPendingRequests = 0; // Should correspond to the number of elements in pendingRequests
 
@@ -12,9 +13,11 @@
 	var lastActiveObjectPollMillisecondTS = 0; // Millisecond TS for when we last polled the server for active object changes
 
 	var timer; // Timer var used to coordinate the eventLoop, which checks for outstanding tasks and kicks them off.
+    var heartbeatTimer;
 
 	var isRezzerConfigured = false;
 	var rezzerControllerID = null;
+    var activeLayoutID = 0;
 	
 	function purgeRequestList() {
 	// TODO: Purge the request list of things that have timed out.
@@ -161,6 +164,7 @@
 		update_labels(parentjq);
 
 		update_buttons(parentjq);
+
 	//	timer = setTimeout( 'eventLoop()', 10000 );
 //		timer = setTimeout( function(){ eventLoop(parentjq); }, 10000 );
 
@@ -235,6 +239,89 @@
 				parentjq.find('.delete_layout_button').show();
 			}
 		}
+	}
+
+	function heartbeat_refresh(parentjq, layoutid, rezzeruuid) {
+		$.getJSON(
+			"refresh_rezzer.php",  
+			{
+				layoutid: layoutid,
+				rezzeruuid: rezzer_uuid,
+				ts: new Date().getTime()
+			},  
+			function(json) {  
+                
+				var result = json.result;
+                var changed = false;
+				if (result == 'refreshed') {
+					//itemjq.removeClass('syncing').addClass("synced");
+                    var leiduuids = json.layoutentries_to_uuids;
+
+					parentjq.find('.rezzed').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (!leiduuids[ leid ] ) {
+                            changed = true;
+                            $(this).removeClass('rezzed').addClass('derezzed');
+                        }
+                    } );
+
+					parentjq.find('.derezzing').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (!leiduuids[ leid ] ) {
+                            changed = true;
+                            $(this).removeClass('derezzing').addClass('derezzed');
+                        }
+                    } );
+
+					parentjq.find('.derezzing_failed').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (!leiduuids[ leid ] ) {
+                            changed = true;
+                            $(this).removeClass('derezzing_failed').addClass('derezzed');
+                        }
+                    } );
+
+                    parentjq.find('.rezzing').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (leiduuids[ leid ] ) {
+                            changed = true;
+                            $(this).removeClass('rezzing').addClass('rezzed');
+                        }
+                    } );
+
+					parentjq.find('.rezzing_failed').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (leiduuids[ leid ] ) {
+                            changed = true;
+                            $(this).removeClass('rezzing_failed').addClass('rezzed');
+                        }
+                    } );
+
+
+                    // Check if anything is marked as rezzed but gone, and remove the rezzed .
+
+                    // Check if anything is marked as unrezzed but present, and create the rezzed label
+				} else if (result == 'failed') {
+					// This can often happen legitimately, ie layout is deleted.
+					// Just ignore the failure and carry on.
+					//alert('failed');
+				} else {
+					alert('refresh returned unknown status');
+				}
+
+                if (changed) { 
+                    eventLoop(parentjq);
+
+                    // Changed layout 
+                    if (layoutid != activeLayoutID) {
+                        return;
+                    }
+                }
+
+                heartbeatTimer = setTimeout( function(){ heartbeat_refresh( parentjq, layoutid, rezzeruuid ); }, heartbeatMilliseconds );
+
+			}
+		);  
 	}
 
 	function refresh_misc_object_group( parentjq) {
@@ -864,6 +951,7 @@
 		var parentjq = $(layoutjqid); // the "#" happens to be the same notation as that used for the jquery id selector
 		var bits = parentjq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
 		var layoutid = bits.pop(); // pop this off - don't think we need it
+        activeLayoutID = layoutid;
 		var controllerid = bits.pop();
 		if ( isRezzerConfigured && ( rezzerControllerID == controllerid) ) {
 			return;
@@ -880,8 +968,9 @@
 				if (result == 'configured') {
 					parentjq.attr('data-connection-status', 'connected');
 					update_buttons( parentjq );
-					refresh_misc_object_group( parentjq );
+					//refresh_misc_object_group( parentjq );
 					rezzerControllerID = controllerid;
+                    heartbeat_refresh( parentjq, layoutid, rezzer_uuid)
 				} else if (result == 'failed') {
 					parentjq.children('.rez_all_objects').hide();	
 				}
@@ -963,6 +1052,9 @@
 		$('#backButton').show();
 	//	iui.animOn = true;
 	});
+
+
+
 
 	function backLevels(fromPageID, num) {
 		if (isBusy) {

@@ -113,7 +113,7 @@ $ao = new SloodleActiveObject();
 if ($ao->loadByUUID($rezzed_object_uuid)) {
     if ($ao->httpinurl) {
         $extraParams = array('sloodlerezzeruuid' => $rezzer->uuid);
-        $ao->sendConfig($extraParams, $async = true);
+        $ao->sendConfig($extraParams, $async = false);
     }
 }
 
