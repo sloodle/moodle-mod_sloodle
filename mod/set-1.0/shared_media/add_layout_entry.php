@@ -33,9 +33,11 @@ foreach($_GET as $n => $v) {
 	}
 }
 
-if (preg_match('/[^A-Za-z0-9_-/', $objectname)) {
+/*
+if (preg_match('/[^A-Za-z0-9_-]/', $objectname)) {
 	error_output( 'Illegal characters in object name');
 }
+*/
 
 if (!$layoutid) {
 	error_output( 'Layout ID missing');
@@ -59,10 +61,12 @@ $layoutentry->position = "<0,-1,1.5>"; // default: behind and above the set wher
 $layoutentry->rotation = "<0.0,0.0,0.0,0.0>";
 
 foreach($configVars as $n=>$v) {
+    /*
 	if (preg_match('/[^A-Za-z0-9_-/', $v)) {
 		error_output( 'Illegal characters in config value');
 	}
-	if (preg_match('/[^A-Za-z0-9_-/', $n)) {
+    */
+	if (preg_match('/[^A-Za-z0-9_-]/', $n)) {
 		error_output( 'Illegal characters in config name');
 	}
 	$layoutentry->set_config( $n, $v );
