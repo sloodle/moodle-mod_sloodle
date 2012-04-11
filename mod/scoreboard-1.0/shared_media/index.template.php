@@ -26,15 +26,12 @@ function print_html_top($loadfrom = '', $is_logged_in) {
     </script>
     </head>
 
-    <body>
+    <body scroll="no">
      <script>
     $(function() {
-        $( "#tabs" ).tabs();
      
          $('#scorelist_scrollpane').jScrollPane();
-          <?php if ($is_admin) { ?>   
-          $('#admin_scrollpane').jScrollPane();
-          <?php }?>   
+       
     });         
     
 </script>
@@ -60,33 +57,27 @@ var active_object_uuid = '<?php echo  htmlentities($active_object_uuid) ?>';
 
 	<div class="scoreboard_top">
 		<span class="scoreboard_title"><?php echo s($objecttitle)?></span>
-		<?php if ($is_admin) { ?>
-		<span class="new_round_button"><input type="image" alt="New Round" width="169" height="71" src="images/new_round.png"</span>
-		<?php } ?>
+		
 	</div>
-    <?php if ($is_admin) { ?>  
-       <div id="tabs">
-       
-    <ul>
-        <li><a href="#tabs-1">Scores</a></li>
-        <li><a href="#tabs-2">Add Players</a></li>
-    </ul>
-    <div id="tabs-1">
-    
-    <?php }?> 
-        <div style="display:none" class="group divider above_scores"><?php echo  s(get_string($group_name, 'sloodle')) ?> <? $is_admin ? s(get_string('scoreboard:displayedonscreen', 'sloodle')) : '' ?> - <?php echo  s($currency->name) ?></div>
+   
+        <div style="display:none" class="group divider above_scores"><?php echo  s(get_string($group_name, 'sloodle')) ?> 
+        - <?php echo  s($currency->name) ?></div>
         <div id="scorelist_scrollpane">
-        <ul id="scorelist" class="<?php echo  $is_admin ? 'admin_view' : 'student_view' ?>" data-refresh-seconds="<?php echo intval($refreshtime) ?>" data-parent="roundlist" title="Scores" selected="true">
+        <ul id="scorelist" class="student_view" data-refresh-seconds="<?php echo intval($refreshtime) ?>" data-parent="roundlist" title="Scores" selected="true">
         
 	        <?php             
 	        $ranki = 1;
 	        foreach($student_scores as $score) { 
 		        if ($score->has_scores) {
-			        render_score_li($score, $is_admin, $ranki); 
+                    $i=0;
+			        for ($i=0;$i<10;$i++)render_score_li($score, $is_admin, $ranki); 
 			        $ranki++;
 		        }
 	        }
 	        ?>
+            <li>
+
+        </li>
 	        <li style="display:none" class="divider below_scores"></li>
         </ul>       
 
@@ -103,46 +94,7 @@ var active_object_uuid = '<?php echo  htmlentities($active_object_uuid) ?>';
 	<?php render_score_li( $dummy_score, $is_admin ); ?>
     </ul>
     </div>
-  </div>
-<?php if ($is_admin) { ?>  
- <div id="tabs-2">
-<?php }?>  
-
-<?php if ($is_admin) { ?>
-
-      <?php if ($is_admin) { ?>
-      <div id="admin_scrollpane">
-    <div class="scoreboard_admin_main">
-
-    <ul>
-        <li class="group divider above_no_scores"></li>
-    <?php
-    foreach($student_scores as $score) { 
-        if (!$score->has_scores) {
-            render_score_li($score, $is_admin, 0); 
-        }
-    }
-    ?>                   
-    </ul>
-    <ul style="display:none" >
-    <li class="divider end below_no_scores"></li>
-<?php /*
-        <li class="group"><?php echo  s(get_string('scoreboard:controlscoreboard', 'sloodle')) ?></li>
-    <li class="new_round_link"><?php echo  s(get_string('scoreboard:newround', 'sloodle')) ?></li>
-*/ ?>            
-    </ul>
-    </div>
-    </div>
-<?php } ?>
-	
-
-	<div class="scoreboard_admin_bottom"></div>
-<?php } ?>
-
-	 <?php if ($is_admin) { ?>  
-     </div>   
-     </div>
-    <?php }?>  
+  </div>    
 <?php 
 }
 
@@ -152,21 +104,7 @@ function render_score_li($score, $is_admin, $rank_number) {
 		<span class="position_number" ><?php echo $rank_number?></span>
 		<span class="user_score_delete_link" ></span>
 		 <span class="avatar_name"><?php echo  s( $score->avname ) ?></span>
-	<?php 
-	if (true&&$is_admin) { 
-	?>
-		<span class="show_link score_change" data-score-change="0"><?php echo  s(get_string('scoreboard:showonscoreboard', 'sloodle')) ?></span>
-	<?php
-		foreach( array("+1","+5","+25","+100","-100","-25","-5","-1") as $score_change ) {
-			
-			$class_name = ( ( $score_change > 0 ) ? 'plus' : 'minus' ).abs($score_change);
-	?>
-			<span class="score_change <?php echo  $class_name?>" data-score-change="<?php echo intval($score_change) ?>"></span>
-	<?php
-		}
-	?>
-	<?php
-	} ?>
+
 		<span class="score_info"><?php echo  intval($score->balance) ?></span>
 	</li>
 	<?php
@@ -192,7 +130,7 @@ function print_html_bottom() {
     />
 </object>
 -->
-
+<div class="scoreboard_bottom"></div>
 </body>
 </html>
 <?php
