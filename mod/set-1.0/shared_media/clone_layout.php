@@ -20,7 +20,7 @@ require_once '../../../lib/json/json_encoding.inc.php';
 $configVars = array();
 
 $layoutid = optional_param('layoutid', 0, PARAM_INT);
-$rezzeruuid = optional_param('layoutid', 0, PARAM_RAW);
+$rezzeruuid = optional_param('rezzeruuid', '', PARAM_RAW);
 
 if (!$layoutid) {
 	error_output( 'Layout ID missing');
