@@ -18,6 +18,11 @@
 	height: 30px !important;
 }
 
+.validation_error {
+    color:#ff0000 !important;
+}
+
+
 .upper_button_zone {
 	width:100%;	
 	height:90px;

@@ -306,7 +306,7 @@
 					// Just ignore the failure and carry on.
 					//alert('failed');
 				} else {
-					alert('refresh returned unknown status');
+					//alert('refresh returned unknown status');
 				}
 
                 if (changed) { 
@@ -349,7 +349,7 @@
 					// Just ignore the failure and carry on.
 					//alert('failed');
 				} else {
-					alert('refresh returned unknown status');
+					//alert('refresh returned unknown status');
 				}
 			}  
 		);  
@@ -420,7 +420,9 @@
 			function(json) {  
 				var result = json.result;
 //alert('derez result:'+result);
-				if (true || result == 'derezzed') {
+				if (result == 'queued') {
+                    // do nothing
+				} else if (true || result == 'derezzed') {
 					itemjq.removeClass('derezzing').addClass('derezzed');;
 					itemjq.removeClass('syncing');
 					itemjq.removeClass('synced');
@@ -570,16 +572,36 @@
 					}
 					eventLoop( $('.layout_container_'+layoutid) );
 				} else if (result == 'failed') {
-					alert('Adding layout entry failed');
+					//alert('Adding layout entry failed');
 					buttonjq.html( buttonjq.attr('data-generate-text') );
 				}
 			}  
 		);  
 	}
 
+    function validate_for_submit(frmjq) {
+        // We have a space for the module id, which is required.
+        // This may only be a placeholder if there are no selected options.
+        if (frmjq.find('[data-fieldname="sloodlemoduleid"]').length > 0) {
+            if (frmjq.find('input:radio[name=sloodlemoduleid]:checked').length == 0) {
+                frmjq.find('[data-fieldname="sloodlemoduleid"]').addClass('validation_error');
+                // Show in red for 10 seconds
+                setTimeout(function(){
+                      $(frmjq.find('[data-fieldname="sloodlemoduleid"]').removeClass('validation_error'));
+                }, 5000);
+                return false;
+            }
+        } 
+        
+        return true;
+    }
+
 	function add_to_layout( buttonjq ) {
 
 		var frmjq = buttonjq.closest("form");
+        if (!validate_for_submit(frmjq)) {
+            return false;
+        }
 		buttonjq.html( buttonjq.attr('data-adding-text') );
 		$.getJSON(  
 			"add_layout_entry.php",  
@@ -594,7 +616,7 @@
 				var moduletitle = json.moduletitle;
 				var layoutentryid = json.layoutentryid;
 				if (layoutid == '') {
-					alert('error: missing layoutid after adding to layout');
+					//alert('error: missing layoutid after adding to layout');
 				}
 				if (result == 'added') {
 					buttonjq.html( buttonjq.attr('data-add-text') );
@@ -647,7 +669,7 @@
 					eventLoop( $('.layout_container_'+layoutid) );
 					backLevels( frmjq.attr('id'), 1 );
 				} else { //if (result == 'failed') 
-					alert('Deleting layout entry failed');
+				//	alert('Deleting layout entry failed');
 					buttonjq.html( buttonjq.attr('data-delete-text') );
 				} 
 			}  
@@ -679,7 +701,7 @@
 					//history.back();
 				} else { //if (result == 'failed') 
 					// For now we'll just live with the failure - it's probably that it's already gone
-					alert('Deleting layout entry failed');
+					//alert('Deleting layout entry failed');
 					buttonjq.html( buttonjq.attr('data-delete-text') );
 				} 
 			}  
@@ -721,7 +743,7 @@
 					parentjq.find('.rename_input_text').show();
 
 				} else {
-					alert('Rename failed');
+					//alert('Rename failed');
 				}
 			}
 		);
@@ -767,7 +789,7 @@
 
 				} else { //if (result == 'failed') 
 					// For now we'll just live with the failure - it's probably that it's already gone
-					alert('Cloning layout entry failed');
+					//alert('Cloning layout entry failed');
 					buttonjq.html( buttonjq.attr('data-clone-text') );
 				} 
 			}  
@@ -812,7 +834,7 @@
 					//history.back();
 					//history.go(-2);
 				} else { //if (result == 'failed') {
-					alert('Updating layout entry failed');
+					//alert('Updating layout entry failed');
 					buttonjq.html( buttonjq.attr('data-update-text') );
 				} 
 			}  
@@ -939,7 +961,7 @@
 						// TODO: Should really remove old ones that no longer exist...
 					}
 				} else if (result == 'failed') {
-					alert('refresh failed');
+					//alert('refresh failed');
 				}
 				buttonjq.html( buttonjq.attr('data-refresh-text') );
 			}  
@@ -1065,13 +1087,13 @@
 		}
 		// Already moved on? Leave the navigation alone
 		if ( $('#'+fromPageID).attr('selected') != 'true' ) {
-			alert(fromPageID + ' not currently selected, not going back levels - attr is '+$('#'+fromPageID).attr('id'));
+			//alert(fromPageID + ' not currently selected, not going back levels - attr is '+$('#'+fromPageID).attr('id'));
 			return false;
 		}
 
 		var nextPageID = $('#'+fromPageID).attr('data-parent');
 		if (nextPageID == null) {
-			alert('no next page to go to, giving up');
+			//alert('no next page to go to, giving up');
 			return false;
 		}
 
@@ -1120,7 +1142,7 @@
 
 			var clickedid=this.hash;
 			if ( clickedid == null ) {
-				alert('Error: no hash found');
+				//alert('Error: no hash found');
 				return false;
 			}
 
@@ -1131,7 +1153,7 @@
 
 			var targetjq = $(clickedid); // already begins with #
 			if (targetjq.size() == 0) {
-				alert('Error: no target found for id '+clickedid);
+				//alert('Error: no target found for id '+clickedid);
 				return false;
 			}
 

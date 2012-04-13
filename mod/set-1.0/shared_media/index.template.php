@@ -23,7 +23,7 @@ function print_html_top($loadfrom = '') {
 <style type="text/css" media="screen">@import "<?php echo $loadfrom?>iui/iui_avatarclassroom.css";</style>
 <style type="text/css" media="screen">@import "<?php echo $loadfrom?>layout.css";</style>
 <script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
-<script type="application/x-javascript" src="layout.js?<?php echo  time() ?>"></script>
+<script type="application/x-javascript" src="layout.js"></script>
 <!--
 -->
 <script type="text/javascript">
@@ -451,7 +451,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <fieldset>
 <div class="row">
 <label for="<?php echo  'sloodlemoduleid' ?>"><?php echo  $config->module_choice_message ? get_string($config->module_choice_message, 'sloodle') : ''?></label>
-<span class="sloodle_config data-fieldname="sloodlemoduleid">
+<span class="sloodle_config" data-fieldname="sloodlemoduleid">
 <?php echo  $moduleoptionselect ? $moduleoptionselect : '<span class="no_options_placeholder" data-fieldname="sloodlemoduleid">'.( ( $config->module_no_choices_message != '' ) ? get_string($config->module_no_choices_message , 'sloodle') : '' ) .'</span>' ?>
 </span>
 </div>
