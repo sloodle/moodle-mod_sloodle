@@ -67,9 +67,6 @@ $content = array(
 	'error' => '',
 );
 
-$rand = rand(0,10);
-sleep($rand);
-
 print json_encode($content);
 
 function error_output($error) {
