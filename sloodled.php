@@ -13,6 +13,11 @@ $_SERVER['REQUEST_TIME'] = time();
 
 require_once('sl_config.php');
 
+if ( !defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK') || !SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK  ) {
+    echo 'To run the sloodle daemon, enable SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK in sl_config.php';
+    exit;
+}
+
 //require_once('lib/beanstalk/Beanstalk.php');
 require_once(SLOODLE_LIBROOT.'/beanstalk/Beanstalk.php');
 
@@ -37,7 +42,9 @@ if (!$sb->connect()) {
     return false;
 }
 
-if (isset($argv[1]) && ($argv[1] == 'stats') ) {
+$verbose = in_array('-v',$argv);
+
+if ( in_array('stats',$argv) ) {
     var_dump($sb->stats());
     exit;
 }
@@ -49,10 +56,14 @@ if (isset($argv[1]) && ($argv[1] == 'stats') ) {
 while (true) {
 
     $tubes = $sb->listTubes();
+    if ($verbose) {
+        //print "Listing tubes\n";
+    }
 
     if (count($tubes) > 0) {
 
         foreach($tubes as $tube) {
+            //print "Watching tube $tube\n";
             //print "inspecting tube $tube\n";
             /*
             if (!$sb->choose($tube)) {
@@ -69,7 +80,13 @@ while (true) {
             while($job = $sb->reserve(0)) {
                 $msg = $job['body'];
                 $id = $job['id'];
+                if ($verbose) {
+                    print "Handling job $id\n";
+                }
                 if (sloodle_handle_message($msg)) {
+                    if ($verbose) {
+                        print "Deleting job $id\n";
+                    }
                     $sb->delete($id);
                 }
                 //sloodle_handle_message($sb, $job, $tube); 
