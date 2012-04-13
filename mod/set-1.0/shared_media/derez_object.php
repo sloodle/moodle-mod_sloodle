@@ -29,6 +29,11 @@ $rezzer = new SloodleActiveObject();
 $sloodleuser = new SloodleUser();
 $sloodleuser->user_data = $USER;
 
+// Set this if we really need an answer now.
+// This is used when removing from a layout, because we want to derez the objects first
+// ...and we won't want to go ahead with the rest of the operation unless the object is gone.
+$forcesynchronous = optional_param('synchronous', 0, PARAM_INT);
+
 if (!$layoutentryid = optional_param( 'layoutentryid', 0, PARAM_INT) ) {
 	error_output( 'Layout ID missing' );
 }
@@ -61,7 +66,7 @@ $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid )
 
 $result = '';
 foreach($active_objects as $ao) {
-    if ($ao->isQueueActive()) {
+    if ($ao->isQueueActive() && !$forcesynchronous) {
         if ($ao->queueDeRez()) {
             $result = 'queued';
         } else {

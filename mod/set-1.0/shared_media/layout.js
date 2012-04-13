@@ -415,6 +415,7 @@
 				layoutentryid: entryid,
 				rezzeruuid: rezzer_uuid,
 				controllerid: controllerid,
+				synchronous: '1',
 				ts: new Date().getTime()
 			},  
 			function(json) {  
