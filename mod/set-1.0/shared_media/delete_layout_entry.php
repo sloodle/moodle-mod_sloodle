@@ -31,24 +31,28 @@ if (!$layoutentryid) {
 
 $result = '';
 $layoutentry = new SloodleLayoutEntry();
-if ($layoutentry->load($layoutentryid)) {
-	if (!$layoutentry->delete()) {
-		error_output('Layout entry deletion failed');
-	}
+
+// Already gone - return that it's deleted.
+if (!$layoutentry->load($layoutentryid)) {
 	$result = 'deleted';
+} 
 
-} else {
-	$result = 'notfound';
-}
+if (!$result) {
+    $layout = new SloodleLayout();
+    if (!$layout->load($layoutentry->layout)) {
+        error_output('Layout not found');
+    }
 
-$layout = new SloodleLayout();
-if (!$layout->load($layoutentry->layout)) {
-	error_output('Layout not found');
-}
+    $controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
+    if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
+            error_output( 'Access denied');
+    }
 
-$controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
-if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
-        error_output( 'Access denied');
+    if (!$layoutentry->delete()) {
+        error_output('Layout entry deletion failed');
+    }
+
+    $result = 'deleted';
 }
 
 
