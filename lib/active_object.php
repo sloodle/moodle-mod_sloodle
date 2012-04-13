@@ -337,12 +337,28 @@
 
         }
 
+ 
         // Sends a message to the object telling it to derez itself.
-        // Deletes the active_object record if successful.
-        // NB the object can't report back whether it successfully derezzed itself, because it no longer exists.	
-        // We'll go by whether it acknowledged the derez command, which is as close as we can get.
-        // Return true on success, false on failure
-        public function deRez() {
+        // Doesn't deletes the active_object record, because it doesn't know whether the message will get through or not.
+        // Return true on successful queuing, false on failure
+        public function queueDeRez() {
+
+            if (!$this->isQueueActive()) {
+                return false;
+            }
+
+            if (!$message = $this->deRezMessage()) {
+                return false;
+            }
+
+            $async = true;
+            $reply = $this->sendMessage($message, $async, $async);
+
+            return true;
+
+        }
+
+        private function deRezMessage() {
 
             if (!$this->httpinurl) {
                 return false;
@@ -361,11 +377,26 @@
             $response->render_to_string($renderStr);
             //send message to httpinurl
 
+            return $renderStr;
+
+        }
+
+        // Sends a message to the object telling it to derez itself.
+        // Deletes the active_object record if successful.
+        // NB the object can't report back whether it successfully derezzed itself, because it no longer exists.	
+        // We'll go by whether it acknowledged the derez command, which is as close as we can get.
+        // Return true on success, false on failure
+        public function deRez() {
+
+            if (!$message = $this->deRezMessage()) {
+                return false;
+            }
+
             $async = false;
-            $reply = $this->sendMessage($renderStr, $async, $async);
+            $reply = $this->sendMessage($message, $async, $async);
             if (!$async) {
                 if ( !( $reply['info']['http_code'] == 200 ) ) {
-                    //return false;
+                    return false;
                 }
             }
 

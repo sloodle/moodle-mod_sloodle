@@ -59,16 +59,27 @@ $failures = array();
 //$active_objects = $controller->get_active_objects( null, $layoutentryid);
 $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
 
+$result = '';
 foreach($active_objects as $ao) {
-	if (!$ao->deRez()) {
-		$failures[] = $ao;
-	}
+    if ($ao->isQueueActive()) {
+        if ($ao->queueDeRez()) {
+            $result = 'queued';
+        } else {
+            $failures[] = $ao;
+        }
+    } else {
+        if (!$ao->deRez()) {
+            $result = 'derezzed';
+        } else {
+            $failures[] = $ao;
+        }
+    }
+	
 	//$rezzed_object_uuid = $reply['result'];
 }
 
 // TODO: Handle failures properly...
 
-$result = 'derezzed';
 if (count($failures) > 0) {
 	$result = 'failed';
 	$error = 'derez_failed';
