@@ -1209,8 +1209,13 @@ class SloodleDebugLogger {
                 return false;
             }
 
+            $REQUEST_URI  = isset($_SERVER['REQUEST_URI'])  ? $_SERVER['REQUEST_URI']  : '';
+            $REMOTE_ADDR  = isset($_SERVER['REMOTE_ADDR'])  ? $_SERVER['REMOTE_ADDR']  : '';
+            $REMOTE_PORT  = isset($_SERVER['REMOTE_PORT'])  ? $_SERVER['REMOTE_PORT']  : '';
+            $REQUEST_TIME = isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : '';
+
             $str = '';
-            $str = '------START-'.$type.'-'.$_SERVER['REQUEST_URI'].'---'.$_SERVER['REMOTE_ADDR'].'---'.$_SERVER['REMOTE_PORT'].'---'.$_SERVER['REQUEST_TIME'].'------'."\n";
+            $str = '------START-'.$type.'-'.$REQUEST_URI.'---'.$REMOTE_ADDR.'---'.$REMOTE_PORT.'---'.$REQUEST_TIME.'------'."\n";
 
             if ( ($type == 'REQUEST') && ($contents == null) ) {
                if (!empty($_GET)) {
@@ -1234,9 +1239,8 @@ class SloodleDebugLogger {
             } else {
                $str .= $contents."\n";
             }
-
             
-            $str .= '------END-'.$type.'-'.$_SERVER['REQUEST_URI'].'---'.$_SERVER['REMOTE_ADDR'].'---'.$_SERVER['REMOTE_PORT'].'---'.$_SERVER['REQUEST_TIME'].'------'."\n";
+            $str .= '------END-'.$type.'-'.$REQUEST_URI.'---'.$REMOTE_ADDR.'---'.$REMOTE_PORT.'---'.$REQUEST_TIME.'------'."\n";
 
             if ($fh = fopen(SLOODLE_DEBUG_REQUEST_LOG, 'a')) {
                fwrite($fh, $str);
