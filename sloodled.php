@@ -18,6 +18,8 @@ if ( !defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK') || !SLOODLE_MESSAGE_QUEU
     exit;
 }
 
+define('SLOODLE_MESSAGE_QUEUE_TASK', true);
+
 //require_once('lib/beanstalk/Beanstalk.php');
 require_once(SLOODLE_LIBROOT.'/beanstalk/Beanstalk.php');
 
@@ -93,7 +95,7 @@ while (true) {
             }
     }
 
-    sleep(1);
+    //sleep(1);
 
 }
 
@@ -110,34 +112,35 @@ exit;
 function sloodle_handle_message($msg) {
 
     $lines = explode("\n", $msg);
-    $url = array_shift($lines);
+    $statusline = array_shift($lines);
     $body = implode("\n", $lines);
 
     //print $url."\n";
 
-    if (!$url) {
+    if (!$statusline) {
         return false;
     }
 
-    $ch = curl_init();    // initialize curl handle
-    curl_setopt($ch, CURLOPT_URL, $url); // set url to post to
-    curl_setopt($ch, CURLOPT_FAILONERROR,0);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10); // times out after 4s
-    curl_setopt($ch, CURLOPT_POST, 1); // set POST method
-    curl_setopt($ch, CURLOPT_POSTFIELDS,$body); // add POST fields
-    /*
-    if ($proxy = $this->httpProxyURL()) {
-        curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
-        curl_setopt($ch, CURLOPT_PROXY, $this->httpProxyURL() );
+    $bits = explode("|", $statusline);
+    // We should at least have the task and address
+    if (count($bits) < 2) {
+        return false;
     }
-    */
 
-    $result = curl_exec($ch); // run the whole process
-    $info = curl_getinfo($ch);
-    curl_close($ch);
+    $handler_prefix = $bits[0];
+    $address = $bits[1];
 
-    //return array('info'=>$info,'result'=>$result);
+    if (!preg_match("/^[A-Za-z0-9_-]+$/", $handler_prefix)) {
+        print "handler_prefix $handler_prefix fails regex";
+        return false;
+    }
+    $request_handler  = $handler_prefix.'_request.php';
+    $response_handler = $handler_prefix.'_response.php';
+
+    include(SLOODLE_LIBROOT.'/message_handlers/'.$request_handler);
+    if (file_exists(SLOODLE_LIBROOT.'/message_handlers/'.$response_handler)) {
+        include(SLOODLE_LIBROOT.'/message_handlers/'.$response_handler);
+    }
 
     return true;
     /*

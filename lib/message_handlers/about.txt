@@ -1,0 +1,30 @@
+About asynchronous message handlers
+Edmund Edgar, 2012-04-20
+
+The message_handlers directory is for files that handle messages that are put in a message queue.
+This will only be used if your installation has some kind of queue mechanism. 
+
+These are called by sloodled.php, which is intended to be run as a background process.
+There may be many instances of sloodled.php running at the same time.
+
+As of 2012-04-14 we are using the Beanstalk daemon which has to be turned on in sl_config.
+On ubuntu you install this with apt-get install beanstalkd.
+In future we'll probably make an SQL table to do this without the need to run beanstalkd, albeit less efficiently.
+We will also make a method to poll the message queue from in-world and relay the results to the addresses that need them.
+This will also make sloodle 2 usable by people who can't get http-in messages through from their Moodle because of firewall issues.
+
+The message handlers take the form:
+ <taskname>_request.php
+ <taskname>_response.php
+
+eg. for the task "derez",
+ derez_request.php
+ ...handles making a request to derez an object, which involves sending a message to the object, while
+ derez_response.php
+ ...handles the answer to that request, which involves deleting the object's active_object entry.
+
+The response handlers are optional - if you don't make one, the result will be ignored.
+
+The job will be deleted once the handler completes, regardless of the result.
+If you want to temporarily abandon the task and retry it, exit.
+

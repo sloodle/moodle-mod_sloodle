@@ -48,12 +48,11 @@ key httpauthobject;
 integer urlform;
 
 sloodle_handle_command(string str) {
-         if (str=="do:requestconfig")llResetScript();
+    if (str=="do:requestconfig")llResetScript();
 }
 
 sloodle_tell_other_scripts(string msg)
 {
-
     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_OBJECT_DIALOG, msg, NULL_KEY);
 }
 
@@ -99,6 +98,10 @@ string rez_object = ""; // Name of the object we will rez
 string rez_object_list = "";
 integer rez_object_http_in_password = 0; // Shared media key of the object we will rez
 
+string rez_object_prim_password = ""; // layout entry id of the object we will rez
+string rez_object_layout_entry_id = ""; // layout entry id of the object we will rez
+
+
 key http_incoming_request_id;
 
 // Send a translation request link message
@@ -116,7 +119,7 @@ string sloodle_random_object_password()
 default {
 
      state_entry() {
-         
+
         llSleep(1.0);
 
         string desc = llGetObjectDesc();
@@ -160,9 +163,9 @@ default {
 state ask_for_site {
 
     state_entry() {
-    
+        
         if (llGetFreeURLs() == 0) {
-
+            llOwnerSay("Error: No URLs are available on this land parcel.");
             string url = "data:text/html,<body style=\"width:1000px;height:1000px;background-color:#595c67;color:white;font-weight:bold;\"><div style=\"position:relative;top:200px;text-align:center;width:1000px;height:750px;font-size:200%\" >No Available URLs</div></body>";
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER, url, NULL_KEY);
 
@@ -174,6 +177,7 @@ state ask_for_site {
             if (publicurl != "") {
                 llReleaseURL(publicurl);
             }
+
             llRequestURL();
             
         }
@@ -195,7 +199,7 @@ state ask_for_site {
                                
         } else if (method == "POST"){
 
-            llSetContentType( id, CONTENT_TYPE_HTML );
+            //llSetContentType( id, CONTENT_TYPE_HTML );
          //  llOwnerSay(body);
 
             // Form input should be a single line, beginning n=
@@ -209,8 +213,8 @@ state ask_for_site {
     
                 llHTTPResponse( id, 200, data );
                                            
-               // llOwnerSay(sloodleserverroot);
-               llReleaseURL(publicurl);
+                // llOwnerSay(sloodleserverroot);
+                llReleaseURL(publicurl);
             
                 state got_site_url;
 
@@ -228,12 +232,13 @@ state ask_for_site {
             if (str == "do:reset") llResetScript();
         }
     }
+
 }
     
 state got_site_url {
 
     state_entry() {                    
-        
+
         llSetTimerEvent(30);
 
         if (privateurl != "") {
@@ -252,8 +257,8 @@ state got_site_url {
             string paramstr = "&sloodleobjuuid=" + (string)llGetKey() + "&sloodleobjname=" + llEscapeURL(llGetObjectName()) + "&sloodleuuid=" + (string)llGetOwner() + "&sloodleavname=" + llEscapeURL(llKey2Name(llGetOwner()));
         
             // register with the site
-            string body = "sloodleobjuuid="+(string)llGetKey()+"&sloodleobjname="+llGetObjectName()+"&sloodleobjpwd="+sloodle_random_object_password()+"&sloodleobjtype="+"set-1.0/default"+"&sloodlehttpinurl="+llEscapeURL(privateurl);
-            httpauthobject = llHTTPRequest(sloodleserverroot + SLOODLE_AUTH_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
+            string rqbody = "sloodleobjuuid="+(string)llGetKey()+"&sloodleobjname="+llGetObjectName()+"&sloodleobjpwd="+sloodle_random_object_password()+"&sloodleobjtype="+"set-1.0/default"+"&sloodlehttpinurl="+llEscapeURL(privateurl);
+            httpauthobject = llHTTPRequest(sloodleserverroot + SLOODLE_AUTH_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], rqbody);
         
         }
         
@@ -312,7 +317,7 @@ state got_site_url {
         llSleep(3);
 
       //llGetKey() hacked in as a signal to force a clear, as the screen seems to fail to update in this particular situation.
-        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER, url, llGetKey());
+        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER, url, llGetKey());                
                     
         state ready;
         
@@ -356,11 +361,13 @@ state ready {
                 list statusbits =  llParseStringKeepNulls( llList2String(lines,0), ["|"], []);
                 string requestType = llList2String( statusbits, 3 );
                 if (requestType == "REZ_OBJECT") {
-                  http_incoming_request_id = id;
+                    http_incoming_request_id = id;
                     rez_object_list = llList2String(lines, 1); // This will be a pipe-delimited string of object choices.
-                    rez_pos = (vector)llList2String(lines, 2);
+                    rez_pos = (vector)llList2String(lines, 2); 
                     rez_rot = (rotation)llList2String(lines, 3);
                     rez_object_http_in_password = (integer)llList2String(lines,4);
+                    rez_object_prim_password = llList2String(lines,5);
+                    rez_object_layout_entry_id = llList2String(lines,6);
                     state rezz_and_reply;
 
                 } else if (requestType == "LIST_INVENTORY") {
@@ -385,6 +392,8 @@ state ready {
                     // This is the end of the configuration data
                     llSleep(0.2);
                     sloodle_tell_other_scripts(SLOODLE_EOF);
+                  //  llHTTPResponse(id, 200, "OK");
+                
               }//endif
 
           }//endif
@@ -424,7 +433,7 @@ state rezz_and_reply
         }
 
         if (llGetFreeURLs() == 0) {
-           // llOwnerSay("could not find an object for the string "+rez_object_list);
+            //llOwnerSay("no free url");
             llHTTPResponse(http_incoming_request_id, 500, "NO_AVAILABLE_URL");
             http_incoming_request_id = NULL_KEY;
             state ready;
@@ -437,11 +446,11 @@ state rezz_and_reply
        // llMessageLinked(LINK_SET,SLOODLE_CHANNEL_OBJECT_CREATOR_REZZING_STARTED, "", NULL_KEY);
 
         llSetTimerEvent(0);
-
+       // llOwnerSay("about to attempt rez for "+rez_object_list);
         llRezObject(rez_object, llGetRootPosition() + ( rez_pos * llGetRootRotation() ), ZERO_VECTOR, rez_rot, rez_object_http_in_password);
 
         // Timeout after a while if the object doesn't get rezzed
-        llSetTimerEvent(10.0);
+        llSetTimerEvent(30.0);
     }
 
     timer()
@@ -455,7 +464,8 @@ state rezz_and_reply
 
     object_rez(key id)
     {
-        llHTTPResponse(http_incoming_request_id, 200,(string)id);
+        string responsebody = (string)id+"\n"+(string)llGetKey()+"\n"+rez_object_prim_password+"\n"+(string)rez_object_http_in_password+"\n"+rez_object_layout_entry_id;
+        llHTTPResponse(http_incoming_request_id, 200,responsebody);
         http_incoming_request_id = NULL_KEY;
         state ready;
     }
@@ -476,9 +486,12 @@ state rezz_and_reply
         }
 
     }
+    
+    on_rez(integer start_param) {
+        llResetScript();
+    }
 }
 
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_shared_media_setup.lsl
-
