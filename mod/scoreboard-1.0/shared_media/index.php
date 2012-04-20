@@ -13,27 +13,27 @@
     *
     * @contributor Edmund Edgar
     * @contributor Paul Preibisch
-	*
-	*/
+    *
+    */
 
-	/** Grab the Sloodle/Moodle configuration. */
-	require_once('../../../sl_config.php');
-	/** Include the Sloodle PHP API. */
-	/** Sloodle core library functionality */
-	require_once(SLOODLE_DIRROOT.'/lib.php');
-	require_once(SLOODLE_DIRROOT.'/lib/db.php');
-	/** General Sloodle functions. */
-	require_once(SLOODLE_LIBROOT.'/general.php');
-	/** Sloodle course data. */
-	require_once(SLOODLE_LIBROOT.'/course.php');
+    /** Grab the Sloodle/Moodle configuration. */
+    require_once('../../../sl_config.php');
+    /** Include the Sloodle PHP API. */
+    /** Sloodle core library functionality */
+    require_once(SLOODLE_DIRROOT.'/lib.php');
+    require_once(SLOODLE_DIRROOT.'/lib/db.php');
+    /** General Sloodle functions. */
+    require_once(SLOODLE_LIBROOT.'/general.php');
+    /** Sloodle course data. */
+    require_once(SLOODLE_LIBROOT.'/course.php');
         require_once(SLOODLE_LIBROOT.'/io.php');
+     require_once(SLOODLE_LIBROOT . '/krumo/class.krumo.php');
 
+    require_once(SLOODLE_LIBROOT.'/object_configs.php');
+    require_once(SLOODLE_LIBROOT.'/active_object.php');
+    require_once(SLOODLE_LIBROOT.'/currency.php');
 
-	require_once(SLOODLE_LIBROOT.'/object_configs.php');
-	require_once(SLOODLE_LIBROOT.'/active_object.php');
-	require_once(SLOODLE_LIBROOT.'/currency.php');
-
- 	require_once('scoreboard_active_object.inc.php');
+     require_once('scoreboard_active_object.inc.php');
 
         $object_uuid = required_param('sloodleobjuuid');
         $sao = SloodleScoreboardActiveObject::ForUUID( $object_uuid );
@@ -44,22 +44,22 @@
 
         if ($is_admin) {
                 require_login($sao->course->id);
-		$is_logged_in = true;
+        $is_logged_in = true;
         }
 
-	if ($is_admin) {
-		require_capability('moodle/course:manageactivities', $sao->context);
-	}
+    if ($is_admin) {
+        require_capability('moodle/course:manageactivities', $sao->context);
+    }
 
-	if (!$currencyid = $sao->currencyid) {
-		print_error(('Currency ID missing'));
-	}	
+    if (!$currencyid = $sao->currencyid) {
+        print_error(('Currency ID missing'));
+    }    
 
-	$currency = SloodleCurrency::ForID( $currencyid );
+    $currency = SloodleCurrency::ForID( $currencyid );
 
-	$student_scores = $sao->get_student_scores($include_scoreless_users = $is_admin);
-	
-	$full = false; 
+    $student_scores = $sao->get_student_scores($include_scoreless_users = $is_admin);
+    
+    $full = false; 
 
 /*
 header('Cache-control: public');
@@ -68,15 +68,25 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 60 * 60 * 24) . ' GMT');
 header('Pragma: public');
 */
 
-	include('index.template.php');
+    if ($is_admin) {
+        include('index.template.admin.php');
+    }
+    else{
+        include('index.template.php');
+    }
+    
 
-	print_html_top('', $is_logged_in);
-	//print_toolbar( $baseurl, $is_logged_in ) ;
+    print_html_top('', $is_logged_in);
+    //print_toolbar( $baseurl, $is_logged_in ) ;
 
-//	print_site_placeholder( $sitesURL );
-//	print_round_list( $roundrecs );
-	print_score_list( 'scoreboard:allstudents', $student_scores, $object_uuid, $currency, $sao->roundid, $is_admin?5:$sao->refreshtime, $sao->objecttitle, $is_logged_in, $is_admin); 
+//    print_site_placeholder( $sitesURL );
+//    print_round_list( $roundrecs );
 
-	print_html_bottom();
+//krumo($student_scores);
+//krumo($score);
+
+    print_score_list( 'scoreboard:allstudents', $student_scores, $object_uuid, $currency, $sao->roundid, $is_admin?5:$sao->refreshtime, $sao->objecttitle, $is_logged_in, $is_admin); 
+
+    print_html_bottom();
 
 ?>

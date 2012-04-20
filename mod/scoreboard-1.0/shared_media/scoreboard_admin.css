@@ -129,10 +129,10 @@ ul{
   text-transform:uppercase;
   color: #ffd000;
   position:relative;
-  left:90px;
-  top: 5px;
+  left:50px;
+  top: -3px;
   font-family: 'Candal', 'Helvetica', sans-serif; 
-  margin-top:4px;
+  
   font-size: 24px;
 }
 .student_view > li.has_scores span.avatar_name{
@@ -142,29 +142,33 @@ ul{
   font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
   margin-top:4px;
   font-size: 24px;
+} 
+.admin_view > li.has_scores span.user_score_delete_link {
+    background: none repeat scroll 0 0;
+    color: white;
+    display: inline-block;
+    height: 35px;
+    left: 55px;
+
+    position: relative;
+    top: 5px;
+    width: 45px;
+} 
+
+.admin_view > li.has_scores span.position_number {
+    color: black;
+    font-family: 'Candal','Arial','Helvetica',sans-serif;
+    font-size: 22px;
+    height: 48px;
+    left: -30px;
+    margin-top: 4px;
+    position: relative;
+    top: -3px;
+    width: 30px;
 }
-.admin_view > li.has_scores span.user_score_delete_link{
-  left:70px; 
-  width:49px;
-  margin-top:6px;
-  color:white;
-  height: 48px;
-  top:5px;
-}
-.admin_view > li.has_scores span.position_number{
-  left:30px; 
-  width:30px;
-  margin-top:4px;
-  color:black;
-  height: 48px;
-  font-size: 22px;
-  position:relative;
-  font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
-}
+
   
-#admin_scrollpane .jspContainer,#scorelist_scrollpane .jspContainer{
-    width: 970px !important;
-}
+
 .jspTrack,.jspDrag{
     -moz-border-radius:10px;
     -webkit-border-radius:10px;
@@ -205,7 +209,7 @@ ul{
 .admin_view > li.has_scores span.score_info{
   text-align:right;
   margin-top:4px;
-  left:480px; 
+  
   top:5px;
   position: relative;
   font-weight: bold;
@@ -213,6 +217,8 @@ ul{
   color:white; 
   width:80px; 
   font-family: 'Candal', 'Arial', 'Helvetica', sans-serif; 
+  float:right;
+  padding-right:10px;
 }
 .student_view > li.has_scores span.score_info{
   text-align:right;

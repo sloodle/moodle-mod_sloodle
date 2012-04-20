@@ -9,7 +9,7 @@ function print_html_top($loadfrom = '', $is_logged_in) {
     <!--                                                
     <style type="text/css" media="screen">@import "http://fonts.googleapis.com/css?family=Candal";</style>
     -->
-    <style type="text/css" media="screen">@import "<?php echo $loadfrom?>scoreboard.css";</style>
+    <style type="text/css" media="screen">@import "<?php echo $loadfrom?>scoreboard_user.css";</style>
     
     <script type="application/x-javascript" src="../../../lib/jquery/jquery.js"></script>
     <script type="application/x-javascript" src="../../../lib/jquery/jquery.ba-hashchange.min.js"></script>
@@ -70,7 +70,8 @@ var active_object_uuid = '<?php echo  htmlentities($active_object_uuid) ?>';
 	        foreach($student_scores as $score) { 
 		        if ($score->has_scores) {
                     $i=0;
-			        for ($i=0;$i<10;$i++)render_score_li($score, $is_admin, $ranki); 
+			     //   for ($i=0;$i<10;$i++)
+                        render_score_li($score, $is_admin, $ranki); 
 			        $ranki++;
 		        }
 	        }

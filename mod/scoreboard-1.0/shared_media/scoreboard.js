@@ -3,13 +3,6 @@
 	var refreshtime = 0;
 	var view_type = null;
     
-    var scorelist_scrollpane = $('#scorelist_scrollpane');
-    var admin_scrollpane = $('#admin_scrollpane');
-    
-    var scorelist_scrollpane_api; 
-   
-    
-    var admin_scrollpane_api;
    
     
     
@@ -145,13 +138,19 @@
 				break;
 			}
 			nextjq.after(changedscorejq);	
-		}
-    if (scorelist_scrollpane_api){
-        scorelist_scrollpane_api.reinitialise();    
-    }
-    if (admin_scrollpane_api){
-        admin_scrollpane_api.reinitialise();
-    }
+		}  
+          
+           var scorelist_scrollpane = $('#scorelist_scrollpane');
+           var admin_scrollpane = $('#admin_scrollpane');
+           var admin_scrollpane_api = scorelist_scrollpane.data('jsp');
+           var scorelist_scrollpane_api = scorelist_scrollpane.data('jsp');
+
+        if (scorelist_scrollpane_api){
+            scorelist_scrollpane_api.reinitialise();    
+        }
+        if (admin_scrollpane_api){
+            admin_scrollpane_api.reinitialise();
+        }
     
 		$('.no_scores').find('.avatar_name').unbind('click').click( function() {
 			return change_score($(this));
@@ -407,24 +406,29 @@ function doStop() {
 	}
 
 	$(document).ready(function () {
+        var scorelist_scrollpane = $('#scorelist_scrollpane');
+        var admin_scrollpane = $('#admin_scrollpane');
+        var scorelist_scrollpane_api; 
+        var admin_scrollpane_api;
         var settings = {
-        
-        contentWidth:50,
-        verticalDragMinHeight: 20,
-        verticalDragMaxHeight: 20,
-        horizontalDragMinWidth: 20,
-        horizontalDragMaxWidth: 20
-    };
+            
+            verticalDragMinHeight: 20,
+            verticalDragMaxHeight: 20,
+            horizontalDragMinWidth: 20,
+            horizontalDragMaxWidth: 20
+        };
           if (scorelist_scrollpane){
-        console.log("scorelist_scrollpane initialized");
-        scorelist_scrollpane.jScrollPane(settings);
-        scorelist_scrollpane_api = scorelist_scrollpane.data('jsp');
-    }
-    if(admin_scrollpane){
-        console.log("admin initialized");
-        admin_scrollpane.jScrollPane(settings);
-        admin_scrollpane_api = scorelist_scrollpane.data('jsp');
-    }
+              $('#tabs').tabs();   
+              console.log("scorelist_scrollpane initialized");
+              scorelist_scrollpane.jScrollPane(settings);
+              scorelist_scrollpane_api = scorelist_scrollpane.data('jsp');
+              
+          }
+        if(admin_scrollpane){
+            console.log("admin initialized");
+            admin_scrollpane.jScrollPane(settings);
+            admin_scrollpane_api = scorelist_scrollpane.data('jsp');
+        }
 		attach_event_handlers();
 		//$('#backButton').show();
 	//	iui.animOn = true;
