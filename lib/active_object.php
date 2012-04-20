@@ -202,7 +202,10 @@
 
             require_once(SLOODLE_LIBROOT.'/beanstalk/Beanstalk.php');
 
-            $tube = 'sloodle-'.$task.'-'.md5($address);
+            global $CFG;
+            // Make a unique name for the sites queue
+            $sitequeue = md5($CFG->dbname.'-'.$CFG->prefix);
+            $tube = 'sloodle-'.$sitequeue.'-'.md5($address);
             //$tube = 'default';
             //$tube = md5($address);
 
@@ -230,7 +233,8 @@
             // Jobs will be handled more-or-less first-in, first-out, unless superseced by a new job and cleared.
             // 
             $priority = time();
-            $msg = $address."\n".$msg;
+            $header = $task.'|'.$address;
+            $msg = $header."\n".$msg;
 
             if (!$pid = $sb->put($priority, 0, $ttr, $msg)) {
                 return false;
@@ -242,7 +246,10 @@
                     if ($job['id'] >= $pid) {
                         break;
                     }
-                    $sb->delete($job['id']);
+                    // Only delete jobs for the same task.
+                    if (strpos( $job['body'], $header) == 0) {
+                        $sb->delete($job['id']);
+                    }
                 }
             }
 
@@ -265,13 +272,14 @@
 
         // sends a curl message to our objects httpinurl
         // If async is set, if possible it will be queued for sending later.
-        public function sendMessage($msg, $async = false, $replaceQueued = false){
+        // 
+        public function sendMessage($msg, $async = false, $replaceQueued = false, $task = 'async_message'){
 
             SloodleDebugLogger::log('HTTP-IN', $msg);
 
             if ($async && $this->isQueueActive()) {
 //$this->httpinurl
-                if ($this->queue($this->httpinurl, 'NOTIFICATION', $msg, 3, $replaceQueued)) {
+                if ($this->queue($this->httpinurl, $task, $msg, 3, $replaceQueued)) {
                     return array('info'=>null, 'result'=>'QUEUED');
                 }
             }
@@ -280,7 +288,7 @@
             curl_setopt($ch, CURLOPT_URL, $this->httpinurl ); // set url to post to
             curl_setopt($ch, CURLOPT_FAILONERROR,0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
-            curl_setopt($ch, CURLOPT_TIMEOUT, 10); // times out after 4s
+            curl_setopt($ch, CURLOPT_TIMEOUT, 20); 
             curl_setopt($ch, CURLOPT_POST, 1); // set POST method
             curl_setopt($ch, CURLOPT_POSTFIELDS,$msg); // add POST fields
             if ($proxy = $this->httpProxyURL()) {
@@ -352,7 +360,7 @@
             }
 
             $async = true;
-            $reply = $this->sendMessage($message, $async, $async);
+            $reply = $this->sendMessage($message, $async, $async, 'derez');
 
             return true;
 
@@ -369,7 +377,7 @@
             $response->set_status_descriptor('SYSTEM');
             $response->set_request_descriptor('DEREZ');
             $response->set_http_in_password($this->httpinpassword);
-            $response->set_return_url();
+            //$response->set_return_url();
             $response->add_data_line('do:derez');
 
             //create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
@@ -393,7 +401,7 @@
             }
 
             $async = false;
-            $reply = $this->sendMessage($message, $async, $async);
+            $reply = $this->sendMessage($message, $async, $async, 'derez');
             if (!$async) {
                 if ( !( $reply['info']['http_code'] == 200 ) ) {
                     return false;

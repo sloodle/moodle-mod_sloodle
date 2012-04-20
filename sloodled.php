@@ -18,6 +18,8 @@ if ( !defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK') || !SLOODLE_MESSAGE_QUEU
     exit;
 }
 
+define('SLOODLE_MESSAGE_QUEUE_TASK', true);
+
 //require_once('lib/beanstalk/Beanstalk.php');
 require_once(SLOODLE_LIBROOT.'/beanstalk/Beanstalk.php');
 
@@ -42,13 +44,96 @@ if (!$sb->connect()) {
     return false;
 }
 
-$verbose = in_array('-v',$argv);
+$args = $argv;
+array_shift($args); // remove the script name
 
-if ( in_array('stats',$argv) ) {
+// Check if the array contains the "-v", and if it does remove it from the array.
+$verbose = in_array( '-v', $args );
+$args = array_diff($args, array('-v') );
+
+$stats = in_array( '-s', $args );
+$args = array_diff($args, array('-s') );
+
+$manage = in_array( '-m', $args );
+$args = array_diff($args, array('-m') );
+
+$list_tubes = in_array( '-t', $args );
+$args = array_diff($args, array('-t') );
+
+if ( $stats ) {
     var_dump($sb->stats());
     exit;
 }
 
+if ($tube = array_shift($args)) {
+    if ($verbose) {
+        print "Using tube $tube";
+    }
+}
+
+if ($list_tubes) {
+    print "List of tubes:\n";
+    print join("\n",$sb->listTubes());
+    print "\n";
+    exit;
+}
+
+if ($manage) {
+    if ($verbose) {
+        print "In manage";
+        $check_after = 90;
+        $tubes_watched = array();
+        while(1) {
+
+            $tubes = $sb->listTubes();
+            if ($verbose) {
+                print "List found ".count($tubes)."\n";
+            }
+
+            foreach($tubes as $tube) {
+
+                if ($verbose) { 
+                    print "Checking tube $tube\n";
+                }
+
+                if (isset($tubes_watched[$tube])) {
+                    $last_check_ts = $tubes_watched[$tube];
+                    if ( ( $last_check_ts + $check_after ) < time() ) {
+                        if ($verbose) { 
+                            print "Time up for tube $tube - rechecking\n";
+                        }
+                        if (!sloodle_is_child_process_running($tube)) {
+                            print "No child process found for tube $tube - spawning\n";
+                            if (sloodle_spawn_child_process($tube)) {
+                                print "Spawned for tube $tube \n";
+                                if ($verbose) { 
+                                    $tubes_watched[$tube] = time();
+                                }
+                            } 
+                        }
+                    }
+                } else {
+                    if (!sloodle_is_child_process_running($tube)) {
+                        print "No child process found for tube $tube - spawning\n";
+                        if (sloodle_spawn_child_process($tube)) {
+                            if ($verbose) {
+                                print "Spawned for tube $tube \n";
+                            }
+                        }
+                        $tubes_watched[$tube] = time();
+                    }
+                }
+            }
+            sleep(1);
+        }
+    }
+}
+
+if ($tube) {
+    $sb->watch($tube);
+    sloodle_job_loop($sb, $verbose, $timeout=30);
+    exit;
+}
 
 //var_dump($sb->stats());
 //exit;
@@ -73,27 +158,15 @@ while (true) {
             $sb->watch($tube);
 
         }
+
+        sloodle_job_loop($sb, $verbose);
             //!$pid = $sb->put(1000, 0, 10, "hello");
             //print "Put job with pid $pid\n";
 
     //var_dump($sb->peekReady());
-            while($job = $sb->reserve(0)) {
-                $msg = $job['body'];
-                $id = $job['id'];
-                if ($verbose) {
-                    print "Handling job $id\n";
-                }
-                if (sloodle_handle_message($msg)) {
-                    if ($verbose) {
-                        print "Deleting job $id\n";
-                    }
-                    $sb->delete($id);
-                }
-                //sloodle_handle_message($sb, $job, $tube); 
-            }
-    }
+   }
 
-    sleep(1);
+    //sleep(1);
 
 }
 
@@ -107,37 +180,57 @@ foreach($tubes as $tube) {
 
 exit;
 
+function sloodle_job_loop($sb, $verbose, $timeout = 0) {
+
+    while($job = $sb->reserve($timeout)) {
+        $msg = $job['body'];
+        $id = $job['id'];
+        if ($verbose) {
+            print "Handling job $id\n";
+        }
+        if (sloodle_handle_message($msg)) {
+            if ($verbose) {
+                print "Deleting job $id\n";
+            }
+            $sb->delete($id);
+        }
+        //sloodle_handle_message($sb, $job, $tube); 
+    }
+ 
+}
+
 function sloodle_handle_message($msg) {
 
     $lines = explode("\n", $msg);
-    $url = array_shift($lines);
+    $statusline = array_shift($lines);
     $body = implode("\n", $lines);
 
     //print $url."\n";
 
-    if (!$url) {
+    if (!$statusline) {
         return false;
     }
 
-    $ch = curl_init();    // initialize curl handle
-    curl_setopt($ch, CURLOPT_URL, $url); // set url to post to
-    curl_setopt($ch, CURLOPT_FAILONERROR,0);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10); // times out after 4s
-    curl_setopt($ch, CURLOPT_POST, 1); // set POST method
-    curl_setopt($ch, CURLOPT_POSTFIELDS,$body); // add POST fields
-    /*
-    if ($proxy = $this->httpProxyURL()) {
-        curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
-        curl_setopt($ch, CURLOPT_PROXY, $this->httpProxyURL() );
+    $bits = explode("|", $statusline);
+    // We should at least have the task and address
+    if (count($bits) < 2) {
+        return false;
     }
-    */
 
-    $result = curl_exec($ch); // run the whole process
-    $info = curl_getinfo($ch);
-    curl_close($ch);
+    $handler_prefix = $bits[0];
+    $address = $bits[1];
 
-    //return array('info'=>$info,'result'=>$result);
+    if (!preg_match("/^[A-Za-z0-9_-]+$/", $handler_prefix)) {
+        print "handler_prefix $handler_prefix fails regex";
+        return false;
+    }
+    $request_handler  = $handler_prefix.'_request.php';
+    $response_handler = $handler_prefix.'_response.php';
+
+    include(SLOODLE_LIBROOT.'/message_handlers/'.$request_handler);
+    if (file_exists(SLOODLE_LIBROOT.'/message_handlers/'.$response_handler)) {
+        include(SLOODLE_LIBROOT.'/message_handlers/'.$response_handler);
+    }
 
     return true;
     /*
@@ -171,6 +264,27 @@ return;
     return array('info'=>$info,'result'=>$result);
 
     print "ok";
+
+}
+
+function sloodle_is_child_process_running($tube) {
+
+    $cmd = "ps aux | grep ".escapeshellarg($tube).' | grep -v grep | wc -l';
+    //print $cmd."\n";
+    exec($cmd, $result);
+    return ( isset($result[0]) && $result[0] > 0 );
+
+}
+
+function sloodle_spawn_child_process($tube) {
+
+    $cmd = "nohup php sloodled.php ".escapeshellarg($tube).' > /dev/null 2>&1 &';
+    
+    print $cmd."\n";
+    exec($cmd, $result);
+    var_dump($result);
+
+    return true;
 
 }
 

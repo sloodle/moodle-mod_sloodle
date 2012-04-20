@@ -86,17 +86,44 @@ $response->add_data_line('<0,-1,0>'); // position
 $response->add_data_line('<0,0,0>'); // rotation
 $response->add_data_line($rez_http_in_password); // This is set as the start parameter. As of 2011-08-08, this is ignored by the object at this point. When we do object persistance, it should be used to prevent people hijacking the object.
 
+// The following are sent to the rezzer just in case the rezzer needs to tell us what it rezzed.
+// In the normal case where we rez synchronously we already know it
+// ...but if we want to rez asynchronously, it may be useful.
+$response->add_data_line($primpassword); 
+$response->add_data_line($layoutentryid); 
+
 //create message - NB for some reason render_to_string changes the string by reference instead of just returning it.
 $renderStr="";
 $response->render_to_string($renderStr);
 
 //send message to httpinurl
-$reply = $rezzer->sendMessage($renderStr);
+$async = ( defined('SLOODLE_ASYNC_REZZING') && SLOODLE_ASYNC_REZZING );
+$reply = $rezzer->sendMessage($renderStr, $async, false, 'rez');
+
+if ($async) {
+
+    $result = 'queued';
+    $error = '';
+
+    $content = array(
+        'result' => $result,
+        'error' => $error,
+    );
+
+    print json_encode($content);
+    exit;
+
+}
+
+
+
+
 if (!( $reply['info']['http_code'] == 200 ) ) {
 	error_output('Rezzing failed');
 }
 
-$rezzed_object_uuid = $reply['result'];
+$lines = explode("\n",$reply['result']);
+$rezzed_object_uuid = $lines[0];
 
 if ( !$authid = $controller->register_object($rezzed_object_uuid, $objectname, $sloodleuser, $primpassword, $rez_http_in_password, $config->type()) ) {
 	error_output('Object registration failed');
