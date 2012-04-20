@@ -269,7 +269,11 @@
                         var leid = $(this).attr('data-layoutentryid');
                         if (!leiduuids[ leid ] ) {
                             changed = true;
-                            $(this).removeClass('derezzing').addClass('derezzed');
+                            if ($(this).hasClass('deleted_from_layout')) {
+                                itemjq.remove(); // TODO: Remove the config form too
+                            } else {
+                                $(this).removeClass('derezzing').addClass('derezzed');
+                            }
                         }
                     } );
 
@@ -277,7 +281,11 @@
                         var leid = $(this).attr('data-layoutentryid');
                         if (!leiduuids[ leid ] ) {
                             changed = true;
-                            $(this).removeClass('derezzing_failed').addClass('derezzed');
+                            if ($(this).hasClass('deleted_from_layout')) {
+                                itemjq.remove(); // TODO: Remove the config form too
+                            } else {
+                                $(this).removeClass('derezzing_failed').addClass('derezzed');
+                            }
                         }
                     } );
 
@@ -415,7 +423,7 @@
 				layoutentryid: entryid,
 				rezzeruuid: rezzer_uuid,
 				controllerid: controllerid,
-				synchronous: '1',
+				synchronous: '0',
 				ts: new Date().getTime()
 			},  
 			function(json) {  
