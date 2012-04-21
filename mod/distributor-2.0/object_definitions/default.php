@@ -1,15 +1,15 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
-$sloodleconfig->primname   = 'SLOODLE 1.1 Vending Machine';
+$sloodleconfig->primname   = 'SLOODLE Vending Machine';
 $sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'distributor-1.0';
+$sloodleconfig->modname    = 'distributor-2.0';
 $sloodleconfig->module     = 'sloodle';
 $sloodleconfig->module_choice_message = 'selectdistributor';
 $sloodleconfig->module_no_choices_message= 'nodistributorinterface';
 $sloodleconfig->module_filters = array( 'type' => SLOODLE_TYPE_DISTRIB );
 $sloodleconfig->group      = 'communication';
-$sloodleconfig->show       = false;
-$sloodleconfig->aliases    = array();
+$sloodleconfig->show       = true;
+$sloodleconfig->aliases    = array('SLOODLE 2.0 Vending Machine');
 $sloodleconfig->field_sets = array( 
 	'generalconfiguration' => array(
 		'sloodlerefreshtime' => new SloodleConfigurationOptionText( 'sloodlerefreshtime', 'refreshtimeseconds', '', 3600, 8),
@@ -20,4 +20,5 @@ $sloodleconfig->field_sets = array(
 	),
 	'awards' => $sloodleconfig->awards_require_options()
 );
+$sloodleconfig->capabilities = array('distributor_send_object_http_in');
 ?>

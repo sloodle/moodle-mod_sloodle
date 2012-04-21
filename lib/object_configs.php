@@ -622,6 +622,34 @@ exit;
 		return $fsgs;
 	}
 
+    /*
+    Return all object definitions that say they have the capability of the specified task.
+    Initially used for the distributor-2 vending machine
+    ...to say that it is capable of giving someone an object.
+    This is done by defining a capabilities array, like:
+        $sloodleconfig->capabilities = array('distributor_send_object_http_in');
+    */
+    function DefinitionsOfObjectsCapableOf($task) {
+
+        $definitions = SloodleObjectConfig::AllAvailableAsArray();
+
+        $capable_defs = array();
+        foreach($definitions as $name=>$def) {
+            if (!isset($def->capabilities)) {
+                continue;
+            }
+            if (!is_array($def->capabilities)) {
+                continue;
+            }
+            if (!in_array($task, $def->capabilities)) {
+                continue;
+            }
+            $capable_defs[$name] = $def;
+        }
+        return $capable_defs;
+
+    }
+
 }
 
 // Represents a single entry or potential entry in an object configuration.

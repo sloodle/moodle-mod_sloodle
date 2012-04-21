@@ -8,10 +8,14 @@
 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
 *
 * @contributor Peter R. Bloomfield
+* @contributor Edmund Edgar
 */
 
 /** The base module view class */
 require_once(SLOODLE_DIRROOT.'/view/base/base_view_module.php');
+
+define('SLOODLE_CHANNEL_DISTRIBUTOR_REQUEST_GIVE_OBJECT', 1639271151); // start the process to give the object
+
 
 
 
@@ -62,6 +66,16 @@ class sloodle_view_distributor extends sloodle_base_view_module
     {
         global $CFG, $USER;
     
+        /*
+        The version 1 method (distributor-1.0) uses a single XML-RPC channel.
+        Presumably if you have multiple ones the most recent to update will win.
+        Version 2 (distributor-2.0) uses the HTTP-in address that objects should already have.
+        There may be more than one.
+        We'll try to use the new method first, and if that fails fall back on the old one.
+        */
+        $id = required_param('id', PARAM_INT);
+        $capableobjects = SloodleActiveObject::ObjectsCapableOfTaskActiveSince( 'distributor_send_object_http_in', time()-3600, array('sloodlemoduleid'=>$id) );
+
         // Fetch a list of all distributor entries
         $entries = sloodle_get_records('sloodle_distributor_entry', 'distributorid', $this->distributor->id, 'name');
         // If the query failed, then assume there were simply no items available
@@ -84,9 +98,54 @@ class sloodle_view_distributor extends sloodle_base_view_module
             // Convert the HTML entities back again
             $send_object = htmlentities(stripslashes($send_object));
 
-            // Construct and send the request
-            $request = "1|OK\\nSENDOBJECT|$send_user|$send_object";
-            $ok = sloodle_send_xmlrpc_message($this->distributor->channel, 0, $request);
+            $errors = array();
+
+            $ok = false;
+            if (count($capableobjects) > 0) {
+                foreach($capableobjects as $obj) {
+                    $v2message = new SloodleResponse();
+                    $v2message->set_status_code(SLOODLE_CHANNEL_DISTRIBUTOR_REQUEST_GIVE_OBJECT);
+                    $v2message->set_status_descriptor('INVENTORY');
+                    $v2message->set_request_descriptor('GIVE_INVENTORY');
+                    $v2message->set_http_in_password($obj->httpinpassword);
+                    $v2message->set_expect_response(1);
+                    $v2message->add_data_line($send_user);
+                    $v2message->add_data_line($send_object);
+                    $v2RenderStr="";
+                    $v2message->render_to_string($v2renderStr);
+                    //print $v2renderStr;
+                    $response = $obj->sendMessage($v2renderStr);
+                    if ($response['info']['http_code'] == 200) {
+                        // If we succeed on one, don't bother telling the user that we failed on others.
+                        if (isset($errors['messagesendingfailed'])) {
+                            unset($errors['messagesendingfailed']);
+                        }
+                        $responselines = explode("\n",$response['result']);
+                        $statusline = array_shift($responselines);
+                        if ($statusline > 0) {
+                            $ok = true;
+                            break;
+                        } else {
+                            // Other lines should be errors.
+                            // We'll ignore anything we don't understand.
+                            foreach($responselines as $line) {
+                                if (in_array($line, array('sloodleobjectnotfound', 'sloodleavatarnotfound'))) {
+                                    $errors['sloodleobjectdistributor:'.$line] = true;
+                                }
+                            }
+                        }
+                    } else {
+                        $errors['messagesendingfailed'] = true;
+                    }
+
+                }
+            }
+
+            if (!$ok && ( $this->distributor->channel != '' )) {
+                // Construct and send the request
+                $request = "1|OK\\nSENDOBJECT|$send_user|$send_object";
+                $ok = sloodle_send_xmlrpc_message($this->distributor->channel, 0, $request);
+            }
             
             // What was the result?
             print_box_start('generalbox boxaligncenter boxwidthnarrow centerpara');
@@ -98,7 +157,7 @@ class sloodle_view_distributor extends sloodle_base_view_module
             print '<p style="text-align:center;">';
                 print get_string('Object','sloodle').': '.$send_object.'<br/>';
                 print get_string('uuid','sloodle').': '.$send_user.'<br/>';
-                print get_string('xmlrpc:channel','sloodle').': '.$this->distributor->channel.'<br/>';
+                //print get_string('xmlrpc:channel','sloodle').': '.$this->distributor->channel.'<br/>';
                 print '</p>';
             print_box_end();
         }
@@ -111,7 +170,7 @@ class sloodle_view_distributor extends sloodle_base_view_module
         //error(get_string('sloodleobjectdistributor:noobjects','sloodle'));
         // If there is no XMLRPC channel specified, then display a warning message
         $disabledattr = '';
-        if (empty($this->distributor->channel)) {
+        if ( empty($this->distributor->channel) && (count($capableobjects) == 0) ) {
             print_box('<span style="font-weight:bold; color:red;">'.get_string('sloodleobjectdistributor:nochannel','sloodle').'</span>', 'generalbox boxaligncenter boxwidthnormal centerpara');
             $disabledattr = 'disabled="true"';
         }

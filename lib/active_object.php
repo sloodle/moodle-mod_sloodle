@@ -198,14 +198,15 @@
         /*
         Queues an object 
         */
-        function queue($address, $task, $msg, $ttr = 30, $clear = false) {
+        function queue($address, $task, $msg, $ttr = 30, $clear = false, $priority=1000) {
 
             require_once(SLOODLE_LIBROOT.'/beanstalk/Beanstalk.php');
 
             global $CFG;
             // Make a unique name for the sites queue
-            $sitequeue = md5($CFG->dbname.'-'.$CFG->prefix);
-            $tube = 'sloodle-'.$sitequeue.'-'.md5($address);
+            $sitequeue = defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PREFIX') ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PREFIX : 'sloodleq';
+
+            $tube = $sitequeue.'-'.md5($address);
             //$tube = 'default';
             //$tube = md5($address);
 
@@ -232,7 +233,7 @@
 
             // Jobs will be handled more-or-less first-in, first-out, unless superseced by a new job and cleared.
             // 
-            $priority = time();
+            //$priority = time();
             $header = $task.'|'.$address;
             $msg = $header."\n".$msg;
 
@@ -273,7 +274,7 @@
         // sends a curl message to our objects httpinurl
         // If async is set, if possible it will be queued for sending later.
         // 
-        public function sendMessage($msg, $async = false, $replaceQueued = false, $task = 'async_message'){
+        public function sendMessage($msg, $async = false, $replaceQueued = false, $task = 'async_message', $priority=1000, $timeout = 20){
 
             SloodleDebugLogger::log('HTTP-IN', $msg);
 
@@ -288,7 +289,7 @@
             curl_setopt($ch, CURLOPT_URL, $this->httpinurl ); // set url to post to
             curl_setopt($ch, CURLOPT_FAILONERROR,0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
-            curl_setopt($ch, CURLOPT_TIMEOUT, 20); 
+            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout); 
             curl_setopt($ch, CURLOPT_POST, 1); // set POST method
             curl_setopt($ch, CURLOPT_POSTFIELDS,$msg); // add POST fields
             if ($proxy = $this->httpProxyURL()) {
@@ -414,7 +415,7 @@
 
         // Sends a message to the object telling it to refresh its configuration.
         // Return true on success, false on failure
-        public function refreshConfig() {
+        public function refreshConfig($async = false) {
 
             if (!$this->httpinurl) {
                 return false;
@@ -430,8 +431,8 @@
             $renderStr="";
             $response->render_to_string($renderStr);
             //send message to httpinurl
-            $reply = $this->sendMessage($renderStr);
-            if ( !( $reply['info']['http_code'] == 200 ) ) {
+            $reply = $this->sendMessage($renderStr, $async, $async);
+            if ( !$async && ( !( $reply['info']['http_code'] == 200 ) ) ) {
                 return false;
             }
 
@@ -444,7 +445,7 @@
         * @var $extraParameters array()
         *
         */
-        public function sendConfig( $extraParameters = NULL, $async = false ){//inside active_object.php
+        public function sendConfig( $extraParameters = NULL, $async = false ) {
 
             global $CFG;
             //construct the body
@@ -506,7 +507,7 @@
             $response->render_to_string($renderStr);
             //curl send this to our object's httpinurl
 
-            return $this->sendMessage( $renderStr, $async, $async );
+            return $this->sendMessage( $renderStr, $async, $async);
 
         }
 
@@ -972,8 +973,59 @@
             
         }
 
+        // Return objects that say they have the capability to do the task
+        // Since restricts to how recently they've been active.
+        // Criteria allows for config filters, eg. by sloodle module id.
+        //$objects = SloodleActiveObject::ObjectsCapableOfTaskActiveSince('asdf',time()-60,array('sloodlemoduleid',123));
+        function ObjectsCapableOfTaskActiveSince($task, $sincets, $criteria) {
+
+            global $CFG;
+
+            $defs = SloodleObjectConfig::DefinitionsOfObjectsCapableOf($task); 
+            if (empty($defs)) {
+                return array();
+            }
+
+            $instr = '';
+            $delim = '';
+            $queryparams = array(); //array(intval($controllerid));
+            foreach($defs as $ot) {
+                $queryparams[] = $ot->type();
+                $instr .= $delim.'?';
+                $delim = ',';
+            }
+            $queryparams[] = $sincets; // time() - (3600+600); // Ping time and then some. All objects that are alive should have updated within this time.
+
+            $wherepairs = array();
+            $criteriastring = '';
+            if (count($criteria) > 0) {
+                foreach($criteria as $field => $value) {
+                    $wherepairs[] = "c.name=? and c.value=?";
+                    $queryparams[] = $field;
+                    $queryparams[] = $value;
+                }
+                $criteriastring = ' AND '.implode(' AND ', $wherepairs);
+            }
+
+            $sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? $criteriastring order by a.timeupdated desc;";
+            $recs = sloodle_get_records_sql_params($sql, $queryparams);
+
+            $ret = array();
+
+            foreach($recs as $rec) {
+                $ao = new SloodleActiveObject();
+                $ao->loadFromRecord( $rec, $lazy = true );
+                $ret[] = $ao;
+            }
+
+            return $ret;
+
+        }
+
+
+
         // An array of config objects, keyed by config name
-            function config_name_config_hash() {
+        function config_name_config_hash() {
         
             $id = $this->id;	
 

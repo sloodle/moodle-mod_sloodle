@@ -5,11 +5,14 @@
 */
 define('CLI_SCRIPT',true);
 
-$_SERVER = array();
-$_SERVER['SERVER_NAME'] = 'gershwinklata1.avatarclassroom.com';
-//$_SERVER['REMOTE_ADDR'] = '';
-$_SERVER['REMOTE_PORT'] = '';
-$_SERVER['REQUEST_TIME'] = time();
+// This makes it possible to have the server name set using an environment variable
+// eg. SERVER_NAME=gershwinklata1.avatarclassroom.com php sloodled.php
+// This is useful in the Avatar Classroom multiple-host environment
+// ...where we want to be able to tell the script which database etc to write to
+if (getenv('SERVER_NAME')) {
+    $_SERVER = array();
+    $_SERVER['SERVER_NAME'] = getenv('SERVER_NAME');
+}
 
 require_once('sl_config.php');
 
@@ -81,7 +84,7 @@ if ($list_tubes) {
 if ($manage) {
     if ($verbose) {
         print "In manage";
-        $check_after = 90;
+        $check_after = 30;
         $tubes_watched = array();
         while(1) {
 
@@ -131,7 +134,7 @@ if ($manage) {
 
 if ($tube) {
     $sb->watch($tube);
-    sloodle_job_loop($sb, $verbose, $timeout=30);
+    sloodle_job_loop($sb, $verbose, $timeout=300);
     exit;
 }
 
@@ -279,10 +282,13 @@ function sloodle_is_child_process_running($tube) {
 function sloodle_spawn_child_process($tube) {
 
     $cmd = "nohup php sloodled.php ".escapeshellarg($tube).' > /dev/null 2>&1 &';
+    if (defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_SERVER_ENVIRONMENT_PREPEND') ) {
+//        $cmd = SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_SERVER_ENVIRONMENT_PREPEND.$cmd;
+    }
     
     print $cmd."\n";
     exec($cmd, $result);
-    var_dump($result);
+ //   var_dump($result);
 
     return true;
 

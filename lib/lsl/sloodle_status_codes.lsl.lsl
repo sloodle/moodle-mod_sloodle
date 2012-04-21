@@ -15,6 +15,9 @@
     http://lslplus.sourceforge.net/
 	
 */
+
+integer SLOODLE_CHANNEL_HTTP_RESPONSE = -1639260101  // Tells the sloodle_rezzer_object script to send the contents as an http response, to the key specified as key
+
 integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102; //Tells us to start a quiz for the avatar, if possible.; Ordinary quiz chair will have a second script that detects and avatar sitting      on it and sends it. Awards-integrated version waits for a game ID to be set before doing this.
 integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103; //Sent by main quiz script to tell UI scripts that quiz has started for avatar with key
 integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104; //Sent by main quiz script to tell UI scripts that quiz has finished for avatar with key, with x/y correct in string
@@ -52,5 +55,8 @@ integer SLOODLE_OBJECT_INTERACTION_SHOUT_COMMAND= -1639271134; //channel interac
 integer SLOODLE_OBJECT_BLINK= -1639271135; //linked message channel to tell a prim to blink
 integer SLOODLE_OBJECT_GIVE_POINTS= -1639271136; //linked message channel to tell an object to give points
 integer SLOODLE_LOAD_CURRENT_URL= -1639271137; //send message to shared media to open url that it is currently displaying in a browser.
+
+integer SLOODLE_CHANNEL_DISTRIBUTOR_REQUEST_GIVE_OBJECT = -1639271151; // start the process to give the specified object to the specified avatar, if they are allowed it.
+integer SLOODLE_CHANNEL_DISTRIBUTOR_DO_GIVE_OBJECT = 1639271152; // actually do give the specified object to the specified avatar
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: lib/lsl/sloodle_status_codes.lsl.lsl 

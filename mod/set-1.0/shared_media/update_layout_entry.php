@@ -72,6 +72,7 @@ if (!$layoutentry->update()) {
 	error_output('Layout entry update failed');
 }
 
+$async = ( defined('SLOODLE_ASYNC_SEND_CONFIG') && SLOODLE_ASYNC_SEND_CONFIG );
 
 $failures = array();
 $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid );
@@ -79,9 +80,9 @@ $active_objects = $controller->get_active_objects( $rezzeruuid, $layoutentryid )
 if (count($active_objects) > 0) {
     foreach($active_objects as $ao) {
         if ($ao->configure_for_layout() || true) {
-            $response = $ao->refreshConfig();
+            $response = $ao->refreshConfig($async);
             sleep(1);
-            $response2 = $ao->sendConfig();
+            $response2 = $ao->sendConfig($async);
         } 
         // No error handling here - if it breaks, just carry on.
 
