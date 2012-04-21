@@ -13,6 +13,8 @@
 *  This script will get an httpin url, and shout it out to the rezzer.  It will then wait to receive its config via httpin, and send it as a linked message to all other scripts
 */
 
+integer SLOODLE_CHANNEL_HTTP_RESPONSE = -1639260101;  // Tells the sloodle_rezzer_object script to send the contents as an http-in response, to the key specified as key, which should be waiting for a response.
+
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;//configuration channel
 integer SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL = -1639270089; //Object creator telling itself it wants to rez an object at a position (specified as key)
 
@@ -79,6 +81,7 @@ integer sloodle_handle_command(string str, integer do_persist)
             rezzer_uuid = llList2Key(bits,3);
             has_position = 1;
         } else if (name == "do:derez") {
+            llSleep(2); // This is needed to give the script a chance to finish making the http response.
             llDie();
         } else if ( (name=="do:requestconfig") || (name=="do:reset") ) {           
             string this_script = llGetScriptName();                
@@ -111,7 +114,7 @@ integer sloodle_handle_command(string str, integer do_persist)
     return isconfigured;
 }
 
-sloodle_tell_other_scripts(string msg, integer channel)
+sloodle_tell_other_scripts(string msg, integer channel, key respond_key)
 {    
     integer status_code;
     if (channel == 0) {
@@ -136,7 +139,7 @@ sloodle_tell_other_scripts(string msg, integer channel)
         msg = msg + "\n"+SLOODLE_EOF;
     }
    // llOwnerSay("sending msg with status code "+(string)status_code+": "+msg);
-    llMessageLinked(LINK_SET, status_code, msg, NULL_KEY);
+    llMessageLinked(LINK_SET, status_code, msg, respond_key);
     
 }
 
@@ -272,8 +275,17 @@ default{
                     return;
                 }                
                 
-                llHTTPResponse(id, 200, "OK");                 
-
+                // If we don't expect a response from the script that handles this, respond now to say we got the message.
+                integer expect_response = 0;
+                if (llGetListLength(header_line) >= 12) {
+                    if (llList2Integer(header_line, 11) == 1) {
+                        expect_response = 1;
+                    }
+                }
+                if (expect_response != 1) {
+                    llHTTPResponse(id, 200, "OK"); 
+                }
+                
                 string descriptor = "";
                 if (llGetListLength(header_line) > 1) descriptor = llList2String(header_line, 3);
                 integer do_persist = 0;   
@@ -296,13 +308,13 @@ default{
                 integer numlines = llGetListLength(lines);
                 integer i = 1;          
                 for (i=1; i < numlines; i++) {
-                    isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);                                 
+                    isconfigured = sloodle_handle_command(llList2String(lines, i), do_persist);                      
                 }                                                         
                                 
-                sloodle_tell_other_scripts(body,0);
+                sloodle_tell_other_scripts(body,0, id);
                 // This is the end of the configuration data
                 llSleep(0.2);
-                sloodle_tell_other_scripts(SLOODLE_EOF, 0);
+                sloodle_tell_other_scripts(SLOODLE_EOF, 0, id);
                 
                 if (isconfigured == 1) {   
                     if (has_position == 1) {                                 
@@ -343,7 +355,7 @@ state ready {
             sloodlecontrollerid = "";
             sloodlepwd = "";
             persistent_config = "";
-            llSleep(2.0); // Give the rezzer time to register us. Seems to be an issue on OpenSim, where everything is faster than SL.
+            // llSleep(2.0); // Give the rezzer time to register us. Seems to be an issue on OpenSim, where everything is faster than SL.
         }
                 
         state default;        
@@ -470,9 +482,18 @@ state ready {
                     llHTTPResponse(id, 200, reply);
                     return;
                 }
-           
+              
+                 // If we don't expect a response from the script that handles this, respond now to say we got the message.
+                integer expect_response = 0;
+                if (llGetListLength(header_line) >= 12) {
+                    if (llList2Integer(header_line, 11) == 1) {
+                        expect_response = 1;
+                    }
+                };
+                if (expect_response != 1) {
+                    llHTTPResponse(id, 200, "OK"); 
+                }
                 
-                llHTTPResponse(id, 200, "OK");                 
                 string status_descriptor = "";
                 string request_descriptor = "";                             
                 integer do_persist = 0;
@@ -494,12 +515,12 @@ state ready {
                     }
                 } 
                                 
-                sloodle_tell_other_scripts(body, 0);
+                sloodle_tell_other_scripts(body, 0, id);
                 // This is the end of the configuration data
                 llSleep(0.2);
-                sloodle_tell_other_scripts(SLOODLE_EOF, 0);
+                sloodle_tell_other_scripts(SLOODLE_EOF, 0, id);
                                                                        
-          }//endif
+          }//endif 
      }//http
 
     // TODO: Need a changed event for region etc to get a new url
@@ -518,7 +539,10 @@ state ready {
         // Check the channel
         if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
             sloodle_handle_command(str, 0);
+        } else if (num == SLOODLE_CHANNEL_HTTP_RESPONSE) {
+            llHTTPResponse(id, 200, str); 
         }
+
     }
 }
         
@@ -532,4 +556,3 @@ state reinitialize {
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_rezzer_object.lsl
-

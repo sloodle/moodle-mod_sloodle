@@ -174,7 +174,7 @@
         * @var string
         * @access private
         */
-        var $return_url = null;
+        var $expect_response = null;
  
 
         /**
@@ -462,13 +462,13 @@
         }
    
         /**
-        * Accessor function to set member value {@link $return_url}
+        * Accessor function to set member value {@link $expect_response}
         * @param mixed $par Any scalar value
         * @return void
         */
-        function set_return_url($url)
+        function set_expect_response($int)
         {
-            $this->return_url = $url;
+            $this->expect_response = $int;
         }
        
 
@@ -593,9 +593,9 @@
             $showall = false;
 
             // return url
-            if ($showall || is_null($this->return_url) == false) {
+            if ($showall || is_null($this->expect_response) == false) {
                 $showall = true;
-                $str = $this->field_separator . $this->return_url. $str;
+                $str = $this->field_separator . $this->expect_response. $str;
             }
 
             // HTTP In Password?
