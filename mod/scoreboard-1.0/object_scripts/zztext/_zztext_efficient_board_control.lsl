@@ -94,7 +94,7 @@ debug (string message){
 *  So if your display has 50 prims, put in their description 1, then the next zzprim description 2 etc
 */
 renderString(string str,string zzTextPrimNames){
-                integer prims = llGetNumberOfPrims();
+				integer prims = llGetNumberOfPrims();
                 vector GridPos1;vector GridPos2;vector GridPos3;vector GridPos4;vector GridPos5;  
                 integer currentLink=0;
                 integer currentCellCharPosition=0;
@@ -102,25 +102,25 @@ renderString(string str,string zzTextPrimNames){
                 string textToRender;
                do{
                        if (llList2String(llGetLinkPrimitiveParams(currentLink, [PRIM_NAME]),0)==zzTextPrimNames){
-                                 currentCellCharPosition=llList2Integer(llGetLinkPrimitiveParams(currentLink, [PRIM_DESC]),0)*10;
-                                //get the part of the text between the cells start and end position
-                                textToRender = llGetSubString(str, currentCellCharPosition, currentCellCharPosition+ 9);
-                                   // Get the grid positions for each pair of characters.
-                                GridPos1 = GetGridPos( GetIndex(llGetSubString(textToRender, 0, 0)),GetIndex(llGetSubString(textToRender, 1, 1)) );
-                                GridPos2 = GetGridPos( GetIndex(llGetSubString(textToRender, 2, 2)),GetIndex(llGetSubString(textToRender, 3, 3)) );
-                                GridPos3 = GetGridPos( GetIndex(llGetSubString(textToRender, 4, 4)),GetIndex(llGetSubString(textToRender, 5, 5)) );
-                                GridPos4 = GetGridPos( GetIndex(llGetSubString(textToRender, 6, 6)),GetIndex(llGetSubString(textToRender, 7, 7)) );
-                                GridPos5 = GetGridPos( GetIndex(llGetSubString(textToRender, 8, 8)),GetIndex(llGetSubString(textToRender, 9, 9)) );
-                                key gridTexture1=  GetGridTexture(GridPos1);key gridTexture2=  GetGridTexture(GridPos2);key gridTexture3=  GetGridTexture(GridPos3);key gridTexture4=  GetGridTexture(GridPos4);key gridTexture5=  GetGridTexture(GridPos5);
-                                llSetLinkPrimitiveParamsFast(currentLink, 
-                                        [
-                                            PRIM_TEXTURE, FACE_1, gridTexture1, <0.125, 0.05, 0>, GetGridOffset(GridPos1) + <0.0375-0.025-0.002, 0.025, 0>, 0.0,
-                                            PRIM_TEXTURE, FACE_2, gridTexture2, <0.05, 0.05, 0>, GetGridOffset(GridPos2)+<-0.025-0.002, 0.025,0>, 0.0,
-                                            PRIM_TEXTURE, FACE_3, gridTexture3, <-0.74, 0.05, 0>, GetGridOffset(GridPos3)+ <-.34-0.002, 0.025, 0>, 0.0,
-                                            PRIM_TEXTURE, FACE_4,gridTexture4, <0.05, 0.05, 0>, GetGridOffset(GridPos4)+<-0.025-0.002, 0.025,0>, 0.0,
-                                            PRIM_TEXTURE, FACE_5, gridTexture5, <0.125, 0.05, 0>, GetGridOffset(GridPos5) + <0.0375-0.025-0.077-0.002, 0.025, 0>, 0.0
-                                        ]
-                                );
+                             	currentCellCharPosition=llList2Integer(llGetLinkPrimitiveParams(currentLink, [PRIM_DESC]),0)*10;
+		                        //get the part of the text between the cells start and end position
+                        		textToRender = llGetSubString(str, currentCellCharPosition, currentCellCharPosition+ 9);
+                           		// Get the grid positions for each pair of characters.
+		                        GridPos1 = GetGridPos( GetIndex(llGetSubString(textToRender, 0, 0)),GetIndex(llGetSubString(textToRender, 1, 1)) );
+		                        GridPos2 = GetGridPos( GetIndex(llGetSubString(textToRender, 2, 2)),GetIndex(llGetSubString(textToRender, 3, 3)) );
+		                        GridPos3 = GetGridPos( GetIndex(llGetSubString(textToRender, 4, 4)),GetIndex(llGetSubString(textToRender, 5, 5)) );
+		                        GridPos4 = GetGridPos( GetIndex(llGetSubString(textToRender, 6, 6)),GetIndex(llGetSubString(textToRender, 7, 7)) );
+		                        GridPos5 = GetGridPos( GetIndex(llGetSubString(textToRender, 8, 8)),GetIndex(llGetSubString(textToRender, 9, 9)) );
+                        		key gridTexture1=  GetGridTexture(GridPos1);key gridTexture2=  GetGridTexture(GridPos2);key gridTexture3=  GetGridTexture(GridPos3);key gridTexture4=  GetGridTexture(GridPos4);key gridTexture5=  GetGridTexture(GridPos5);
+		                        llSetLinkPrimitiveParamsFast(currentLink, 
+		                                [
+		                                    PRIM_TEXTURE, FACE_1, gridTexture1, <0.125, 0.05, 0>, GetGridOffset(GridPos1) + <0.0375-0.025-0.002, 0.025, 0>, 0.0,
+		                                    PRIM_TEXTURE, FACE_2, gridTexture2, <0.05, 0.05, 0>, GetGridOffset(GridPos2)+<-0.025-0.002, 0.025,0>, 0.0,
+		                                    PRIM_TEXTURE, FACE_3, gridTexture3, <-0.74, 0.05, 0>, GetGridOffset(GridPos3)+ <-.34-0.002, 0.025, 0>, 0.0,
+		                                    PRIM_TEXTURE, FACE_4,gridTexture4, <0.05, 0.05, 0>, GetGridOffset(GridPos4)+<-0.025-0.002, 0.025,0>, 0.0,
+		                                    PRIM_TEXTURE, FACE_5, gridTexture5, <0.125, 0.05, 0>, GetGridOffset(GridPos5) + <0.0375-0.025-0.077-0.002, 0.025, 0>, 0.0
+		                                ]
+		                        );
                       }
             }while(++currentLink < prims); 
 }
@@ -223,7 +223,7 @@ integer GetIndex(string char)
     // special char do nice trick :)
     string escaped=llEscapeURL(char);
  
-    if(escaped=="%E2%80%99") return 7; // remap .
+    if(escaped=="%E2%80%99") return 7; // remap ’
     //llSay(0,"Looking for "+escaped);
     integer found=llListFindList(decode, [escaped]);
  
@@ -252,12 +252,6 @@ doTest(){
     test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1300\n";
     test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1400\n";
     test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1500\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1600\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1700\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1800\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1900\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        2000\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        2100\n";
     //string test = "1639271140|blah_blah_blah|ignore_line_zero
     //\nstatus|1|1|Scavenger Hunt|Red Team|Credits
     //\na819d3a6-0cf5-445c-94a9-c5ba84285bb1|17|Avatar Classroom                      17
@@ -334,9 +328,7 @@ default
        // set_scoreboard_score_text("THIS IS A TEST 123");
       
     } 
-touch_start(integer start_param){
- doTest();    
- }
+  
     link_message(integer sender_num, integer num, string str, key id) {
         if (num==SLOODLE_CHANNEL_SCOREBOARD_UPDATE_COMPLETE){
             list lines = llParseString2List(str, ["\n"], []);
