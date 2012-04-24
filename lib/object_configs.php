@@ -30,9 +30,10 @@ class SloodleObjectConfig {
 	// Used in displaying objects in groups in the set.
 	var $group;
 
-	// Whether the object should be displayed by default.
-	// Was previously controlled using a file called "noshow".
-	var $show;
+	// Which collections of 
+    // Was previously controlled by a variable called show
+	// ...and prior to that by a file called "noshow".
+	var $collections;
 
 	// An array of groupings containing an array of SloodleInputWidget objects
 	// One used for each configuration control.
@@ -155,7 +156,15 @@ class SloodleObjectConfig {
 				if (!preg_match('/\.php$/', $def_include)) {
 					continue;
 				}
+                $sloodleconfig = null;
+                // Should define $sloodleconfig, which should be a SloodleObjectConfig object.
 				include($object_definition_dir.'/'.$def_include);
+                if (!$sloodleconfig) {
+                    continue;
+                }
+                if (!$sloodleconfig->do_show()) {
+                    continue;
+                }
 				$object_configs[$sloodleconfig->$key] = $sloodleconfig;
 			}
 			closedir($dh2);
@@ -231,6 +240,25 @@ class SloodleObjectConfig {
 		return array($name, $version);
 	}
 
+    /*
+    Whether an object should be shown or not.
+    Controlled by whether it declares that it's a collection of objects that we support.
+    The collections we support are currently defined in the sloodle config
+    ...although in future we'll probably improve on that to handle multiple different kinds of rezzer.
+    */
+    function do_show() {
+
+        $supported_collections = unserialize(SLOODLE_SUPPORTED_OBJECT_COLLECTIONS);
+
+        // If you don't specify a collection, never show the object.
+        if ( !isset( $this->collections ) || !is_array( $this->collections ) ) {
+            return false;
+        }
+
+        return ( count( array_intersect( $supported_collections, $this->collections ) ) > 0 );;
+
+    }
+
 	function AllAvailableAsNameVersionHash() {
 
 		$objs = array();
@@ -240,8 +268,8 @@ class SloodleObjectConfig {
 		    if (empty($obj_def)) continue;
 		    
 		    $modname = $obj_def->modname;
-		    if (!$obj_def->show) {
-			continue;
+		    if (!$obj_def->do_show()) {
+                continue;
 		    }
 
 		    // Parse the object identifier
@@ -274,7 +302,7 @@ class SloodleObjectConfig {
 		$sloodleconfig->object_code= $encoded_name;
 		$sloodleconfig->modname    = null;
 		$sloodleconfig->group      = 'misc';
-		$sloodleconfig->show       = false;
+		$sloodleconfig->collections= array('SLOODLE 2.0');
 		$sloodleconfig->aliases    = array();
 		$sloodleconfig->field_sets = array();
 

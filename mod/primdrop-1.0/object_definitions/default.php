@@ -8,7 +8,7 @@ $sloodleconfig->module_choice_message = 'selectassignment';
 $sloodleconfig->module_no_choices_message = 'noassignments'; 
 $sloodleconfig->module_filters = array( 'assignmenttype' => 'sloodleobject');
 $sloodleconfig->group      = 'communication';
-$sloodleconfig->show       = true;
+$sloodleconfig->collections= array('SLOODLE 2.0');
 $sloodleconfig->aliases    = array('SLOODLE 1.1 PrimDrop');
 $sloodleconfig->field_sets = array( 
 	'accesslevel' => array(

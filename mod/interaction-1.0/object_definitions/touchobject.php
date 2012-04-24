@@ -4,7 +4,7 @@ $sloodleconfig->primname   = 'SLOODLE Touch Object';
 $sloodleconfig->object_code= 'touchobject';
 $sloodleconfig->modname    = 'interaction-1.0';
 $sloodleconfig->group      = 'activity';
-$sloodleconfig->show       = true;
+$sloodleconfig->collections= array('SLOODLE 2.0');
 $sloodleconfig->aliases    = array();
 $sloodleconfig->field_sets = array( 
 	'accesslevel' => array(
@@ -15,7 +15,7 @@ $sloodleconfig->field_sets = array(
 		$sloodleconfig->awards_deposit_options( array( 'default' => 'awards:interactwithobjectplus' ) ),
 		$sloodleconfig->awards_require_options( array( 'default' => 'awards:interactwithobjectrequires' ) ), 
 		$sloodleconfig->awards_withdraw_options( array( 'default' => 'awards:interactwithobjectminus' ) )
-	 ) 
+	 )
         //'awards' => $sloodleconfig->awards_deposit_options( array( 'touch' => 'awards:answerquestionaward' ) ) 
         //'awards' => $sloodleconfig->awards_setting_options() // Allows you to award points for taking part in a discussion. Not sure if we want to display this or not...
 //        'awards' => $sloodleconfig->awards_pay_options()

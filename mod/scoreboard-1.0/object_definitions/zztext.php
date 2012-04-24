@@ -4,7 +4,7 @@ $sloodleconfig->primname   = 'SLOODLE ZZText Scoreboard';
 $sloodleconfig->object_code= 'zztext';
 $sloodleconfig->modname    = 'scoreboard-1.0';
 $sloodleconfig->group      = 'activity';
-$sloodleconfig->show       = true;
+$sloodleconfig->collections= array('SLOODLE 2.0');
 $sloodleconfig->aliases    = array();
 
  // If this happens on the server side, tell me about it.

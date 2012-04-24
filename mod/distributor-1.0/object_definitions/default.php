@@ -8,7 +8,7 @@ $sloodleconfig->module_choice_message = 'selectdistributor';
 $sloodleconfig->module_no_choices_message= 'nodistributorinterface';
 $sloodleconfig->module_filters = array( 'type' => SLOODLE_TYPE_DISTRIB );
 $sloodleconfig->group      = 'communication';
-$sloodleconfig->show       = false;
+$sloodleconfig->collections= array('SLOODLE 1.0'); // Replaced in SLOODLE 2.0 with a new, incompatible vending machine using http-in
 $sloodleconfig->aliases    = array();
 $sloodleconfig->field_sets = array( 
 	'generalconfiguration' => array(
