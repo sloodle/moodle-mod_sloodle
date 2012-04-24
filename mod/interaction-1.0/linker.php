@@ -50,16 +50,18 @@
     $sloodle_session->validate_user(true);
     $sloodle_session->user->login();
 
-    // If the config for this object specifies something that we haven't done, this will return an error to the calling LSL script and exit.
-    $sloodle_session->validate_requirements();
+    $task = optional_param('task', 'default', PARAM_TEXT);
 
-    $ok = $sloodle_session->process_interaction('default', 1);
+    // If the config for this object specifies something that we haven't done, this will return an error to the calling LSL script and exit.
+    $sloodle_session->validate_requirements($task,1);
+
+    $ok = $sloodle_session->process_interaction($task, 1);
     
     // Was it successful?
     if ($ok) {
             $sloodle_session->response->set_status_code(1);
             $sloodle_session->response->set_status_descriptor('OK');
-            $sloodle_session->response->add_data_line($authid);
+            $sloodle_session->response->add_data_line($task);
     } else {
             $sloodle_session->response->set_status_code(-201);
             $sloodle_session->response->set_status_descriptor('OBJECT_AUTH');
