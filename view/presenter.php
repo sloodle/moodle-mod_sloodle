@@ -341,13 +341,20 @@ class sloodle_view_presenter extends sloodle_base_view_module
 
             //else echo "<span style=\"color:#bbbbbb;\">&rarr;</span>";            
             echo "</p>\n";
+
+ 
+            global $OUTPUT;
+            var_dump($OUTPUT);
+
+            echo '<div style="text-align:center;" >';
+            echo '<table border="0" width="100%"><tr><td align="center">';
             
             $entrynumcounter=1;            
             $jumpNumber=5;
             //display >>
             $arrowLinks = new stdClass();       
             $arrowLinks->class='texrender';     
-            $arrowLinks->size = array('40px', '40px','40px','40px');
+            $arrowLinks->size = array('40px', '40px','40px','40px','40px');
             $arrowLinks->cellpadding='1';
             $arrowLinks->width='500px';
             
@@ -364,9 +371,9 @@ class sloodle_view_presenter extends sloodle_base_view_module
             $prev=$displayentrynum-1;
             if ($displayentrynum>=2) $arow[]= "<a href=\"?id={$this->cm->id}&sloodledisplayentry={$prev}#slide\" title=\"{$strviewprev}\"><img alt=\"{$strviewprev}\" style=\"vertical-align:middle;\" src=\"".SLOODLE_WWWROOT."/lib/media/bluecons_prev.gif\" width=\"40\" height=\"40\"></a>  "; 
             else $arow[]= "<img alt=\"{$strviewprev}\" style=\"vertical-align:middle;\" src=\"".SLOODLE_WWWROOT."/lib/media/bluecons_prev.gif\" width=\"40\" height=\"40\">"; 
-            
+           
             // display hyperlinks for each slide
-            $row="<table width='400px'><tr>";
+            $row="<table width='100%'><tr>";
             foreach ($entries as $entryid => $entry) {
                 //get start and end slides                 
                 $start = $displayentrynum - $jumpNumber;
@@ -375,7 +382,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
                 if ($end>$numentries) $end =$numentries;
                 if (($entrynumcounter >= $start)&& ($entrynumcounter<=$end)){
                     if ($entrynumcounter==$displayentrynum) $row.= "<td style=\"font-weight:bold; font-size:larger;\">"."<a href=\"?id={$this->cm->id}&sloodledisplayentry=".$entrynumcounter."#slide\" title=\"{$entry->name}\">{$entrynumcounter}</a></td>";
-                    else $row.= "<td><a href=\"?id={$this->cm->id}&sloodledisplayentry=".$entrynumcounter."#slide\" title=\"{$entry->name}\">{$entrynumcounter}</td>";
+                    else $row.= "<td style='padding:10px'><a href=\"?id={$this->cm->id}&sloodledisplayentry=".$entrynumcounter."#slide\" title=\"{$entry->name}\">{$entrynumcounter}</td>";
                 }
                 $entrynumcounter++;
             }
@@ -393,8 +400,13 @@ class sloodle_view_presenter extends sloodle_base_view_module
             //$slideLinks->data[]=$row;
             $arrowLinks->data[]=$arow;
             
+            echo '<div>';
             print_table($arrowLinks); 
+            echo '</div>';
             echo "<br><br>";
+            echo '</td></tr>';
+            echo '</table>';
+            echo '</div>';
             // Get the frame dimensions for this Presenter
             $framewidth = $this->presenter->get_frame_width();
             $frameheight = $this->presenter->get_frame_height();            
@@ -411,7 +423,9 @@ class sloodle_view_presenter extends sloodle_base_view_module
 
             // Display a direct link to the media
             echo "<p>";
-           print_string('trydirectlink', 'sloodle', $currententry->source);
+            print '<a href="'.$slideplugin->get_absolute_url($currententry->source).'">';
+            print_string('trydirectlink', 'sloodle');
+            print "</a>";
             echo "</p>\n";
             echo "</div>";
     
