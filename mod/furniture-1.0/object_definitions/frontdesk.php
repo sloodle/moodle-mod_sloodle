@@ -1,7 +1,7 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'FrontDesk';
-$sloodleconfig->object_code= 'FrontDesk';
+$sloodleconfig->object_code= 'frontdesk';
 $sloodleconfig->modname    = 'furniture-1.0';
 $sloodleconfig->group      = 'misc';
 $sloodleconfig->collections= array('Avatar Classroom 2.0 Furniture A');
