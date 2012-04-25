@@ -1,10 +1,10 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
-$sloodleconfig->primname   = 'SLOODLE Scoreboard';
-$sloodleconfig->object_code= 'default';
+$sloodleconfig->primname   = 'SLOODLE Scoreboard Shared Media';
+$sloodleconfig->object_code= 'sharedmedia.php';
 $sloodleconfig->modname    = 'scoreboard-1.0';
 $sloodleconfig->group      = 'activity';
-$sloodleconfig->collections= array('SLOODLE 2.0');
+$sloodleconfig->collections= array('SLOODLE 2.0 Deprecated');
 $sloodleconfig->aliases    = array('SLOODLE 1.1 Scoreboard');
 $sloodleconfig->notify     = array('awards_points_change', 'awards_points_deletion', 'awards_points_round_change'); // If this happens on the server side, tell me about it.
 $sloodleconfig->field_sets = array( 
