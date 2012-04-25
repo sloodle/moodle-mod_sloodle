@@ -284,6 +284,7 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 </span>
 </li>
 <?php
+                if (count($entriesbygroup) > 0) {
 				foreach($entriesbygroup as $group => $entries) {
 ?>
 					<li class="group"><?php echo  htmlentities( get_string('objectgroup:'.$group, 'sloodle') ) ?></li>
@@ -311,6 +312,7 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 					<li></li>
 <?php
 				}
+                }
 ?>
 			    </ul>
 
@@ -367,6 +369,9 @@ function print_layout_add_object_groups( $courses, $controllers, $courselayouts,
         <li class="group"><?php echo s(get_string('rezzer:addobjectsforgroup', 'sloodle', $group) ) ?></li>
 <?php
 	foreach($groupobjectconfigs as $object_title => $config) {
+        if (!$config) {
+            continue;
+        }
 		print_add_object_item_li( $object_title, $config, $cid, $contid, $layout );
 	}
 
@@ -518,6 +523,14 @@ function print_edit_object_forms($courses, $controllers, $courselayouts, $object
                     if (count($entries) > 0) {
 					foreach($entries as $e) {
 						$entryname = $e->name;	
+                        if (!isset($object_configs[$entryname])) {
+                            //print "error: no config for entry :$entryname:";
+                            //var_dump($object_configs);
+                            //print ":";
+                            //var_dump(array_keys($object_configs));
+                            //exit;
+                            continue; // No config - skip it.
+                        }
 						$config = $object_configs[$entryname]; // TODO: Merge in the layout entries
 
 						print_config_form( $e, $config, $cid, $contid, $lid, $group, $rezzeruuid );
