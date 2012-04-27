@@ -1,6 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
-$sloodleconfig->primname   = 'BlueMagicPlant';
+$sloodleconfig->primname   = 'Magic Plant (Blue)';
 $sloodleconfig->object_code= 'bluemagicplant';
 $sloodleconfig->modname    = 'interaction-1.0';
 $sloodleconfig->group      = 'activity';
