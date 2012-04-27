@@ -54,7 +54,6 @@ integer SLOODLE_OBJECT_INTERACTION_SHOUT_COMMAND= -1639271134; //channel interac
 integer SLOODLE_OBJECT_BLINK= -1639271135; //linked message channel to tell a prim to blink
 integer SLOODLE_OBJECT_GIVE_POINTS= -1639271136; //linked message channel to tell an object to give points
 integer SLOODLE_LOAD_CURRENT_URL= -1639271137; //send message to shared media to open url that it is currently displaying in a browser.
-
 integer SLOODLE_CHANNEL_DISTRIBUTOR_REQUEST_GIVE_OBJECT = -1639271151; // start the process to give the specified object to the specified avatar, if they are allowed it.
 integer SLOODLE_CHANNEL_DISTRIBUTOR_DO_GIVE_OBJECT = 1639271152; // actually do give the specified object to the specified avatar
 // Please leave the following line intact to show where the script lives in Subversion:
@@ -92,7 +91,8 @@ integer SLOODLE_CHANNEL_SCOREBOARD_TITLE_SET_THICKNESS = -1639275004;
 integer SLOODLE_CHANNEL_SCOREBOARD_TITLE_SET_COLOR = -1639275005;
 integer SLOODLE_CHANNEL_SCOREBOARD_TITLE= 1639275100;
 integer SLOODLE_CHANNEL_ZZTEXT_TEXTURE_CONFIG= -1639276000;
-integer SLOODLE_SCOREBOARD_OPEN_IN_BROWSER= -1639277000;
+
+integer SLOODLE_CHANNEL_OPEN_IN_BROWSER = -1639277000;
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: lib/lsl/sloodle_status_codes.lsl.lsl 
