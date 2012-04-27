@@ -1,6 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
-$sloodleconfig->primname   = 'AvatarClassroomFloors234';
+$sloodleconfig->primname   = 'Avatar Classroom Extra Floors';
 $sloodleconfig->object_code= 'AvatarClassroomFloors234';
 $sloodleconfig->modname    = 'building-1.0';
 $sloodleconfig->group      = 'misc';

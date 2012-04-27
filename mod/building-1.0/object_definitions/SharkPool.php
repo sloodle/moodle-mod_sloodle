@@ -1,6 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
-$sloodleconfig->primname   = 'SharkPool';
+$sloodleconfig->primname   = 'Shark Pool';
 $sloodleconfig->object_code= 'SharkPool';
 $sloodleconfig->modname    = 'building-1.0';
 $sloodleconfig->group      = 'misc';
