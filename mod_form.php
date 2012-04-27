@@ -13,7 +13,7 @@
 
 
 /** Core Sloodle configuration/functionality */
-require_once($CFG->dirroot.'/mod/sloodle/sl_config.php');
+require_once($CFG->dirroot.'/mod/sloodle/init.php');
 /** The base class for the Moodle module form */
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
 

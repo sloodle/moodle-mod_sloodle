@@ -31,7 +31,7 @@
     //  sloodleobjtype = gives the type identifier of the object (not necessary if type is already registered)
     
     /** Grab the Sloodle/Moodle configuration. */
-    require_once('../sl_config.php');
+    require_once('../init.php');
     /** Include the Sloodle PHP API. */
     require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
     require_once(SLOODLE_LIBROOT.'/general.php');

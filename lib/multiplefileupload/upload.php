@@ -3,7 +3,7 @@
 // Copyright (C) 2009 by Ronnie Garcia
 // Co-developed by Travis Nickels
 
-require_once('../../sl_config.php');
+require_once('../../init.php');
 //include('../../../../config.php');
 
 $cmid = (int)$_GET['cmid'];

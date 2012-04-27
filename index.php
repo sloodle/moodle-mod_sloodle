@@ -15,7 +15,7 @@
     */
 
     /** Sloodle/Moodle configuration script. */
-    require_once('sl_config.php');
+    require_once('init.php');
     /** Sloodle core library functionality */
     require_once(SLOODLE_DIRROOT.'/lib.php');
     require_once(SLOODLE_DIRROOT.'/lib/io.php');

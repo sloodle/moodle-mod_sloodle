@@ -4,7 +4,7 @@
 require_once '../../../lib/json/json_encoding.inc.php';
 
 /** Grab the Sloodle/Moodle configuration. */
-require_once('../../../sl_config.php');
+require_once('../../../init.php');
 /** Include the Sloodle PHP API. */
 /** Sloodle core library functionality */
 require_once(SLOODLE_DIRROOT.'/lib.php');

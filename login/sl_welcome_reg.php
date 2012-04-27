@@ -36,7 +36,7 @@
     //  sloodlecourseid - the integer ID of the course which the user should be enrolled in after registration
     
     /** Include Sloodle/Moodle configuration. */
-    require_once('../sl_config.php');
+    require_once('../init.php');
     require_once(SLOODLE_LIBROOT.'/general.php');
     
     sloodle_require_login_no_guest();

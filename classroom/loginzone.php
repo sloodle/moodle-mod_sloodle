@@ -14,7 +14,7 @@
     */
 
     /** Sloodle/Moodle configuration script. */
-    require_once('../sl_config.php');
+    require_once('../init.php');
     /** Main Sloodle API. */
     require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
     

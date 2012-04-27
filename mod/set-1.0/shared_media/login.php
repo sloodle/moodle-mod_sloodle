@@ -1,5 +1,5 @@
 <?php
-//require_once('../../sl_config.php');
+//require_once('../../init.php');
 
 if (!$USER || !$USER->id) {
 

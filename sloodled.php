@@ -14,10 +14,10 @@ if (getenv('SERVER_NAME')) {
     $_SERVER['SERVER_NAME'] = getenv('SERVER_NAME');
 }
 
-require_once('sl_config.php');
+require_once('init.php');
 
 if ( !defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK') || !SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK  ) {
-    echo 'To run the sloodle daemon, enable SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK in sl_config.php';
+    echo 'To run the sloodle daemon, enable SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK in init.php';
     exit;
 }
 

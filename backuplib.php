@@ -19,7 +19,7 @@
     *
     */
     
-    require_once($CFG->dirroot.'/mod/sloodle/sl_config.php');
+    require_once($CFG->dirroot.'/mod/sloodle/init.php');
     require_once(SLOODLE_LIBROOT.'/modules.php');
     require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
     

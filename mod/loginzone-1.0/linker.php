@@ -40,7 +40,7 @@
     // The avatar UUID (if specified) will be returned in the request for Mode 2, according to the communications specification.
 
     /** Get the Sloodle configuration. */
-	require_once('../../sl_config.php');
+	require_once('../../init.php');
     /** Get the Sloodle API. */
 	require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
 	

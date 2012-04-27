@@ -33,7 +33,7 @@
 define('SLOODLE_LINKER_SCRIPT', true);
 
 /** Sloodle/Moodle configuration information. */
-require_once('sl_config.php');
+require_once('init.php');
 /** Sloodle API. */
 require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
 

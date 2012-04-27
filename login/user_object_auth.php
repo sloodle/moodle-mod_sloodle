@@ -28,7 +28,7 @@
     */
     
     /** Include Sloodle/Moodle configuration. */
-    require_once('../sl_config.php');
+    require_once('../init.php');
     require_once(SLOODLE_LIBROOT.'/general.php');
     
     // Make sure the Moodle user is logged-in

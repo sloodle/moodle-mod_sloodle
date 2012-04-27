@@ -495,7 +495,7 @@
 
             /*
             If we send the object a CONFIG_PERSISTENT descriptor, it will keep the config and use it if re-rezzed or copied.
-            This is set in sl_config.php.
+            This is set in init.php.
             Normally this would be on, but if you're developing a set to give to other people, you want it off
             Otherwise it will use your server details, rather than getting new ones.
             */
