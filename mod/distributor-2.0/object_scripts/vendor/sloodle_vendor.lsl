@@ -26,7 +26,7 @@ list ignorelist = ["sloodle_config","sloodle_object_distributor","sloodle_setup_
 integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
-
+integer SLOODLE_CHANNEL_OPEN_IN_BROWSER= -1639277000;
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;
 integer SLOODLE_CHANNEL_HTTP_RESPONSE = -1639260101;  // Tells the sloodle_rezzer_object script to send the contents as an http-in response, to the key specified as key, which should be waiting for a response.
 
@@ -67,7 +67,7 @@ list cmddialog = []; // Alternating list of keys, timestamps and page numbers, i
 // Menu button texts
 string MENU_BUTTON_RECONNECT = "A";
 string MENU_BUTTON_RESET = "B";
-string MENU_BUTTON_SHUTDOWN = "C";
+
 
 string MENU_BUTTON_PREVIOUS = "<<";
 string MENU_BUTTON_NEXT = ">>";
@@ -93,7 +93,7 @@ string SLOODLE_TRANSLATE_DIALOG = "dialog";         // Recipient avatar should b
 string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";      // Recipient avatar should be identified in link message keyval.
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";  // 2 output parameters: colour <r,g,b>, and alpha value
 string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
-
+integer DIALOG_CHANNEL;
 // Send a translation request link message
 // Parameter: output_method = should identify an output method, as given by the "SLOODLE_TRANSLATE_..." constants above
 // Parameter: output_params = a list of parameters which controls the output, such as chat channel or buttons for a dialog
@@ -307,7 +307,10 @@ update_inventory()
     }
     
 }
-
+ 
+integer Key2AppChan(key ID, integer App) {
+    return 0x80000000 | ((integer)("0x"+(string)ID) ^ App);
+}
 // Update the server with our channel and inventory.
 // Returns the key of the HTTP request.
 key update_server()
@@ -320,13 +323,6 @@ key update_server()
     return llHTTPRequest(sloodleserverroot + SLOODLE_DISTRIB_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
 }
 
-// Shows a command dialog to the user, with options for reconnect, reset, and shutdhown
-sloodle_show_command_dialog(key id)
-{
-    // The dialog presents 3 options: reconnect, reset, and shutdown.
-    // Numerical buttons are used for request inventory, so we'll use letters here: A, B, and C.
-    sloodle_translation_request(SLOODLE_TRANSLATE_DIALOG, [SLOODLE_CHANNEL_AVATAR_DIALOG, "A", "B", "C"], "dialog:distributorcommandmenu", ["A", "B", "C"], id, "distributor");
-}
 
 // Shows the given user a dialog of objects, starting at the specified page
 // If parameter "showcmd" is TRUE, then the "command" menu option will be shown.
@@ -377,7 +373,7 @@ sloodle_show_object_dialog(key id, integer page, integer showcmd)
         buttonlabels +=[MENU_BUTTON_CMD];
     }
        
-          buttonlabels += [MENU_BUTTON_WEB];
+       
        
     
     list box1=[];list box2=[];list box3=[];list box4=[];
@@ -413,17 +409,14 @@ sloodle_show_object_dialog(key id, integer page, integer showcmd)
     
     
     buttonlabels = box1+box2+box3+box4;
-    // Are we to show the commmand button?
-    if (showcmd) {
-        // Display the object menu with the command button
-        
-        sloodle_translation_request(SLOODLE_TRANSLATE_DIALOG, [SLOODLE_CHANNEL_AVATAR_DIALOG] + buttonlabels, "dialog:distributorobjectmenu:cmd", [buttondef, MENU_BUTTON_CMD,MENU_BUTTON_WEB], id, "distributor");
-    } else {
-        // Display the basic object menu
-        sloodle_translation_request(SLOODLE_TRANSLATE_DIALOG, [SLOODLE_CHANNEL_AVATAR_DIALOG] + buttonlabels, "dialog:distributorobjectmenu", [buttondef,MENU_BUTTON_WEB], id, "distributor");
-    }
+
+        sloodle_translation_request(SLOODLE_TRANSLATE_DIALOG, [DIALOG_CHANNEL] + buttonlabels, "dialog:distributorobjectmenu", [buttondef,MENU_BUTTON_WEB], id, "distributor");
+   
    
 } 
+integer random_integer( integer min, integer max ){  
+	return min + (integer)( llFrand( max - min + 1 ) );
+}
 
 
 ///// STATES /////
@@ -433,6 +426,8 @@ default
 {
     state_entry()
     {
+    	 DIALOG_CHANNEL = Key2AppChan(llGetKey(),SLOODLE_CHANNEL_AVATAR_DIALOG);
+    	 
         sloodle_debug("Distributor: default state");
         // Reset to empty settings
         sloodleserverroot = "";
@@ -522,8 +517,9 @@ state ready
         // Set a regular timer going
         llSetTimerEvent(12.0);
         lastrefresh = llGetUnixTime();
+        
         // Listen for settings coming in on the avatar dialog channel
-        llListen(SLOODLE_CHANNEL_AVATAR_DIALOG, "", NULL_KEY, "");
+        llListen(DIALOG_CHANNEL, "", NULL_KEY, "");
     }
     
     on_rez(integer start_param)
@@ -552,10 +548,14 @@ state ready
     
     listen(integer channel, string name, key id, string msg)
     {
+    
         // Check what channel it is
-        if (channel == SLOODLE_CHANNEL_AVATAR_DIALOG) {
+        if (channel == DIALOG_CHANNEL) {
             // Ignore the message if the user is not on our list
-            if (llListFindList(cmddialog, [id]) == -1) return;
+            if (llListFindList(cmddialog, [id]) == -1) {
+           
+            	return;
+            }
             // Find out what the current page number is
             integer page = sloodle_get_cmd_dialog_page(id);
             
@@ -570,46 +570,13 @@ state ready
                 // Show the previous menu of objects
                 sloodle_show_object_dialog(id, page - 1, sloodle_check_access_ctrl(id));
                 sloodle_add_cmd_dialog(id, page - 1);
-            } else if (msg == MENU_BUTTON_CMD) {
-                // Show the command menu
-                sloodle_show_command_dialog(id);
-                sloodle_add_cmd_dialog(id, 0);
-            }else if (msg == MENU_BUTTON_WEB) {                
-                 
-                string urltoload = sloodleserverroot+"/mod/sloodle/view.php?id="+(string)sloodlemoduleid; //the  url to load
-                string transLookup = "dialog:distributorobjectmenu:visitmoodle"; //the translation lookup as defined in your translation script which will be displayed on the dialog
-                key avuuid = id; // this is the avatar the dialog will be displayed to
-                if (isconfigured&&sloodlemoduleid>0) {
-                    sloodle_translation_request(SLOODLE_TRANSLATE_LOAD_URL, [urltoload], transLookup , [], avuuid, "distributor");
-                    
-                }else{
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "distributor:notconnected", [], NULL_KEY, "distributor");
-                }
-                
-            } else if (msg == MENU_BUTTON_RECONNECT) {
-                // Attempt reconnection to the server
-                sloodle_remove_cmd_dialog(id);
-                state reconnect;
-                return;
-                
-            } else if (msg == MENU_BUTTON_RESET) {
-                // Reset the object
-                sloodle_remove_cmd_dialog(id);
-                llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
-                state default;
-                return;
-                
-            } else if (msg == MENU_BUTTON_SHUTDOWN) {
-                // Temporarily shutdown the distributor
-                sloodle_remove_cmd_dialog(id);
-                state shutdown;
-                return;
-                
-            } else {
+            }else {
+             	
                 // Treat the message as a number (objects are numbered from 1)
                 integer objnum = (integer)msg;
                 if (objnum > 0 && objnum <= llGetListLength(inventory)) {
-                    // Attempt to give the specified item                    
+                    // Attempt to give the specified item                
+                 	
                     sloodle_kick_off_inventory_giving_or_say_error(id, llList2String(inventory, objnum - 1));
                 }
                 sloodle_remove_cmd_dialog(id);
@@ -623,6 +590,15 @@ state ready
               //  llOwnerSay("got message on num"+(string)num);
               //  llOwnerSay(str);
         // Check the channel
+        if (num ==SLOODLE_CHANNEL_OPEN_IN_BROWSER){
+              string urltoload = sloodleserverroot+"/mod/sloodle/view.php?id=" +( string)sloodlemoduleid; //the  url to load
+              string transLookup = "dialog:distributorobjectmenu:visitmoodle" ; //the translation lookup as defined in your translation script which will be displayed on the dialog
+              key avuuid = id; // this is the avatar the dialog will be displayed to
+              if (isconfigured&&sloodlemoduleid>0) {
+                    sloodle_translation_request(SLOODLE_TRANSLATE_LOAD_URL, [urltoload], transLookup , [], avuuid, "distributor" );
+              }
+        
+        }
         if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
             // Split the message into lines
             list lines = llParseString2List(str, ["\n"], []);
@@ -700,7 +676,7 @@ state ready
     }
 
     http_response(key request_id, integer status, list metadata, string body) {
-
+		
         if (status < 200) {
             return;
         }
@@ -711,13 +687,17 @@ state ready
         list lines = llParseString2List(body, ["\n"], []);        
         list bits = llParseStringKeepNulls(llList2String(lines,0),["|"],[]);
         integer response_code = llList2Integer(bits,0);
+        
        // llOwnerSay(body);
         if (response_code == SLOODLE_CHANNEL_DISTRIBUTOR_DO_GIVE_OBJECT){
-            llGiveInventory(llList2Key(lines,1), llList2String(lines,2));
+            key avuuid = llList2Key(lines,1);
+            string object_to_give= llList2String(lines,2);
+            llDialog(avuuid, "An item called ("+object_to_give+")"+" has been delivered to your inventory, please open your recent items in your inventory", ["ok"], DIALOG_CHANNEL);
+            llGiveInventory(avuuid,object_to_give);
             return;
         } else if (response_code < 0) {        
             if (llGetListLength(bits) > 5) {
-                key avuuid = llList2Key(bits,6);    
+               key avuuid = llList2Key(bits,6);    
                 if (llGetListLength(lines) > 0) {
                     if (llKey2Name(avuuid) != "") {
                         // Report an error to the user, eg they didn't have enough money.
@@ -732,73 +712,9 @@ state ready
     
 }        
         
-state shutdown
-{
-    on_rez(integer param)
-    {
-        state default;
-    }
-
-    state_entry()
-    {
-        sloodle_debug("Distributor: shutdown state");
-        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [<0.5,0.5,0.5>, 1.0], "shutdown", [], NULL_KEY, "");
-        llSetTimerEvent(12.0);
-        // Listen for settings coming in on the avatar dialog channel
-        llListen(SLOODLE_CHANNEL_AVATAR_DIALOG, "", NULL_KEY, "");
-    }
-    
-    touch_start(integer num_detected)
-    {
-        // Go through each toucher
-        integer i = 0;
-        key id = NULL_KEY;
-        for (; i < num_detected; i++) {
-            id = llDetectedKey(i);
-            // Check control access level here
-            if (sloodle_check_access_ctrl(id)) {            
-                // Show the command dialog to the user
-                sloodle_show_command_dialog(id);
-                sloodle_add_cmd_dialog(id, 0);
-            } else {
-                // Inform the user that they do not have permission
-                sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:ctrl", [llKey2Name(id)], NULL_KEY, "");
-            }
-        }
-    }
-    
-    listen(integer channel, string name, key id, string msg)
-    {
-        // Check which channel this is arriving on
-        if (channel == SLOODLE_CHANNEL_AVATAR_DIALOG) {
-            // Ignore this message if the sender isn't already being listened-to
-            if (llListFindList(cmddialog, [id]) == -1) return;
-            // Remove the user from the listen list
-            sloodle_remove_cmd_dialog(id);
-            
-            // What message is it?
-            if (msg == MENU_BUTTON_RECONNECT) {
-                state default;
-                return;
-            } else if (msg == MENU_BUTTON_RESET) {
-                llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
-                state default;
-                return;
-            } else if (msg == MENU_BUTTON_SHUTDOWN) {
-                state shutdown;
-                return;
-            }
-        }
-    }
-    
-    timer()
-    {
-        // Purge the list of expired dialogs
-        sloodle_purge_cmd_dialog();
-    }
-}
 
  
     
    
    
+
