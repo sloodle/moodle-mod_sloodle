@@ -1,4 +1,3 @@
-// LSL script generated: mod.zztext-scoreboard-1.0.object_scripts.btn_open_in_browser.lslp Sat Mar 31 19:53:39 Tokyo Standard Time 2012
 /*
 *  Part of the Sloodle project (www.sloodle.org)
 *
@@ -29,18 +28,30 @@
 */
 
 
+string view_url;
+string admin_url;
+string sloodleserverroot = "";
+string paramstr;
+integer SLOODLE_CHANNEL_OPEN_IN_BROWSER= -1639277000;
 
-integer SLOODLE_SCOREBOARD_OPEN_IN_BROWSER = -1639277000;
 
-
-default {
-
+default{
     on_rez(integer start_param) {
         llResetScript();
     }
-
-touch_start(integer total_number) {
-        if ((llDetectedKey(0) != llGetOwner())) return;
-        llMessageLinked(LINK_ALL_OTHERS,SLOODLE_SCOREBOARD_OPEN_IN_BROWSER,"",llDetectedKey(0));
+touch_start( integer total_number){
+    integer j;
+    for (j=0;j<total_number;j++){
+        if (llDetectedKey(j)!=llGetOwner())return;
+        llMessageLinked(LINK_ALL_OTHERS, SLOODLE_CHANNEL_OPEN_IN_BROWSER, "", llDetectedKey(j));    
+    }        
+    
+   
+        
     }
 }
+
+
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: mod/scoreboard-1.0/sloodle_connect_button.lsl
+
