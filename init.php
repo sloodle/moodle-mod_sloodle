@@ -161,7 +161,7 @@
     This corresponds to the collections parameter in the object definition of each object.
     NB The array should be serialized because PHP won't do arrays as constants.
     */
-    if ( !defined(SLOODLE_SUPPORTED_OBJECT_COLLECTIONS) ) {
+    if ( !defined('SLOODLE_SUPPORTED_OBJECT_COLLECTIONS') ) {
         define('SLOODLE_SUPPORTED_OBJECT_COLLECTIONS', serialize(array('SLOODLE 2.0') ) ); //
     }
 

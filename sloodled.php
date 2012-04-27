@@ -1,30 +1,35 @@
 <?php
 /*
-
-
+To save memory, we'll try to leave loading the full Moodle/Sloodle thing to the last minute.
+If we're just 
 */
 define('CLI_SCRIPT',true);
 
-// This makes it possible to have the server name set using an environment variable
-// eg. SERVER_NAME=gershwinklata1.avatarclassroom.com php sloodled.php
-// This is useful in the Avatar Classroom multiple-host environment
-// ...where we want to be able to tell the script which database etc to write to
-if (getenv('SERVER_NAME')) {
-    $_SERVER = array();
-    $_SERVER['SERVER_NAME'] = getenv('SERVER_NAME');
+if (file_exists('sloodle_config.php')) {
+    require_once('sloodle_config.php');
 }
 
-require_once('init.php');
+define('SLOODLED_BASE_DIR', dirname(__FILE__));
+
+// This is useful in the Avatar Classroom multiple-host environment
+// ...where we want to be able to tell the script which database etc to write to
+if (!isset($_SERVER['SERVER_NAME'])) {
+    $_SERVER = array();
+    $_SERVER['SERVER_NAME'] = SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PREFIX.SLOODLE_MESSAGE_QUEUE_URL_SUFFIX;
+    //SLOODLE_MESSAGE_QUEUE_SITE_PATH_PREFIX.SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PREFIX.SLOODLE_MESSAGE_QUEUE_SITE_PATH_SUFFIX;
+}
 
 if ( !defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK') || !SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK  ) {
-    echo 'To run the sloodle daemon, enable SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK in init.php';
+    echo 'To run the sloodle daemon, enable SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK in sloodle_config.php';
     exit;
 }
 
 define('SLOODLE_MESSAGE_QUEUE_TASK', true);
 
+
 //require_once('lib/beanstalk/Beanstalk.php');
-require_once(SLOODLE_LIBROOT.'/beanstalk/Beanstalk.php');
+require_once(SLOODLED_BASE_DIR.'/lib/beanstalk/Beanstalk.php');
+require_once(SLOODLED_BASE_DIR.'/init.php');
 
 /*
 $sbhost = ( ( defined(SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST) && (SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST != '') ) ) ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST : '127.0.0.1';
@@ -107,6 +112,7 @@ if ($manage) {
                         }
                         if (!sloodle_is_child_process_running($tube)) {
                             print "No child process found for tube $tube - spawning\n";
+                            require_once(SLOODLED_BASE_DIR.'/init.php');
                             if (sloodle_spawn_child_process($tube)) {
                                 print "Spawned for tube $tube \n";
                                 if ($verbose) { 
@@ -118,6 +124,7 @@ if ($manage) {
                 } else {
                     if (!sloodle_is_child_process_running($tube)) {
                         print "No child process found for tube $tube - spawning\n";
+                        require_once(SLOODLED_BASE_DIR.'/init.php');
                         if (sloodle_spawn_child_process($tube)) {
                             if ($verbose) {
                                 print "Spawned for tube $tube \n";
@@ -281,10 +288,14 @@ function sloodle_is_child_process_running($tube) {
 
 function sloodle_spawn_child_process($tube) {
 
-    $cmd = "nohup php sloodled.php ".escapeshellarg($tube).' > /dev/null 2>&1 &';
-    if (defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_SERVER_ENVIRONMENT_PREPEND') ) {
-//        $cmd = SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_SERVER_ENVIRONMENT_PREPEND.$cmd;
+    // The tube may have the site name prefixed to it.
+    $cmd = '';
+    if (preg_match('/^(.*?)-.*/', $tube, $matches)) {
+        $path = SLOODLE_MESSAGE_QUEUE_SITE_PATH_PREFIX.$matches[1].SLOODLE_MESSAGE_QUEUE_SITE_PATH_SUFFIX;
+        $cmd = 'cd '.$path.' && ';
     }
+    $cmd .= "nohup php sloodled.php ".escapeshellarg($tube).' > /dev/null 2>&1 &';
+    //$cmd .= "php sloodled.php ".escapeshellarg($tube);
     
     print $cmd."\n";
     exec($cmd, $result);

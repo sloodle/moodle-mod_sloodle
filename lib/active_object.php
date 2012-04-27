@@ -204,7 +204,7 @@
 
             global $CFG;
             // Make a unique name for the sites queue
-            $sitequeue = defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PREFIX') ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PREFIX : 'sloodleq';
+            $sitequeue = defined('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PREFIX') ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_PREFIX : '';
 
             $tube = $sitequeue.'-'.md5($address);
             //$tube = 'default';
