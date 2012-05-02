@@ -1,7 +1,26 @@
 <?php
 /*
-To save memory, we'll try to leave loading the full Moodle/Sloodle thing to the last minute.
-If we're just 
+sloodled.php, Edmund Edgar, 2012-04
+Copyright contributors, licensed under the same license as the rest of SLOODLE.
+
+This script is a background daemon used to improve performance when sending messages via http-in.
+It relies on having the Beanstalk daemon installed and running, and turned on in sloodle_config.php
+In a normal SLOODLE install you probably won't need to use it.
+
+You would normally run it in the background with something like:
+nohup php sloodled.php -m > /dev/null 2>&1 &
+
+Run with the -m flag, it will monitor the beanstalkd queue for tubes
+...each corresponding to a particular combination of a task and an http-in address
+It spawns a copy of itself as a worker process to handle each tube, which will run for 90 seconds or so then exit.
+
+If you want to see it in action, run it with the -v flag (verbose)
+php sloodled.php -m -v
+
+If you've set things like SLOODLE_MESSAGE_QUEUE_SITE_PATH_PREFIX, 
+...it will check which site the task belongs to and change to the directory of that site to run the worker process.
+This is designed for Avatar Classroom, and contains some assumptions about the directory layout of multiple sites.
+As such, it probably won't work for anybody else without modification.
 */
 define('CLI_SCRIPT',true);
 
@@ -77,6 +96,7 @@ if ($tube = array_shift($args)) {
     if ($verbose) {
         print "Using tube $tube";
     }
+    $untilts = array_shift($args);
 }
 
 if ($list_tubes) {
@@ -87,61 +107,81 @@ if ($list_tubes) {
 }
 
 if ($manage) {
+
     if ($verbose) {
-        print "In manage";
-        $check_after = 30;
-        $tubes_watched = array();
-        while(1) {
-
-            $tubes = $sb->listTubes();
-            if ($verbose) {
-                print "List found ".count($tubes)."\n";
-            }
-
-            foreach($tubes as $tube) {
-
-                if ($verbose) { 
-                    print "Checking tube $tube\n";
-                }
-
-                if (isset($tubes_watched[$tube])) {
-                    $last_check_ts = $tubes_watched[$tube];
-                    if ( ( $last_check_ts + $check_after ) < time() ) {
-                        if ($verbose) { 
-                            print "Time up for tube $tube - rechecking\n";
-                        }
-                        if (!sloodle_is_child_process_running($tube)) {
-                            print "No child process found for tube $tube - spawning\n";
-                            require_once(SLOODLED_BASE_DIR.'/init.php');
-                            if (sloodle_spawn_child_process($tube)) {
-                                print "Spawned for tube $tube \n";
-                                if ($verbose) { 
-                                    $tubes_watched[$tube] = time();
-                                }
-                            } 
-                        }
-                    }
-                } else {
-                    if (!sloodle_is_child_process_running($tube)) {
-                        print "No child process found for tube $tube - spawning\n";
-                        require_once(SLOODLED_BASE_DIR.'/init.php');
-                        if (sloodle_spawn_child_process($tube)) {
-                            if ($verbose) {
-                                print "Spawned for tube $tube \n";
-                            }
-                        }
-                        $tubes_watched[$tube] = time();
-                    }
-                }
-            }
-            sleep(1);
-        }
+        print "In manage\n";
     }
+
+    $check_after = 15;
+    $tubes_watched = array();
+    while(1) {
+
+        $tubes = $sb->listTubes();
+        if ($verbose) {
+            print "List found ".count($tubes)."\n";
+        }
+
+        foreach($tubes as $tube) {
+
+            if ($verbose) { 
+                print "Checking tube $tube\n";
+            }
+
+            /*
+            We'll go through the active tubes, check if they have a worker process spawned for them, and if they don't, start one.
+
+            We'll tell each script to run until the check_after time, then exit once it's finished the task it's working on.
+            That will avoid the need to keep checking on all the tubes, all the time.
+
+            If a worker process dies prematurely for some reason, it will get restarted when the check_after time comes around.
+
+            There will be a short window between the time we tell a worker to end and the time when it actually exists, as it has to finish what it's doing.
+            During that time, we'll just keep checking the process table.
+            */
+
+            $untilts = time() + $check_after;
+
+            // Unset any records we have of tubes whose time is up.
+            if (isset($tubes_watched[$tube])) {
+                // Time's up, the process should be exiting right about now.
+                if ( $tubes_watched[$tube] < time() ) {
+                    unset($tubes_watched[$tube]);
+                } 
+            }
+
+            // Should already be running, won't bother to check.
+            if (isset($tubes_watched[$tube])) {
+                continue;
+            }
+
+            if (sloodle_is_child_process_running($tube)) {
+                continue;
+            }
+
+            if ($verbose) {
+                print "No child process found for tube $tube - spawning\n";
+            }
+
+            require_once(SLOODLED_BASE_DIR.'/init.php');
+            if (sloodle_spawn_child_process($tube, $untilts)) {
+                // Make a note of the tube we spawned a worker for so we don't have to keep checking.
+                $tubes_watched[$tube] = $untilts;
+                if ($verbose) { 
+                    print "Spawned for tube $tube \n";
+                }
+            }
+
+        }
+
+        sleep(1);
+
+    }
+
 }
 
 if ($tube) {
     $sb->watch($tube);
-    sloodle_job_loop($sb, $verbose, $timeout=300);
+    sloodle_job_loop($sb, $verbose, $untilts);
     exit;
 }
 
@@ -169,7 +209,7 @@ while (true) {
 
         }
 
-        sloodle_job_loop($sb, $verbose);
+        sloodle_job_loop($sb, $verbose, $untilts);
             //!$pid = $sb->put(1000, 0, 10, "hello");
             //print "Put job with pid $pid\n";
 
@@ -190,19 +230,22 @@ foreach($tubes as $tube) {
 
 exit;
 
-function sloodle_job_loop($sb, $verbose, $timeout = 0) {
+function sloodle_job_loop($sb, $verbose, $untilts) {
 
-    while($job = $sb->reserve($timeout)) {
-        $msg = $job['body'];
-        $id = $job['id'];
-        if ($verbose) {
-            print "Handling job $id\n";
-        }
-        if (sloodle_handle_message($msg)) {
+    $timeout = 10;
+    while( $untilts > time() ) {
+        if ( $job = $sb->reserve($timeout) ) {
+            $msg = $job['body'];
+            $id = $job['id'];
             if ($verbose) {
-                print "Deleting job $id\n";
+                print "Handling job $id\n";
             }
-            $sb->delete($id);
+            if (sloodle_handle_message($msg)) {
+                if ($verbose) {
+                    print "Deleting job $id\n";
+                }
+                $sb->delete($id);
+            }
         }
         //sloodle_handle_message($sb, $job, $tube); 
     }
@@ -286,7 +329,7 @@ function sloodle_is_child_process_running($tube) {
 
 }
 
-function sloodle_spawn_child_process($tube) {
+function sloodle_spawn_child_process($tube, $untilts) {
 
     // The tube may have the site name prefixed to it.
     $cmd = '';
@@ -294,7 +337,7 @@ function sloodle_spawn_child_process($tube) {
         $path = SLOODLE_MESSAGE_QUEUE_SITE_PATH_PREFIX.$matches[1].SLOODLE_MESSAGE_QUEUE_SITE_PATH_SUFFIX;
         $cmd = 'cd '.$path.' && ';
     }
-    $cmd .= "nohup php sloodled.php ".escapeshellarg($tube).' > /dev/null 2>&1 &';
+    $cmd .= "nohup php sloodled.php ".escapeshellarg($tube).' '.$untilts.' > /dev/null 2>&1 &';
     //$cmd .= "php sloodled.php ".escapeshellarg($tube);
     
     print $cmd."\n";
