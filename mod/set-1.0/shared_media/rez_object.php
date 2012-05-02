@@ -98,6 +98,8 @@ $response->render_to_string($renderStr);
 
 //send message to httpinurl
 $async = ( defined('SLOODLE_ASYNC_REZZING') && SLOODLE_ASYNC_REZZING );
+
+
 $reply = $rezzer->sendMessage($renderStr, $async, false, 'rez');
 
 if ($async) {
@@ -138,9 +140,12 @@ if (!$controller->configure_object_from_layout_entry($authid, $layoutentryid, $r
 // TODO: This uses more db hits than it should - it would be better if register_object returned the object, not just its ID.
 $ao = new SloodleActiveObject();
 if ($ao->loadByUUID($rezzed_object_uuid)) {
+
+    $async_config = ( defined('SLOODLE_ASYNC_SEND_CONFIG') && SLOODLE_ASYNC_SEND_CONFIG);
+
     if ($ao->httpinurl) {
         $extraParams = array('sloodlerezzeruuid' => $rezzer->uuid);
-        $ao->sendConfig($extraParams, $async = false);
+        $ao->sendConfig( $extraParams, $async_config, $async_config );
     }
 }
 

@@ -130,21 +130,23 @@ if(!$active_object->loadByUUID( $childobjectuuid )){
         $sloodle->response->add_data_line('Could not save HTTP In URL for rezzed object'); 
      }
 
+    $async_config = ( defined('SLOODLE_ASYNC_SEND_CONFIG') && SLOODLE_ASYNC_SEND_CONFIG);
+
     //active object is loaded, send config to the object, and also send the rezzeruuid to the object so 
     //our object also knows its rezzer uuid 
-    $result = $active_object->sendConfig($extraParams);
+    $result = $active_object->sendConfig($extraParams, $async_config, $async_config);
     //result is an array(curlinfo,curlresult)
     //lsl script returns an OK or FAIL
-    if ($result["result"]=='OK'){          
-              $sloodle->response->set_status_code(1);
-            $sloodle->response->set_status_descriptor('OK');//httpin config sent properly
-      }else{
-           $sloodle->response->set_status_code(-219);//Sending configuration to object via HTTP-in URL failed
-           $sloodle->response->set_status_descriptor('OBJECT_AUTH');
-           $sloodle->response->add_data_line('Sending configuration to object via HTTP-in URL failed'); 
-      }
+    if ( in_array( $result["result"], array('OK','QUEUED') ) ) { 
+        $sloodle->response->set_status_code(1);
+        $sloodle->response->set_status_descriptor('OK');//httpin config sent properly
+    }else{
+        $sloodle->response->set_status_code(-219);//Sending configuration to object via HTTP-in URL failed
+        $sloodle->response->set_status_descriptor('OBJECT_AUTH');
+        $sloodle->response->add_data_line('Sending configuration to object via HTTP-in URL failed'); 
+    }
 
-      $sloodle->response->render_to_output();
+    $sloodle->response->render_to_output();
 
 }//end else
 ?>

@@ -386,8 +386,9 @@
                 $renderStr="";
                 $response->render_to_string($renderStr);
 
+                $async = ( defined('SLOODLE_ASYNC_SEND_MESSAGES') && SLOODLE_ASYNC_SEND_MESSAGES );
                 // If this stuff fails, tough. We did our best.
-                if ($resarr = $ao->sendMessage($renderStr, true, true)) {
+                if ($resarr = $ao->sendMessage($renderStr, $async, $async)) {
                     if($resarr['info']['http_code'] == 200){
                         $ao->lastmessagetimestamp = time();
                         $ao->save();
