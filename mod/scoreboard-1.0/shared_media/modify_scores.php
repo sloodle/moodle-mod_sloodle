@@ -33,7 +33,9 @@
 
         require_once('scoreboard_active_object.inc.php');
 
-        $object_uuid = required_param('sloodleobjuuid');
+        $error = '';
+
+        $object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
         $sao = SloodleScoreboardActiveObject::ForUUID( $object_uuid );
 
         $is_logged_in = isset($USER) && ($USER->id > 0);
@@ -44,8 +46,8 @@
 		exit;
 	}
 
-	$userids = required_param('userids');
-	$userscores = required_param('userscores');
+	$userids = required_param('userids', PARAM_RAW);
+	$userscores = required_param('userscores', PARAM_RAW);
 	
 	$i=0;
 	foreach($userids as $userid) {
