@@ -33,7 +33,13 @@ default
     touch_start(integer total_number)  
     { 
        // if(llDetectedKey(0) == llGetOwner())
-        
+        integer j=0;
+        for (j=0;j<total_number;j++){
+            if (llDetectedKey(j)!=llGetOwner()){
+                llInstantMessage(llDetectedKey(j),"Sorry, but you must be the owner to open this rezzer");
+                return;
+            }
+        }
         if (open==TRUE) { 
             llSetLocalRot(llEuler2Rot( <0, 0, 45 * DEG_TO_RAD> ));
             llMessageLinked(LINK_ALL_OTHERS,SLOODLE_CHANNEL_SET_SIMPLE_DOOR_CLOSED,"",NULL_KEY);  
