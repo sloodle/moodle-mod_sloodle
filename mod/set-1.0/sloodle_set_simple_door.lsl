@@ -38,12 +38,14 @@ default
             llSetLocalRot(llEuler2Rot( <0, 0, 45 * DEG_TO_RAD> ));
             llMessageLinked(LINK_ALL_OTHERS,SLOODLE_CHANNEL_SET_SIMPLE_DOOR_CLOSED,"",NULL_KEY);  
             llTriggerSound("open",1.0);     
+            llTriggerSound("powerup",1.0); 
             llMessageLinked(LINK_SET, -99, "turn glow on", NULL_KEY);
             open = FALSE;             
         } else { 
             llMessageLinked(LINK_ALL_OTHERS,SLOODLE_CHANNEL_SET_SIMPLE_DOOR_OPEN,"",NULL_KEY);   
            // llSetPos( llGetRootPosition() );
             llTriggerSound("close",1.0);
+           llTriggerSound("powerdown",1.0); 
             llSetLocalRot(llEuler2Rot( <0, 0, 270 * DEG_TO_RAD> ));   open = TRUE; 
             llMessageLinked(LINK_SET, -99, "turn glow off", NULL_KEY);
         } 
@@ -53,3 +55,4 @@ default
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_set_simple_door.lsl
+
