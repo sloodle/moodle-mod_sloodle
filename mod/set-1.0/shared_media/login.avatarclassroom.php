@@ -1,5 +1,5 @@
 <?php
-if ( !( defined(SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE) && (SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE != '') ) ) {
+if ( !defined('SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE') || (SLOODLE_SHARED_MEDIA_LOGIN_INCLUDE == '') ) {
     exit;
 }
 
@@ -19,10 +19,10 @@ if (!$USER || !$USER->id) {
 	}
     if (isset($_REQUEST['sloodleobjname'])) {
         // Old version
-        header('Location: '.'http://www.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/index.php?'.$_SERVER['QUERY_STRING'].'&bounced');
+        header('Location: '.SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL.'index.php?'.$_SERVER['QUERY_STRING'].'&bounced');
     } else {
         // New version
-        header('Location: '.'http://www.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/main.php?sloodleobjuuid='.$_REQUEST['sloodleobjuuid']);
+        header('Location: '.SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL.'main.php?sloodleobjuuid='.$_REQUEST['sloodleobjuuid']);
     }
 	exit;
 
