@@ -40,7 +40,8 @@ default
                 return;
             }
         }
-        if (open==TRUE) { 
+        
+        if (llGetLocalRot()==<0, 0, 270 * DEG_TO_RAD>){ 
             llSetLocalRot(llEuler2Rot( <0, 0, 45 * DEG_TO_RAD> ));
             llMessageLinked(LINK_ALL_OTHERS,SLOODLE_CHANNEL_SET_SIMPLE_DOOR_CLOSED,"",NULL_KEY);  
             llTriggerSound("open",1.0);     
