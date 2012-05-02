@@ -48,7 +48,6 @@ define('SLOODLE_MESSAGE_QUEUE_TASK', true);
 
 //require_once('lib/beanstalk/Beanstalk.php');
 require_once(SLOODLED_BASE_DIR.'/lib/beanstalk/Beanstalk.php');
-require_once(SLOODLED_BASE_DIR.'/init.php');
 
 /*
 $sbhost = ( ( defined(SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST) && (SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST != '') ) ) ? SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK_HOST : '127.0.0.1';
@@ -162,7 +161,6 @@ if ($manage) {
                 print "No child process found for tube $tube - spawning\n";
             }
 
-            require_once(SLOODLED_BASE_DIR.'/init.php');
             if (sloodle_spawn_child_process($tube, $untilts)) {
                 // Make a note of the tube we spawned a worker for so we don't have to keep checking.
                 $tubes_watched[$tube] = $untilts;
@@ -280,9 +278,9 @@ function sloodle_handle_message($msg) {
     $request_handler  = $handler_prefix.'_request.php';
     $response_handler = $handler_prefix.'_response.php';
 
-    include(SLOODLE_LIBROOT.'/message_handlers/'.$request_handler);
-    if (file_exists(SLOODLE_LIBROOT.'/message_handlers/'.$response_handler)) {
-        include(SLOODLE_LIBROOT.'/message_handlers/'.$response_handler);
+    include(SLOODLED_BASE_DIR.'/lib/message_handlers/'.$request_handler);
+    if (file_exists(SLOODLED_BASE_DIR.'/lib/message_handlers/'.$response_handler)) {
+        include(SLOODLED_BASE_DIR.'/lib/message_handlers/'.$response_handler);
     }
 
     return true;
