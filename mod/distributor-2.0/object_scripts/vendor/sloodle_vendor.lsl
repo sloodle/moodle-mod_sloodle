@@ -409,13 +409,17 @@ sloodle_show_object_dialog(key id, integer page, integer showcmd)
     
     
     buttonlabels = box1+box2+box3+box4;
-
-        sloodle_translation_request(SLOODLE_TRANSLATE_DIALOG, [DIALOG_CHANNEL] + buttonlabels, "dialog:distributorobjectmenu", [buttondef,MENU_BUTTON_WEB], id, "distributor");
+    if (llGetListLength(buttonlabels)==0){
+            sloodle_translation_request(SLOODLE_TRANSLATE_DIALOG, [DIALOG_CHANNEL] + "ok", "distributor:distributerisempty", [buttondef,MENU_BUTTON_WEB], id, "distributor");
+    }else{
+            sloodle_translation_request(SLOODLE_TRANSLATE_DIALOG, [DIALOG_CHANNEL] + buttonlabels, "dialog:distributorobjectmenu", [buttondef,MENU_BUTTON_WEB], id, "distributor");
+    }
+    
    
    
 } 
 integer random_integer( integer min, integer max ){  
-	return min + (integer)( llFrand( max - min + 1 ) );
+    return min + (integer)( llFrand( max - min + 1 ) );
 }
 
 
@@ -426,8 +430,8 @@ default
 {
     state_entry()
     {
-    	 DIALOG_CHANNEL = Key2AppChan(llGetKey(),SLOODLE_CHANNEL_AVATAR_DIALOG);
-    	 
+         DIALOG_CHANNEL = Key2AppChan(llGetKey(),SLOODLE_CHANNEL_AVATAR_DIALOG);
+         
         sloodle_debug("Distributor: default state");
         // Reset to empty settings
         sloodleserverroot = "";
@@ -554,7 +558,7 @@ state ready
             // Ignore the message if the user is not on our list
             if (llListFindList(cmddialog, [id]) == -1) {
            
-            	return;
+                return;
             }
             // Find out what the current page number is
             integer page = sloodle_get_cmd_dialog_page(id);
@@ -571,12 +575,12 @@ state ready
                 sloodle_show_object_dialog(id, page - 1, sloodle_check_access_ctrl(id));
                 sloodle_add_cmd_dialog(id, page - 1);
             }else {
-             	
+                 
                 // Treat the message as a number (objects are numbered from 1)
                 integer objnum = (integer)msg;
                 if (objnum > 0 && objnum <= llGetListLength(inventory)) {
                     // Attempt to give the specified item                
-                 	
+                     
                     sloodle_kick_off_inventory_giving_or_say_error(id, llList2String(inventory, objnum - 1));
                 }
                 sloodle_remove_cmd_dialog(id);
@@ -676,7 +680,7 @@ state ready
     }
 
     http_response(key request_id, integer status, list metadata, string body) {
-		
+        
         if (status < 200) {
             return;
         }

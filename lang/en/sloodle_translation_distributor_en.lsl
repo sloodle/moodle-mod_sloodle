@@ -40,7 +40,9 @@ list locstrings = [
     "dialog:distributorobjectmenu", "Sloodle Distributor.\n\n{{0}}", // The parameter should be a set of button labels and object names, e.g. "1 = WebIntercom, 2 = MetaGloss"
     "dialog:distributorobjectmenu:cmd", "Sloodle Distributor.\n\n{{0}}{{1}} = Command menu\n{{2}} = Visit Distributer on MOODLE", // As above, but the second parameter gives the command menu button label
     "dialog:distributorobjectmenu:visitmoodle", "Click \"Go to page\" to visit the distributer on MOODLE", // As above, but the second parameter gives the command menu button label
-    "distributor:notconnected", "The distributer is currently not connected, or is shut down.  So we can not redirect you to the webpage for this distributer." 
+    "distributor:notconnected", "The distributer is currently not connected, or is shut down.  So we can not redirect you to the webpage for this distributer.",
+     "distributor:distributerisempty", "This distributer currently has no items in it."
+    
 ];
 
 ///// ----------- /////
@@ -265,17 +267,19 @@ default
                 
             } else if (output_method == SLOODLE_TRANSLATE_DIALOG) {
                 // Display a dialog - we need a valid key
+             
                 if (id == NULL_KEY) {
                     sloodle_debug("ERROR: Non-null key value required to show dialog with string \"" + string_name + "\".");
                     return;
                 }
+                        //llOwnerSay("message: "+str+" id: "+(string)id+ " trans: "+trans+" buttons: "+" chanel: "); 
                 // We need at least 2 additional output parameters (channel, and at least 1 button)
                 if (num_output_params >= 2) {
                     // Extract the channel number
                     integer channel = llList2Integer(output_params, 0);
                     // Extract up to 12 button values
                     list buttons = llList2List(output_params, 1, 12);
-                    
+              
                     // Display the dialog
                     llDialog(id, trans, buttons, channel);
                     
