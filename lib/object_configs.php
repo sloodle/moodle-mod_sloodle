@@ -191,7 +191,7 @@ class SloodleObjectConfig {
 		$defs = SloodleObjectConfig::AllAvailableAsArray();
 		$types = array();
 		foreach($defs as $def) {
-			if ( is_null($def->notify) || !is_array($def->notify) || count($def->notify) == 0 ) {
+			if ( !isset($def->notify) || !is_array($def->notify) || count($def->notify) == 0 ) {
 				continue;
 			}
 			if ( !in_array( $notification_action, $def->notify) ) {
