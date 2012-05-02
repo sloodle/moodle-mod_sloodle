@@ -34,6 +34,7 @@ integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER = -1639270111; // set the
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP = -1639270112; // set the main shared media panel to the specified URL, accessible to the group
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_ANYONE = -1639270114; // set the main shared media panel to the specified URL, accessible to anyone
 integer SLOODLE_LOAD_CURRENT_URL= -1639271137; //send message to shared media to open url that it is currently displaying in a browser.
+integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;
 default
 {
     on_rez(integer start_param) {
@@ -44,6 +45,11 @@ default
       currentUrl = ""; 
    }
     link_message( integer sender_num, integer num, string str, key id ){        
+            if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
+           		if (str=="do:reconfigure"||str=="do:reset"){
+           			  llClearPrimMedia(3);  
+           		}
+        	}  
         if (num == SLOODLE_LOAD_CURRENT_URL){
              list data = llGetPrimMediaParams(3,[PRIM_MEDIA_CURRENT_URL]);
              if (currentUrl!=""){
@@ -70,3 +76,4 @@ llSetColor(<1.00000, 1.00000, 1.00000>,3);
 }
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_shared_media_screen.lsl
+
