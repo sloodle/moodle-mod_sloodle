@@ -88,30 +88,34 @@
 
         } 
              
-        // For Avatar Classroom, the rezzer config may have been stored on the avatar classroom server.
-        // This URL should already have a parameter name and an =, if required.
-        // NB This will fail on PHP < 5.
-        if (defined('SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE') && (SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE != '') ) {
+        // Do legacy sites the legacy way
+        if (!isset($_REQUEST['sloodleavname'])) {
 
-            // Initializing curl
-            $ch = curl_init( SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE.$_REQUEST['sloodleobjuuid'] );
-            $options = array(
-                CURLOPT_RETURNTRANSFER => true,
-            );
-            curl_setopt_array( $ch, $options );
-            if ($result = curl_exec($ch)) {
-                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                if ($http_code == 200) {
-                    $ao_obj = json_decode($result);
-                    // If the server has been updated after our active object list because of a rezzer reset, use the new information.
-                    if ( ( !$timeupdated ) || ($ao_obj->timeupdated >= $timeupdated) ) {
-                        $object_uuid = $ao_obj->uuid;
-                        $httpinurl = $ao_obj->httpinurl;
-                        $objname = $ao_obj->name;
-                    }
+            // For Avatar Classroom, the rezzer config may have been stored on the avatar classroom server.
+            // This URL should already have a parameter name and an =, if required.
+            // NB This will fail on PHP < 5.
+            if (defined('SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE') && (SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE != '') ) {
+
+                // Initializing curl
+                $ch = curl_init( SLOODLE_SHARED_MEDIA_REZZER_CONFIG_WEB_SERVICE.$_REQUEST['sloodleobjuuid'] );
+                $options = array(
+                    CURLOPT_RETURNTRANSFER => true,
+                );
+                curl_setopt_array( $ch, $options );
+                if ($result = curl_exec($ch)) {
+                    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    if ($http_code == 200) {
+                        $ao_obj = json_decode($result);
+                        // If the server has been updated after our active object list because of a rezzer reset, use the new information.
+                        if ( ( !$timeupdated ) || ($ao_obj->timeupdated >= $timeupdated) ) {
+                            $object_uuid = $ao_obj->uuid;
+                            $httpinurl = $ao_obj->httpinurl;
+                            $objname = $ao_obj->name;
+                        }
+                    } 
                 } 
-            } 
 
+            }
         }
 
     }
