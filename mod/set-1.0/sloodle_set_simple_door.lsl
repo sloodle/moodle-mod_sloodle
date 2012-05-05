@@ -13,9 +13,18 @@ integer open=FALSE;
 integer SLOODLE_CHANNEL_SET_SIMPLE_DOOR_OPEN =-1639270101;
 integer SLOODLE_CHANNEL_SET_SIMPLE_DOOR_CLOSED = -1639270102;
 integer SLOODLE_CHANNEL_OBJECT_DIALOG                   = -3857343;
+integer CompareRots(rotation rot1, rotation rot2)
+{
+    return (
+        llRound(rot1.x * 10000) == llRound(rot2.x * 10000)
+        && llRound(rot1.y * 10000) == llRound(rot2.y * 10000)
+        && llRound(rot1.z * 10000) == llRound(rot2.z * 10000)
+        && llRound(rot1.s * 10000) == llRound(rot2.s * 10000)
+        );
+}
 
 default 
-{ 
+{  
     state_entry() 
     {      
         llSetLocalRot(llEuler2Rot( <0, 0, 270.00 * DEG_TO_RAD> ));       
@@ -40,14 +49,17 @@ default
                 return;
             }
         }
+        rotation theRot = llGetLocalRot();
         
-        if (llGetLocalRot()==<0, 0, 270 * DEG_TO_RAD>){ 
+        rotation openRot = <0.000000,0.000000,0.382683,0.923880>;
+        rotation closedRot = <0.000000,0.000000,0.707107,-0.707107>;
+        if (CompareRots(theRot, closedRot)){ 
             llSetLocalRot(llEuler2Rot( <0, 0, 45 * DEG_TO_RAD> ));
             llMessageLinked(LINK_ALL_OTHERS,SLOODLE_CHANNEL_SET_SIMPLE_DOOR_CLOSED,"",NULL_KEY);  
             llTriggerSound("open",1.0);     
             llTriggerSound("powerup",1.0); 
             llMessageLinked(LINK_SET, -99, "turn glow on", NULL_KEY);
-            open = FALSE;             
+                      
         } else { 
             llMessageLinked(LINK_ALL_OTHERS,SLOODLE_CHANNEL_SET_SIMPLE_DOOR_OPEN,"",NULL_KEY);   
            // llSetPos( llGetRootPosition() );
@@ -55,6 +67,7 @@ default
            llTriggerSound("powerdown",1.0); 
             llSetLocalRot(llEuler2Rot( <0, 0, 270 * DEG_TO_RAD> ));   open = TRUE; 
             llMessageLinked(LINK_SET, -99, "turn glow off", NULL_KEY);
+          
         } 
         
     }
