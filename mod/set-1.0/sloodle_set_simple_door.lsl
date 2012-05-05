@@ -13,15 +13,6 @@ integer open=FALSE;
 integer SLOODLE_CHANNEL_SET_SIMPLE_DOOR_OPEN =-1639270101;
 integer SLOODLE_CHANNEL_SET_SIMPLE_DOOR_CLOSED = -1639270102;
 integer SLOODLE_CHANNEL_OBJECT_DIALOG                   = -3857343;
-integer CompareRots(rotation rot1, rotation rot2)
-{
-    return (
-        llRound(rot1.x * 10000) == llRound(rot2.x * 10000)
-        && llRound(rot1.y * 10000) == llRound(rot2.y * 10000)
-        && llRound(rot1.z * 10000) == llRound(rot2.z * 10000)
-        && llRound(rot1.s * 10000) == llRound(rot2.s * 10000)
-        );
-}
 
 default 
 {  
