@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 string SLOODLE_EOF = "sloodleeof";
 integer eof= FALSE;
 integer isconfigured=FALSE;

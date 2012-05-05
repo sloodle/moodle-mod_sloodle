@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle web-configuration script
 // In the absence of a configuration notecard, allows an object to be authorised/configured via the web
 // Part of the Sloodle project (www.sloodle.org)

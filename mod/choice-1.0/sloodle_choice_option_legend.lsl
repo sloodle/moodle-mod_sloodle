@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Choice (for Sloodle 0.3)
 // This script represents an item on the graph 'legend'.
 //

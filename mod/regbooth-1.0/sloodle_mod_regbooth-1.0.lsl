@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Registration Booth (for Sloodle 0.3)
 // Allows users to touch a panel to do manual registration of their avatar.
 //

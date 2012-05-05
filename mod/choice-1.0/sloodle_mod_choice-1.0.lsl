@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Choice (for Sloodle 0.3)
 // Allows avatars to interact graphically with a Moodle choice.
 //

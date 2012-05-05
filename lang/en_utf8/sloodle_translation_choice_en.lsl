@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Standard translation script for Sloodle.
 // Contains the common, re-usable words and phrases.
 //

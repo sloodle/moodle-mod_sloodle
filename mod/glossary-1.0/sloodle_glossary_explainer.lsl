@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // NB Not sure what this script is for.
 // It was in Fumi's oar, but I couldn't find anything like it in SVN.
 // If anybody knows, please delete these comments and replace them with some comments explaining why it's here.

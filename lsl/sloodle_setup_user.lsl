@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle user-centric configuration script.
 // Allows users (e.g. students) to authorise and configure user-centric objects themselves.
 // Part of the Sloodle project (www.sloodle.org)

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle AviLister
 // When touched, lists the Moodle names of any known avatars nearby (up to a maximum of 16)
 // Part of the Sloodle project (www.sloodle.org)

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Demo object (for Sloodle 0.4)
 // Part of the SLOODLE project (www.sloodle.org)
 //

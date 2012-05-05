@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Blog channel display
 // Shows which channel the blog is currently listening on (for user input)
 // Part of the Sloodle project (www.sloodle.org)

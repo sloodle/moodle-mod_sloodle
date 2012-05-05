@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle quiz chair
 // Allows SL users to take Moodle quizzes in-world
 // Part of the Sloodle project (www.sloodle.org)

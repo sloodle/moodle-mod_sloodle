@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 integer SLOODLE_CHANNEL_SET_CONFIGURED = -1639270091;
 integer SLOODLE_CHANNEL_SET_RESET = -1639270092; 
 integer SLOODLE_CHANNEL_OBJECT_CREATOR_WILL_REZ_AT_POSITION = -1639270084;

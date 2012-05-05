@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle PrimDrop (for Sloodle 0.3)
 // Allows students to submit SL objects as Moodle assignments.
 // Part of the Sloodle project (www.sloodle.org)

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 
 /*
 Blink - this will make an object start blinking different colors for MAX_TIME if a message is received on a BLINK_CHANNEL

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 /* Sloodle Status Codes
 
 	Copyright (c) 2006-9 Sloodle (various contributors)

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Choice text display
 // Displays the text of a choice using hover text
 //

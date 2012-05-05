@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Blog visibility display
 // Shows the current visibility setting of the Toolbar.
 // Part of the Sloodle project (www.sloodle.org)

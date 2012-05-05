@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // LoginZone script (for Sloodle 0.3).
 // Allows avatar-Moodle identification by teleporting into pre-defined space in-world.
 //

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Blog Length meter
 // Shows the length of the current blog entry, relative to the maximum allowable length
 // Part of the Sloodle project (www.sloodle.org)

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle URL loader
 // Allows other scripts to transfer the loading of a *single* URL to another script
 // Part of the Sloodle project (www.sloodle.org)

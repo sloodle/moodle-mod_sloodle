@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 /*
 *********************************************************************************************
 *  sloodle_hover_text_displayer.lsl

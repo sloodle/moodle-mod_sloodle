@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle configuration notecard reader
 // Reads a configuration notecard and transmits the data via link messages to other scripts
 // If the notecard changes, then it automatically resets.

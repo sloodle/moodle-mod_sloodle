@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // LSL script generated: furniture-1.0.object_definitions.presentation_seating.lslp Sat Nov 19 14:36:29 Tokyo Standard Time 2011
 /*********************************************************************************************************    
  *  Avatar Classroom Seating

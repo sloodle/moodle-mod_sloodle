@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // "PictureGloss" -- SLOODLE MetaGloss modified to show textures instead of text definitions
 
 ///////////////////////////////////////////

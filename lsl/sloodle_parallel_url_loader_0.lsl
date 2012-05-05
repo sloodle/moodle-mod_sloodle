@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle parallel URL loader
 // Allows the loading of a single URL on a specified channel.
 // (NOTE: should be in the same prim as a "sloodle_multi_url_loader.lsl" script)

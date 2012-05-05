@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Set object creation script.
 // Handles the dispensor box's inventory and allows users to rez it.
 //

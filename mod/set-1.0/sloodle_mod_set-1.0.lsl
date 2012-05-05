@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Set manager script (for Sloodle 0.3).
 // Performs the overall management of a Sloodle Set's configuration.
 //

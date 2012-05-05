@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 default
 {// zFire Xue Prim Animator Generator 5.1 Fastest Web Version.
 // Script belongs to Fire Centaur

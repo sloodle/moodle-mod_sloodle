@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 integer SLOODLE_CHANNEL_QUIZ_MULTIPLE_MY_NUMBER = -1639270062;
 integer SLOODLE_CHANNEL_QUIZ_MULTIPLE_QUESTION = -1639270063;
 integer SLOODLE_CHANNEL_QUIZ_MULTIPLE_CORRECT = -1639270064;

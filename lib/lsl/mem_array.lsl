@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 /**********************************************************************************************
 *  mem_array.lsl
 *  Copyright (c) 2009 Paul Preibisch

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 default
 {
     link_message( integer sender_num, integer num, string str, key id ){

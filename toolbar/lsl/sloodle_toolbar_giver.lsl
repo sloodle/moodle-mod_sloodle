@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 integer CHAT_CHANNEL;
 
 //just returns a random integer - used for setting channels

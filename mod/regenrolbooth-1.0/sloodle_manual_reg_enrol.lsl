@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Manual avatar registration and enrolment script.
 // Will initiate manual (URL-based) avatar registration/enrolment in
 //  response to link messages.

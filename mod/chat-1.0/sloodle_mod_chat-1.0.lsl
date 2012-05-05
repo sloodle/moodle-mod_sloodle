@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle WebIntercom (for Sloodle 0.4)
 // Links in-world SL (text) chat with a Moodle chatroom
 // Part of the Sloodle project (www.sloodle.org)

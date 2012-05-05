@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle multiple URL loader
 // Manages the parallelized loading of multiple (potentially) simultaneous URLs for different users
 // (NOTE: requires copies of the "sloodle_parallel_url_loader_x.lsl" script to be in the SAME prim)

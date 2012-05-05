@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Presenter (for Sloodle 0.4)
 // Lets the educator display a presentation of images. videos and webpages hosted on the web.
 // Part of the Sloodle project (www.sloodle.org)

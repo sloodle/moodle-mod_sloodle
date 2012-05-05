@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 /*
 * showadminpanel.lsl
 * Part of the Sloodle project (www.sloodle.org)

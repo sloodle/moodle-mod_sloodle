@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 integer SLOODLE_CHANNEL_OBJECT_DIALOG                   = -3857343;//configuration channel
 integer counter;
 

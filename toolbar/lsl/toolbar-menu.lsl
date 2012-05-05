@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 //////////
 //
 // Sloodle Toolbar menu script (v2.0)

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sliding door script
 // (c) Edmund Edgar, 2007-07-09
 // Licensed under GPL v2

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle object layout script.
 // Allows individual objects to store themselves in a Sloodle layout.
 //

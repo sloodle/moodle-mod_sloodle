@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Blog HUD
 // Allows SL users in-world to write to their Moodle blog
 // Part of the Sloodle project (www.sloodle.org)

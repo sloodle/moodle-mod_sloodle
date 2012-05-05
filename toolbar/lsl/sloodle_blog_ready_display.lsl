@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Blog "Ready" display
 // Shows when the blog is ready, not ready, or in the error state
 // Part of the Sloodle project (www.sloodle.org)

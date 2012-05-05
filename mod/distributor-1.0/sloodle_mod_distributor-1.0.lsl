@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle object distributor.
 // Allows Sloodle objects to be distributed in-world to Second Life users,
 //  either by an in-world user touching it and using a menu,

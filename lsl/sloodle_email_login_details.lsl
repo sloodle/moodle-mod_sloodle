@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // How many seconds between each email check
 float EMAIL_CHECK_PERIOD = 30.0;
 

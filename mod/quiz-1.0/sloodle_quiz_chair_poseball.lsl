@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 //////////
 // SLODLE Quiz Chair Poseball (www.sloodle.org)
 // For SLOODLE 0.4

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle PrimDrop inventory checker.
 // Receives dropped prims, and checks for the most recently added one
 // Part of the Sloodle project (www.sloodle.org)

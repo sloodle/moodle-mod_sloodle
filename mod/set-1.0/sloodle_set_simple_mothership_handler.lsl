@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Set Mothership Handler
 // Rezzes and controls the rezzer as a seperate object
 //

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Access Checker (for Sloodle 0.3)
 // Detects users colliding, and makes sure they are registered/enrolled.
 //

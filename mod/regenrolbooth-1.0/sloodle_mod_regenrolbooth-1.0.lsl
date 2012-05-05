@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Registration / Enrolment Booth (for Sloodle 0.4)
 // Allows users to touch a panel to do manual registration of their avatar,
 //  and/or enrolment of their Moodle account.

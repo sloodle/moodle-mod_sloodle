@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Glossary (for Sloodle 0.3)
 // Allows users in-world to search a Moodle glossary.
 // Part of the Sloodle project (www.sloodle.org)

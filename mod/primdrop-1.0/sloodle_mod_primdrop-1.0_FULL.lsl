@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // NOTE: this version of the script should be fully functional, but does not appear to be compilable by SL.
 
 // Sloodle PrimDrop (for Sloodle 0.3)

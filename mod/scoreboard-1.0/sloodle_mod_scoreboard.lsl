@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Scoreboard
 // 
 // Part of the Sloodle project (www.sloodle.org)

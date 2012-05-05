@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle Password Reset object
 // Allows avatar with auto-registered Moodle accounts to reset their Moodle password from in-world.
 // Part of the Sloodle project (www.sloodle.org)

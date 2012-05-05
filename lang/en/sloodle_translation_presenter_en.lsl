@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Translation strings for the Sloodle Presenter object(s).
 //
 // The "locstrings" list is pairs of strings.

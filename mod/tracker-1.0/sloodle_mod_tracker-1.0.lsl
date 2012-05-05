@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // This file is part of SLOODLE Tracker.
 // Copyright (c) 2009-11 Sloodle community (various contributors)
     

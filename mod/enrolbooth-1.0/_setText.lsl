@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 /*********************************************
 *  Copyright (c) 2009 Paul Preibisch
 *  GPL 3.0 for the Sloodle Project

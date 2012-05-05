@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 /**********************************************************************************************
 *  error_messages.lsl
 *  Copyright (c) 2009 Paul Preibisch

@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // LSL script generated: interaction-1.0.object_scripts.locked_door.lslp Sat Nov 19 14:36:29 Tokyo Standard Time 2011
 /*
 *  lockeddoor.lsl

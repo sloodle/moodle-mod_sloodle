@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // Sloodle quiz chair UI
 // Controls the movement of the quiz chair, based on linked messages from the main script.
 // It should be possible to radically alter the object, eg. change it into an aeroplane etc - by altering this script.
