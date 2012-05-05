@@ -172,7 +172,8 @@ state ready {
                 llOwnerSay("Could not save HTTP In URL for rezzed object "+llKey2Name(objKey));
             }else
             if (statuscode == -218) {
-                llOwnerSay("This rezzer did not recognize "+llKey2Name(objKey));
+		// Probably a different rezzer - ignore
+                //llOwnerSay("This rezzer did not recognize "+llKey2Name(objKey));
             }else
             if (statuscode == -219) {
                 llOwnerSay("Sending configuration to object via HTTP-in URL failed "+llKey2Name(objKey));
