@@ -40,7 +40,8 @@ list locstrings = [
     "dialog:distributorobjectmenu", "Sloodle Distributor.\n\n{{0}}", // The parameter should be a set of button labels and object names, e.g. "1 = WebIntercom, 2 = MetaGloss"
     "dialog:distributorobjectmenu:cmd", "Sloodle Distributor.\n\n{{0}}{{1}} = Command menu\n{{2}} = Visit Distributer on MOODLE", // As above, but the second parameter gives the command menu button label
     "dialog:distributorobjectmenu:visitmoodle", "Click \"Go to page\" to visit the distributer on MOODLE", // As above, but the second parameter gives the command menu button label
-    "distributor:notconnected", "The distributer is currently not connected, or is shut down.  So we can not redirect you to the webpage for this distributer." 
+    "distributor:distributerisempty", "This distributer currently has no items in it."
+
 ];
 
 ///// ----------- /////
