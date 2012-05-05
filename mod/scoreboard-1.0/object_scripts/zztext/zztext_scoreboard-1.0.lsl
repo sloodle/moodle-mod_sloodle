@@ -96,6 +96,12 @@ sloodle_debug(string msg)
 {
     llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
 }
+debug (string message){
+      list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
+      if (llList2Integer (params ,0)==PRIM_MATERIAL_FLESH){
+           llOwnerSay(llGetObjectName()+"."+llGetScriptName()+": "+message);
+     }
+}
 
 handle_points_notification(string str) {
 
@@ -140,7 +146,22 @@ update_media(string hash) {
     
     
 }
-
+requestScores(){
+ paramstr = "&sloodleobjuuid=" + (string)llGetKey();
+        view_url= sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr;
+        admin_url =  sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr + "&mode=admin";
+        update_media("");
+        // Inform the Moodle chatroom
+        string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
+        body += "&sloodlepwd=" + sloodlepwd;
+        body += "&sloodlemoduleid=" + (string)sloodlemoduleid;
+        body += "&sloodleuuid=" + (string)llGetKey();
+        body += "&sloodleavname=" + llEscapeURL(llGetObjectName());
+        body += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
+        body += "&sloodleisobject=true";
+        body += "&format=paddedtext";
+         httpscoreboard = llHTTPRequest(sloodleserverroot + SLOODLE_SCOREBOARD_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);       
+}
 // Configure by receiving a linked message from another script in the object
 // Returns TRUE if the object has all the data it needs
 integer sloodle_handle_command(string str) 
@@ -253,20 +274,7 @@ state ready
     state_entry()
     {  
        
-        paramstr = "&sloodleobjuuid=" + (string)llGetKey();
-        view_url= sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr;
-        admin_url =  sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr + "&mode=admin";
-        update_media("");
-        // Inform the Moodle chatroom
-        string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
-        body += "&sloodlepwd=" + sloodlepwd;
-        body += "&sloodlemoduleid=" + (string)sloodlemoduleid;
-        body += "&sloodleuuid=" + (string)llGetKey();
-        body += "&sloodleavname=" + llEscapeURL(llGetObjectName());
-        body += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
-        body += "&sloodleisobject=true";
-        body += "&format=paddedtext";
-         httpscoreboard = llHTTPRequest(sloodleserverroot + SLOODLE_SCOREBOARD_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);                               
+       requestScores();                            
     }
      http_response(key id, integer status, list meta, string body){
         // Is this the expected data?
@@ -321,6 +329,7 @@ state ready
     
     link_message( integer sender_num, integer num, string str, key id)
     {
+            debug("linked message: "+str);
         // Check the channel
         if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
             // Split the message into lines
@@ -330,7 +339,21 @@ state ready
             for (i=0; i < numlines; i++) {
                 isconfigured = sloodle_handle_command(llList2String(lines, i));
             }
-            
+
+            if (eof == TRUE) {
+                if (isconfigured == TRUE) {
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                  requestScores();
+                } else {
+                    // Go all configuration but, it's not complete... request reconfiguration
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
+                    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
+                    eof = FALSE;
+                }
+            }
+    
+        
+
         } else if (num == SLOODLE_AWARDS_POINTS_CHANGE_NOTIFICATION) { // Awards points change notification
             handle_points_notification( str );
 
@@ -351,4 +374,5 @@ state ready
 }
 
 // Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/scoreboard-1.0/sloodle_mod_scoreboard.lsl
+// SLOODLE LSL Script Subversion Location: mod/scoreboard-1.0/object_scripts/zztext/zztext_scoreboard-1.0.lsl
+
