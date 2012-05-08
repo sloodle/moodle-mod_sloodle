@@ -53,7 +53,7 @@
         
         $sloodle->response->set_status_code(1);
         $sloodle->response->set_status_descriptor('OK');
-        $sloodle->response->set_refresh_seconds(9);
+        $sloodle->response->set_refresh_seconds(SLOODLE_REZZER_STATUS_CONFIRM_INTERVAL);
            
 
         if (count($uuids) > 0) {
