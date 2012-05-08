@@ -25,11 +25,8 @@ integer isconfigured=FALSE;
 integer eof=FALSE;
 integer sloodlecontrollerid = 0;
 integer sloodlemoduleid = 0;
-integer sloodlelistentoobjects = 0; // Should this object listen to other objects?
-integer sloodleobjectaccessleveluse = 0; // Who can use this object?
-integer sloodleobjectaccesslevelctrl = 0; // Who can control this object?
-integer sloodleserveraccesslevel = 0; // Who can use the server resource? (Value passed straight back to Moodle)
-integer sloodleautodeactivate = 1; // Should the WebIntercom auto-deactivate when not in use?
+
+
 key listenHandle;
 integer  SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL =  -1639270089; //Object creator telling itself it wants to rez an object  at a position (specified as key) 
 string  SLOODLE_HTTP_IN_REQUEST_LINKER = "/mod/sloodle/classroom/httpin_config_linker.php";
@@ -55,11 +52,6 @@ integer sloodle_handle_command(string str)
         else sloodlepwd = value1;
         
     } else if (name == "set:sloodlecontrollerid") sloodlecontrollerid = (integer)value1;
-    else if (name == "set:sloodlelistentoobjects") sloodlelistentoobjects = (integer)value1;
-    else if (name == "set:sloodleobjectaccessleveluse") sloodleobjectaccessleveluse = (integer)value1;
-    else if (name == "set:sloodleobjectaccesslevelctrl") sloodleobjectaccesslevelctrl = (integer)value1;
-    else if (name == "set:sloodleserveraccesslevel") sloodleserveraccesslevel = (integer)value1;
-    else if (name == "set:sloodleautodeactivate") sloodleautodeactivate = (integer)value1;
     else if (name == SLOODLE_EOF) eof = TRUE;
     
     return (sloodleserverroot != "" && sloodlepwd != "" && sloodlecontrollerid > 0 );
@@ -107,11 +99,13 @@ default
             // If we've got all our data AND reached the end of the configuration data, then move on
             if (eof == TRUE) {
                 if (isconfigured == TRUE) {
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                    // The main script should deal with talking about configuration.
+                    // We'll avoid confusing the user by saying it twice, and just hope we both got the same messages.
+                    // sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
                      state ready;
                 } else {
                     // Go all configuration but, it's not complete... request reconfiguration
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
+                   // sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
                     llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
                     eof = FALSE;
                 }
@@ -175,7 +169,7 @@ state ready {
                 llOwnerSay("Could not save HTTP In URL for rezzed object "+llKey2Name(objKey));
             }else
             if (statuscode == -218) {
-		// Probably a different rezzer - ignore
+        // Probably a different rezzer - ignore
                 //llOwnerSay("This rezzer did not recognize "+llKey2Name(objKey));
             }else
             if (statuscode == -219) {
@@ -223,3 +217,4 @@ state ready {
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_httpin_forwarder.lsl
+
