@@ -44,6 +44,8 @@
     
     $sloodle->response->set_status_code(1);
     $sloodle->response->set_status_descriptor('OK');
+    $sloodle->response->set_refresh_seconds(SLOODLE_PING_INTERVAL);
+
     
     // Output the response
     $sloodle->response->render_to_output();

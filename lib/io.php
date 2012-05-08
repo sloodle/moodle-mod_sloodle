@@ -167,7 +167,7 @@
         var $http_in_password= null;
      
         /**
-        * Return URL
+        * Expect response
         * Used when sending a one-way message, where you want a reply to be sent somewhere.
         * This is intended to be used in situations where we can't make http-in reqests to the grid
         * ...and we instead queue them on the server and have a process in SL/OpenSim to pass them on.
@@ -176,6 +176,15 @@
         */
         var $expect_response = null;
  
+        /**
+        * Refresh after seconds
+        * Used in objects like the ping linker and the rezzer status confirmer
+        * ...to indicate to an object that it should repeat its request in X seconds.
+        * @var string
+        * @access private
+        */
+        var $refresh_seconds= null;
+
 
         /**
         * Data to render following the status line in the response.
@@ -470,7 +479,17 @@
         {
             $this->expect_response = $int;
         }
-       
+    
+        /**
+        * Accessor function to set member value {@link $refresh_seconds}
+        * @param mixed $par Any scalar value
+        * @return void
+        */
+        function set_refresh_seconds($int)
+        {
+            $this->refresh_seconds = $int;
+        }
+    
 
      
 
@@ -592,7 +611,13 @@
             // We will step backwards through out list of fields, and as soon as one item is specified, all of them should be
             $showall = false;
 
-            // return url
+            // refresh seconds
+            if ($showall || is_null($this->refresh_seconds) == false) {
+                $showall = true;
+                $str = $this->field_separator . $this->refresh_seconds. $str;
+            }
+
+            // expect response
             if ($showall || is_null($this->expect_response) == false) {
                 $showall = true;
                 $str = $this->field_separator . $this->expect_response. $str;

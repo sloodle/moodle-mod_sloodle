@@ -2,7 +2,7 @@
 // The line above should be left blank to avoid script errors in OpenSim.
 
 /*********************************************
-*  Copyrght (c) 2012 various contributors (see below)
+*  Copyright (c) 2012 various contributors (see below)
 *  Released under the GNU GPL 3.0
 *  This script can be used in your scripts, but you must include this copyright header as per the GPL Licence
 *  For more information about GPL 3.0 - see: http://www.gnu.org/copyleft/gpl.html
@@ -62,7 +62,7 @@ default
 {
     state_entry()
     {        
-    llOwnerSay("waiging for config");
+   // llOwnerSay("waiting for config");
     }
 
     // allow for reconfiguration without resetting
@@ -103,7 +103,7 @@ state ready {
 
     state_entry()
     {
-        llOwnerSay("config rez status confirmer ready");
+       // llOwnerSay("config rez status confirmer ready");
         llSetTimerEvent(10);
     }
 
@@ -120,6 +120,13 @@ state ready {
         list statusfields = llParseStringKeepNulls( llList2String(lines,0), ["|"], [] );
         // Get the statuscode
         integer statuscode = llList2Integer(statusfields,0);
+        float refreshseconds = 60;
+       // llOwnerSay(body);
+        if (llGetListLength(statusfields) >= 12) {
+            if (llList2Float(statusfields,12) > 0) {
+                refreshseconds = llList2Float(statusfields,12);
+            }
+        }
 
         string replybody = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
         replybody += "&sloodlepwd=" + sloodlepwd; 
@@ -140,7 +147,7 @@ state ready {
 
         reporthttp = llHTTPRequest(sloodleserverroot + SLOODLE_CONFIRM_ACTIVE_OBJECTS_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], replybody );
        // llOwnerSay("requestiong " +sloodleserverroot + SLOODLE_CONFIRM_ACTIVE_OBJECTS_LINKER + replybody);
-        llSetTimerEvent(10);
+        llSetTimerEvent(refreshseconds);
 
     }
 
@@ -155,7 +162,7 @@ state ready {
 
         requesthttp = llHTTPRequest(sloodleserverroot + SLOODLE_CONFIRM_ACTIVE_OBJECTS_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
        // llOwnerSay("on timer requestiong " +sloodleserverroot + SLOODLE_CONFIRM_ACTIVE_OBJECTS_LINKER + body);
-        llSetTimerEvent(10);
+        llSetTimerEvent(30); // In case the request fails
         
     } 
                             
@@ -183,3 +190,4 @@ state ready {
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_rez_status_confirmer.lsl
+

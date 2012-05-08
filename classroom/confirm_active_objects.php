@@ -53,6 +53,8 @@
         
         $sloodle->response->set_status_code(1);
         $sloodle->response->set_status_descriptor('OK');
+        $sloodle->response->set_refresh_seconds(9);
+           
 
         if (count($uuids) > 0) {
             foreach($uuids as $uuid) {

@@ -143,8 +143,8 @@
 
     /*
     Customizable parameters follow.
-    Normally these will be defined in an optional 'config.php' file.
-    For ease of upgrading, the config.php will not be included in the release, although we will provide a sample.
+    Normally these will be defined in an optional 'sloodle_config.php' file.
+    For ease of upgrading, the sloodle_config.php will not be included in the release, although we will provide a sample.
     */
 
     if ( file_exists(SLOODLE_DIRROOT.'/sloodle_config.php') ) {
@@ -164,6 +164,23 @@
     if ( !defined('SLOODLE_SUPPORTED_OBJECT_COLLECTIONS') ) {
         define('SLOODLE_SUPPORTED_OBJECT_COLLECTIONS', serialize(array('SLOODLE 2.0') ) ); //
     }
+
+    /*
+    How often objects should be told to ping us to let us know they're alive.
+    NB The initial ping from an object will be at a random proportion of this number
+    ...to provide some jitter and prevent the server being hammered by all the scripts at the same time.
+    */
+    if ( !defined('SLOODLE_PING_INTERVAL') ) {
+        define('SLOODLE_PING_INTERVAL', 3600);
+    }
+
+    /*
+    How often the rezzer should poll to check which objects may be rezzed
+    ...and provide a report of which, in any, are missing.
+    Since there is usually only one rezzer, you should be able to make this happen fairly fast without worrying about killing your server.
+    If you aren't worried about server resources, it would be meaningful to bring it down as low as 3 seconds.
+    */
+    define('SLOODLE_REZZER_STATUS_CONFIRM_INTERVAL', 15);
 
 
 

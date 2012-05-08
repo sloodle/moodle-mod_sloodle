@@ -492,6 +492,8 @@
                 $response->add_data_line( 'set:'.$n.'|'.$v );
             }//endforeach
             $response->set_status_code(1);
+            $response->set_refresh_seconds(SLOODLE_PING_INTERVAL);
+
 
             /*
             If we send the object a CONFIG_PERSISTENT descriptor, it will keep the config and use it if re-rezzed or copied.
