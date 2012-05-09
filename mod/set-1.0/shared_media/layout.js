@@ -2,7 +2,6 @@
 //	var actionStatus = 'unrezzed'; // The state of the page. Goes to 'rezzed' when you hit the 'rez' button. 
 
 	var timeoutMilliseconds = 30000; // How long until we give up waiting and try again. NB even after this a response may still show up, so we need to be able to handle it.
-	var heartbeatMilliseconds = 9000; // We do automatic refreshes to see if anything has changed in-world. This decides how often.
 	var pendingRequests = new Object(); // A list of entries that we've made a request for, and the timestamp in milliseconds when we made them
 	var numPendingRequests = 0; // Should correspond to the number of elements in pendingRequests
 
@@ -242,6 +241,11 @@
 	}
 
 	function heartbeat_refresh(parentjq, layoutid, rezzeruuid) {
+
+        if (!isRezzerConfigured) {
+            return false;
+        }
+
 		$.getJSON(
 			"refresh_rezzer.php",  
 			{
@@ -326,6 +330,7 @@
                     }
                 }
 
+                clearTimeout(heartbeatTimer);
                 heartbeatTimer = setTimeout( function(){ heartbeat_refresh( parentjq, layoutid, rezzeruuid ); }, heartbeatMilliseconds );
 
 			}
@@ -474,7 +479,7 @@
 		parentjq.children('li.derezzing_failed').removeClass('derezzing_failed');
 		parentjq.children('li.rezzing_failed').removeClass('rezzing_failed');
 		parentjq.children('li.derezzed').removeClass('derezzed');
-		parentjq.children('li.rezzable_item').not('li.rezzed').addClass( 'waiting_to_rez' );
+		parentjq.children('li.rezzable_item').not('li.rezzed').not('li.rezzing').addClass( 'waiting_to_rez' );
 		parentjq.find('.rez_all_objects').html('Stop rezzing objects');
 		parentjq.find('.rez_all_objects').unbind('click');
 		parentjq.find('.rez_all_objects').click(function() {
@@ -977,17 +982,15 @@
 		);  
 	}
 
-	function configure_set( layoutlinkjq ) {
-		var layoutjqid = layoutlinkjq.attr('href'); // looks like #layout_2-2-1
-		var parentjq = $(layoutjqid); // the "#" happens to be the same notation as that used for the jquery id selector
-		var bits = parentjq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
-		var layoutid = bits.pop(); // pop this off - don't think we need it
-        activeLayoutID = layoutid;
-		var controllerid = bits.pop();
-		if ( isRezzerConfigured && ( rezzerControllerID == controllerid) ) {
-			return;
-		}
-		$.getJSON(  
+    function configure_rezzer( parentjq, controllerid, layoutid) {
+
+        // Layout ID has changed
+        // This can happen if we fail, then try to reconnect
+        if (activeLayoutID != layoutid) {
+            return;
+        }
+
+        $.getJSON(  
 			"configure_rezzer.php",  
 			{
 				controllerid: controllerid,
@@ -997,17 +1000,43 @@
 			function(json) {  
 				var result = json.result;
 				if (result == 'configured') {
+                    isRezzerConfigured = true;
+                    rezzerControllerID = controllerid;
 					parentjq.attr('data-connection-status', 'connected');
 					update_buttons( parentjq );
 					//refresh_misc_object_group( parentjq );
 					rezzerControllerID = controllerid;
                     heartbeat_refresh( parentjq, layoutid, rezzer_uuid)
+                    parentjq.find('.fatal_error_zone').hide();
 				} else if (result == 'failed') {
+                    parentjq.find('.fatal_error_zone').show();
 					parentjq.children('.rez_all_objects').hide();	
+
+                    // Try again in 30 seconds
+                    setTimeout(function() {
+                        configure_rezzer( parentjq, controllerid, layoutid );
+                    }, 30000);
+
 				}
 			}  
 		);  
-		return true;
+
+    }
+
+    function handle_scene_selection( layoutlinkjq ) {
+		var layoutjqid = layoutlinkjq.attr('href'); // looks like #layout_2-2-1
+		var parentjq = $(layoutjqid); // the "#" happens to be the same notation as that used for the jquery id selector
+		var bits = parentjq.attr('id').split("_").pop().split("-"); // layoutentryid_1-2-3 becomes an Array(1,2,3)
+		var layoutid = bits.pop(); // pop this off - don't think we need it
+        activeLayoutID = layoutid;
+		var controllerid = bits.pop();
+        /*
+		if ( isRezzerConfigured && ( rezzerControllerID == controllerid) ) {
+			return;
+		}
+        */
+        configure_rezzer( parentjq, controllerid, layoutid );
+        return true;
 	}
 
 	function attach_event_handlers() {
@@ -1015,7 +1044,7 @@
 			return create_layout($(this));
 		});
 		$().find('.layout_link').unbind('click').click(function() {
-			return configure_set($(this));
+			return handle_scene_selection($(this));
 		});
 		$().find('.rez_all_objects').hide();
 		$().find('.rez_all_objects').unbind('click').click(function() {

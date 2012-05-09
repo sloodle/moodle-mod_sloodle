@@ -44,7 +44,6 @@ if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
         error_output( 'Access denied');
 }
 
-
 // TODO: Make this check for a change in the site name, then remove the "true" to avoid pointless reconfiguration
 if (true || ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {
 //if ( ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USER->id) ) {
@@ -58,13 +57,18 @@ if (true || ($rezzer->controllerid != $controllerid) || ($rezzer->userid != $USE
 	if ($result['info']['http_code'] == 404) {
 		error_output('HTTP-in URL not found');
 	}
+	if ($result['info']['http_code'] != 200) {
+		error_output('HTTP-in request failed');
+	}
 }
+$info = $result['info'];
 
 $result = 'configured';
 
 $content = array(
 	'result' => $result,
 	'error' => '',
+	'info' => $info,
 );
 
 print json_encode($content);

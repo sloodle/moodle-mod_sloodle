@@ -28,6 +28,7 @@ function print_html_top($loadfrom = '') {
 -->
 <script type="text/javascript">
 	var rezzer_uuid = '<?php echo  htmlentities($_REQUEST['sloodleobjuuid']) ?>';
+	var heartbeatMilliseconds = <?php echo (SLOODLE_REZZER_STATUS_CONFIRM_INTERVAL*1000/2);?> // We do automatic refreshes to see if anything has changed in-world. This decides how often.
 </script>
 </head>
 
@@ -94,7 +95,6 @@ $full = false;
 
 </span>
 </div>
-
 
 	<?php if (!$hasControllersWithPermission) { ?>
 		<?php if (!$hasCourses) { ?>
@@ -282,7 +282,16 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				<span id="generate_standard_layout_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" data-generate-text="<?php echo  s(get_string('rezzer:importmoodleactivities','sloodle', $cn )) ?>" data-generating-text="<?php echo  s(get_string('rezzer:importingmoodleactivities', 'sloodle'))?>" data-layoutid="<?php echo  intval($layout->id) ?>" class="big_control_button generate_standard_layout"><?php echo  s(get_string('rezzer:importmoodleactivities', 'sloodle', $cn )) ?></span>
 
 </span>
+
 </li>
+
+<li class="fatal_error_zone">
+<span class="fatal_error_icon"></span>
+<span class="fatal_error_text">
+<?php echo  s(get_string('rezzer:couldnotconnect', 'sloodle', $cn )) ?>
+</div>
+</li>
+
 <?php
                 if (count($entriesbygroup) > 0) {
 				foreach($entriesbygroup as $group => $entries) {

@@ -190,6 +190,28 @@ form {
 	content: url(images/rezzer_icon_add_small.png); 
 }
 
+li.fatal_error_zone {
+    display:none;
+    border:2px solid red;
+    vertical-align:middle !important
+    font-size:24;
+}
+
+span.fatal_error_icon {
+    display:inline-block;
+	background-image: url(images/error.png); 
+    width:32px;
+    height:32px;
+}
+
+/*
+span.fatal_error_text:before {
+	content: url(images/error.png); 
+    margin-top:40px;
+    padding:0 5px 0 0;
+}
+*/
+
 /*
 rezzer_icon_add.png        rezzer_icon_delete.png     rezzer_icon_import.png   rezzer_icon_rez_all.png   rezzer_icon_update.png
 rezzer_icon_add_small.png  rezzer_icon_derez_all.png  rezzer_icon_refresh.png  rezzer_icon_settings.png
