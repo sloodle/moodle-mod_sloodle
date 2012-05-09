@@ -391,10 +391,8 @@ state ready {
                    // llOwnerSay( llList2String(lines, i) );
                   //  sloodle_tell_other_scripts(llList2String(lines, i));
                 //}
-                    sloodle_tell_other_scripts(body);
-                    // This is the end of the configuration data
-                    llSleep(0.2);
-                    sloodle_tell_other_scripts(SLOODLE_EOF);
+                    sloodle_tell_other_scripts(body+"\n"+SLOODLE_EOF);
+    
                   //  llHTTPResponse(id, 200, "OK");
                 
               }//endif
@@ -498,3 +496,4 @@ state rezz_and_reply
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_shared_media_setup.lsl
+

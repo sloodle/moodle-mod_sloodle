@@ -39,7 +39,7 @@ integer sloodle_handle_command(string str)
     integer numbits = llGetListLength(bits);
     string name = llList2String(bits,0);
     string value1 = "";
-    string value2 = "";
+    string value2 = ""; 
 
     string SLOODLE_EOF="sloodleeof";
     if (numbits > 1) value1 = llList2String(bits,1);
@@ -87,6 +87,9 @@ default
           //  llOwnerSay("http-in forwarder got mesage"+str);
         // Check the channel
         if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
+        
+            if (str == "do:reset") llResetScript();
+        
             // Split the message into lines
             list lines = llParseString2List(str, ["\n"], []);
             integer numlines = llGetListLength(lines);
@@ -101,7 +104,7 @@ default
                 if (isconfigured == TRUE) {
                     // The main script should deal with talking about configuration.
                     // We'll avoid confusing the user by saying it twice, and just hope we both got the same messages.
-                    // sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
                      state ready;
                 } else {
                     // Go all configuration but, it's not complete... request reconfiguration
@@ -153,34 +156,6 @@ state ready {
 //llOwnerSay("requested config with body "+body); 
           httpchat = llHTTPRequest(sloodleserverroot + SLOODLE_HTTP_IN_REQUEST_LINKER, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);    
    }
-    http_response(key request_id, integer status, list metadata, string body) {
-        // Split the data up into lines
-        list lines = llParseStringKeepNulls(body, ["\n"], []);  
-        integer numlines = llGetListLength(lines);
-        // Extract all the status fields
-        list statusfields = llParseStringKeepNulls( llList2String(lines,0), ["|"], [] );
-        // Get the statuscode
-        integer statuscode = llList2Integer(statusfields,0);
-        
-        // Was it an error code?
-        if (statuscode<0){
-            key objKey = llList2Key(lines,1);
-            if (statuscode == -217) {
-                llOwnerSay("Could not save HTTP In URL for rezzed object "+llKey2Name(objKey));
-            }else
-            if (statuscode == -218) {
-        // Probably a different rezzer - ignore
-                //llOwnerSay("This rezzer did not recognize "+llKey2Name(objKey));
-            }else
-            if (statuscode == -219) {
-                llOwnerSay("Sending configuration to object via HTTP-in URL failed "+llKey2Name(objKey));
-            } else {
-                llOwnerSay("Unknown Error: "+(string)statuscode+" "+llKey2Name(objKey)); 
-            }
-        }
-
-        
-    }      
 
     // allow for reconfiguration without resetting
      link_message( integer sender_num, integer num, string str, key id)
@@ -200,7 +175,7 @@ state ready {
             // If we've got all our data AND reached the end of the configuration data, then move on
             if (eof == TRUE) {
                 if (isconfigured == TRUE) {
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");;
                 } else {
                     // Go all configuration but, it's not complete... request reconfiguration
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");

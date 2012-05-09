@@ -2,7 +2,7 @@
 // The line above should be left blank to avoid script errors in OpenSim.
 
 /*********************************************
-*  Copyright (c) 2012 various contributors (see below)
+*  Copyrght (c) 2012 various contributors (see below)
 *  Released under the GNU GPL 3.0
 *  This script can be used in your scripts, but you must include this copyright header as per the GPL Licence
 *  For more information about GPL 3.0 - see: http://www.gnu.org/copyleft/gpl.html
@@ -75,6 +75,9 @@ default
             list lines = llParseString2List(str, ["\n"], []);
             integer numlines = llGetListLength(lines);
             integer i = 0;
+            
+            if (str == "do:reset") llResetScript();
+            
             for (i=0; i < numlines; i++) {
                 isconfigured = sloodle_handle_command(llList2String(lines, i));
        // llOwnerSay("got command "+llList2String(lines,i)+", configured is "+(string)isconfigured);
@@ -172,6 +175,9 @@ state ready {
         // llOwnerSay(str);
         // Check the channel
         if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
+            
+            if (str == "do:reset") llResetScript();        
+        
             // Split the message into lines
             list lines = llParseString2List(str, ["\n"], []);
             integer numlines = llGetListLength(lines);
