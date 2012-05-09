@@ -766,6 +766,7 @@ $string['rezzer:addobjects'] = 'Add objects';
 $string['rezzer:addobjects'] = 'Add objects';
 $string['rezzer:renaminglayout'] = 'Renaming';
 $string['rezzer:renamebutton'] = 'Rename';
+$string['rezzer:couldnotconnect'] = 'Server connection failed. Press the reset button to retry.';
 
 $string['misc:presentation_seating'] = 'Presentation Seating Color (Please add a vector color)'; 
 $string['misc:channel'] = 'Channel owner can send commands on:'; 
