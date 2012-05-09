@@ -36,6 +36,8 @@ string currentUrl;
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER = -1639270111; // set the main shared media panel to the specified URL, accessible to the owner
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP = -1639270112; // set the main shared media panel to the specified URL, accessible to the group
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_ANYONE = -1639270114; // set the main shared media panel to the specified URL, accessible to anyone
+
+
 integer SLOODLE_LOAD_CURRENT_URL= -1639271137; //send message to shared media to open url that it is currently displaying in a browser.
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;
 default
@@ -48,22 +50,11 @@ default
       currentUrl = ""; 
    }
     link_message( integer sender_num, integer num, string str, key id ){        
-            if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
-           		if (str=="do:reconfigure"||str=="do:reset"){
-           			  llClearPrimMedia(3);  
-           		}
-        	}  
-        if (num == SLOODLE_LOAD_CURRENT_URL){
-             list data = llGetPrimMediaParams(3,[PRIM_MEDIA_CURRENT_URL]);
-             if (currentUrl!=""){
-                 llOwnerSay("Click to open the Rezzer in your Browser: "+ currentUrl+"&frame=1");
-             }else{
-                 llOwnerSay("Rezzer could not initialize, please reset.");
-                 llTriggerSound("beep_bad", 1.0);
-             }
-        }else
-        
-        if ( (num == SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER) || (num == SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP) ||(num == SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_ANYONE ) ) {
+        if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
+            if (str=="do:reconfigure"||str=="do:reset"){
+                llClearPrimMedia(3);  
+            }
+        }else if ( (num == SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER) || (num == SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP) ||(num == SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_ANYONE ) ) {
 llSetColor(<1.00000, 1.00000, 1.00000>,3);
             integer perms = PRIM_MEDIA_PERM_OWNER;
             if (num == SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP) {

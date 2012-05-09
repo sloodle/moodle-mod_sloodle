@@ -27,6 +27,15 @@ integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER = -1639270111; // set the
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP = -1639270112; // set the main shared media panel to the specified URL, accessible to the group
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_ANYONE = -1639270114; // set the main shared media panel to the specified URL, accessible to anyone
 
+// We define all of these
+// ...but for now the rezzer should only be accessible to the owner.
+// In future we could implement a switch to allow other people to use it.
+integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_OWNER = -1639270121; // set the open browser button to url, accessible to owner
+integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_GROUP = -1639270122; // set the open browser button to url, accessible to group
+integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_ANYONE = -1639270124; // set the open browser button to url, accessible to anyone
+
+
+
 
 // Translation output methods
 string SLOODLE_TRANSLATE_LINK = "link";             // No output parameters - simply returns the translation on SLOODLE_TRANSLATION_RESPONSE link message channel
@@ -171,6 +180,7 @@ state ask_for_site {
             llOwnerSay("Error: No URLs are available on this land parcel.");
             string url = "data:text/html,<body style=\"width:1000px;height:1000px;background-color:#595c67;color:white;font-weight:bold;\"><div style=\"position:relative;top:200px;text-align:center;width:1000px;height:750px;font-size:200%\" >No Available URLs</div></body>";
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER, url, NULL_KEY);
+            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_BROWSER_URL_OWNER, "", NULL_KEY);            
 
         } else {
             
@@ -197,8 +207,9 @@ state ask_for_site {
 
             string url = "data:text/html,<body style=\"width:1000px;height:1000px;background-color:#595c67;color:white;font-weight:bold;\"><div style=\"position:relative;top:200px;text-align:center;width:1000px;height:750px;font-size:200%\" ><form method=\"POST\" action=\""+body+"\">Moodle URL<br /><input style=\"height:60px;width:800px;margin:50px;\" type=\"text\" name=\"n\"><br /><input style=\":border:1px solid;width:200px;height:50px\" type=\"submit\" value=\"Submit\"></form></div></body>";
             
-           // llOwnerSay(url);
+            // The browser button can't use a URL, so fall back on giving the public URL, which will then serve the same page via GET.
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER, url, NULL_KEY); 
+            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_BROWSER_URL_OWNER, "nourlmessage|usedescriptioninstead", NULL_KEY); 
                                
         } else if (method == "POST"){
 
@@ -207,6 +218,7 @@ state ask_for_site {
 
             // Form input should be a single line, beginning n=
             if (llGetSubString(body, 0, 1) == "n=" ) {
+                
                 sloodleserverroot = llUnescapeURL(llGetSubString(body, 2, -1));
                 if ( (llGetSubString(sloodleserverroot, 0, 6) != "http://" ) && ( llGetSubString(sloodleserverroot, 0, 7) != "https://" ) ) {
                     sloodleserverroot = "http://"+sloodleserverroot;
@@ -320,7 +332,8 @@ state got_site_url {
         llSleep(3);
 
       //llGetKey() hacked in as a signal to force a clear, as the screen seems to fail to update in this particular situation.
-        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER, url, llGetKey());                
+        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER, url, llGetKey());               
+        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_SET_BROWSER_URL_OWNER, url, NULL_KEY);         
                     
         state ready;
         

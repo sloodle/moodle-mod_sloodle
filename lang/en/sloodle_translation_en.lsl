@@ -76,7 +76,7 @@ list locstrings = [
     "objectconfigfailed:code", "ERROR: object configuration failed with code {{0}}",
     "initobjectauth", "Initiating object authorisation...",
     "autoreg:newaccount", "A new Moodle account has been automatically generated for you.\nWebsite: {{0}} \nUsername: {{1}}\nPassword: {{2}}", // Parameters: site address, username, password
-    "configurationreceived", "Configuration received",
+    "configurationreceived", "Ready",
     "configdatamissing", "ERROR: some required data was missing from the configuration",
     "readingconfignotecard", "Reading configuration notecard...",
     "checkingcourse", "Checking course...",
@@ -85,6 +85,8 @@ list locstrings = [
     "resetting", "Resetting...",
     "noconfigavailable", "There is no configuration available to download. Please visit the configuration web-page first.",
     "checkingauth", "Checking authorisation...",
+    "usedescriptioninstead", "If you can't see the shared media screen, please enter your Moodle URL (http://...) in the description field of the rezzer and press \"Reset\"",
+    "openrezzerurl", "Click the URL below to open the rezzer screen in your browser: \n{{0}}",
 
     //  Sloodle installation/version
     "sloodlenotinstalled", "ERROR: Sloodle is not installed on specified site.",
@@ -391,3 +393,4 @@ default
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: lang/en_utf8/sloodle_translation_en.lsl 
+
