@@ -35,7 +35,7 @@ $sloodleconfig->field_sets = array(
 // In this case the code in our callback, SloodleModuleAwards::PageScoreMessage, needs to know this stuff.
 $sloodleconfig->fixed_parameters = array(
     //'maxlinesperpage' => 15, // How many lines are shown if we have more than one page full of scores
-    'linesperpage' => 2, // How many lines are shown if we have more than one page full of scores
+    'linesperpage' => 20, // How many lines are shown if we have more than one page full of scores
     'charactersperline' => 40, // How many lines are shown if we have more than one page full of scores
 );
 ?>
