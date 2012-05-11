@@ -180,7 +180,9 @@
     Since there is usually only one rezzer, you should be able to make this happen fairly fast without worrying about killing your server.
     If you aren't worried about server resources, it would be meaningful to bring it down as low as 3 seconds.
     */
-    define('SLOODLE_REZZER_STATUS_CONFIRM_INTERVAL', 15);
+    if ( !defined('SLOODLE_REZZER_STATUS_CONFIRM_INTERVAL')) {
+        define('SLOODLE_REZZER_STATUS_CONFIRM_INTERVAL', 15);
+    }
 
 
 
