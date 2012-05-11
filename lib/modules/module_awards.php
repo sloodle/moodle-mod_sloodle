@@ -321,10 +321,11 @@
                 return true;
             }
 
-
             $roundid = $params['roundid'];
             $currencyid = $params['currencyid'];
             $currencyname = '';
+
+            $aoarr = SloodleActiveObject::FilterForConfigNameValue( $aoarr, 'sloodlecurrencyid', $currencyid);
 
             if ($currencyid) {
                 // Ge the name of the currency

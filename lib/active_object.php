@@ -1106,6 +1106,54 @@
 
         }
 
+
+        /*
+        Take an array of active objects
+        ...and return only the ones with the specified name/value config.
+        */
+        function FilterForConfigNameValue( $aos, $name, $value ) {
+
+            if (!count($aos)) {
+                return array();
+            }
+
+            $params = array($name, $value);
+            $placeholders = array();
+
+            foreach($aos as $ao) {
+                if (!$id = intval($ao->id)) {
+                    continue;
+                }
+                $params[] = $id;
+                $placeholders[] = '?';
+            }
+
+            if (!count($placeholders)) {
+                return array();
+            }
+
+            $query = "select object as objid from mdl_sloodle_object_config where name=? and value=? and object in (".join(',',$placeholders).");";
+            $recs = sloodle_get_records_sql_params($query, $params);
+            if (!is_array($recs) || (!count($recs))) {
+                return array();
+            }
+            $wantobjids = array();
+            foreach($recs as $rec) {
+                $wantobjids[ $rec->objid ] = true;
+            }
+
+            $ret = array();
+            foreach($aos as $ao) {
+                $id = $ao->id;
+                if (isset($wantobjids[$id])) {
+                    $ret[] = $ao;
+                }
+            }
+
+            return $ret;
+
+        }
     }
+
 
 ?>
