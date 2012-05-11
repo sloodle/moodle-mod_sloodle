@@ -137,6 +137,24 @@
 
 			$need_notify = true;
 
+			// Notify any active objects that care about changes to scores
+			// We'll check this in the object definition.
+			// TODO: We should probably do this with a notification_request table, 
+			// ...where the scoreboard etc will register with Sloodle that it's interested in certain events.
+
+			// TODO: Figure out the round/controller filters
+			$user_point_total_recs = sloodle_get_records_sql_params( "select sum(amount) as balance from {$CFG->prefix}sloodle_award_points where currencyid=? and roundid=? and userid=?;", array($currencyid, $roundid, $userid));
+			if (!$user_point_total_recs && (count($user_point_total_recs) == 0 ) ) {
+				return false;
+			}
+			$first_rec = array_shift($user_point_total_recs);
+			$balance = $first_rec->balance;
+
+            // This sends a single points change notification to an object.
+            // It's used by the shared media scoreboard to prompt a re-fetch of score data.
+			SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );
+
+
 		}
 
 		if ( isset($relevant_configs['sloodleawardswithdraw_numpoints']) && isset($relevant_configs['sloodleawardswithdraw_currency']) ) {
@@ -159,9 +177,7 @@
 			}
 
 			$need_notify = true;
-		}
 
-		if ($need_notify) {
 			// Notify any active objects that care about changes to scores
 			// We'll check this in the object definition.
 			// TODO: We should probably do this with a notification_request table, 
@@ -178,7 +194,6 @@
             // This sends a single points change notification to an object.
             // It's used by the shared media scoreboard to prompt a re-fetch of score data.
 			SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );
-
 
 		}
 		
