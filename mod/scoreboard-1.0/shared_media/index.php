@@ -27,7 +27,6 @@
     /** Sloodle course data. */
     require_once(SLOODLE_LIBROOT.'/course.php');
         require_once(SLOODLE_LIBROOT.'/io.php');
-     require_once(SLOODLE_LIBROOT . '/krumo/class.krumo.php');
 
     require_once(SLOODLE_LIBROOT.'/object_configs.php');
     require_once(SLOODLE_LIBROOT.'/active_object.php');
