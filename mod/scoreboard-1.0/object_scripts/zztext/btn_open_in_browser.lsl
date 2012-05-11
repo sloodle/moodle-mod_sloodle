@@ -56,5 +56,6 @@ touch_start( integer total_number){
 
 
 // Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/scoreboard-1.0/sloodle_connect_button.lsl
+// SLOODLE LSL Script Subversion Location: mod/scoreboard-1.0/object_scripts/zztext/btn_open_in_browser.lsl
+
 
