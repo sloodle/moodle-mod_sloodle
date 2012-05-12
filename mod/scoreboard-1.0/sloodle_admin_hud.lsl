@@ -50,12 +50,14 @@ default
         if (channel == SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_SET_ADMIN_URL_CHANNEL){
             currentScoreboard= id;
             //set media    
-            llSetPrimMediaParams( face, [ PRIM_MEDIA_HOME_URL, admin_url, PRIM_MEDIA_CURRENT_URL, admin_url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, face, PRIM_MEDIA_PERMS_CONTROL, PRIM_MEDIA_PERM_NONE ] ); 
+            llSetPrimMediaParams( face, [ PRIM_MEDIA_CURRENT_URL, admin_url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, face, PRIM_MEDIA_PERMS_CONTROL, face ] );
+            llSetPrimMediaParams( face, [ PRIM_MEDIA_HOME_URL, admin_url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, face, PRIM_MEDIA_PERMS_CONTROL, face ] );
         }else
         if (channel == SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_CHANGE_ADMIN_URL_CHANNEL){
             currentScoreboard= id;
             //set media
-            llSetPrimMediaParams( face, [ PRIM_MEDIA_HOME_URL, admin_url, PRIM_MEDIA_CURRENT_URL, admin_url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_OWNER, PRIM_MEDIA_PERMS_CONTROL, PRIM_MEDIA_PERM_NONE ] );            
+            llSetPrimMediaParams( face, [ PRIM_MEDIA_CURRENT_URL, admin_url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, face, PRIM_MEDIA_PERMS_CONTROL, face ] );
+            llSetPrimMediaParams( face, [ PRIM_MEDIA_HOME_URL, admin_url, PRIM_MEDIA_AUTO_ZOOM, TRUE, PRIM_MEDIA_AUTO_PLAY, TRUE, PRIM_MEDIA_PERMS_INTERACT, face, PRIM_MEDIA_PERMS_CONTROL, face ] );
         }            
     }
    
@@ -68,4 +70,3 @@ default
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/scoreboard-1.0/sloodle_admin_hud.lsl 
-

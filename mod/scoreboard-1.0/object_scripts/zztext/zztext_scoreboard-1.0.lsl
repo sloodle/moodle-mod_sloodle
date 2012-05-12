@@ -23,7 +23,7 @@ integer SLOODLE_SCOREBOARD_CONNECT_HUD= -1639271130; // channel which gets sent 
  string SLOODLE_SCOREBOARD_LINKER = "/mod/sloodle/mod/scoreboard-1.0/linker.php";
 string SLOODLE_EOF = "sloodleeof";
 integer SLOODLE_SCOREBOARD_OPEN_IN_BROWSER= -1639277000;
-string SLOODLE_OBJECT_TYPE = "chat-1.0";
+string SLOODLE_OBJECT_TYPE = "scoreboard-1.0";
 
 integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1; 
@@ -106,54 +106,9 @@ debug (string message){
      }
 }
 
-handle_points_notification(string str) {
-
-    string changeduserid;
-    string newbalance;
-
-    list lines = llParseStringKeepNulls(str,["\n"],[]);
-    integer l;
-   // llOwnerSay("points notification: "+str);
-    for(l=0; l<llGetListLength(lines); l++) {
-        string line = llList2String(lines, l);
-        list bits = llParseStringKeepNulls(line,["|"],[]);
-        integer numbits = llGetListLength(bits);
-        string name = llList2String(bits,0);
-        string value = ""; 
-        if (llGetListLength(bits) > 1) {
-            value = llList2String(bits,1);
-        }
-        if (name == "balance") newbalance = value;
-        if (name == "userid") changeduserid = value;
-        if (name == "lastmessagetimestamp") lastmessagetimestamp = (integer)value;
-        if (name == "messagetimestamp") messagetimestamp = (integer)value;
-    }
-
-    string hash = "#"+changeduserid+"_"+newbalance+"_"+(string)lastmessagetimestamp+"_"+(string)messagetimestamp;
-   // llOwnerSay("About to update scoreboard for "+newbalance+" for user "+changeduserid);
-    update_media(hash);
-    
-    lastmessagetimestamp = messagetimestamp;
- 
-}
-//update screen    
-update_media(string hash) {
-    
-    string url = view_url+hash;
-   
-    // setup the control screen
-    integer media_control;
-    if ( sloodleobjectaccesslevelctrl == 0 ) media_control = PRIM_MEDIA_PERM_ANYONE;
-    else if ( sloodleobjectaccesslevelctrl == 2 ) media_control = PRIM_MEDIA_PERM_GROUP;
-    else media_control = PRIM_MEDIA_PERM_OWNER;
-    
-    
-}
 requestScores(){
  paramstr = "&sloodleobjuuid=" + (string)llGetKey();
-        view_url= sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr;
-        admin_url =  sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr + "&mode=admin";
-        update_media("");
+
         // Inform the Moodle chatroom
         string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
         body += "&sloodlepwd=" + sloodlepwd;
@@ -175,7 +130,7 @@ integer sloodle_handle_command(string str)
     integer numbits = llGetListLength(bits);
     string name = llList2String(bits,0);
     string value1 = "";
-    string value2 = "";
+    string value2 = ""; 
 
     if (numbits > 1) value1 = llList2String(bits,1); 
     if (numbits > 2) value2 = llList2String(bits,2);
@@ -209,10 +164,7 @@ default
        llResetScript();
     }
     state_entry()
-    {
-     
-        
-    
+    {             
         // Starting again with a new configuration
         isconfigured = FALSE;
         eof = FALSE;
@@ -275,8 +227,7 @@ state ready
     }    
     
     state_entry()
-    {  
-       
+    {         
        requestScores();                            
     }
      http_response(key id, integer status, list meta, string body){
@@ -325,11 +276,6 @@ state ready
     
     } 
         
- 
-    
-   
-
-    
     link_message( integer sender_num, integer num, string str, key id)
     {
             debug("linked message: "+str);
@@ -346,7 +292,8 @@ state ready
             if (eof == TRUE) {
                 if (isconfigured == TRUE) {
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
-                  requestScores();
+                    admin_url = sloodleserverroot+"/mod/sloodle/mod/scoreboard-1.0/shared_media/index.php?" + paramstr + "&mode=admin";        
+                    requestScores();
                 } else {
                     // Go all configuration but, it's not complete... request reconfiguration
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
@@ -355,25 +302,21 @@ state ready
                 }
             }
     
-        
+        } else if (num == SLOODLE_CHANNEL_SCOREBOARD_UPDATE_COMPLETE) { // Awards points change notification
+            
+            // Nothing to do here: The sloodle_rezzer_object gets this and sends it directly to the scoreboard.
 
-        } else if (num == SLOODLE_AWARDS_POINTS_CHANGE_NOTIFICATION) { // Awards points change notification
-            handle_points_notification( str );
-
-        }else
-        if (num == SLOODLE_SCOREBOARD_OPEN_IN_BROWSER){
+        } else if (num == SLOODLE_SCOREBOARD_OPEN_IN_BROWSER){
                 llOwnerSay("You can access the scoreboard administration screen by going to: "+(string)admin_url);                
                 llLoadURL(llGetOwner(),"You can load your scoreboard administration screen by going to the following url:",(string)admin_url);
-        }
-        if (num == SLOODLE_SCOREBOARD_CONNECT_HUD){
-               llOwnerSay("Transmitting Scoreboard UUID to Owner's HUD"); 
+        } else if (num == SLOODLE_SCOREBOARD_CONNECT_HUD){
+               llOwnerSay("Contacting owner's HUD"); 
                llRegionSay(SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_SET_ADMIN_URL_CHANNEL, (string)admin_url+"|"+(string)id+"|"+(string)llGetKey()); 
                llShout(SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_SET_ADMIN_URL_CHANNEL,(string)admin_url+"|"+(string)id+"|"+(string)llGetKey());
         
         } 
     } 
-    
-    
+        
 }
 
 // Please leave the following line intact to show where the script lives in Subversion:

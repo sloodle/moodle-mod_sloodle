@@ -237,63 +237,6 @@ integer GetIndex(string char)
     return llStringLength(gCharIndex)+found;
  
 }
-doTest(){
-    string test = "1639271140|blah_blah_blah|ignore_line_zero\nstatus|1|1|Scavenger Hunt|Red Team|Credits\n";
-    test+="a819d3a6-0cf5-445c-94a9-c5ba84285bb1|17|Avatar Classroom                      17\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire 0entaur                         300\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire 1entaur                         200\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire 2entaur                         300\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire 3entaur                         400\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire 4entaur                         500\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire 5entaur                         600\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                         700\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                         800\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                         900\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1000\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1100\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1200\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1300\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1400\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1500\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1600\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1700\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1800\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        1900\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        2000\n";
-    test+="b560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        2100\n";
-    //string test = "1639271140|blah_blah_blah|ignore_line_zero
-    //\nstatus|1|1|Scavenger Hunt|Red Team|Credits
-    //\na819d3a6-0cf5-445c-94a9-c5ba84285bb1|17|Avatar Classroom                      17
-    //\nb560e4b4-a441-4fea-bb30-1d35309640ad|100|Fire Centaur                        100";           
-            list lines = llParseString2List(test, ["\n"], []);
-            list status = llParseString2List(llList2String(lines,1), ["|"], []); //status|page_num|num_page|scoreboard_name|team|currency
-            integer pageNum = llList2Integer(status,1);
-            integer numPages =  llList2Integer(status,2);
-            string scoreboardName=  llList2String(status,3);
-            string teamName=  llList2String(status,4);
-            string currency=  llList2String(status,5);
-            list users;
-            integer numLines = llGetListLength(lines);
-       //     debug("****************numLines: "+(string)numLines);
-            integer numUsers= llGetListLength(lines)-2;
-            integer i=0;
-            list scores;
-            string scoreboardText="";
-            //the first two lines are our status and info lines
-            //the remaining lines is our userdata
-            for (i=2;i<numLines;i++){
-                 list userData=llParseString2List(llList2String(lines,i),["|"], []);
-        //         debug("parsing: "+llList2String(lines,i));
-                 users+=llList2Key(userData,0);
-                 scores+=llList2Integer(userData,1);
-                 scoreboardText+=llList2String(userData,2);
-                 
-             }
-    renderString(scoreboardText,"zztextprim");
-            
-              
-                  
-}
  
 XytstOrder()
 { 
@@ -329,7 +272,11 @@ default
         ResetCharIndex();
          loadTextures();
         // Clear the screen.
-         set_scoreboard_score_text(LOAD_MSG);
+         set_scoreboard_score_text("");     
+        set_scoreboard_score_text("");
+        set_scoreboard_team_text("");
+        set_scoreboard_currency_text("");
+        set_scoreboard_title_text(LOAD_MSG);    
  
         integer StartLink = llGetLinkNumber() + 1;
         // Configure the board.

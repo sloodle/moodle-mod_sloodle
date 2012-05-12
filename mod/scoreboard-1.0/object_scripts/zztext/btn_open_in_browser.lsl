@@ -46,16 +46,14 @@ touch_start( integer total_number){
     integer j;
     for (j=0;j<total_number;j++){
         if (llDetectedKey(j)!=llGetOwner())return;
-        llMessageLinked(LINK_ALL_OTHERS, SLOODLE_CHANNEL_OPEN_IN_BROWSER, "", llDetectedKey(j));    
-    }        
-    
-   
-        
+        llMessageLinked(LINK_ALL_OTHERS, SLOODLE_CHANNEL_OPEN_IN_BROWSER, "", llDetectedKey(j));
+    }
+
+
+
     }
 }
 
 
 // Please leave the following line intact to show where the script lives in Subversion:
 // SLOODLE LSL Script Subversion Location: mod/scoreboard-1.0/object_scripts/zztext/btn_open_in_browser.lsl
-
-
