@@ -4,6 +4,11 @@ Edmund Edgar, 2012-05-12
 This is the main server-side component for the SLOODLE system connecting Moodle the 3D virtual worlds of Second Life or OpenSim.
 See http://www.sloodle.org for details.
 
+You will also need a set of in-world objects in Second Life or OpenSim. These are contained in the SLOODLE Rezzer.
+Details of where to get these are available at sloodle.org. 
+You can also create an IAR for OpenSim from scratch using the code at:
+https://github.com/sloodle/sloodle_opensim_iar
+
 This is for SLOODLE 2.0. Previous versions are managed using Subversion, hosted at Google Code:
 http://code.google.com/p/sloodle/
 
