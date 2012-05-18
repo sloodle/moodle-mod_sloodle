@@ -37,4 +37,11 @@ Optional components:
 * The presenter tool has a feature to import PDFs and convert them into slides. This needs ImageMagick, available either through the command line or using PHP bindings.
 * It is possible to optimize the sending of messages from the server to objects by adding a message queue, and running a process in the background called sloodled.php. This uses a separate piece of software called beanstalkd. See the comments at the top of sloodled.php for more details.
 
+Other SLOODLE components:
+* The primdrop tool for submitting in-world objects as homework uses the sloodleobject assignment plugin at https://github.com/sloodle/moodle-assignment_sloodleobject
+* An optional menu block is available showing students' avatar information and helping people navigate to SLOODLE tools in Moodle: https://github.com/sloodle/moodle-block_sloodle_menu
+* A separate menu block displays currency information related to the awards system: https://github.com/sloodle/moodle-block_sloodle_backpack
+All the above are included in the zip / tarball release. The latest version is available at http://download.avatarclassroom.com/sloodle/
+
+
 Please post any questions or comments on the forums at http://www.sloodle.org.
