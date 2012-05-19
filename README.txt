@@ -17,7 +17,7 @@ See http://slisapps.sjsu.edu/sl/index.php/Install_Sloodle for step-by-step instr
 
 Web Server requirements:
 * A web server running Moodle 1.9 or Moodle 2.x.
-* This has been tested mainly on Moodle 2.0. As of 2012-05-12, the quiz tools do not yet run on Moodle 2.1 or higher.
+* This has been tested mainly on Moodle 2.0. Cursory testing has been done on 2.1, 2.2 and 2.3-dev.
 * This code should run on either UNIX-like operating systems or Windows. However, the import functions of the presenter tool may misbehave on Windows, and the beanstalkd-based optimization won't be usable at all.
 
 Browser requirements:
