@@ -1230,7 +1230,7 @@ class SloodleDebugLogger {
         // Return true if we write something, false if we don't.
         function log($type, $contents = null) {
 
-            if ( SLOODLE_DEBUG_REQUEST_LOG == '' ) {
+            if ( !defined('SLOODLE_DEBUG_REQUEST_LOG') || ( SLOODLE_DEBUG_REQUEST_LOG == '' ) ) {
                 return false;
             }
 
@@ -1265,6 +1265,16 @@ class SloodleDebugLogger {
                $str .= $contents."\n";
             }
             
+            $directstr = $REQUEST_URI;
+            $directstr .= '?';
+            foreach($_GET as $n=>$v) {
+                $directstr .= "$n=$v".'&';
+            }
+            foreach($_POST as $n=>$v) {
+                $directstr .= "$n=$v".'&';
+            }
+            $str .= "LINK: $directstr\n";
+
             $str .= '------END-'.$type.'-'.$REQUEST_URI.'---'.$REMOTE_ADDR.'---'.$REMOTE_PORT.'---'.$REQUEST_TIME.'------'."\n";
 
             if ($fh = fopen(SLOODLE_DEBUG_REQUEST_LOG, 'a')) {
