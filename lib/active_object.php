@@ -962,11 +962,11 @@
                 }
             }
 
-            SloodleDebugLogger::log('DEBUG', "calling callbacs for ".count($callback_objects)." callbacks");
+            //SloodleDebugLogger::log('DEBUG', "calling callbacs for ".count($callback_objects)." callbacks");
             if (count($callback_objects) > 0) {
                 foreach($callback_objects as $callback => $aoarr) {
 
-                SloodleDebugLogger::log('DEBUG', "calling callback $callback for ".count($aoarr)." objects");
+                //SloodleDebugLogger::log('DEBUG', "calling callback $callback for ".count($aoarr)." objects");
                     call_user_func_array( $callback, array( $aoarr, $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) );
                 } 
             }
