@@ -159,7 +159,7 @@ class sloodle_view_currency extends sloodle_base_view
         global $CFG;
         $id = required_param('id', PARAM_INT);
         $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?&_type=currency&mode=allcurrencies&id={$id}\">".get_string('currencies:view', 'sloodle')."</a>";
-        print_header_simple(get_string('backpack','sloodle'), "", $navigation, "", "", true, '', navmenu($this->course));
+        print_header_simple(get_string('backpack','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
         
     }
 

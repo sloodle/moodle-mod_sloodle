@@ -61,6 +61,7 @@ class sloodle_view_course extends sloodle_base_view
         if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
+
     }
 
     /**
@@ -85,7 +86,9 @@ class sloodle_view_course extends sloodle_base_view
     {
         global $CFG;
         $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?_type=course&id={$this->course->id}\">".get_string('courseconfig', 'sloodle')."</a>";
-        print_header_simple(get_string('courseconfig','sloodle'), "", $navigation, "", "", true, '', navmenu($this->course));
+
+
+        print_header_simple(get_string('courseconfig','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
     }
 
 

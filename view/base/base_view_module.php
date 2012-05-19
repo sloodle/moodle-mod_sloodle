@@ -144,7 +144,7 @@ class sloodle_base_view_module extends sloodle_base_view
         }
         // Display the header
         $navigation = "<a href=\"index.php?id={$this->course->id}\">".get_string('modulenameplural','sloodle')."</a> ->";
-        print_header_simple(format_string($this->sloodle->name), "", "{$navigation} ".format_string($this->sloodle->name), "", "", true, $editbuttons, navmenu($this->course, $this->cm));
+        print_header_simple(format_string($this->sloodle->name), "&nbsp;", "{$navigation} ".format_string($this->sloodle->name), "", "", true, $editbuttons, navmenu($this->course, $this->cm));
 
         // Display the module name
         $img = '<img src="'.$CFG->wwwroot.'/mod/sloodle/icon.gif" width="16" height="16" alt=""/> ';

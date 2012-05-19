@@ -48,7 +48,7 @@
     require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
     
     // Display the page header
-    print_header_simple(get_string('welcometosloodle', 'sloodle'), "", get_string('welcometosloodle', 'sloodle'), "", "", true);
+    print_header_simple(get_string('welcometosloodle', 'sloodle'), "&nbsp;", get_string('welcometosloodle', 'sloodle'), "", "", true);
     
     
     // Process the request data

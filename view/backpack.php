@@ -144,7 +144,7 @@ class sloodle_view_backpack extends sloodle_base_view
         $navigation .= get_string('backpack:view', 'sloodle');
         $navigation .= "</a>";
         //print the header
-        print_header_simple(get_string('backpack','sloodle'), "", $navigation, "", "", true, '', navmenu($this->course));
+        print_header_simple(get_string('backpack','sloodle'), '&nbsp;', $navigation, "", "", true, '', navmenu($this->course));
     }
     
     /**

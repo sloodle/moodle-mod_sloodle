@@ -64,7 +64,7 @@
     // Display the page header
     //$navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/index.php?id=$course->id\">$strsloodles</a> ->";
     $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?id=$sloodlecontrollerid\">".format_string($sloodle->name)."</a> ->";
-    print_header_simple($pagename, "", "$navigation ". $pagename, "", "", true, '', navmenu($course, $cm));
+    print_header_simple($pagename, "&nbsp;", "$navigation ". $pagename, "", "", true, '', navmenu($course, $cm));
 
     // We can display the Sloodle module info... log the view
     add_to_log($course->id, 'sloodle', 'view sloodle config', "classroom/notecard_configuration.php?sloodlecontrollerid=$sloodlecontrollerid&sloodleobjtype=$sloodleobjtype", $sloodleobjtype, $cm->id);

@@ -39,7 +39,7 @@
     
     // Display the page header
     $strsloodle = get_string('modulename', 'sloodle');
-    print_header_simple(get_string('userobjectauth', 'sloodle'), "", get_string('userobjectauth', 'sloodle'), "", "", true);
+    print_header_simple(get_string('userobjectauth', 'sloodle'), "&nbsp;", get_string('userobjectauth', 'sloodle'), "", "", true);
     
     // Make sure it's not a guest who is logged in
     if (isguestuser()) {

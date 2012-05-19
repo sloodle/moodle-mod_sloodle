@@ -55,7 +55,7 @@
 
     // Display the page header
     $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/classroom/loginzone.php?id={$course->id}\">".get_string('loginzone','sloodle')."</a>";
-    print_header_simple(get_string('loginzone','sloodle'), "", $navigation, "", "", true, '', navmenu($course));
+    print_header_simple(get_string('loginzone','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($course));
     
     echo '<h1 style="text-align:center;">'.get_string('loginzone','sloodle').'</h1>';
     
