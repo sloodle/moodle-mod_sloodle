@@ -17,21 +17,21 @@ See http://slisapps.sjsu.edu/sl/index.php/Install_Sloodle for step-by-step instr
 
 Web Server requirements:
 * A web server running Moodle 1.9 or Moodle 2.x.
-* This has been tested mainly on Moodle 2.0. Cursory testing has been done on 2.1, 2.2 and 2.3-dev.
+* This has been tested mainly on Moodle 2.0. Cursory testing has been done on 1.9, 2.1, 2.2 and 2.3-dev.
 * This code should run on either UNIX-like operating systems or Windows. However, the import functions of the presenter tool may misbehave on Windows, and the beanstalkd-based optimization won't be usable at all.
 
 Browser requirements:
 * Any regular web browser, with JavaScript turned on.
 * Presenter upload functionality uses Flash.
 
+Viewer requirements:
+* Some tools require Shared Media. This needs a viewer based on the Linden viewer, version 2.0 or higher.
+
 Grid requirements:
 * You can use the SLOODLE 2 objects on the main Second Life grid or an OpenSim grid. However, your OpenSim grid and your Moodle server need to be able to send HTTP requests to each other. This means:
  1) Your Moodle server needs to accept traffic from SL/OpenSim on the same port as the normal Moodle website. This is normally not a problem, but some Moodle sites using external sign-on methods may prevent it.
  2) Your Moodle server needs to allow traffic out on the ports used by your grid for HTTP-in. For Second Life, these are 12046 and 12043. Some large Moodle hosting providers have firewalls that block outgoing traffic, or limit it to ports 80 and 443.
  3) Traffic needs to be routable from your Moodle server to your grid. This can be a problem if you are running a public Moodle server outside your firewall, but your own OpenSim server inside your firewall. Fixing it may require NAT settings to allow traffic coming from outside your firewall to be directed to your grid, and ports opening to allow HTTP-in traffic through to it.
-
-Viewer requirements:
-* Some tools require Shared Media. This needs a viewer based on the Linden viewer, version 2.0 or higher.
 
 Optional components:
 * The presenter tool has a feature to import PDFs and convert them into slides. This needs ImageMagick, available either through the command line or using PHP bindings.
