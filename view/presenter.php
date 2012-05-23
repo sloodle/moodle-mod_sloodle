@@ -344,7 +344,6 @@ class sloodle_view_presenter extends sloodle_base_view_module
 
  
             global $OUTPUT;
-            var_dump($OUTPUT);
 
             echo '<div style="text-align:center;" >';
             echo '<table border="0" width="100%"><tr><td align="center">';
@@ -747,9 +746,13 @@ class sloodle_view_presenter extends sloodle_base_view_module
     * @uses upload.php          - upload.php is the upload handler script
     * @uses uploader.swf        - enables multiple file uploading     
     */   
+
+    $context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
+    $contextid = $context->id;
+
     echo '<script type="text/javascript">';                                                           
     if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
-	    echo 'var uploadWwwDir="'.$CFG->wwwroot.'/pluginfile.php/'.intval($this->cm->id).'/mod_sloodle/presenter/'.intval($itemid).'/'.'";'."\n";
+	    echo 'var uploadWwwDir="'.$CFG->wwwroot.'/pluginfile.php/'.intval($contextid).'/mod_sloodle/presenter/'.intval($itemid).'/'.'";'."\n";
     } else {
 	    echo 'var uploadWwwDir="'.$CFG->wwwroot.'/file.php/1/presenter/'.intval($this->cm->id).'/";'."\n";
     }
@@ -765,6 +768,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
     echo 'var cmid = '.intval($this->cm->id)."\n";
     echo 'var itemid = '.intval($itemid)."\n";
     echo "var stradd = '".s($stradd)."';\n";
+
 
     $signeddata = date('Ymd').'-'.intval($USER->id).'-'.intval($this->cm->id).'-'.'presenter';
     echo "var signeddata = '".s($signeddata)."';"."\n";

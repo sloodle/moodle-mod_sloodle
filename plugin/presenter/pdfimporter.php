@@ -213,9 +213,12 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     {
         global $CFG;
 
-	$cmid = $presenter->cm->id;
-	// In Moodle 2, we make an itemid for the file api
-	$itemid = time();
+        $cmid = $presenter->cm->id;
+        $context = get_context_instance(CONTEXT_MODULE, $cmid);
+        $contextid = $context->id;
+
+        // In Moodle 2, we make an itemid for the file api
+        $itemid = time();
         
         if (!file_exists($path)) error("Import file doesn't exist.");
 
@@ -228,7 +231,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         $dir_sitefiles = SLOODLE_IS_ENVIRONMENT_MOODLE_2 ? $CFG->dataroot.'/temp/sloodle' : $CFG->dataroot.'/'.SITEID;
         //$dir_sitefiles = $CFG->dataroot.'/'.SITEID;
         $dir_presenter = $dir_sitefiles.'/presenter';
-        $dir_import = $dir_presenter.'/'.$presenter->cm->id;
+        $dir_import = $dir_presenter.'/'.$contextid;
         if (!file_exists($dir_sitefiles)) mkdir($dir_sitefiles);
         if (!file_exists($dir_presenter)) mkdir($dir_presenter);
         if (!file_exists($dir_import)) mkdir($dir_import);
@@ -240,7 +243,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         // Construct the URL of the folder for viewing the files
         $dir_view = $CFG->wwwroot;
 	if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
-		$dir_view .= '/pluginfile.php/'.intval($cmid).'/mod_sloodle/presenter/'.intval($itemid);
+		$dir_view .= '/pluginfile.php/'.intval($contextid).'/mod_sloodle/presenter/'.intval($itemid);
 	} else {
 		$dir_view .= '/file.php/'.SITEID.'/presenter/'.$presenter->cm->id;
 	}
@@ -248,7 +251,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
 	// In Moodle 2, make a file path, as distinct to the temporary file saving location
 	$fileapipath = '';
 	if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
-		$fileapipath = '/'.intval($cmid).'/mod_sloodle/presenter/'.intval($itemid).'/';
+		$fileapipath = '/'.intval($contextid).'/mod_sloodle/presenter/'.intval($itemid).'/';
 	} 
 
         // Use the file name from the path if necessary
@@ -264,8 +267,8 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         $ext = 'jpg';
 
         // Attempt each importing method in turn
-        $result = $this->_import_MagickWand($presenter, $path, $dir_import, $dir_view, $filebase, $ext, $name, $position, $itemid, $cmid, $fileapipath);
-        if ($result === false) $result = $this->_import_ImageMagick($presenter, $path, $dir_import, $dir_view, $filebase, $ext, $name, $position, $itemid, $cmid, $fileapipath);
+        $result = $this->_import_MagickWand($presenter, $path, $dir_import, $dir_view, $filebase, $ext, $name, $position, $itemid, $contextid, $fileapipath);
+        if ($result === false) $result = $this->_import_ImageMagick($presenter, $path, $dir_import, $dir_view, $filebase, $ext, $name, $position, $itemid, $contextid, $fileapipath);
 
         // Prepare a "Continue" link which takes us to edit mode
         $continueURL = $CFG->wwwroot."/mod/sloodle/view.php?id={$presenter->cm->id}&amp;mode=edit";
@@ -297,7 +300,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     * @return integer|bool If successful, an integer indicating the number of slides loaded is displayed. If the import does not (or cannot) work, then boolean false is returned.
     * @access private
     */
-    function _import_MagickWand($presenter, $srcfile, $destpath, $viewurl, $destfile, $destfileext, $destname, $position = -1, $itemid = '', $cmid = '', $fileapipath = '')
+    function _import_MagickWand($presenter, $srcfile, $destpath, $viewurl, $destfile, $destfileext, $destname, $position = -1, $itemid = '', $contextid= '', $fileapipath = '')
     {
         global $CFG;
         // Only continue if the MagickWand extension is loaded (this is done by the check_compatibility function)
@@ -338,7 +341,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             }
 
             if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
-                $registered = $this->_register_moodle_api_file( $page_filename, $itemid, $cmid, $fileapipath, "{$destfile}-{$pagenum}.{$destfileext}");
+                $registered = $this->_register_moodle_api_file( $page_filename, $itemid, $contextid, $fileapipath, "{$destfile}-{$pagenum}.{$destfileext}");
                 @unlink($page_filename);
                 if (!$registered) {
                      return false;
@@ -376,7 +379,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
     * @return integer|bool If successful, an integer indicating the number of slides loaded is displayed. If the import does not (or cannot) work, then boolean false is returned.
     * @access private
     */
-    function _import_ImageMagick($presenter, $srcfile, $destpath, $viewurl, $destfile, $destfileext, $destname, $position = -1, $itemid = '', $cmid = '', $fileapipath = '')
+    function _import_ImageMagick($presenter, $srcfile, $destpath, $viewurl, $destfile, $destfileext, $destname, $position = -1, $itemid = '', $contextid = '', $fileapipath = '')
     {
         global $IMAGICK_CONVERT_PATH;
 
@@ -427,7 +430,7 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
             if (file_exists($page_filename)) {
 
 		if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
-			$registered = $this->_register_moodle_api_file( $page_filename, $itemid, $cmid, $fileapipath, "{$destfile}-{$pagenum}.{$destfileext}"); 
+			$registered = $this->_register_moodle_api_file( $page_filename, $itemid, $contextid, $fileapipath, "{$destfile}-{$pagenum}.{$destfileext}"); 
 			@unlink($page_filename);
 			if (!$registered) {
 				return false;	
@@ -445,12 +448,12 @@ class SloodlePluginPresenterPDFImporter extends SloodlePluginBasePresenterImport
         return $pagenum;
     }
     
-    function _register_moodle_api_file( $tempfile, $itemid, $cmid, $fileapipath, $filename ) {
+    function _register_moodle_api_file( $tempfile, $itemid, $contextid, $fileapipath, $filename ) {
 
         $fs = get_file_storage();
 
         $fileinfo = array(
-            'contextid' => $cmid, // ID of context
+            'contextid' => $contextid, // ID of context
             'component' => 'mod_sloodle',     // usually = table name
             'filearea' => 'presenter',     // usually = table name
             'itemid' => $itemid,               // usually = ID of row in table

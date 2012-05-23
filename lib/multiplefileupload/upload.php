@@ -58,13 +58,16 @@ if (SLOODLE_IS_ENVIRONMENT_MOODLE_2) {
 		exit();
 	}
 
+    $context = get_context_instance(CONTEXT_MODULE, $cmid); 
+    $contextid = $context->id;
+
 	$fileinfo = array(
-	    'contextid' => $cmid, // ID of context
+	    'contextid' => $contextid, // ID of context
 	    'component' => 'mod_sloodle',     // usually = table name
 	    'filearea' => 'presenter',     // usually = table name
 	    'itemid' => $itemid,               // usually = ID of row in table
 //	    'filepath' => '/presenter',           // any path beginning and ending in /
-	    'filepath' => '/'.$cmid.'/mod_sloodle/presenter/'.$itemid.'/',
+	    'filepath' => '/'.$contextid.'/mod_sloodle/presenter/'.$itemid.'/',
 	    'filename' => $filename
 	);
 
