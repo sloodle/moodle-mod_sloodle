@@ -198,9 +198,9 @@ class sloodle_view_presenter extends sloodle_base_view_module
                 }
                 
                 // Fetch the IDs of the slides which are being deleted
-                if (isset($_REQUEST['entries'])) $entryids = $_REQUEST['entries'];
+                if (isset($_REQUEST['entriesstr'])) $entryids = explode(',',$_REQUEST['entriesstr']);
                 else error("Expected HTTP parameter 'entries' not found.");
-                
+
                 // Go through the given entry IDs and attempt to delete them
                 $numdeleted = 0;
                 foreach ($entryids as $entryid) {
@@ -532,11 +532,13 @@ class sloodle_view_presenter extends sloodle_base_view_module
                 if (isset($_REQUEST['entries'])) $deletingentries = $_REQUEST['entries'];
                 if (is_array($deletingentries) && count($deletingentries) > 0) {
                     // Construct our links
-                    $entriesparam = '';
-                    foreach ($deletingentries as $de) {
-                        $entriesparam .= "entries[]={$de}&amp;";
+                    $entriesparam = 'entriesstr=';
+                    $delim = '';
+                    foreach($deletingentries as $de) {
+                        $entriesparam .= $delim.intval($de);
+                        $delim = ',';
                     }
-                    $linkYes = SLOODLE_WWWROOT."/view.php?id={$this->cm->id}&amp;mode=deletemultiple&amp;{$entriesparam}sesskey=".sesskey();
+                    $linkYes = SLOODLE_WWWROOT."/view.php?id={$this->cm->id}&amp;mode=deletemultiple&amp;{$entriesparam}&amp;sesskey=".sesskey();
                     $linkNo = SLOODLE_WWWROOT."/view.php?id={$this->cm->id}&amp;mode=edit";
                     // Output our confirmation form
                     notice_yesno(get_string('presenter:confirmdeletemultiple', 'sloodle', count($deletingentries)), $linkYes, $linkNo);
