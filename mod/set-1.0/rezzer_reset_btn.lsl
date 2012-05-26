@@ -59,7 +59,6 @@ default {
         toggle = (-1);
         llSetTexture("btn_reset_cancel",FACE);
         llOffsetTexture(0,BTN_RESET_OFFSET,FACE);
-        llRotateTexture(-90*DEG_TO_RAD, ALL_SIDES);
         llSetObjectName("btn:Reset");
         facilitators += llStringTrim(llToLower(llKey2Name(llGetOwner())),STRING_TRIM);
     }
@@ -87,7 +86,6 @@ default {
                 llSetObjectName("btn:Reset");
                 counter = 0;
             }
-            llRotateTexture(-90*DEG_TO_RAD, ALL_SIDES);            
        }
        
     }
@@ -105,7 +103,6 @@ default {
         if ((counter >= TIME_LIMIT)) {
             llSetTimerEvent(0.0);
             llOffsetTexture(0,BTN_RESET_OFFSET,FACE);
-            llRotateTexture(-90*DEG_TO_RAD, ALL_SIDES);            
             llSetObjectName("btn:Reset");
             toggle *= (-1);
             llSetText("",RED,1.0);
@@ -119,7 +116,6 @@ default {
   changed(integer change) {
         if ((change == CHANGED_INVENTORY)) {
             llOffsetTexture(0,BTN_RESET_OFFSET,FACE);
-            llRotateTexture(-90*DEG_TO_RAD, ALL_SIDES);            
             llSetObjectName("btn:Reset");
             llResetScript();
         }
