@@ -26,19 +26,17 @@
 *
 *  DESCRIPTION
 */
+integer SLOODLE_TOUCH_OBJECT_SUCCESS = -1639277100;
 
-integer SLOODLE_TOUCH_OBJECT_SUCCESS= -1639277100;
 default {
     state_entry() {
-        llOwnerSay("Hello Scripter");
+    
     }
-    link_message(integer sender_num, integer num, string str, key id) {
-    	if (num==SLOODLE_TOUCH_OBJECT_SUCCESS){
-    	
+    link_message(integer sender_num, integer num, string str, key userkey) {
+    	if (num ==SLOODLE_TOUCH_OBJECT_SUCCESS){
+    		llMessageLinked(LINK_SET, -100,"p1", NULL_KEY);
+    		llSay("Gave one "+llGetObjectName()+" to " +llKey2Name(userkey));
+    		
     	}
-    	llMessageLinked(LINK_SET, , "p1", NULL_KEY);
-        llTriggerSound("SND_BLING", 1);
-       llSay(0,"Gave one "+llGetObjectName()+" to: "+llKey2Name(userKey));
-       
     }
 }
