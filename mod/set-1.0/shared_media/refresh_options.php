@@ -18,7 +18,7 @@ require_once '../../../lib/json/json_encoding.inc.php';
 $primname = optional_param('primname', NULL, PARAM_RAW);
 $courseid = optional_param('courseid', NULL, PARAM_INT);
 
-// TODO: What should this be? Probably not 1...
+//  Would be better to pass the controller in here and check permissions for that.
 $course_context = get_context_instance( CONTEXT_COURSE, $courseid);
 $can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
 if (!$can_use_layouts) {

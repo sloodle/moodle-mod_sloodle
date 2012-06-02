@@ -16,15 +16,12 @@ require_once(SLOODLE_LIBROOT.'/object_configs.php');
 
 require_once '../../../lib/json/json_encoding.inc.php';
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 // TODO: What should this be? Probably not 1...
-$course_context = get_context_instance( CONTEXT_COURSE, 1);
-$can_use_layouts = has_capability('mod/sloodle:uselayouts', $course_context);
+$controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
+$can_use_layouts = has_capability('mod/sloodle:uselayouts', $controller_context);
 if (!$can_use_layouts) {
 	//include('../../../login/shared_media/index.php');
-	include('login.php');
+	error_output( 'Permission denied');
 }
 
 $layoutid = optional_param('layoutid', 0, PARAM_INT);
