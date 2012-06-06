@@ -23,4 +23,3 @@ $sloodleconfig->field_sets = array(
 
 );
 ?>
-~
