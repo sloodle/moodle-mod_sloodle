@@ -38,9 +38,11 @@
 *  Required Sounds:
 *   SND_DRIP_CAVE - http://www.freesound.org/people/jnr%20hacksaw/sounds/11126/
 *   SND_DANCER_SHORT - http://www.freesound.org/people/ERH/sounds/49603/
+*   SND_ERH_STRINGS - http://www.freesound.org/people/ERH/sounds/40775/
 */
 string MOVE_SOUND ="SND_DANCER_SHORT";
 string DROP_SOUND ="SND_DRIP_CAVE";
+string REZ_SOUND = "SND_ERH_STRINGS";
 integer TARGET_CHANNEL;
 string TARGET_NAME;
 string  CONTROLLER_ID = "A"; // See comments at end regarding CONTROLLERS.
@@ -49,8 +51,7 @@ integer AUTO_START = TRUE;   // Optionally FALSE only if using CONTROLLERS.
 list particle_parameters=[]; // stores your custom particle effect, defined below.
 list target_parameters=[]; // remembers targets found using TARGET TEMPLATE scripts.
 float fade=0;
-string REZ_SOUND;
-string DROP_SOUND;
+
 particle_effect_rez(){
     //this is a white particle effect - has stright vertical lines
 llParticleSystem([PSYS_PART_FLAGS,257
@@ -110,8 +111,8 @@ default {
         list objD = llParseString2List(objDesc, [","], []);
         TARGET_CHANNEL=(integer)extractResponse(llList2String(objD,0));
         TARGET_NAME=extractResponse(llList2String(objD,1));
-       REZ_SOUND=extractResponse(llList2String(objD,2));
-       DROP_SOUND=extractResponse(llList2String(objD,3));
+       
+       
         integer ix= (integer)Where.x;
         integer  iy = (integer)Where.y;
         integer  iz = (integer)Where.z;
@@ -119,7 +120,7 @@ default {
         llRegionSay(TARGET_CHANNEL,"COMMAND:USER REZZED LEAF|LEAFNAME:"+llGetObjectName()+"|AVUUID:"+(string)llGetOwner()+"|"+SLURL); 
         llSetAlpha(0.0, ALL_SIDES);
         particle_effect_rez();        
-          llPlaySound(REZ_SOUND, 1.0); 
+        llTriggerSound(REZ_SOUND, 1.0); 
         llSetTimerEvent(0.5);
     }
     timer() {
