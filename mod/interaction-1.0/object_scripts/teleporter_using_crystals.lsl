@@ -224,7 +224,7 @@ warpPos( vector destpos)
         list rules = [ PRIM_POSITION, destpos ];  //The start for the rules list
         integer count = 1;
         while ( ( count = count << 1 ) < jumps)
-        rules = (rules=[]) + rules + rules;   //should tighten memory use.
+        rules = ([]) + rules + rules;   //should tighten memory use.
         llSetPrimitiveParams( rules + llList2List( rules, (count - jumps) << 1, count) );
         if (sitter!=NULL_KEY){
             llUnSit(sitter);
