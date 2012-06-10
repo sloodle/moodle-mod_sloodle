@@ -193,7 +193,7 @@ integer sloodle_handle_command(string str){
 trytoTp(key av){
         //when touched, tell mod_interaction script that a water action has occured
         llMessageLinked(LINK_SET, SLOODLE_OBJECT_REGISTER_INTERACTION, "accessteleporter", av);
-        llTriggerSound("SND_SPARKS", 0.7);
+        llTriggerSound("SND_TELEPORTING", 0.7);
 }
 list give_in_folder;
 integer item_no = 0;
