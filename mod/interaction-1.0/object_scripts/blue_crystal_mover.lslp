@@ -40,9 +40,9 @@
 *   SND_DANCER_SHORT - http://www.freesound.org/people/ERH/sounds/49603/
 *   SND_ERH_STRINGS - http://www.freesound.org/people/ERH/sounds/40775/
 */
-string MOVE_SOUND ="SND_DANCER_SHORT";
+string MOVE_SOUND ="SND_ERH_STRINGS";
 string DROP_SOUND ="SND_DRIP_CAVE";
-string REZ_SOUND = "SND_ERH_STRINGS";
+string REZ_SOUND = "SND_DANCER_SHORT";
 integer TARGET_CHANNEL;
 string TARGET_NAME;
 string  CONTROLLER_ID = "A"; // See comments at end regarding CONTROLLERS.
