@@ -179,6 +179,48 @@ form {
 .create_layout_button{ background-image: url(images/rezzer_icon_add.png); }
 .sync_object_positions { background-image: url(images/rezzer_icon_layout_save_pos.png); }
 
+li.rezzable_item a {
+    background: url("images/rezzer_item_settings.png") no-repeat scroll right center transparent;
+    background-position: 10px right;
+}
+li.rezzable_item a[selected], li.rezzable_item a:active {
+            background-image: url(images/cog.png), url(selection.png) !important;
+                background-repeat: no-repeat, repeat-x;
+}
+
+
+span.rezzable_item_rez_button { 
+    display:none;
+    width:61px; 
+    height:21px; 
+    float:right; 
+    margin-right:14px; 
+    margin-left:10px; 
+    margin-top:3px; 
+    padding:0px;
+	background-image: url(images/rezzer_icon_rez_one.png); 
+ }
+span.rezzable_item_derez_button { 
+    display:none;
+    width:61px; 
+    height:21px; 
+    float:right; 
+    margin-right:14px; 
+    margin-left:10px; 
+    margin-top:3px; 
+    padding:0px;
+	background-image: url(images/rezzer_icon_derez_one.png); 
+}
+
+li.rezzed span.rezzable_item_derez_button { display:inline }
+li:not(.rezzed) span.rezzable_item_rez_button { display:inline }
+
+li.rezzed a { color:black}
+li.rezzable_item:not(.rezzed) a { color:gray}
+
+ul[data-rez-mode=derezzed] a.add_object_link { color:gray }
+ul[data-rez-mode=unrezzed] a.add_object_link { color:gray }
+
 .add_object_link:before {
 	padding-left:3px; 
 	padding-right:10px; 
