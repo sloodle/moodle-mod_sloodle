@@ -257,82 +257,58 @@
                 
 				var result = json.result;
                 var changed = false;
-
 				if (result == 'refreshed') {
-
 					//itemjq.removeClass('syncing').addClass("synced");
                     var leiduuids = json.layoutentries_to_uuids;
 
-					parentjq.find('.rezzable_item').each( function() {
-
+					parentjq.find('.rezzed').each( function() {
                         var leid = $(this).attr('data-layoutentryid');
-                        var exists = leiduuids[ leid ];
-                        var deleted = false;
+                        if (!leiduuids[ leid ] ) {
+                            changed = true;
+                            $(this).removeClass('rezzed').addClass('derezzed');
+                        }
+                    } );
 
-                        /*
-                        This gives us an update of the server's representation of the in-world scene.
-                        In theory we should already know what's happening in the scene, because we gave the commands to do things and got the results.
-                        But some communication may have got lost, or the rezzer may have been controlled in a different window.
-                        There are some delays between the rezzer updating the server and this script polling the server.
-                        */
-                        if ( $(this).hasClass('waiting_to_derez') || $(this).hasClass('waiting_to_rez') || $(this).hasClass('derezzing') || $(this).hasClass('rezzing')  ) {
-                            // Leave this to either catch its reponse or handle its time out.
-
-                        } else if ( $(this).hasClass('rezzing_failed') || $(this).hasClass('rezzing_timed_out') ) {
-                            // We thought it failed, but it seemed to have worked - we must have just not got the response.
-                            // Mark it as rezzed.
-                            if (exists) {
-                                $(this).removeClass('rezzing_failed').removeClass('rezzing_timed_out').addClass('rezzed');
-                                changed = true;
-                            }
-                        } else if ( $(this).hasClass('derezzing_failed') || $(this).hasClass('derezzing_timed_out') ) {
-                            // We thought derezzing failed but it's gone. 
-                            // Mark it as derezzed.
-                            if (!exists) {
-                                $(this).removeClass('derezzing_failed').removeClass('derezzing_timed_out').addClass('derezzed');
-                                changed = true;
-                                deleted = true;
-                            }
-                        } else if ( $(this).hasClass('rezzed') ) {
-                            if (!exists) {
-                                var lastupdatets = $(this).attr('data-lastupdatets'); 
-                                if (!lastupdatets) {
-                                    lastupdatets = 0;
-                                }
-                                var nowts = new Date().getTime();
-                                if ( ( nowts - lastupdatets ) > 10000 ) {
-                                    $(this).removeClass('rezzed').addClass('derezzed');
-                                    $(this).removeAttr('data-lastupdatets');
-                                    deleted = true;
-                                    changed = true;
-                                }
-                            }
-                        } else {
-                            // Wasn't there originally but is now
-                            // Mark it rezzed, but only if the derezzing we thought worked was a while ago.
-                            if (exists) {
-                                if ( $(this).hasClass('derezzed') ) {
-                                    var lastupdatets = $(this).attr('data-lastupdatets'); 
-                                    if (!lastupdatets) {
-                                        lastupdatets = 0;
-                                    }
-                                    var nowts = new Date().getTime();
-                                    if ( ( nowts - lastupdatets ) > 10000 ) {
-                                        $(this).removeClass('derezzed');
-                                        $(this).removeAttr('data-lastupdatets');
-                                        changed = true;
-                                    }
-                                }
-                                $(this).addClass('rezzed');
-                                changed = true;
+					parentjq.find('.derezzing').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (!leiduuids[ leid ] ) {
+                            changed = true;
+                            if ($(this).hasClass('deleted_from_layout')) {
+                                itemjq.remove(); // TODO: Remove the config form too
+                            } else {
+                                $(this).removeClass('derezzing').addClass('derezzed');
                             }
                         }
+                    } );
 
-                        if (deleted && $(this).hasClass('deleted_from_layout') ) {
-                            itemjq.remove(); // TODO: Remove the config form too
+					parentjq.find('.derezzing_failed').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (!leiduuids[ leid ] ) {
+                            changed = true;
+                            if ($(this).hasClass('deleted_from_layout')) {
+                                itemjq.remove(); // TODO: Remove the config form too
+                            } else {
+                                $(this).removeClass('derezzing_failed').addClass('derezzed');
+                            }
                         }
+                    } );
 
-                    });
+                    parentjq.find('.rezzing').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (leiduuids[ leid ] ) {
+                            changed = true;
+                            $(this).removeClass('rezzing').addClass('rezzed');
+                        }
+                    } );
+
+					parentjq.find('.rezzing_failed').each( function() {
+                        var leid = $(this).attr('data-layoutentryid');
+                        if (leiduuids[ leid ] ) {
+                            changed = true;
+                            $(this).removeClass('rezzing_failed').addClass('rezzed');
+                        }
+                    } );
+
 
                     // Check if anything is marked as rezzed but gone, and remove the rezzed .
 
@@ -406,10 +382,6 @@
 				var result = json.result;
 				if (result == 'synced') {
 					itemjq.removeClass('syncing').addClass("synced");
-                    var itemjqid = itemjq.attr('id');
-                    setTimeout( function() {
-                        $('#'+itemjqid).removeClass('synced').find('span.rezzable_item_positioning').html('&nbsp;');
-                    }, 10000);
 				} else if (result == 'failed') {
 					itemjq.removeClass('syncing').addClass('syncing_failed');;
 				}
@@ -421,6 +393,7 @@
 			}  
 		);  
 	}
+
 
 	function rez_layout_item(itemjq, entryid, controllerid, parentjq) {
 		$.getJSON(  
@@ -435,7 +408,6 @@
 				var result = json.result;
 				if (result == 'rezzed') {
 					itemjq.removeClass('rezzing').addClass('rezzed');;
-                    itemjq.attr('data-lastupdatets', new Date().getTime());
 				} else if (result == 'failed') {
 					itemjq.removeClass('rezzing').addClass('rezzing_failed');;
 				}
@@ -473,7 +445,6 @@
 					if (itemjq.hasClass('deleted_from_layout')) {
 						itemjq.remove(); // TODO: Remove the config form too
 					}
-                    itemjq.attr('data-lastupdatets', new Date().getTime());
 				} else if (result == 'failed') {
 					itemjq.removeClass('derezzing').addClass('derezzing_failed');;
 				}
@@ -486,47 +457,6 @@
 			}  
 		);  
 	}
-
-    function mark_for_derez( btnjq, e ) {
-
-        var lijq = btnjq.closest('li');
-
-        if (!lijq.hasClass('rezzed')) {
-            return false;
-        }
-        if (lijq.hasClass('waiting_to_derez')) {
-            return false;
-        }
-
-		lijq.addClass( 'waiting_to_derez' ).removeClass('rezzed');
-		eventLoop( (lijq.closest('.layout_container') ) );
-
-        e.stopPropagation();
-
-        return false;
-
-    }
-
-    function mark_for_rez( btnjq, e ) {
-
-        var lijq = btnjq.closest('li');
-
-        if (lijq.hasClass('rezzed')) {
-            return false;
-        }
-        if (lijq.hasClass('waiting_to_rez')) {
-            return false;
-        }
-
-		lijq.addClass( 'waiting_to_rez' ).removeClass('derezzed').removeClass('waiting_to_derez');
-		eventLoop( (lijq.closest('.layout_container') ) );
-
-        e.stopPropagation();
-
-        return false;
-
-
-    }
 
 	function start_derez_all(parentjq) {
 		parentjq.attr('data-action-status', 'derezzing');
@@ -969,7 +899,7 @@
 			}
 
 			// make a list item for the layout screen, and insert it at the bottom of its group.
-			var newItem = '<li data-layoutentryid="'+layoutentryid+'" id="'+newElementID+'" class="rezzable_item' + actionClass + '"><a href="#configure_'+newElementID+'">'+objectname+'<span class="module_info">'+moduletitle+'</span>'+'<span class="rezzable_item_rez_button">&nbsp;</span><span class="rezzable_item_derez_button">&nbsp;</span> <span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>';
+			var newItem = '<li data-layoutentryid="'+layoutentryid+'" id="'+newElementID+'" class="rezzable_item' + actionClass + '"><a href="#configure_'+newElementID+'">'+objectname+'<span class="module_info">'+moduletitle+'</span>'+'<span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>'
 
 			// If we don't yet have a group to put this item in, create it
 			if ( $(this).children(".after_group_"+objectgroup).size() == 0 ) {
@@ -978,18 +908,6 @@
 			}
 
 			$(this).children(".after_group_"+objectgroup).before(newItem);
-
-            attach_event_handlers();
-            /*
-            newItem.find('.rezzable_item_derez_button').unbind('click').click( function(e) {
-                mark_for_derez( $(this), e );
-            });
-            newItem.find('.rezzable_item_rez_button').unbind('click').click( function(e) {
-                mark_for_rez( $(this), e );
-            });
-            */
-
-
 
 			// Make a copy of the add form and change it into an edit form
 			var editFrm = addfrmjq.clone(); 
@@ -1174,14 +1092,6 @@
 		$('.reload_page_button').unbind('click').click( function() {
 			location.reload();
 		});
-        $().find('.rezzable_item_derez_button').unbind('click').click( function(e) {
-            mark_for_derez( $(this), e );
-        });
-        $().find('.rezzable_item_rez_button').unbind('click').click( function(e) {
-            mark_for_rez( $(this), e );
-        });
-
-        
 	}
 
 	function handle_rename_button_click(btnjq) {
@@ -1455,4 +1365,3 @@ function setOrientation(orient)
 	document.body.setAttribute("orient", orient);
 	setTimeout(scrollTo, 100, 0, 1);
 }
-
