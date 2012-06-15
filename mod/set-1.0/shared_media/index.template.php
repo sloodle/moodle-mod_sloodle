@@ -269,17 +269,16 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 				<span class="control_button rename_layout_button" data-layoutid="<?php echo  intval($layout->id) ?>" data-renamed-text="<?php echo  s(get_string('rezzer:renamelayout', 'sloodle'))?>" data-rename-text="<?php echo  s(get_string('rezzer:renamelayout','sloodle'))?>" data-renaming-text="<?php echo  s(get_string('rezzer:renaminglayout', 'sloodle'))?>" class="control_button" type="submit" ><?php echo  s(get_string('rezzer:renamelayout','sloodle'))?></span>
 
 				<span class="control_button delete_layout_button" data-layoutid="<?php echo  intval($layout->id) ?>" data-deleted-text="<?php echo  s(get_string('rezzer:deletedderezzingobjects', 'sloodle')) ?>" data-delete-text="<?php echo  s(get_string('rezzer:deletelayout', 'sloodle'))?>" data-deleting-text="<?php echo  s(get_string('rezzer:deletinglayout','sloodle'))?>" type="submit"><?php echo  s(get_string('rezzer:deletelayout', 'sloodle'))?></span>
-				<span class="control_button delete_layout_button_placeholder"></span>
 
 				<span class="control_button clone_layout_button" data-layoutid="<?php echo  intval($layout->id) ?>" data-cloned-text="<?php echo  s(get_string('rezzer:clonelayout','sloodle'))?>" data-cloning-text="<?php echo s(get_string('rezzer:cloninglayout','sloodle'))?>" data-clone-text="<?php echo s(get_string('rezzer:clonelayout','sloodle'))?>" type="submit" ><?php echo s(get_string('rezzer:clonelayout','sloodle'))?></span>
 									
 				<span class="control_button sync_object_positions" data-freeze-text="<?php echo  s(get_string('rezzer:savecurrentposition', 'sloodle'))?>" data-freezing-text="<?php echo  s(get_string('rezzer:savingcurrentposition', 'sloodle'))?>" type="submit" href="#clonelayout"><?php echo  s(get_string('rezzer:savecurrentposition', 'sloodle'))?></span>
-				<span class="control_button sync_object_positions_placeholder"></span>
 
-				<span id="set_configuration_status_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" class="big_control_button button_goes_here_zone set_configuration_status"></span>
-				<span id="rez_all_objects_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" class="big_control_button rez_all_objects"> &nbsp; <?php echo  s(get_string('rezzer:rezallobjects', 'sloodle'))?></span>
+				<span id="derez_all_objects_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" class="control_button derez_all_objects"> &nbsp; <?php echo  s(get_string('rezzer:derezallobjects', 'sloodle'))?></span>
 
-				<span id="generate_standard_layout_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" data-generate-text="<?php echo  s(get_string('rezzer:importmoodleactivities','sloodle', $cn )) ?>" data-generating-text="<?php echo  s(get_string('rezzer:importingmoodleactivities', 'sloodle'))?>" data-layoutid="<?php echo  intval($layout->id) ?>" class="big_control_button generate_standard_layout"><?php echo  s(get_string('rezzer:importmoodleactivities', 'sloodle', $cn )) ?></span>
+				<span id="rez_all_objects_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" class="control_button rez_all_objects double_width"> &nbsp; <?php echo  s(get_string('rezzer:rezallobjects', 'sloodle'))?></span>
+
+				<span id="generate_standard_layout_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" data-generate-text="<?php echo  s(get_string('rezzer:importmoodleactivities','sloodle', $cn )) ?>" data-generating-text="<?php echo  s(get_string('rezzer:importingmoodleactivities', 'sloodle'))?>" data-layoutid="<?php echo  intval($layout->id) ?>" class="control_button double_width generate_standard_layout"><?php echo  s(get_string('rezzer:importmoodleactivities', 'sloodle', $cn )) ?></span>
 
 </span>
 
@@ -345,7 +344,7 @@ function print_rezzable_item_li( $e, $cid, $contid, $layout, $isrezzed) {
 					<li><a href="#<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo  intval($e->id) ?>"><?php echo  htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
 	*/ ?>
 							<?php /* NB If you change this, you also need to change layout.js, which creates some of these dynamically. */ ?>
-							<li data-layoutentryid="<?php echo  $e->id?>" id="layoutentryid_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo intval( $e->id ) ?>" class="rezzable_item <?php echo  ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo intval( $e->id ) ?>"><?php echo  s($entryname) ?><span class="module_info"><?php echo s($modTitle)?></span><span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
+							<li data-layoutentryid="<?php echo  $e->id?>" id="layoutentryid_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo intval( $e->id ) ?>" class="rezzable_item <?php echo  ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo intval( $e->id ) ?>"><?php echo  s($entryname) ?><span class="module_info"><?php echo s($modTitle)?></span></span> <span class="rezzable_item_rez_button">&nbsp;</span><span class="rezzable_item_derez_button">&nbsp;</span> <span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
 <?php
 }
 

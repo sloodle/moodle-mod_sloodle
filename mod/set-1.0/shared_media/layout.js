@@ -5,7 +5,7 @@
 	var pendingRequests = new Object(); // A list of entries that we've made a request for, and the timestamp in milliseconds when we made them
 	var numPendingRequests = 0; // Should correspond to the number of elements in pendingRequests
 
-	var maxPendingRequests = 5; // Max outstanding requests we should have at one time. NB if requests time out but still return, there may be more outstanding.
+	var maxPendingRequests = 2; // Max outstanding requests we should have at one time. NB if requests time out but still return, there may be more outstanding.
 
 	var statusPollingInterval= 5; // How often we should poll the server for activeobject updates
 
@@ -115,24 +115,22 @@
 		if (actionStatus == 'rezzing') {
 			if ( ( parentjq.children('li.rezzing').length == 0 ) && ( parentjq.children('li.waiting_to_rez').length == 0 ) ) {
 				parentjq.attr('data-action-status', 'rezzed');
-				parentjq.find('.rez_all_objects').html(' &nbsp; Derez all');
-				parentjq.find('.rez_all_objects').unbind('click');
-				parentjq.find('.rez_all_objects').click(function() {
-					start_derez_all(parentjq);
-				});
-				parentjq.children('.sync_object_positions').show();
-				parentjq.children('.sync_object_positions_placeholder').hide();
+                parentjq.find('.rez_all_objects').html('Rez all');
+                parentjq.find('.rez_all_objects').unbind('click');
+                parentjq.find('.rez_all_objects').click(function() {
+                    start_rez_all(parentjq);	
+                });
+
 			}
 		} else if (actionStatus == 'derezzing') {
 			if ( ( parentjq.children('li.derezzing').length == 0 ) && ( parentjq.children('li.waiting_to_derez').length == 0 ) ) {
 				parentjq.attr('data-action-status', 'derezzed');
-				parentjq.find('.rez_all_objects').html('Rez all');
-				parentjq.find('.rez_all_objects').unbind('click');
-				parentjq.find('.rez_all_objects').click(function() {
-					start_rez_all(parentjq);
-				});
-				parentjq.find('.sync_object_positions').hide();
-				parentjq.find('.sync_object_positions_placeholder').show();
+                parentjq.find('.derez_all_objects').html('Derez all');
+                parentjq.find('.derez_all_objects').unbind('click');
+                parentjq.find('.derez_all_objects').click(function() {
+                    start_derez_all(parentjq);	
+                });
+
 			}
 		}
 
@@ -171,73 +169,59 @@
 
 	function update_buttons(parentjq) {
 		// If there are no objects to rez, show the generated button
-		if ( parentjq.children('.rezzable_item').length == 0 ) {
-			parentjq.find('.generate_standard_layout').show();
-			parentjq.find('.set_configuration_status').hide();
-			parentjq.find('.rez_all_objects').hide();
-			parentjq.find('.sync_object_positions').hide();
-			parentjq.find('.sync_object_positions_placeholder').show();
+        var rezzable_items_jq = parentjq.children('.rezzable_item');
+        var num_rezzable = rezzable_items_jq.length;
+
+		if (num_rezzable  == 0 ) {
+
+			parentjq.find('.sync_object_positions').css('visibility','hidden');
 
 			// allow layout deletion
-			parentjq.find('.delete_layout_button').show();
-			parentjq.find('.delete_layout_button_placeholder').hide();
-		} else {
-			parentjq.find('.generate_standard_layout').hide(); // can't generate a layout if we already have entries
-			if (parentjq.attr('data-connection-status') == 'connected') {
-				parentjq.find('.set_configuration_status').hide();
-				if (parentjq.attr('data-action-status') == 'rezzed') {
-					parentjq.find('.sync_object_positions').show();
-					parentjq.find('.sync_object_positions_placeholder').hide();
+			parentjq.find('.delete_layout_button').css('visibility','visible')
 
-					parentjq.find('.rez_all_objects').html(' &nbsp; Derez all');
-					parentjq.find('.rez_all_objects').unbind('click');
-					parentjq.find('.rez_all_objects').click(function() {
-						start_derez_all(parentjq);
-					});
-					parentjq.find('.rez_all_objects').show();
+            parentjq.find('.derez_all_objects').css('visibility','hidden');
 
-					// allow layout deletion
-					parentjq.find('.delete_layout_button').hide();
-					parentjq.find('.delete_layout_button_placeholder').show();
+            // The generate button takes the place of the rez all button, so we hide() one and show() the other.
+            // All the other buttons keep their positions, so we make them invisible with css.
+            parentjq.find('.rez_all_objects').hide();
+			parentjq.find('.generate_standard_layout').show();
 
-				} else if (parentjq.attr('data-action-status') == 'syncing') {
-					parentjq.find('.sync_object_positions').show();
-					parentjq.find('.sync_object_positions_placeholder').hide();
+        } else {
 
-					parentjq.find('.rez_all_objects').html(' &nbsp; Derez all');
-					parentjq.find('.rez_all_objects').unbind('click');
-					parentjq.find('.rez_all_objects').click(function() {
-						start_derez_all(parentjq);
-					});
-					parentjq.find('.rez_all_objects').show();
+            parentjq.find('.rez_all_objects').show();
+            parentjq.find('.generate_standard_layout').hide(); // can't generate a layout if we already have entries
 
-					// allow layout deletion
-					parentjq.find('.delete_layout_button').hide();
-					parentjq.find('.delete_layout_button_placeholder').show();
+            // Have items listed, but none of them are rezzed.
+            var num_rezzed = (rezzable_items_jq.filter('.rezzed, .rezzing, .rezzing_failed, .rezzing_timed_out, .derezzing, .derezzing_failed, .derezzing_timed_out')).length;
+            var num_derezzed = num_rezzable - num_rezzed;
 
-				} else {
-					parentjq.find('.sync_object_positions').hide();
-					parentjq.find('.sync_object_positions_placeholder').show();
+            if (num_rezzed > 0) {
 
-					parentjq.find('.rez_all_objects').html('Rez all');
-					parentjq.find('.rez_all_objects').unbind('click');
-					parentjq.find('.rez_all_objects').click(function() {
-						start_rez_all(parentjq);
-					});
-					parentjq.find('.rez_all_objects').show();
+                parentjq.find('.sync_object_positions').css('visibility','visible');
 
-					// allow layout deletion
-					parentjq.find('.delete_layout_button').show();
-					parentjq.find('.delete_layout_button_placeholder').hide();
+                if (num_rezzed < num_rezzable) {
+                    parentjq.find('.derez_all_objects').css('visibility','visible');
+                    parentjq.find('.rez_all_objects').css('visibility','visible');
+                } else {
+                    parentjq.find('.derez_all_objects').css('visibility','visible');
+                    parentjq.find('.rez_all_objects').css('visibility','hidden');
+                }
 
-				}
-			} else {
-				parentjq.find('.rez_all_objects').hide();
-				parentjq.find('.set_configuration_status').show();
-				parentjq.find('.sync_object_positions').hide();
-				parentjq.find('.delete_layout_button').show();
-			}
-		}
+                // allow layout deletion
+                parentjq.find('.delete_layout_button').css('visibility','hidden');
+
+            } else {
+
+                parentjq.find('.sync_object_positions').css('visibility','hidden');
+
+                parentjq.find('.rez_all_objects').css('visibility','visible');
+                parentjq.find('.derez_all_objects').css('visibility','hidden');
+
+                // allow layout deletion
+                parentjq.find('.delete_layout_button').css('visibility','visible');
+
+            }
+        }
 	}
 
 	function heartbeat_refresh(parentjq, layoutid, rezzeruuid) {
@@ -257,58 +241,82 @@
                 
 				var result = json.result;
                 var changed = false;
+
 				if (result == 'refreshed') {
+
 					//itemjq.removeClass('syncing').addClass("synced");
                     var leiduuids = json.layoutentries_to_uuids;
 
-					parentjq.find('.rezzed').each( function() {
-                        var leid = $(this).attr('data-layoutentryid');
-                        if (!leiduuids[ leid ] ) {
-                            changed = true;
-                            $(this).removeClass('rezzed').addClass('derezzed');
-                        }
-                    } );
+					parentjq.find('.rezzable_item').each( function() {
 
-					parentjq.find('.derezzing').each( function() {
                         var leid = $(this).attr('data-layoutentryid');
-                        if (!leiduuids[ leid ] ) {
-                            changed = true;
-                            if ($(this).hasClass('deleted_from_layout')) {
-                                itemjq.remove(); // TODO: Remove the config form too
-                            } else {
-                                $(this).removeClass('derezzing').addClass('derezzed');
+                        var exists = leiduuids[ leid ];
+                        var deleted = false;
+
+                        /*
+                        This gives us an update of the server's representation of the in-world scene.
+                        In theory we should already know what's happening in the scene, because we gave the commands to do things and got the results.
+                        But some communication may have got lost, or the rezzer may have been controlled in a different window.
+                        There are some delays between the rezzer updating the server and this script polling the server.
+                        */
+                        if ( $(this).hasClass('waiting_to_derez') || $(this).hasClass('waiting_to_rez') || $(this).hasClass('derezzing') || $(this).hasClass('rezzing')  ) {
+                            // Leave this to either catch its reponse or handle its time out.
+
+                        } else if ( $(this).hasClass('rezzing_failed') || $(this).hasClass('rezzing_timed_out') ) {
+                            // We thought it failed, but it seemed to have worked - we must have just not got the response.
+                            // Mark it as rezzed.
+                            if (exists) {
+                                $(this).removeClass('rezzing_failed').removeClass('rezzing_timed_out').addClass('rezzed');
+                                changed = true;
+                            }
+                        } else if ( $(this).hasClass('derezzing_failed') || $(this).hasClass('derezzing_timed_out') ) {
+                            // We thought derezzing failed but it's gone. 
+                            // Mark it as derezzed.
+                            if (!exists) {
+                                $(this).removeClass('derezzing_failed').removeClass('derezzing_timed_out').addClass('derezzed');
+                                changed = true;
+                                deleted = true;
+                            }
+                        } else if ( $(this).hasClass('rezzed') ) {
+                            if (!exists) {
+                                var lastupdatets = $(this).attr('data-lastupdatets'); 
+                                if (!lastupdatets) {
+                                    lastupdatets = 0;
+                                }
+                                var nowts = new Date().getTime();
+                                if ( ( nowts - lastupdatets ) > 10000 ) {
+                                    $(this).removeClass('rezzed').addClass('derezzed');
+                                    $(this).removeAttr('data-lastupdatets');
+                                    deleted = true;
+                                    changed = true;
+                                }
+                            }
+                        } else {
+                            // Wasn't there originally but is now
+                            // Mark it rezzed, but only if the derezzing we thought worked was a while ago.
+                            if (exists) {
+                                if ( $(this).hasClass('derezzed') ) {
+                                    var lastupdatets = $(this).attr('data-lastupdatets'); 
+                                    if (!lastupdatets) {
+                                        lastupdatets = 0;
+                                    }
+                                    var nowts = new Date().getTime();
+                                    if ( ( nowts - lastupdatets ) > 10000 ) {
+                                        $(this).removeClass('derezzed');
+                                        $(this).removeAttr('data-lastupdatets');
+                                        changed = true;
+                                    }
+                                }
+                                $(this).addClass('rezzed');
+                                changed = true;
                             }
                         }
-                    } );
 
-					parentjq.find('.derezzing_failed').each( function() {
-                        var leid = $(this).attr('data-layoutentryid');
-                        if (!leiduuids[ leid ] ) {
-                            changed = true;
-                            if ($(this).hasClass('deleted_from_layout')) {
-                                itemjq.remove(); // TODO: Remove the config form too
-                            } else {
-                                $(this).removeClass('derezzing_failed').addClass('derezzed');
-                            }
+                        if (deleted && $(this).hasClass('deleted_from_layout') ) {
+                            itemjq.remove(); // TODO: Remove the config form too
                         }
-                    } );
 
-                    parentjq.find('.rezzing').each( function() {
-                        var leid = $(this).attr('data-layoutentryid');
-                        if (leiduuids[ leid ] ) {
-                            changed = true;
-                            $(this).removeClass('rezzing').addClass('rezzed');
-                        }
-                    } );
-
-					parentjq.find('.rezzing_failed').each( function() {
-                        var leid = $(this).attr('data-layoutentryid');
-                        if (leiduuids[ leid ] ) {
-                            changed = true;
-                            $(this).removeClass('rezzing_failed').addClass('rezzed');
-                        }
-                    } );
-
+                    });
 
                     // Check if anything is marked as rezzed but gone, and remove the rezzed .
 
@@ -382,6 +390,10 @@
 				var result = json.result;
 				if (result == 'synced') {
 					itemjq.removeClass('syncing').addClass("synced");
+                    var itemjqid = itemjq.attr('id');
+                    setTimeout( function() {
+                        $('#'+itemjqid).removeClass('synced').find('span.rezzable_item_positioning').html('&nbsp;');
+                    }, 10000);
 				} else if (result == 'failed') {
 					itemjq.removeClass('syncing').addClass('syncing_failed');;
 				}
@@ -393,7 +405,6 @@
 			}  
 		);  
 	}
-
 
 	function rez_layout_item(itemjq, entryid, controllerid, parentjq) {
 		$.getJSON(  
@@ -408,6 +419,7 @@
 				var result = json.result;
 				if (result == 'rezzed') {
 					itemjq.removeClass('rezzing').addClass('rezzed');;
+                    itemjq.attr('data-lastupdatets', new Date().getTime());
 				} else if (result == 'failed') {
 					itemjq.removeClass('rezzing').addClass('rezzing_failed');;
 				}
@@ -445,6 +457,7 @@
 					if (itemjq.hasClass('deleted_from_layout')) {
 						itemjq.remove(); // TODO: Remove the config form too
 					}
+                    itemjq.attr('data-lastupdatets', new Date().getTime());
 				} else if (result == 'failed') {
 					itemjq.removeClass('derezzing').addClass('derezzing_failed');;
 				}
@@ -458,33 +471,92 @@
 		);  
 	}
 
+    function mark_for_derez( btnjq, e ) {
+
+        var lijq = btnjq.closest('li');
+
+        if (!lijq.hasClass('rezzed')) {
+            return false;
+        }
+        if (lijq.hasClass('waiting_to_derez')) {
+            return false;
+        }
+
+		lijq.addClass( 'waiting_to_derez' ).removeClass('rezzed');
+		eventLoop( (lijq.closest('.layout_container') ) );
+
+        e.stopPropagation();
+
+        return false;
+
+    }
+
+    function mark_for_rez( btnjq, e ) {
+
+        var lijq = btnjq.closest('li');
+
+        if (lijq.hasClass('rezzed')) {
+            return false;
+        }
+        if (lijq.hasClass('waiting_to_rez')) {
+            return false;
+        }
+
+		lijq.addClass( 'waiting_to_rez' ).removeClass('derezzed').removeClass('waiting_to_derez');
+		eventLoop( (lijq.closest('.layout_container') ) );
+
+        e.stopPropagation();
+
+        return false;
+
+
+    }
+
 	function start_derez_all(parentjq) {
+
+		parentjq.find('.derez_all_objects').html('Stop derez');
+		parentjq.find('.derez_all_objects').unbind('click');
+		parentjq.find('.derez_all_objects').click(function() {
+			stop_derez_all(parentjq);	
+		});
+
+        var oldstatus = parentjq.attr('data-action-status');
+		
 		parentjq.attr('data-action-status', 'derezzing');
 		parentjq.attr('data-rez-mode', 'derezzed');
 
+        if (oldstatus == 'rezzing') {
+            stop_rez_all(parentjq);
+        }
+
 		parentjq.children('li.rezzed').addClass( 'waiting_to_derez' );
 		parentjq.children('li.waiting_to_derez').removeClass('rezzed');
-		parentjq.find('.rez_all_objects').html('Stop derezzing objects');
-		parentjq.find('.rez_all_objects').unbind('click');
-		parentjq.find('.rez_all_objects').click(function() {
-			stop_derez_all(parentjq);	
-		});
+
 		eventLoop( parentjq );
 	}
 
 	function start_rez_all(parentjq) {
+
+		parentjq.find('.rez_all_objects').html('Stop rez');
+		parentjq.find('.rez_all_objects').unbind('click');
+		parentjq.find('.rez_all_objects').click(function() {
+			stop_rez_all(parentjq);	
+		});
+
+        var oldstatus = parentjq.attr('data-action-status');
+
 		parentjq.attr('data-action-status', 'rezzing');
 		parentjq.attr('data-rez-mode', 'rezzed');
+
+        if (oldstatus == 'derezzing') {
+            stop_derez_all(parentjq);
+        }
 
 		parentjq.children('li.derezzing_failed').removeClass('derezzing_failed');
 		parentjq.children('li.rezzing_failed').removeClass('rezzing_failed');
 		parentjq.children('li.derezzed').removeClass('derezzed');
 		parentjq.children('li.rezzable_item').not('li.rezzed').not('li.rezzing').addClass( 'waiting_to_rez' );
-		parentjq.find('.rez_all_objects').html('Stop rezzing objects');
-		parentjq.find('.rez_all_objects').unbind('click');
-		parentjq.find('.rez_all_objects').click(function() {
-			stop_rez_all();	
-		});
+
 		eventLoop( parentjq );
 	}
 
@@ -495,23 +567,31 @@
 	}
 
 	function stop_derez_all(parentjq) {
-		parentjq.children('li.waiting_to_derez').addClass( 'rezzed' ).removeClass('waiting_to_derez');;
-		parentjq.children('.rez_all_objects').html(' &nbsp; Derez all');
-		parentjq.children('.rez_all_objects').unbind('click');
-		parentjq.children('.rez_all_objects').click(function() {
+
+        parentjq.children('.derez_all_objects').html('Derez all');
+		parentjq.children('.derez_all_objects').unbind('click');
+		parentjq.children('.derez_all_objects').click(function() {
 			start_derez_all(parentjq);
 		});
-		eventLoop( parentjq );
+
+		parentjq.children('li.waiting_to_derez').addClass( 'rezzed' ).removeClass('waiting_to_derez');;
+
+        eventLoop( parentjq );
+
 	}
 
 	function stop_rez_all(parentjq) {
-		parentjq.children('li.rezzable_item').removeClass( 'waiting_to_rez' );
-		parentjq.children('.rez_all_objects').html('Rez all');
+
+        parentjq.children('.rez_all_objects').html('Rez all');
 		parentjq.children('.rez_all_objects').unbind('click');
 		parentjq.children('.rez_all_objects').click(function() {
 			start_rez_all(parentjq);
 		});
-		eventLoop( parentjq );
+
+		parentjq.children('li.rezzable_item').removeClass( 'waiting_to_rez' ).find('.rezzable_item_status').html('Derezzed');
+
+        eventLoop( parentjq );
+
 	}
 
 	function create_layout( buttonjq ) {
@@ -899,7 +979,7 @@
 			}
 
 			// make a list item for the layout screen, and insert it at the bottom of its group.
-			var newItem = '<li data-layoutentryid="'+layoutentryid+'" id="'+newElementID+'" class="rezzable_item' + actionClass + '"><a href="#configure_'+newElementID+'">'+objectname+'<span class="module_info">'+moduletitle+'</span>'+'<span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>'
+			var newItem = '<li data-layoutentryid="'+layoutentryid+'" id="'+newElementID+'" class="rezzable_item' + actionClass + '"><a href="#configure_'+newElementID+'">'+objectname+'<span class="module_info">'+moduletitle+'</span>'+'<span class="rezzable_item_rez_button">&nbsp;</span><span class="rezzable_item_derez_button">&nbsp;</span> <span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>';
 
 			// If we don't yet have a group to put this item in, create it
 			if ( $(this).children(".after_group_"+objectgroup).size() == 0 ) {
@@ -908,6 +988,18 @@
 			}
 
 			$(this).children(".after_group_"+objectgroup).before(newItem);
+
+            attach_event_handlers();
+            /*
+            newItem.find('.rezzable_item_derez_button').unbind('click').click( function(e) {
+                mark_for_derez( $(this), e );
+            });
+            newItem.find('.rezzable_item_rez_button').unbind('click').click( function(e) {
+                mark_for_rez( $(this), e );
+            });
+            */
+
+
 
 			// Make a copy of the add form and change it into an edit form
 			var editFrm = addfrmjq.clone(); 
@@ -1046,10 +1138,14 @@
 		$().find('.layout_link').unbind('click').click(function() {
 			return handle_scene_selection($(this));
 		});
-		$().find('.rez_all_objects').hide();
 		$().find('.rez_all_objects').unbind('click').click(function() {
 			start_rez_all($(this).closest('.layout_container'));
 		});
+
+		$().find('.derez_all_objects').unbind('click').click(function() {
+			start_derez_all($(this).closest('.layout_container'));
+		});
+
 		$().find('.add_to_layout_button').unbind('click').click(function() {
 			return add_to_layout($(this));
 		});
@@ -1092,6 +1188,14 @@
 		$('.reload_page_button').unbind('click').click( function() {
 			location.reload();
 		});
+        $().find('.rezzable_item_derez_button').unbind('click').click( function(e) {
+            mark_for_derez( $(this), e );
+        });
+        $().find('.rezzable_item_rez_button').unbind('click').click( function(e) {
+            mark_for_rez( $(this), e );
+        });
+
+        
 	}
 
 	function handle_rename_button_click(btnjq) {
@@ -1365,3 +1469,4 @@ function setOrientation(orient)
 	document.body.setAttribute("orient", orient);
 	setTimeout(scrollTo, 100, 0, 1);
 }
+
