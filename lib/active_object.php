@@ -1112,6 +1112,8 @@
         */
         function FilterForConfigNameValue( $aos, $name, $value ) {
 
+            global $CFG;
+
             if (!count($aos)) {
                 return array();
             }
@@ -1131,7 +1133,7 @@
                 return array();
             }
 
-            $query = "select object as objid from mdl_sloodle_object_config where name=? and value=? and object in (".join(',',$placeholders).");";
+            $query = "select object as objid from {$CFG->prefix}sloodle_object_config where name=? and value=? and object in (".join(',',$placeholders).");";
             $recs = sloodle_get_records_sql_params($query, $params);
             if (!is_array($recs) || (!count($recs))) {
                 return array();
