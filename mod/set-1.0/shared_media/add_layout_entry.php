@@ -24,7 +24,7 @@ include('index.template.php');
 $configVars = array();
 
 $layoutid = null;
-foreach($_GET as $n => $v) {
+foreach($_POST as $n => $v) {
 	if ($n == 'layoutid') {
 		$layoutid = intval($v);
 	} else if ($n == 'objectname') {

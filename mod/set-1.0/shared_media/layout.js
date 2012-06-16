@@ -230,7 +230,7 @@
             return false;
         }
 
-		$.getJSON(
+		$.post(
 			"refresh_rezzer.php",  
 			{
 				layoutid: layoutid,
@@ -342,7 +342,7 @@
                 heartbeatTimer = setTimeout( function(){ heartbeat_refresh( parentjq, layoutid, rezzeruuid ); }, heartbeatMilliseconds );
 
 			}
-		);  
+		,'json');  
 	}
 
 	function refresh_misc_object_group( parentjq) {
@@ -351,7 +351,7 @@
 		var layoutid = bits.pop(); 
 		var controllerid = bits.pop();
 		var courseid = bits.pop();
-		$.getJSON(  
+		$.post(
 			"update_rezzer_contents.php",  
 			{
 				layoutid: layoutid,
@@ -373,12 +373,12 @@
 					//alert('refresh returned unknown status');
 				}
 			}  
-		);  
+		,'json');  
 	}
 
 
 	function sync_layout_item(itemjq, entryid, controllerid) {
-		$.getJSON(  
+		$.post(
 			"sync_layout_position.php",  
 			{
 				layoutentryid: entryid,
@@ -403,11 +403,11 @@
 				}
 				eventLoop( itemjq.closest('.layout_container') );
 			}  
-		);  
+		,'json');  
 	}
 
 	function rez_layout_item(itemjq, entryid, controllerid, parentjq) {
-		$.getJSON(  
+		$.post(
 			"rez_object.php",  
 			{
 				layoutentryid: entryid,
@@ -429,12 +429,12 @@
 				}
 				eventLoop( parentjq );
 			}  
-		);  
+		,'json');  
 	}
 
 	function derez_layout_item(itemjq, entryid, controllerid, parentjq) {
 //alert('sending derez request with rezzeruuid '+rezzer_uuid);
-		$.getJSON(  
+		$.post(
 			"derez_object.php",  
 			{
 				layoutentryid: entryid,
@@ -468,7 +468,7 @@
 				eventLoop( parentjq );
 
 			}  
-		);  
+		,'json');  
 	}
 
     function mark_for_derez( btnjq, e ) {
@@ -602,7 +602,7 @@
 
 		var frmjq = buttonjq.closest("form");
 		buttonjq.html( buttonjq.attr('data-creating-text') );
-		$.getJSON(  
+		$.post(
 			"add_layout.php",  
 			frmjq.serialize(),
 			function(json) {  
@@ -631,7 +631,7 @@
 					buttonjq.html( buttonjq.attr('data-create-text') );
 				}
 			}  
-		);  
+		,'json');
 		return false;
 
 	}
@@ -649,7 +649,7 @@
 		var frmjq = buttonjq.closest("form");
 		buttonjq.html( buttonjq.attr('data-generating-text') );
 		var layoutid = buttonjq.attr('data-layoutid');
-		$.getJSON(  
+		$.post(
 			"generate_layout_entries.php",  
 			{
 				layoutid: layoutid,
@@ -664,7 +664,6 @@
 					var entryi;
 					for (entryi = 0; entryi<addedentries.length; entryi++) {
 						thisentry = addedentries[entryi];
-						//$('.layout_container_'+layoutid).each( function() {
 						$('.addobject_layout_'+layoutid+'_'+thisentry['objecttypelinkable']).each( function() {
 							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objecttypelinkable'], thisentry['moduletitle'], $(this), thisentry['html_list_item'], thisentry['edit_object_form'] );
 						});
@@ -675,7 +674,7 @@
 					buttonjq.html( buttonjq.attr('data-generate-text') );
 				}
 			}  
-		);  
+		,'json');
 	}
 
     function validate_for_submit(frmjq) {
@@ -702,7 +701,7 @@
             return false;
         }
 		buttonjq.html( buttonjq.attr('data-adding-text') );
-		$.getJSON(  
+		$.post(
 			"add_layout_entry.php",  
 			frmjq.serialize(),
 			function(json) {  
@@ -731,7 +730,7 @@
 					buttonjq.html( buttonjq.attr('data-add-text') );
 				}
 			}  
-		);  
+		,'json');  
 		return false;
 
 	}
@@ -742,7 +741,7 @@
 
 		var frmjq = buttonjq.closest("form");
 		buttonjq.html( buttonjq.attr('data-deleting-text') );
-		$.getJSON(  
+		$.post(
 			"delete_layout_entry.php",  
 			frmjq.serialize(),
 			function(json) {  
@@ -774,7 +773,7 @@
 					buttonjq.html( buttonjq.attr('data-delete-text') );
 				} 
 			}  
-		);  
+		,'json');  
 		return false;
 
 	}
@@ -827,7 +826,7 @@
 		frmjq = buttonjq.closest('ul');
 		buttonjq.html( buttonjq.attr('data-deleting-text') );
 		var layoutid = buttonjq.attr('data-layoutid');
-		$.getJSON(  
+		$.post(
 			"delete_layout.php",  
 			{
 				layoutid: layoutid,
@@ -847,7 +846,7 @@
 					buttonjq.html( buttonjq.attr('data-delete-text') );
 				} 
 			}  
-		);  
+		,'json');  
 		return false;
 
 	}
@@ -859,7 +858,7 @@
 		var newname = inputjq.val();
 		var layoutid = inputjq.attr('data-rename-input-layoutid');
 
-		$.getJSON(
+		$.post(
 			"rename_layout.php",
 			{
 				layoutid: layoutid,
@@ -888,7 +887,7 @@
 					//alert('Rename failed');
 				}
 			}
-		);
+		,'json');
 
 	}
 
@@ -897,7 +896,7 @@
 		buttonjq.html( buttonjq.attr('data-cloning-text') );
 		var layoutid = buttonjq.attr('data-layoutid');
 		var frmjq = buttonjq.closest('ul');
-		$.getJSON(  
+		$.post(
 			"clone_layout.php",  
 			{
 				layoutid: layoutid,
@@ -935,7 +934,7 @@
 					buttonjq.html( buttonjq.attr('data-clone-text') );
 				} 
 			}  
-		);  
+		,'json');  
 		return false;
 
 	}
@@ -945,13 +944,13 @@
 	function update_layout_position( buttonjq ) {
 
 		var frmjq = buttonjq.closest("form");
-		$.getJSON(  
+		$.post(
 			"sync_layout_position.php",  
 			frmjq.serialize(),
 			function(json) {  
 				var result = json.result;
 			}  
-		);  
+		,'json');  
 		return false;
 
 	}
@@ -960,7 +959,7 @@
 
 		var frmjq = buttonjq.closest("form");
 		buttonjq.html( buttonjq.attr('data-updating-text') );
-		$.getJSON(  
+		$.post(
 			"update_layout_entry.php",  
 			frmjq.serialize(),	
 			function(json) {  
@@ -980,7 +979,7 @@
 					buttonjq.html( buttonjq.attr('data-update-text') );
 				} 
 			}  
-		);  
+		,'json');  
 		return false;
 
 	}
@@ -1056,7 +1055,7 @@
 		var courseid = frmjq.attr('data-courseid');
 		var primname = frmjq.attr('data-primname');
 		buttonjq.html( buttonjq.attr('data-refreshing-text') );
-		$.getJSON(  
+		$.post(
 			"refresh_options.php",  
 			{
 				courseid: courseid,
@@ -1093,7 +1092,7 @@
 				}
 				buttonjq.html( buttonjq.attr('data-refresh-text') );
 			}  
-		);  
+		,'json');  
 	}
 
     function configure_rezzer( parentjq, controllerid, layoutid) {
@@ -1104,7 +1103,7 @@
             return;
         }
 
-        $.getJSON(  
+        $.post(
 			"configure_rezzer.php",  
 			{
 				controllerid: controllerid,
@@ -1133,7 +1132,7 @@
 
 				}
 			}  
-		);  
+		,'json');  
 
     }
 

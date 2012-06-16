@@ -19,8 +19,8 @@ require_once '../../../lib/json/json_encoding.inc.php';
 $configVars = array();
 
 $layoutentryid = null;
-if (isset($_GET['layoutentryid'])) {
-	$layoutentryid = intval($_GET['layoutentryid']);
+if (isset($_POST['layoutentryid'])) {
+	$layoutentryid = intval($_POST['layoutentryid']);
 }
 
 //$rezzeruuid = optional_param( 'rezzeruuid', null, PARAM_SAFEDIR ); 

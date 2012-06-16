@@ -23,7 +23,7 @@ $configVars = array();
 
 $layoutentryid = null;
 $rezzeruuid = null;
-foreach($_GET as $n => $v) {
+foreach($_POST as $n => $v) {
 	if ($n == 'layoutentryid') {
 		$layoutentryid = intval($v);
 	} else if ($n == 'rezzeruuid') {
