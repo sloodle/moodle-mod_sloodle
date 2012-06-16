@@ -201,10 +201,10 @@
 
                 if (num_rezzed < num_rezzable) {
                     parentjq.find('.derez_all_objects').css('visibility','visible');
-                    parentjq.find('.rez_all_objects').css('visibility','visible');
+                    //parentjq.find('.rez_all_objects').css('visibility','visible');
                 } else {
                     parentjq.find('.derez_all_objects').css('visibility','visible');
-                    parentjq.find('.rez_all_objects').css('visibility','hidden');
+                    //parentjq.find('.rez_all_objects').css('visibility','hidden');
                 }
 
                 // allow layout deletion
@@ -214,7 +214,7 @@
 
                 parentjq.find('.sync_object_positions').css('visibility','hidden');
 
-                parentjq.find('.rez_all_objects').css('visibility','visible');
+                //parentjq.find('.rez_all_objects').css('visibility','visible');
                 parentjq.find('.derez_all_objects').css('visibility','hidden');
 
                 // allow layout deletion
@@ -514,11 +514,13 @@
 
 	function start_derez_all(parentjq) {
 
+        /*
 		parentjq.find('.derez_all_objects').html('Stop derez');
 		parentjq.find('.derez_all_objects').unbind('click');
 		parentjq.find('.derez_all_objects').click(function() {
 			stop_derez_all(parentjq);	
 		});
+        */
 
         var oldstatus = parentjq.attr('data-action-status');
 		
@@ -537,11 +539,13 @@
 
 	function start_rez_all(parentjq) {
 
+        /*
 		parentjq.find('.rez_all_objects').html('Stop rez');
 		parentjq.find('.rez_all_objects').unbind('click');
 		parentjq.find('.rez_all_objects').click(function() {
 			stop_rez_all(parentjq);	
 		});
+        */
 
         var oldstatus = parentjq.attr('data-action-status');
 
@@ -772,6 +776,47 @@
 
 	}
 
+    function confirm_clone_layout(buttonjq) {
+
+		var frmjq = buttonjq.closest('ul');
+        var confirm_section = frmjq.find('.clone_confirmation_zone');
+
+        if (confirm_section.is(":visible")) {
+            confirm_section.hide();
+            return false;
+        }
+
+        confirm_section.show();
+        confirm_section.find('.clone_confirmation_button_ok').unbind('click').bind('click', function() {
+            clone_layout(buttonjq);
+            confirm_section.hide();
+        });
+        confirm_section.find('.clone_confirmation_button_cancel').unbind('click').bind('click', function() {
+            confirm_section.hide();
+        });
+
+    }
+    function confirm_delete_layout(buttonjq) {
+
+		var frmjq = buttonjq.closest('ul');
+        var confirm_section = frmjq.find('.delete_confirmation_zone');
+
+        if (confirm_section.is(":visible")) {
+            confirm_section.hide();
+            return false;
+        }
+
+        confirm_section.show();
+        confirm_section.find('.delete_confirmation_button_ok').unbind('click').bind('click', function() {
+            delete_layout(buttonjq);
+            confirm_section.hide();
+        });
+        confirm_section.find('.delete_confirmation_button_cancel').unbind('click').bind('click', function() {
+            confirm_section.hide();
+        });
+
+    }
+
 	// NB This just removes the layout from the server and marks it for deletion.
 	// If rezzed, we'll derez the objects separately, and only remove the layout from view when they're done
 	function delete_layout( buttonjq ) {
@@ -969,9 +1014,14 @@
 
 			var rezMode = $(this).attr('data-rez-mode');
 			var actionClass = '';
+            /*
+            We used to automatically rez the objects you add, before we added individual rez buttons.
+            Now we rely less on the assumption that everything is either rezzed or not.
+            We'll add it, you can rez it yourself.
 			if (rezMode == 'rezzed') {
 				actionClass =' waiting_to_rez';
 			}
+            */
 
 			// already there
 			if ( $(this).children('#'+newElementID).length > 0 ) {
@@ -1159,10 +1209,10 @@
 			start_sync_all( $(this).closest('.layout_container') );
 		});
 		$().find('.delete_layout_button').unbind('click').click(function() {
-			return delete_layout( $(this) );
+			return confirm_delete_layout( $(this) );
 		});
 		$().find('.clone_layout_button').unbind('click').click(function() {
-			return clone_layout( $(this) );
+			return confirm_clone_layout( $(this) );
 		});
 		$().find('.generate_standard_layout').unbind('click').click(function() {
 			return generate_standard_layout( $(this) );

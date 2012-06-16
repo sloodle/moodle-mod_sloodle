@@ -90,27 +90,27 @@
 	padding-top:54px;
 	margin-top:7px;
 	margin-bottom:7px;
-	margin-left:6px;
-	margin-right:6px;
+	margin-left:3px;
+	margin-right:3px;
 }
 .upper_button_zone .right_zone .control_button.double_width {
 	display:inline-block;
 	min-width:176px;
-	height:50px;
+	height:48px;
 	font-size:18px;	
 	font-weight:bold;	
 	position:relative;
 	vertical-align:bottom;
 	text-align:left;
 	padding-top:24px;
-	text-indent:66px;
+	text-indent:71px;
 /*
 	padding-left:24px;
 */
 	margin-top:7px;
 	margin-bottom:7px;
-	margin-left:6px;
-	margin-right:6px;
+	margin-left:3px;
+	margin-right:3px;
 
 }
 .active_button {
@@ -239,14 +239,79 @@ li.fatal_error_zone {
     border:2px solid red;
     vertical-align:middle !important
     font-size:24;
+    height:40px;
 }
 
-span.fatal_error_icon {
-    display:inline-block;
-	background-image: url(images/error.png); 
-    width:32px;
-    height:32px;
+span.fatal_error_text{ 
+    float:left; 
+    height:32px; 
+    margin-right:14px; 
+    margin-left:10px; 
+    margin-top:3px; 
+    padding:0px;
+	background-image: url(images/process-stop-7.png); 
+    background-repeat: no-repeat;
+    text-indent: 40px;
+    border:1px solid white;
 }
+
+
+li.confirmation_zone {
+    display:none;
+    border:2px solid red;
+    vertical-align:middle !important
+    font-size:24;
+    height:40px;
+}
+
+span.confirmation_text { 
+    float:left; 
+    height:32px; 
+    margin-right:14px; 
+    margin-left:10px; 
+    margin-top:3px; 
+    padding:0px;
+	background-image: url(images/dialog-question.png); 
+    background-repeat: no-repeat;
+    text-indent: 40px;
+    border:1px solid white;
+}
+
+span.delete_confirmation_text {
+	background-image: url(images/dialog-warning-2.png); 
+}
+
+span.confirmation_button_ok { 
+    width:172px; 
+    height:32px; 
+    float:right; 
+    margin-right:14px; 
+    margin-left:10px; 
+    margin-top:3px; 
+    padding:0px;
+	background-image: url(images/dialog-apply.png); 
+    background-repeat: no-repeat;
+    text-indent: 40px;
+    border:1px solid red;
+}
+
+span.confirmation_button_cancel { 
+    width:96px; 
+    height:32px; 
+    float:right; 
+    margin-right:14px; 
+    margin-left:10px; 
+    margin-top:3px; 
+    padding:0px;
+	background-image: url(images/dialog-cancel-3.png); 
+    background-repeat: no-repeat;
+    text-indent: 40px;
+    border:1px solid red;
+}
+
+
+
+
 
 /*
 span.fatal_error_text:before {

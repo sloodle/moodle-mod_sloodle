@@ -285,11 +285,29 @@ function print_layout_lists( $courses, $controllers, $courselayouts, $layoutentr
 </li>
 
 <li class="fatal_error_zone">
-<span class="fatal_error_icon"></span>
 <span class="fatal_error_text">
 <?php echo  s(get_string('rezzer:couldnotconnect', 'sloodle', $cn )) ?>
-</div>
+</span>
 </li>
+
+<li class="delete_confirmation_zone confirmation_zone">
+<span class="delete_confirmation_text confirmation_text">
+<?php echo  s(get_string('rezzer:reallydeletescene', 'sloodle'))?>
+</span>
+<span class="delete_confirmation_button_cancel confirmation_button_cancel"><?php echo s(get_string('No', 'sloodle')); ?></span>
+<span class="delete_confirmation_button_ok confirmation_button_ok"><?php echo s(get_string('rezzer:yesdeletelayout', 'sloodle')); ?></span>
+</li>
+
+<li class="clone_confirmation_zone confirmation_zone">
+<span class="clone_confirmation_text confirmation_text">
+<?php echo  s(get_string('rezzer:reallyclonescene', 'sloodle'))?>
+</span>
+<span class="clone_confirmation_button_cancel confirmation_button_cancel"><?php echo s(get_string('No', 'sloodle')); ?></span>
+<span class="clone_confirmation_button_ok confirmation_button_ok"><?php echo s(get_string('rezzer:yesclonescene', 'sloodle')); ?></span>
+</li>
+
+
+
 
 <?php
                 if (count($entriesbygroup) > 0) {
