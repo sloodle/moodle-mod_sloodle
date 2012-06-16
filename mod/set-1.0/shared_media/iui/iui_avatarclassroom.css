@@ -63,7 +63,7 @@ body > .toolbar {
     margin: 1px 0 0 -75px;
     height: 45px;
     font-size: 20px;
-    width: 150px;
+    width: 500px;
     font-weight: bold;
     text-shadow: rgba(0, 0, 0, 0.4) 0px -1px 0;
     text-align: center;
@@ -72,9 +72,14 @@ body > .toolbar {
     color: #FFFFFF;
 }
 
+body > .toolbar > h1 {
+    margin-left: -250px;
+    width: 500px;
+}
+
 body[orient="landscape"] > .toolbar > h1 {
-    margin-left: -125px;
-    width: 250px;
+    margin-left: -250px;
+    width: 500px;
 }
 
 .button {
