@@ -14,13 +14,13 @@ require_once(SLOODLE_LIBROOT.'/user.php');
 require_once(SLOODLE_LIBROOT.'/object_configs.php');
 require_once '../../../lib/json/json_encoding.inc.php';
 
+include('index.template.php');
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 require_once(SLOODLE_LIBROOT.'/layout_recipe/layout_recipe_base.php');
 
-$courseid = optional_param('courseid', 0, PARAM_INT);
 $layoutid = optional_param('layoutid', 0, PARAM_INT);
 $recipe   = optional_param('layoutrecipe', 'SloodleSimpleLayoutRecipe', PARAM_TEXT);
 
@@ -45,14 +45,16 @@ if (!$recipe->generate()) {
 if (!$recipe->saveToLayoutWithID( $layoutid )) {
 	error_output( 'Could not save generated recipe to layout');
 }
-//$courseid = $layout->course;
 
+$courseid = $layout->course;
 
 $controller_context = get_context_instance( CONTEXT_MODULE, $layout->controllerid);
 if (!has_capability('mod/sloodle:uselayouts', $controller_context)) {
         error_output( 'Access denied');
 }
 
+$controllerid = $layout->controllerid;
+$rezzeruuid = $_REQUEST['rezzeruuid'];
 
 $addedentries = array();
 foreach($layout->get_entries() as $layoutentry) {
@@ -63,6 +65,14 @@ foreach($layout->get_entries() as $layoutentry) {
 		$modtitle = '';
 	}
 
+    ob_start();
+    $element_id = print_rezzable_item_li( $layoutentry, $courseid, $controllerid, $layout, false);
+    $html_list_item = ob_get_clean();
+
+    ob_start();
+    $element_id = print_config_form( $layoutentry, $config, $courseid, $controllerid, $layoutid, $config->group, $rezzeruuid);
+    $edit_object_form = ob_get_clean();
+
 	$addedentries[] = array(
 		'objectgroup' => $config->group,
 		'objectgrouptext' => get_string('objectgroup:'.$config->group, 'sloodle'), 
@@ -70,7 +80,9 @@ foreach($layout->get_entries() as $layoutentry) {
 		'objectname' => preg_replace('/SLOODLE\s/', '', $layoutentry->name),
 		'moduletitle' => $modtitle,
 		'layoutid' => $layoutid,
-		'layoutentryid' => $layoutentry->id
+		'layoutentryid' => $layoutentry->id,
+        'html_list_item' => $html_list_item,
+        'edit_object_form' => $edit_object_form
 	);
 };
 

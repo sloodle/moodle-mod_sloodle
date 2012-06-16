@@ -357,12 +357,7 @@ function print_rezzable_item_li( $e, $cid, $contid, $layout, $isrezzed) {
 	$entryname = preg_replace('/SLOODLE\s/', '', $entryname);
 
 	$modTitle = $e->get_course_module_title();
-	?>
-<?php /*
-					<li><a href="#<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo  intval($e->id) ?>"><?php echo  htmlentities($entryname) ?><span style="float:right; margin-right:10px; color:grey; font-style:italic" class="rezzable_item">Rezzed</span> <span style="float:right; margin-right:100px; color:grey; font-style:italic" class="rezzable_item">Moved</span></a></li>
-	*/ ?>
-							<?php /* NB If you change this, you also need to change layout.js, which creates some of these dynamically. */ ?>
-							<li data-layoutentryid="<?php echo  $e->id?>" id="layoutentryid_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo intval( $e->id ) ?>" class="rezzable_item <?php echo  ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo intval( $e->id ) ?>"><?php echo  s($entryname) ?><span class="module_info"><?php echo s($modTitle)?></span></span> <span class="rezzable_item_rez_button">&nbsp;</span><span class="rezzable_item_derez_button">&nbsp;</span> <span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
+?><li data-layoutentryid="<?php echo  $e->id?>" id="layoutentryid_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo intval( $e->id ) ?>" class="rezzable_item <?php echo  ( $isrezzed ? 'rezzed' : '' ) ?>"><a href="#configure_layoutentryid_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>-<?php echo intval( $e->id ) ?>"><?php echo  s($entryname) ?><span class="module_info"><?php echo s($modTitle)?></span></span> <span class="rezzable_item_rez_button">&nbsp;</span><span class="rezzable_item_derez_button">&nbsp;</span> <span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>
 <?php
 }
 
@@ -506,7 +501,7 @@ $moduleoptionselect = $config->course_module_select( $cid, $val = null );
 <?php } else if ($ctrl->type == 'select') { ?>
 <select name="<?php echo  $fieldname ?>">
 <?php foreach($ctrl->options as $opn => $opv) { ?>
-<option value="<?php echo  $opn ?>" <?php echo  $opn == $ctrl->default ? 'selected' : '' ?>> <?php echo  $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?></option>
+<option value="<?php echo  $opn ?>" <?php echo  $opn == $ctrl->default ? 'selected="selected"' : '' ?>> <?php echo  $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?></option>
 <?php } ?>
 </select>
 <?php } else if ($ctrl->type == 'input') { ?>
@@ -646,7 +641,7 @@ $moduleoptionselect = $config->course_module_select( $cid, isset($lconfig['slood
 <?php } else if ($ctrl->type == 'select') {?>
 <select name="<?php echo  $fieldname ?>">
 <?php foreach($ctrl->options as $opn => $opv) { ?>
-<option value="<?php echo  $opn ?>" <?php echo  $opn == $val ? 'selected' : '' ?>> <?php echo  $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?></option> 
+<option value="<?php echo  $opn ?>" <?php echo  $opn == $val ? 'selected="selected"' : '' ?>> <?php echo  $ctrl->is_value_translatable ? get_string($opv, 'sloodle') : s($opv) ?></option> 
 <?php } ?>
 </select>
 <?php } else if ($ctrl->type == 'input') {?>

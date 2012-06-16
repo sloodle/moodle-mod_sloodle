@@ -653,6 +653,7 @@
 			"generate_layout_entries.php",  
 			{
 				layoutid: layoutid,
+				rezzeruuid: rezzer_uuid,
 				ts: new Date().getTime()
 			},
 			function(json) {  
@@ -665,7 +666,7 @@
 						thisentry = addedentries[entryi];
 						//$('.layout_container_'+layoutid).each( function() {
 						$('.addobject_layout_'+layoutid+'_'+thisentry['objecttypelinkable']).each( function() {
-							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objecttypelinkable'], thisentry['moduletitle'], $(this) );
+							insert_layout_entry_into_layout_divs( thisentry['layoutid'], thisentry['layoutentryid'], thisentry['objectname'], thisentry['objectgroup'], thisentry['objectgrouptext'], thisentry['objecttypelinkable'], thisentry['moduletitle'], $(this), thisentry['html_list_item'], thisentry['edit_object_form'] );
 						});
 					}
 					eventLoop( $('.layout_container_'+layoutid) );
@@ -713,12 +714,14 @@
 				var objecttypelinkable = json.objecttypelinkable;
 				var moduletitle = json.moduletitle;
 				var layoutentryid = json.layoutentryid;
+                var edit_object_form = json.edit_object_form;
+                var html_list_item = json.html_list_item;
 				if (layoutid == '') {
 					//alert('error: missing layoutid after adding to layout');
 				}
 				if (result == 'added') {
 					buttonjq.html( buttonjq.attr('data-add-text') );
-					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objecttypelinkable, moduletitle, frmjq);
+					insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objecttypelinkable, moduletitle, frmjq, html_list_item, edit_object_form);
 					eventLoop( $('.layout_container_'+layoutid) );
 					//history.back();
 					backLevels( frmjq.attr('id'), 2 );
@@ -1002,7 +1005,7 @@
 		attach_event_handlers();
 	}
 
-	function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objecttypelinkable, moduletitle, addfrmjq ) {
+	function insert_layout_entry_into_layout_divs( layoutid, layoutentryid, objectname, objectgroup, objectgrouptext, objecttypelinkable, moduletitle, addfrmjq, html_list_item, edit_object_form ) {
 
 		regexPtn = '^layout_.+-.+-'+layoutid+'$';
 		var re = new RegExp(regexPtn,"");
@@ -1012,24 +1015,10 @@
 			// make an id for the new element	
 			var newElementID = $(this).attr('id').replace('layout_','layoutentryid_')+'-'+layoutentryid;
 
-			var rezMode = $(this).attr('data-rez-mode');
-			var actionClass = '';
-            /*
-            We used to automatically rez the objects you add, before we added individual rez buttons.
-            Now we rely less on the assumption that everything is either rezzed or not.
-            We'll add it, you can rez it yourself.
-			if (rezMode == 'rezzed') {
-				actionClass =' waiting_to_rez';
-			}
-            */
-
 			// already there
 			if ( $(this).children('#'+newElementID).length > 0 ) {
 				return;
 			}
-
-			// make a list item for the layout screen, and insert it at the bottom of its group.
-			var newItem = '<li data-layoutentryid="'+layoutentryid+'" id="'+newElementID+'" class="rezzable_item' + actionClass + '"><a href="#configure_'+newElementID+'">'+objectname+'<span class="module_info">'+moduletitle+'</span>'+'<span class="rezzable_item_rez_button">&nbsp;</span><span class="rezzable_item_derez_button">&nbsp;</span> <span class="rezzable_item_status">&nbsp;</span> <span class="rezzable_item_positioning">&nbsp;</span> </a></li>';
 
 			// If we don't yet have a group to put this item in, create it
 			if ( $(this).children(".after_group_"+objectgroup).size() == 0 ) {
@@ -1037,33 +1026,12 @@
 				$(this).children(".add_object_group").before( groupLi );
 			}
 
-			$(this).children(".after_group_"+objectgroup).before(newItem);
+			$(this).children(".after_group_"+objectgroup).before(html_list_item);
 
             attach_event_handlers();
-            /*
-            newItem.find('.rezzable_item_derez_button').unbind('click').click( function(e) {
-                mark_for_derez( $(this), e );
-            });
-            newItem.find('.rezzable_item_rez_button').unbind('click').click( function(e) {
-                mark_for_rez( $(this), e );
-            });
-            */
 
+			var editFrm = $(edit_object_form);
 
-
-			// Make a copy of the add form and change it into an edit form
-			var editFrm = addfrmjq.clone(); 
-			editFrm.attr('id', 'configure_'+newElementID); 
-			editFrm.attr('data-parent', $(this).attr('id')); 
-			editFrm.find("input[name='layoutentryid']").val(layoutentryid);  // set the layoutentryid hidden field
-			editFrm.attr('selected', ''); // Remove the selected property so that iui hides the form
-			editFrm.find('.add_to_layout_button').addClass('update_layout_entry_button').removeClass('add_to_layout_button');
-			editFrm.find('.update_layout_entry_button').html( editFrm.find('.update_layout_entry_button:first').attr('data-update-text') );
-			editFrm.removeClass('addobject_layout_'+layoutid+'_'+objecttypelinkable);
-
-
-			// We keep a button hidden on the add form to use for deletion when it turns into an edit form
-			editFrm.find('.delete_layout_entry_button').removeClass('hiddenButton');
 			// Seems like the original click handler doesn't get created initially - maybe because it's hidden?
 			editFrm.find('.delete_layout_entry_button').unbind('click').click(function() {
 				return delete_layout_configuration($(this));
@@ -1074,6 +1042,10 @@
 			editFrm.find('.update_layout_entry_button').unbind('click').click(function() {
 				return update_layout_configuration($(this));
 			});
+
+            editFrm.find('.refresh_config_button').unbind('click').click( function() {
+                refresh_form_options( $(this) );	
+            });
 
 		});
 		

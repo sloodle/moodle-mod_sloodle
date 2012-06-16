@@ -18,6 +18,9 @@ require_once(SLOODLE_LIBROOT.'/object_configs.php');
 
 require_once '../../../lib/json/json_encoding.inc.php';
 
+include('index.template.php');
+
+
 $configVars = array();
 
 $layoutid = null;
@@ -80,6 +83,35 @@ if (!$layoutentryid = $layoutentry->insert()) {
 if (!$moduletitle = $layoutentry->get_course_module_title()) {
 	$moduletitle = '';
 }
+
+if (!$config = $layoutentry->get_object_config()) {
+	error_output( 'Could not create config for object');
+}
+
+if (!$courseid = $layout->course) {
+    error_output('Could not get courseidfrom layout');
+}
+
+if (!$controllerid = $layout->controllerid) {
+    error_output('Could not get controllerid from layout');
+}
+
+$edit_object_form = '';
+$html_list_item = '';
+
+//var_dump($objectname);
+//var_dump($config);
+//var_dump($courseid);
+//var_dump($controllerid);
+
+ob_start();
+$element_id = print_rezzable_item_li( $layoutentry, $courseid, $controllerid, $layout, false); 
+$html_list_item = ob_get_clean();
+
+ob_start();
+$element_id = print_config_form( $layoutentry, $config, $courseid, $controllerid, $layoutid, $config->group, $rezzer->uuid);
+$edit_object_form = ob_get_clean();
+
 $content = array(
 	'result' => 'added',
 	'objectgroup' => $objectgroup, // TODO: Get this from the object_configs
@@ -88,67 +120,13 @@ $content = array(
 	'objecttypelinkable' => $layoutentry->objectDefinition()->type_for_link(),
         'moduletitle' => $moduletitle,
 	'layoutid' => $layoutid,
-	'layoutentryid' => $layoutentry->id
+	'layoutentryid' => $layoutentry->id, 
+    'edit_object_form' => $edit_object_form,
+    'html_list_item' => $html_list_item
 );
 
 $rand = rand(0,10);
 //sleep($rand);
 print json_encode($content);
 exit;
-?>
-<?php
-// Simulates an ajax object-rezzing request
-if (!$USER->id) {
-	output( 'User not logged in' );
-	exit;
-}
-
-$rezzer = new SloodleActiveObject();
-$sloodleuser = new SloodleUser();
-$sloodleuser->user_data = $USER;
-
-if (!$layoutentryid = optional_param('layoutentryid', 0, PARAM_INT)) {
-	error_output( 'Layout ID missing' );
-}
-
-if (!$controllerid  = optional_param('controllerid', 0, PARAM_INT)) {
-	error_output( 'Controller ID missing' );
-}
-
-if ( !$layoutentry->load( $layoutentryid ) ) {
-	error_output( 'Layout Entry ID missing' );
-}
-
-// TODO: Get actual object name via layoutentryid
-$objectname = $layoutentry->name;
-if ( !$objectname ) {
-	error_output( 'Layout entry did not have a name');
-}
-
-
-$controller = new SloodleController();
-
-if (!$controller->load( $controllerid )) {
-	error_output('Could not load controller');
-}
-
-if ( !$rezzer->loadByUUID($_REQUEST['rezzeruuid']) ) {
-	error_output('Could not load rezzer');
-}
-
-$content = array(
-	'result' => $result,
-	'error' => $error,
-);
-
-print json_encode($content);
-
-function error_output($error) {
-	$content = array(
-		'result' => 'failed',
-		'error' => $error,
-	);
-	print json_encode($content);
-	exit;
-}
 ?>
