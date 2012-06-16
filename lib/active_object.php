@@ -1088,8 +1088,7 @@
         function layoutentryids_to_uuids_of_currently_rezzed($layoutid) {
 
             global $CFG;
-            $sql = "select id, layoutentryid, uuid from {$CFG->prefix}sloodle_active_object where rezzeruuid=? order by timeupdated asc;";
-            $sql = "select ao.id as id, ao.layoutentryid as layoutentryid, ao.uuid as uuid from mdl_sloodle_active_object ao inner join mdl_sloodle_layout_entry le on ao.layoutentryid=le.id where ao.rezzeruuid=? and le.layout=? order by timeupdated desc";
+            $sql = "select ao.id as id, ao.layoutentryid as layoutentryid, ao.uuid as uuid from {$CFG->prefix}sloodle_active_object ao inner join {$CFG->prefix}sloodle_layout_entry le on ao.layoutentryid=le.id where ao.rezzeruuid=? and le.layout=? order by timeupdated desc";
             $recs = sloodle_get_records_sql_params($sql, array($this->uuid, $layoutid));
             $layoutentryhash = array();
             if ( ($recs) && (count($recs) > 0) ) {
