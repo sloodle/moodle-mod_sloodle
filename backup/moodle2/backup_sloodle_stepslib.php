@@ -25,6 +25,49 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
             )
         );
  
+
+        $trackers = new backup_nested_element('trackers');
+        $tracker = new backup_nested_element('tracker',
+            array('id'),
+            array(
+                'sloodleid',
+            )
+        );
+
+
+        $distributors = new backup_nested_element('distributors');
+        $distributor = new backup_nested_element('distributor',
+            array('id'),
+            array(
+                'sloodleid',
+                'channel',
+                'timeupdated'
+            )
+        );
+
+        $presenters = new backup_nested_element('presenters');
+        $presenter = new backup_nested_element('presenter',
+            array('id'),
+            array(
+                'sloodleid',
+                'framewidth',
+                'frameheight'
+            )
+        );
+
+        $presenterentries = new backup_nested_element('presenter_entries');
+        $presenterentry = new backup_nested_element('presenter_entry',
+            array('id'),
+            array(
+                'sloodleid',
+                'name',
+                'source',
+                'type', 
+                'ordering'
+            )
+        );
+
+
         $controllers = new backup_nested_element('controllers');
         $controller = new backup_nested_element('controller',
             array('id'),
@@ -69,18 +112,32 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
 
         $sloodle->add_child($controllers);
         $controllers->add_child($controller);
-        $sloodle->add_child($layouts);
+        $controller->add_child($layouts);
         $layouts->add_child($layout);
         $layout->add_child($layoutentries);
         $layoutentries->add_child($layoutentry);
+
         $layoutentry->add_child($layoutentryconfigs);
         $layoutentryconfigs->add_child($layoutentryconfig);
+
+        $distributors->add_child($distributor);
+        $sloodle->add_child($distributors);
+
+        $trackers->add_child($tracker);
+        $sloodle->add_child($trackers);
+
+        $presenters->add_child($presenter);
+        $sloodle->add_child($presenters);
+
 
         // Build the tree
  
         // Define sources
         $sloodle->set_source_table('sloodle', array('id' => backup::VAR_ACTIVITYID));
-        $controller->set_source_table('sloodle_controller', array('id' => backup::VAR_ACTIVITYID));
+        $distributor->set_source_table('sloodle_distributor', array('sloodleid' => backup::VAR_ACTIVITYID));
+        $tracker->set_source_table('sloodle_tracker', array('sloodleid' => backup::VAR_ACTIVITYID));
+        $presenter->set_source_table('sloodle_presenter', array('sloodleid' => backup::VAR_ACTIVITYID));
+        $controller->set_source_table('sloodle_controller', array('sloodleid' => backup::VAR_ACTIVITYID));
         $layout->set_source_table('sloodle_layout', array('controllerid' => backup::VAR_MODID));
         $layoutentry->set_source_table('sloodle_layout_entry', array('layout' => backup::VAR_PARENTID));
         $layoutentryconfig->set_source_table('sloodle_layout_entry_config', array('layout_entry' => backup::VAR_PARENTID));
