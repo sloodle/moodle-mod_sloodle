@@ -103,6 +103,11 @@ integer SLOODLE_CHANNEL_SCOREBOARD_TITLE_SET_THICKNESS = -1639275004;
 integer SLOODLE_CHANNEL_SCOREBOARD_TITLE_SET_COLOR = -1639275005;
 integer SLOODLE_CHANNEL_SCOREBOARD_TITLE= 1639275100;
 integer SLOODLE_CHANNEL_ZZTEXT_TEXTURE_CONFIG= -1639276000;
+integer SLOODLE_CHANNEL_POOL_BOUNDARIES_QUERY= -163928000;//sharks whisper on this channel requesting the boundaries from the shark pool
+integer SLOODLE_CHANNEL_POOL_BOUNDARIES_RESPONSE= -163928001;//pool whispers on this channel telling sharks the boundaries from the shark pool
+integer SLOODLE_CHANNEL_ENEMY_AIM = -163928665;//Channel to communicate on when enemy is aming at target, ie:delivering a laserbeam
+integer SLOODLE_CHANNEL_ENEMY_ATTACK= -163928666;//Channel to communicate on when attack occurs by an enemy
+
 
 integer SLOODLE_CHANNEL_OPEN_IN_BROWSER = -1639277000;
 
