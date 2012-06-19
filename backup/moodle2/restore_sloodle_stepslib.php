@@ -140,8 +140,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         $oldid = $data->id;
 
         $data->course = $this->get_courseid();
+        $data->controllerid = $this->task->get_moduleid();
         //$data->controllerid = $this->get_moduleid();
-        $data->controllerid = $this->get_new_parentid('sloodle'); // CHECK: Probably need to look for the course module ID instead
+        //var_dump($this);
+        //exit;
+        //$data->controllerid = $this->get_new_parentid('sloodle'); // CHECK: Probably need to look for the course module ID instead
         $data->timeupdated = $this->apply_date_offset($data->timeupdated);
 
         $newitemid = $DB->insert_record('sloodle_layout', $data);

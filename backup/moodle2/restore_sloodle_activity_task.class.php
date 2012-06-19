@@ -131,8 +131,8 @@ class restore_sloodle_activity_task extends restore_activity_task {
             $DB->set_field('course_sections', 'sequence', $newsequence,
                     array('id' => $section->id));
             rebuild_course_cache($cm->course, true);
-        */
         }
+        */
     }
 
 
