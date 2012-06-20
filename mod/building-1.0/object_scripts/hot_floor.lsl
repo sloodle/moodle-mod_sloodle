@@ -137,6 +137,7 @@ default{
     }
     
     on_rez(integer r){
+    llSetText("", <0,0,0>,1);
         llResetScript();
     }
     touch_start(integer num_detected) {
