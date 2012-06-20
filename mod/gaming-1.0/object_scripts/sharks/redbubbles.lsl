@@ -1,4 +1,4 @@
-// LSL script generated: mod.gaming-1.0.object_scripts.sharks.redbubbles.lslp Wed Jun 20 03:41:45 Tokyo Standard Time 2012
+// LSL script generated: mod.gaming-1.0.object_scripts.sharks.redbubbles.lslp Wed Jun 20 18:06:25 Tokyo Standard Time 2012
 /*
 *  Part of the Sloodle project (www.sloodle.org)
 *
@@ -37,11 +37,12 @@
 *  DESCRIPTION
 * displays bloody red bubbles for 5 seconds then disapears - used for sharks and other under water enemies to rez blood effects  
 */
-
-
- 
-integer counter = 0;redBubbles(){
+integer SLOODLE_CHANNEL_ENEMY_ATTACK = -163928666;
+redBubbles(){
     llParticleSystem([PSYS_PART_MAX_AGE,1.2,PSYS_PART_FLAGS,259,PSYS_PART_START_COLOR,<0.89235,4.807e-2,0.25145>,PSYS_PART_END_COLOR,<0.91157,4.489e-2,0.21028>,PSYS_PART_START_SCALE,<0.20782,0.25554,0.0>,PSYS_PART_END_SCALE,<0.22479,0.207,0.0>,PSYS_SRC_PATTERN,2,PSYS_SRC_BURST_RATE,0.0,PSYS_SRC_ACCEL,<0.0,0.0,0.51501>,PSYS_SRC_BURST_PART_COUNT,133,PSYS_SRC_BURST_RADIUS,0.0,PSYS_SRC_BURST_SPEED_MIN,5.0e-2,PSYS_SRC_BURST_SPEED_MAX,0.64,PSYS_SRC_ANGLE_BEGIN,0.0,PSYS_SRC_ANGLE_END,0.0,PSYS_SRC_OMEGA,<0.0,0.0,0.72661>,PSYS_SRC_MAX_AGE,0.0,PSYS_SRC_TEXTURE,"TEXTURE_BUBBLE",PSYS_PART_START_ALPHA,6.999999999999999e-2,PSYS_PART_END_ALPHA,0.66]);
+}
+  particles_off(){
+    llParticleSystem([]);
 }
 default {
 
@@ -50,18 +51,19 @@ default {
     }
 
     state_entry() {
-        redBubbles();
-        llTriggerSound("SND_BUBBLES",1);
-        llSetTimerEvent(2);
+        particles_off();
+    }
+
+    link_message(integer sender_num,integer num,string str,key id) {
+        if ((num == SLOODLE_CHANNEL_ENEMY_ATTACK)) {
+            llTriggerSound("SND_BUBBLES",1);
+            redBubbles();
+            llSetTimerEvent(3);
+        }
     }
 
     timer() {
-        (counter++);
-        if (((counter % 2) == 0)) {
-            llTriggerSound("SND_BUBBLES",1);
-        }
-        if ((counter > 10)) {
-            llDie();
-        }
+        particles_off();
+        llSetTimerEvent(0);
     }
 }

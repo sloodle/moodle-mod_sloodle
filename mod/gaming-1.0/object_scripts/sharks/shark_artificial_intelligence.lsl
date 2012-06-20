@@ -1,4 +1,4 @@
-// LSL script generated: mod.gaming-1.0.object_scripts.sharks.shark_attack.lslp Wed Jun 20 03:40:46 Tokyo Standard Time 2012
+// LSL script generated: mod.gaming-1.0.object_scripts.sharks.shark_artificial_intelligence.lslp Wed Jun 20 18:05:29 Tokyo Standard Time 2012
 /*
 *  shark attack.lsl
 *  Part of the Sloodle project (www.sloodle.org)
@@ -39,8 +39,8 @@ Than van Nispen tot Pannerden - Composer for (non-linear) Media
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343;
 integer SLOODLE_CHANNEL_ENEMY_ATTACK = -163928666;
 integer SLOODLE_CHANNEL_ENEMY_AIM = -163928665;
-float POOL_WIDTH = 6;
-float POOL_HEIGHT = 6.525;
+float POOL_WIDTH;
+float POOL_HEIGHT;
 vector PUSH_STRENGTH = <25,15,10>;
 // last center position
 vector center;
@@ -310,7 +310,6 @@ on_rez(integer start_param) {
 
     at_target(integer tnum,vector targetpos,vector ourpos) {
         if ((tnum == target_id)) {
-            llRezObject("redBubbles",llGetPos(),llGetVel(),ZERO_ROTATION,0);
             llRezObject("blood_bath",llGetPos(),llGetVel(),ZERO_ROTATION,0);
             llMessageLinked(LINK_SET,SLOODLE_CHANNEL_ENEMY_ATTACK,"",deathKey);
             llTriggerSound(getScream(),1);
