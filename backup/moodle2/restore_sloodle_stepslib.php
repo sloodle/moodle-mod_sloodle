@@ -21,9 +21,9 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         $paths[] = new restore_path_element('sloodle_distributor', '/activity/sloodle/distributors/distributor');
         $paths[] = new restore_path_element('sloodle_distributor_entry', '/activity/sloodle/distributors/distributor_entry');
 
-        $paths[] = new restore_path_element('sloodle_layout', '/activity/sloodle/layouts/layout');
-        $paths[] = new restore_path_element('sloodle_layout_entry', '/activity/sloodle/layouts/layout/layout_entries/layout_entry');
-        $paths[] = new restore_path_element('sloodle_layout_entry_config', '/activity/sloodle/layouts/layout/layout_entries/layout_entry/layout_entry_configs/layout_entry_config');
+        $paths[] = new restore_path_element('sloodle_layout', '/activity/sloodle/controllers/controller/layouts/layout');
+        $paths[] = new restore_path_element('sloodle_layout_entry', '/activity/sloodle/controllers/controller/layouts/layout/layout_entries/layout_entry');
+        $paths[] = new restore_path_element('sloodle_layout_entry_config', '/activity/sloodle/controllers/controller/layouts/layout/layout_entries/layout_entry/layout_entry_configs/layout_entry_config');
 
         /*
         if ($userinfo) {
