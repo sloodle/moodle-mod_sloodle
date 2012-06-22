@@ -189,7 +189,10 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         } else {
             // If the Moodle user is already there, create an avatar for them.
             $data->userid = $this->get_mappingid('user', $data->userid);
-            $newitemid = $DB->insert_record('sloodle_users', $data);
+            // Only import avatars if we know which user they are.
+            if ($data->userid > 0) {
+                $newitemid = $DB->insert_record('sloodle_users', $data);
+            }
         }
 
         $this->set_mapping('sloodle_user', $oldid, $newitemid);
@@ -245,42 +248,10 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
     }
 
     protected function after_execute() {
-
         // Add choice related files, no need to match by itemname (just internally handled context)
         //$this->add_related_files('mod_choice', 'intro', null);
 
         global $DB;
-
-        // Layout entry config may refer to an external course module, eg chatroom.
-        // If we've done a full course backup, we should be able to recover it.
-        // If we can't recover it, we'll set it to 0/null, and hope the UI can deal with that sensibly.
-        $layouts = $DB->get_records('sloodle_layout', array('controllerid' => $this->task->get_moduleid()));
-        if (count($layouts)) {
-            foreach($layouts as $layout) {
-                $layout_entries = $DB->get_records('sloodle_layout_entry', array('layout' => $layout->id)); 
-                if (count($layout_entries)) {
-                    foreach($layout_entries as $le) {
-
-                        $layout_entry_configs = $DB->get_records('sloodle_layout_entry_config', array('layout_entry' => $le->id, 'name'=>'sloodlemoduleid')); 
-                        foreach($layout_entry_configs as $lec) {
-                            if ($mapcm = restore_structure_step::get_mapping('course_module', $lec->value)) {
-                                $lec->value = $mapcm->newitemid;
-                                $DB->update_record('sloodle_layout_entry_config', $lec);
-                            }
-                        }
-
-                        $layout_entry_configs = $DB->get_records('sloodle_layout_entry_config', array('layout_entry' => $le->id, 'name'=>'sloodlecurrencyid')); 
-                        foreach($layout_entry_configs as $lec) {
-                            if ($mapcm = restore_structure_step::get_mapping('sloodle_currency_types', $lec->value)) {
-                                $lec->value = $mapcm->newitemid;
-                                $DB->update_record('sloodle_layout_entry_config', $lec);
-                            }
-                        } 
-
-                    }
-                }
-            }
-        }
 
         // Add choice related files, no need to match by itemname (just internally handled context)
         //$this->add_related_files('mod_choice', 'intro', null);

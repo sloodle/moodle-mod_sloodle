@@ -95,44 +95,41 @@ class restore_sloodle_activity_task extends restore_activity_task {
     }
  
     public function after_restore() {
-        global $DB;
-
         // Get a list of inserted layout entries
 
-        /*
-        // Get this repeatactivity
-        $cm = $DB->get_record('repeatactivity', array('id' => $this->get_activityid()));
+        global $DB;
 
-        // get mapping to determine new item id.
-        $mapcm = restore_structure_step::get_mapping('course_module', $repeat->originalcmid);
+        // Layout entry config may refer to an external course module, eg chatroom.
+        // If we've done a full course backup, we should be able to recover it.
+        // If we can't recover it, we'll set it to 0/null, and hope the UI can deal with that sensibly.
+        $layouts = $DB->get_records('sloodle_layout', array('controllerid' => $this->get_moduleid()));
+        if (count($layouts)) {
+            foreach($layouts as $layout) {
+                $layout_entries = $DB->get_records('sloodle_layout_entry', array('layout' => $layout->id)); 
+                if (count($layout_entries)) {
+                    foreach($layout_entries as $le) {
 
-        if ($mapcm && $mapcm->newitemid !== null) {
-            // if new item id available, then update originalcmid with this value
-            $DB->update_record('repeatactivity',
-                    (object)array('id'=>$repeat->id, 'originalcmid'=>$mapcm->newitemid));
-        } else {
-            $this->get_logger()->process('Repeat activity ' . $repeat->id . ' (' .
-                    $repeat->name . '): skipping, cannot find target activity ' . $repeat->originalcmid,
-                    backup::LOG_WARNING);
-            // Get cm and section
-            $cm = $DB->get_record('course_modules', array('id' => $this->get_moduleid()),
-                    '*', MUST_EXIST);
-            $section = $DB->get_record('course_sections', array('id' => $cm->section),
-                    '*', MUST_EXIST);
-            // Delete records
-            $DB->delete_records('repeatactivity', array('id' => $cm->instance));
-            $DB->delete_records('course_modules', array('id' => $cm->id));
-            // Update section; add commas to each end and do replace...
-            $newsequence = str_replace(',' . $cm->id . ',', ',',
-                ',' . $section->sequence . ',');
-            // ...then remove commas from each end
-            $newsequence = substr($newsequence, 1, strlen($newsequence)-2);
-            $DB->set_field('course_sections', 'sequence', $newsequence,
-                    array('id' => $section->id));
-            rebuild_course_cache($cm->course, true);
+                        $layout_entry_configs = $DB->get_records('sloodle_layout_entry_config', array('layout_entry' => $le->id, 'name'=>'sloodlemoduleid')); 
+                        foreach($layout_entry_configs as $lec) {
+                            if ($mapcm = restore_structure_step::get_mapping('course_module', $lec->value)) {
+                                $lec->value = $mapcm->newitemid;
+                                $DB->update_record('sloodle_layout_entry_config', $lec);
+                            } 
+                        }
+
+                        $layout_entry_configs = $DB->get_records('sloodle_layout_entry_config', array('layout_entry' => $le->id, 'name'=>'sloodlecurrencyid')); 
+                        foreach($layout_entry_configs as $lec) {
+                            if ($mapcm = restore_structure_step::get_mapping('sloodle_currency_types', $lec->value)) {
+                                $lec->value = $mapcm->newitemid;
+                                $DB->update_record('sloodle_layout_entry_config', $lec);
+                            }
+                        } 
+
+                    }
+                }
+            }
         }
-        */
-    }
 
+    }
 
 }
