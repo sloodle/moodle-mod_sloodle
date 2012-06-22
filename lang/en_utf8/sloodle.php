@@ -449,7 +449,7 @@ $string['submit'] = 'Submit';
 
 $string['timeago'] = '{$a} ago'; // $a = period of time, e.g. "3 weeks"
 $string['type'] = 'Type';
-$string['trydirectlink'] = 'If you cannot see the above entry, try this <a href=\"{$a}\">direct link</a> instead.';
+$string['trydirectlink'] = 'If you cannot see the above entry, try this direct link instead.';
 $string['tracker:settings'] = 'Tracker Settings';
 $string['tracker:nousers'] = 'No users found in course.';
 $string['trackeradmin'] = 'Administration';

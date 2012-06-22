@@ -88,6 +88,15 @@ class SloodlePluginManager
         // Go through each filename
         foreach ($files as $file) {
             // Include the specified file
+            // Skip things that are usually backups etc.
+            // Skip .files
+            if (preg_match('/^\./', $file)) {
+                continue;
+            }
+            // Skip non-php files
+            if (!preg_match('/\.php$/', $file)) {
+                continue;
+            }
             include_once($pluginFolder.'/'.$file);
         }
         
