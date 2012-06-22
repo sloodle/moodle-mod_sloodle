@@ -11,6 +11,11 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
 
         $paths[] = new restore_path_element('sloodle', '/activity/sloodle');
 
+        $paths[] = new restore_path_element('sloodle_currency_type', '/activity/sloodle/currency_types/currency_type');
+        if ($userinfo) {
+            $paths[] = new restore_path_element('sloodle_user', '/activity/sloodle/users/user');
+        }
+
         $paths[] = new restore_path_element('sloodle_controller', '/activity/sloodle/controllers/controller');
 
         $paths[] = new restore_path_element('sloodle_tracker', '/activity/sloodle/trackers/tracker');
@@ -19,7 +24,7 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         $paths[] = new restore_path_element('sloodle_presenter_entry', '/activity/sloodle/presenters/presenter_entry');
 
         $paths[] = new restore_path_element('sloodle_distributor', '/activity/sloodle/distributors/distributor');
-        $paths[] = new restore_path_element('sloodle_distributor_entry', '/activity/sloodle/distributors/distributor_entry');
+        $paths[] = new restore_path_element('sloodle_distributor_entry', '/activity/sloodle/distributor/distributors/distributor_entry');
 
         $paths[] = new restore_path_element('sloodle_layout', '/activity/sloodle/controllers/controller/layouts/layout');
         $paths[] = new restore_path_element('sloodle_layout_entry', '/activity/sloodle/controllers/controller/layouts/layout/layout_entries/layout_entry');
@@ -37,7 +42,6 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_sloodle($data) {
-
         global $DB;
 
         $data = (object)$data;
@@ -146,7 +150,7 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         $newitemid = $DB->insert_record('sloodle_distributor_entry', $data);
         // immediately after inserting "activity" record, call this
 
-        $this->set_mapping('sloodle_distributor', $oldid, $newitemid);
+        $this->set_mapping('sloodle_distributor_entry', $oldid, $newitemid);
 
     }
 
@@ -170,6 +174,48 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
 
     }
 
+    protected function process_sloodle_user($data) {
+
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $newitemid = 0;
+
+        // If the avatar is already there, map the record ID to the existing user.
+        if ( $existing = $DB->get_record('sloodle_users', array( 'uuid' => $data->uuid ) ) ) {
+            $newitemid = $existing->id;
+        } else {
+            // If the Moodle user is already there, create an avatar for them.
+            $data->userid = $this->get_mappingid('user', $data->userid);
+            $newitemid = $DB->insert_record('sloodle_users', $data);
+        }
+
+        $this->set_mapping('sloodle_user', $oldid, $newitemid);
+
+    }
+
+    protected function process_sloodle_currency_type($data) {
+
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $newitemid = 0;
+
+        // If the avatar is already there, map the record ID to the existing user.
+        if ( $existing = $DB->get_record('sloodle_currency_types', array( 'name' => $data->name) ) ) {
+            $newitemid = $existing->id;
+        } else {
+            $newitemid = $DB->insert_record('sloodle_currency_types', $data);
+        }
+
+        $this->set_mapping('sloodle_currency_types', $oldid, $newitemid);
+
+    }
+ 
     protected function process_sloodle_layout_entry($data) {
 
         global $DB;
@@ -214,18 +260,30 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
                 $layout_entries = $DB->get_records('sloodle_layout_entry', array('layout' => $layout->id)); 
                 if (count($layout_entries)) {
                     foreach($layout_entries as $le) {
+
                         $layout_entry_configs = $DB->get_records('sloodle_layout_entry_config', array('layout_entry' => $le->id, 'name'=>'sloodlemoduleid')); 
                         foreach($layout_entry_configs as $lec) {
-                            $mapcm = restore_structure_step::get_mapping('course_module', $lec->value);
-                            $lec->value = $mapcm;
-                            $DB->update_record('sloodle_layout_entry_config', $lec);
+                            if ($mapcm = restore_structure_step::get_mapping('course_module', $lec->value)) {
+                                $lec->value = $mapcm->newitemid;
+                                $DB->update_record('sloodle_layout_entry_config', $lec);
+                            }
                         }
+
+                        $layout_entry_configs = $DB->get_records('sloodle_layout_entry_config', array('layout_entry' => $le->id, 'name'=>'sloodlecurrencyid')); 
+                        foreach($layout_entry_configs as $lec) {
+                            if ($mapcm = restore_structure_step::get_mapping('sloodle_currency_types', $lec->value)) {
+                                $lec->value = $mapcm->newitemid;
+                                $DB->update_record('sloodle_layout_entry_config', $lec);
+                            }
+                        } 
+
                     }
                 }
             }
         }
 
-
+        // Add choice related files, no need to match by itemname (just internally handled context)
+        //$this->add_related_files('mod_choice', 'intro', null);
 
     }
 

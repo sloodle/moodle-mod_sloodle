@@ -96,7 +96,6 @@ class restore_sloodle_activity_task extends restore_activity_task {
  
     public function after_restore() {
         global $DB;
-        print "in after_restore";
 
         // Get a list of inserted layout entries
 

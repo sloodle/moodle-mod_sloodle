@@ -10,7 +10,7 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
  
         // To know if we are including userinfo
         $userinfo = $this->get_setting_value('userinfo');
- 
+
         // Define each element separated
         $sloodle = new backup_nested_element('sloodle', 
             array('id'),  
@@ -24,7 +24,6 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
                 'timemodified'
             )
         );
- 
 
         $trackers = new backup_nested_element('trackers');
         $tracker = new backup_nested_element('tracker',
@@ -66,7 +65,6 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
                 'ordering'
             )
         );
-
 
         $controllers = new backup_nested_element('controllers');
         $controller = new backup_nested_element('controller',
@@ -110,6 +108,29 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
             )
         );        
 
+        $sloodlecurrencytypes = new backup_nested_element('currency_types');
+        $sloodlecurrencytype = new backup_nested_element('currency_type',
+            array('id'),
+            array(
+                'name',
+                'timemodified',
+                'imageurl',
+                'displayorder'
+            )
+        );
+
+        $sloodleusers = new backup_nested_element('users');
+        $sloodleuser = new backup_nested_element('user',
+            array('id'),
+            array(
+                'userid',
+                'uuid',
+                'avname',
+                'profilepic',
+                'lastactive'
+            )
+        );
+
         $sloodle->add_child($controllers);
         $controllers->add_child($controller);
         $controller->add_child($layouts);
@@ -126,21 +147,46 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
         $trackers->add_child($tracker);
         $sloodle->add_child($trackers);
 
+        $presenterentries->add_child($presenterentry);
+        $presenter->add_child($presenterentries);
         $presenters->add_child($presenter);
         $sloodle->add_child($presenters);
 
+
+        if ($userinfo) {
+            $sloodleusers->add_child($sloodleuser);
+            $sloodle->add_child($sloodleusers);
+        }
+
+        $sloodlecurrencytypes->add_child($sloodlecurrencytype);
+        $sloodle->add_child($sloodlecurrencytypes);
 
         // Build the tree
  
         // Define sources
         $sloodle->set_source_table('sloodle', array('id' => backup::VAR_ACTIVITYID));
+
+        /*
+        Neither of these tables link directly to a course or controller.
+        However, they may be referenced by other things that are in a controller, so we can't leave them out.
+        There will need to be some restore code in the to do something sensible with these on load.
+        */
+        $sloodleuser->set_source_table('sloodle_users', array());
+        $sloodlecurrencytype->set_source_table('sloodle_currency_types', array());
+        //$sloodleuser->set_source_sql("SELECT * FROM {sloodle_users} ORDER BY id", array());
+
+
+        if ($userinfo) {
+        }
         $distributor->set_source_table('sloodle_distributor', array('sloodleid' => backup::VAR_ACTIVITYID));
         $tracker->set_source_table('sloodle_tracker', array('sloodleid' => backup::VAR_ACTIVITYID));
         $presenter->set_source_table('sloodle_presenter', array('sloodleid' => backup::VAR_ACTIVITYID));
+        $presenterentry->set_source_table('sloodle_presenter_entry', array('sloodleid' => backup::VAR_ACTIVITYID));
         $controller->set_source_table('sloodle_controller', array('sloodleid' => backup::VAR_ACTIVITYID));
         $layout->set_source_table('sloodle_layout', array('controllerid' => backup::VAR_MODID));
         $layoutentry->set_source_table('sloodle_layout_entry', array('layout' => backup::VAR_PARENTID));
         $layoutentryconfig->set_source_table('sloodle_layout_entry_config', array('layout_entry' => backup::VAR_PARENTID));
+
         /*
         $layout->set_source_sql(
             'SELECT * FROM {sloodle_layout} WHERE controllerid = ?',
@@ -149,8 +195,11 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
         */
 
         // Define id annotations
+        $sloodleuser->annotate_ids('sloodle_user', 'userid');
  
         // Define file annotations
+        //mod_sloodle | presenter |      8 
+        $presenter->annotate_files('mod_sloodle', 'presenter', 'id');
  
         // Return the root element (sloodle), wrapped into standard activity structure
         return $this->prepare_activity_structure($sloodle);
