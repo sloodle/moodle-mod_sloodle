@@ -21,10 +21,10 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         $paths[] = new restore_path_element('sloodle_tracker', '/activity/sloodle/trackers/tracker');
 
         $paths[] = new restore_path_element('sloodle_presenter', '/activity/sloodle/presenters/presenter');
-        $paths[] = new restore_path_element('sloodle_presenter_entry', '/activity/sloodle/presenters/presenter_entry');
+        $paths[] = new restore_path_element('sloodle_presenter_entry', '/activity/sloodle/presenters/presenter/presenter_entries/presenter_entry');
 
         $paths[] = new restore_path_element('sloodle_distributor', '/activity/sloodle/distributors/distributor');
-        $paths[] = new restore_path_element('sloodle_distributor_entry', '/activity/sloodle/distributor/distributors/distributor_entry');
+        $paths[] = new restore_path_element('sloodle_distributor_entry', '/activity/sloodle/distributor/distributors/distributor_entries/distributor_entry');
 
         $paths[] = new restore_path_element('sloodle_layout', '/activity/sloodle/controllers/controller/layouts/layout');
         $paths[] = new restore_path_element('sloodle_layout_entry', '/activity/sloodle/controllers/controller/layouts/layout/layout_entries/layout_entry');
@@ -118,7 +118,7 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
         $newitemid = $DB->insert_record('sloodle_presenter_entry', $data);
         // immediately after inserting "activity" record, call this
 
-        $this->set_mapping('sloodle_presenter', $oldid, $newitemid);
+        $this->set_mapping('sloodle_presenter_entry', $oldid, $newitemid);
 
     }
 
