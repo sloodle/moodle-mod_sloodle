@@ -199,7 +199,7 @@ class backup_sloodle_activity_structure_step extends backup_activity_structure_s
  
         // Define file annotations
         //mod_sloodle | presenter |      8 
-        $presenter->annotate_files('mod_sloodle', 'presenter', 'id');
+        $presenter->annotate_files('mod_sloodle', 'presenter', null);
  
         // Return the root element (sloodle), wrapped into standard activity structure
         return $this->prepare_activity_structure($sloodle);

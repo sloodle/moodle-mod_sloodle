@@ -21,6 +21,14 @@ class restore_sloodle_activity_task extends restore_activity_task {
         $this->add_step(new restore_sloodle_activity_structure_step('sloodle_structure', 'sloodle.xml'));
     }
 
+    /*
+    Hack alert, Edmund Edgar, 2012-06-23:
+    Presenter URLs need to be mapped back to the new site and context.
+    This is probably doable with these decode_rules, but I don't understand how they work
+    ...so I'm using after_restore instead.
+    If anyone understands this stuff, please go ahead and rewrite it to do it right.
+    */
+
     /**
     * Define the contents in the activity that must be
     * processed by the link decoder
@@ -28,7 +36,7 @@ class restore_sloodle_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
 
-        //$contents[] = new restore_decode_content('sloodle', array('intro'), 'sloodle');
+        //$contents[] = new restore_decode_content('sloodle_presenter_entry', array('source'), 'sloodle_presenter_entry');
 
         return $contents;
     }
@@ -98,6 +106,7 @@ class restore_sloodle_activity_task extends restore_activity_task {
         // Get a list of inserted layout entries
 
         global $DB;
+        global $CFG;
 
         // Layout entry config may refer to an external course module, eg chatroom.
         // If we've done a full course backup, we should be able to recover it.
@@ -129,6 +138,29 @@ class restore_sloodle_activity_task extends restore_activity_task {
                 }
             }
         }
+
+        /*
+        This should probably really be done with decode_rules - see hack alert above.
+        */
+        $moduleid = $this->get_moduleid();
+        $sloodleid = $DB->get_field('course_modules', 'instance', array('id'=>$moduleid));
+        $contextid = $this->get_contextid();
+
+        $presenter_entries = $DB->get_records('sloodle_presenter_entry', array('sloodleid' => $sloodleid));
+        if (count($presenter_entries) > 0) {
+            foreach($presenter_entries as $pe) {
+                $source = $pe->source;
+                $base = preg_quote('$@SITEROOT@$', '#');
+                $contextidplaceholder = preg_quote('$@CONTEXTID@$', '#');
+                if (preg_match('#^'.$base.'(/pluginfile.php/)'.$contextidplaceholder.'(/mod_sloodle/presenter/.*)#', $source, $matches)) {
+                    $pe->source = $CFG->wwwroot.$matches[1].$contextid.$matches[2];
+                    $DB->update_record('sloodle_presenter_entry', $pe);
+                }
+            }
+        }
+        //$file_entries = $DB->get_records('mdl_files', array('contextid'=>$contextid, 'component'=>'mod_sloodle', 'filearea'=>'presenter'));
+        
+
 
     }
 

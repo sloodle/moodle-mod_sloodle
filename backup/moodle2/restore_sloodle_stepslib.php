@@ -248,13 +248,41 @@ class restore_sloodle_activity_structure_step extends restore_activity_structure
     }
 
     protected function after_execute() {
-        // Add choice related files, no need to match by itemname (just internally handled context)
-        //$this->add_related_files('mod_choice', 'intro', null);
 
         global $DB;
 
-        // Add choice related files, no need to match by itemname (just internally handled context)
-        //$this->add_related_files('mod_choice', 'intro', null);
+        // Add sloodle related files, no need to match by itemname (just internally handled context)
+        $this->add_related_files('mod_sloodle', 'presenter', null);
+
+        /*
+        Presenter files have the context ID in the path.
+        This needs to be replaced with the new context ID.
+        We'll get the files directly from the files table and fix any context IDs.
+        This is almost definitely the wrong way to do this, but I'm buggered if I know what the right one is.
+        */
+
+        $contextid = $this->task->get_contextid();
+
+        $files = $DB->get_records('files', array('contextid'=>$contextid, 'component'=>'mod_sloodle', 'filearea'=>'presenter'));
+
+        if (count($files) > 0) {
+
+            foreach($files as $fr) {
+
+                $fs = get_file_storage();
+
+                if (!preg_match('#^(/)\d+(/.*)$#', $fr->filepath, $matches)) {
+                    continue;
+                }
+
+                $fr->filepath = $matches[1].$contextid.$matches[2];
+
+                $fr->pathnamehash = $fs->get_pathname_hash($fr->contextid, $fr->component, $fr->filearea, $fr->itemid, $fr->filepath, $fr->filename);
+                $DB->update_record('files', $fr);
+
+            }
+
+        }
 
     }
 
