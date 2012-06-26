@@ -1,5 +1,5 @@
 /*
-*  magicchest.lsl
+*  teleporter_using_crystals.lsl
 *  Part of the Sloodle project (www.sloodle.org)
 *
 *  Copyright (c) 2011-06 contributors (see below)
@@ -23,11 +23,34 @@
 *
 *  DESCRIPTION
 *  This script was built for an adventure game which involves access to hidden chambers etc.
-*  A user must collect X currency in order to unlock and open this door through touch
+*  A user must collect a blue crystal, drop it onto the ground, to insert it into this teleporter
+*  Once a crystal has been inserted, the teleporter will be activated for 30 seconds.
+*  The teleporter makes use of the objects description input field, which you can find in the edit
+*  box inside the Second Life viewer. 
+*  Enter in: CHANNEL:99882234,NAME:Teleporter,REZSOUND:SND_dancershort,DROPSOUND:SND_splash2
+*  CHANNEL: is the channel the blue crystal will use to communicate with this teleporter
+*  NAME is the name of the object which the blue crystal will set its sensors for, and when found, move towards
+*  REZSOUND is the name of the sound file that will play when this teleporter is rezzed
+*  After a crystal shouts an INSERT message into this script, this script will send a linked message to 
+*  sloodle_mod_touchable to see if the interaction (teleport) is allowed
+*  sloodle_mod_touchable will contact the server, and respond via linked message if teleporting is allowed
+*  ie: if the user's currency matches any restrictions placed in this objects configuration
+*  if all restrictions have been fulfilled, the teleporter will teleport the sitting user to the destination
+*  in the config.
 *
-*  
-*  A touch action will check to see if the user has X currency in their inventory, and if so 
-*  instruct the chest to open
+*  THIS VERSION IS FOR OPENSIM - llAvatarSitOnTarget doesnt work in Opensim, so the behavior is modified: 
+*  User must sdrop a crystal in to activate the teleporter, then sit, then click to tp
+*
+*  For this script to function properly, it should have the following sounds inside 
+*  SND_POWER_DOWN
+*  SND_POWER_UP
+*  SND_SPARKS
+*  SND_VORTEX   
+*
+*  Accompaning scripts:
+*  sloodle_mod_touchable-1.0
+*  sloodle_rezzer_object
+*  sloodle_setup_notecard_httpin
 *
 *  Contributors:
 *  Paul Preibisch
@@ -69,10 +92,29 @@ integer isconfigured = 0;
 integer MAX=30;
 key sitter;
 integer counter=0;
+string animation;
+
+integer SLOODLE_TELPORTER_POWER_UP= -1639277101;
+integer SLOODLE_TELPORTER_POWER_DOWN= -1639277102;
+integer SLOODLE_OBJECT_INTERACTION= -1639271132; //channel interaction objects speak on
+integer TARGET_CHANNEL;
+string TARGET_NAME;
+integer SLOODLE_TOUCH_OBJECT_SUCCESS = -1639277100;
+vector RED =<1.00000, 0.00000, 0.00000>;
+vector ORANGE=<1.00000, 0.43763, 0.02414>;
+vector YELLOW=<1.00000, 1.00000, 0.00000>;
+vector GREEN=<0.00000, 1.00000, 0.00000>;
+vector BLUE=<0.00000, 0.00000, 1.00000>;
+vector BABYBLUE=<0.00000, 1.00000, 1.00000>;
+vector PINK=<1.00000, 0.00000, 1.00000>;
+vector PURPLE=<0.57338, 0.25486, 1.00000>;
+vector BLACK= <0.00000, 0.00000, 0.00000>;
+vector WHITE= <1.00000, 1.00000, 1.00000>;
+
 //order of animation messages 
 key userKey;
 vector MYDEST;
-vector RED =<1.00000, 0.00000, 0.00000>;
+
 integer SLOODLE_NOT_ENOUGH_CURRENCY= -1001;//     AWARDS     You do not have enough points to use this object. (There may be a customized message in the next line.)
 integer SLOODLE_OBJECT_REGISTER_INTERACTION= -1639271133; //channel objects send interactions to the mod_interaction-1.0 script on to be forwarded to server
 debug(string str){
@@ -81,18 +123,58 @@ debug(string str){
 string objecttogive;
 integer soundCounter=0;
 integer DOOR_STATE;
+vector rezzer_position_offset;
+rotation rezzer_rotation_offset;
+key rezzer_uuid;
 
+/***********************************************
+*  extractResponse()
+*  Is used so that sending of linked messages is more readable by humans.  Ie: instead of sending a linked message as
+*  GETDATA|50091bcd-d86d-3749-c8a2-055842b33484 
+*  Context is added instead: COMMAND:GETDATA|PLAYERUUID:50091bcd-d86d-3749-c8a2-055842b33484
+*  By adding a context to the messages, the programmer can understand whats going on when debugging
+*  All this function does is strip off the text before the ":" char 
+***********************************************/
+string extractResponse(string cmd){     
+     return llList2String(llParseString2List(cmd, [":"],[]),1);
+}
+move_to_layout_position() {
+    // llOwnerSay("todo: move to position "+(string)rezzer_position_offset+", rot "+(string)rezzer_rotation_offset+ " in relation to rezzer "+(string)rezzer_uuid);
+    list rezzerdetails = llGetObjectDetails( rezzer_uuid, [ OBJECT_POS, OBJECT_ROT ] );
+    vector rezzerpos = llList2Vector( rezzerdetails, 0 );
+    rotation rezzerrot = llList2Rot( rezzerdetails, 1 );
+    sloodle_set_pos( rezzerpos + ( rezzer_position_offset * rezzerrot ) );
+    llSetRot( rezzerrot * rezzer_rotation_offset );
+
+}
+sloodle_set_pos(vector targetposition){
+    integer counter=0;
+    while ((llVecDist(llGetPos(), targetposition) > 0.001)&&(counter<50)) {
+        counter+=1;
+        llSetPos(targetposition);
+    }
+
+}
+vector getVector(string s){       
+       list vector_parts = llParseString2List(s,["<",",",">"], []);
+       vector result;
+       result.x = llList2Float(vector_parts,0);
+       result.y = llList2Float(vector_parts,1);
+       result.z = llList2Float(vector_parts,2);
+return result;
+}
 
 integer sloodle_handle_command(string str){
    // llOwnerSay("handling command "+str);
     list bits = llParseString2List(str,["|"],[]);
     integer numbits = llGetListLength(bits);
+    
    string name;
     if (numbits >= 1 ) {
         name = llList2String(bits,0);
            
-        string value1 = "";
-        string value2 = "";
+        string value1 = ""; 
+        string value2 = ""; 
            
         if (numbits > 1) value1 = llList2String(bits,1);
         if (numbits > 2) value2 = llList2String(bits,2);
@@ -100,17 +182,24 @@ integer sloodle_handle_command(string str){
      
     } 
         if (name == "set:destination") {
-              MYDEST= llList2Vector(bits,1); 
-        }
+              MYDEST= getVector(llList2String(bits,1));
+              llOwnerSay("Teleporter Destination: "+(string)MYDEST); 
+
+        }else
+         if (name == "set:position") {        
+            rezzer_position_offset = (vector)llList2String(bits,1);
+            rezzer_rotation_offset = (rotation)llList2String(bits,2);
+            rezzer_uuid = llList2Key(bits,3);
+
+         }
     
     return TRUE; 
 }
 
-trytoTp(){
+trytoTp(key av){
         //when touched, tell mod_interaction script that a water action has occured
-        llMessageLinked(LINK_SET, SLOODLE_OBJECT_REGISTER_INTERACTION, "accessteleporter", llDetectedKey(0));
-        llSay(0,"Attempting to access the teleporter");
-        llTriggerSound("SND_SPARKS", 0.7);
+        llMessageLinked(LINK_SET, SLOODLE_OBJECT_REGISTER_INTERACTION, "accessteleporter", av);
+          llSay(0,"Attempting to Teleport");
 }
 list give_in_folder;
 integer item_no = 0;
@@ -120,11 +209,6 @@ integer item_no = 0;
 vector gTargetPos = <246, 181, 415>;
 // Text for the "pie menu"
 string gSitText="Teleport";
-// Define channel number to listen to user commands from
-integer myChannel = 123;
- 
-// No need to edit the global variables below
- 
 // Return position for tp object - no need to edit
 vector gStartPos=<0,0,0>;
 // Key for avatar sitting on object, if any
@@ -146,21 +230,46 @@ warpPos( vector destpos)
         list rules = [ PRIM_POSITION, destpos ];  //The start for the rules list
         integer count = 1;
         while ( ( count = count << 1 ) < jumps)
-        rules = (rules=[]) + rules + rules;   //should tighten memory use.
+        rules = ([]) + rules + rules;   //should tighten memory use.
         llSetPrimitiveParams( rules + llList2List( rules, (count - jumps) << 1, count) );
+        if (sitter!=NULL_KEY){
+            llUnSit(sitter);
+        }
+        move_to_layout_position();
 }
+string teleporter="OFF";
+        integer count=0;
 default {
+    on_rez(integer start_param) {
+        llResetScript();
+        llSitTarget ( <-0.00000, 0.00000, 1.20565>, <0.00000, 0.00000, 0.00000, 1.00000>);
+    }
+    state_entry() {
+        
+         llSitTarget(<0.0, 0.0, 1.0>, ZERO_ROTATION);
+  
+         teleporter="ON";
+         
+        
+    }
+   
     changed(integer change) {
-         if(change & (CHANGED_LINK)){
-             sitter = llAvatarOnSitTarget();
-            if (sitter!=NULL_KEY){
-                trytoTp();
-            } 
+         if ((change & CHANGED_LINK) != 0){
+               
+               sitter = llAvatarOnSitTarget();
+              // llOwnerSay((string)sitter);
+               if (sitter!=NULL_KEY){
+                            trytoTp(sitter);
+               }
          }
     }  
+    
+    
+   
     link_message(integer sender_num, integer num, string str, key id) {
          // Split the data up into lines
         list lines = llParseStringKeepNulls(str, ["\n"], []);  
+
         integer numlines = llGetListLength(lines);
         // Extract all the status fields
         list statusfields = llParseStringKeepNulls( llList2String(lines,0), ["|"], [] );
@@ -168,7 +277,24 @@ default {
         integer statuscode = llList2Integer(statusfields,0);
         key user = llList2Key(statusfields,6);
         // Was it an error code?
+     if (num==SLOODLE_CHANNEL_OBJECT_DIALOG){
+               llTriggerSound("SND_POWER_UP", 1);
+     }
         
+     if (num==SLOODLE_OBJECT_INTERACTION){
+         string notenoughcurrencymessage=llList2String(lines,1);
+          if (statuscode==1){
+              if (llList2String(lines,1)=="accessteleporter"){
+                  llSay(0,"Teleporting to: "+(string)MYDEST);
+                llTriggerSound("SND_TELEPORTING", 0.7);
+                warpPos(MYDEST);
+              }
+          }else if (statuscode=-1001){
+                   llSay(0,notenoughcurrencymessage);
+                   llTriggerSound("SND_SPARKS", 0.7);
+                   llUnSit(sitter);
+          }
+      }
          if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
             // Split the message into lines
             integer i = 0;
@@ -177,24 +303,8 @@ default {
             }
             return;
         }
-        if (statuscode <= 0) {
-            //error will come if u dont have enough water.
-            if (statuscode==SLOODLE_NOT_ENOUGH_CURRENCY){
-                                 
-                 if (sitter!=NULL_KEY){
-                    llUnSit(sitter);
-                 }
-            }
-        }
-        else{
-            string task = llList2String(lines, 1);
-            if (task=="tryopenchest"){
-                llSay(0,"Prepare to Teleport!");
-                llTriggerSound("SND_VORTEX", 1);
-                warpPos(MYDEST);
-            }
-        
-      } 
-    }
+          
+       
+      }
 }
  
