@@ -3,7 +3,7 @@
     * Sloodle configuration settings
     *
     * This file is for settings that can be configured on a site-by-site basis.
-    * It needs to be renamed as config.php to be used.
+    * It needs to be renamed as sloodle_config.php to be used.
     * For a normal sloodle installation you shouldn't have to bother with this.
     *
     * @package sloodle
@@ -21,6 +21,7 @@
         It will contain all data sent to and from the server by LSL scripts, including sensitive data like prim passwords
         ...so if you turn this on, be careful about who has access to the file it creates.
     */
+    //define('SLOODLE_DEBUG_REQUEST_LOG', '/tmp/sloodle_debug.log');
     define('SLOODLE_DEBUG_REQUEST_LOG', '');
 
     /** The following tells objects that we want them to persist their config over resets, and copy it to new objects that are copied.
@@ -29,6 +30,7 @@
     * That way the objects you rez won't try to use your server if the start_param somehow fails, which seems to happen sometimes.
     * 
     */
+    //define('SLOODLE_ENABLE_OBJECT_PERSISTANCE', false);
     define('SLOODLE_ENABLE_OBJECT_PERSISTANCE', true);
 
 //---------------------------------------------------------------------
@@ -51,7 +53,7 @@
     * Used in Avatar Classroom to provide a list of your hosted Moodle sites so that you can switch between them or create a new one.
     * Probably not useful to anyone else.
     */
-    //define('SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL', 'http://api.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/');
+    //define('SLOODLE_SHARED_MEDIA_SITE_LIST_BASE_URL', 'http://www.avatarclassroom.com/mod/sloodle/mod/set-1.0/shared_media/');
 
     /*
     * Set this to true if you want the rezzer to automatically link its owner to the person logged in and using it in Moodle.
@@ -77,4 +79,47 @@
 
 //---------------------------------------------------------------------
 
+    /*
+    For performance, it's possible to send HTTP-in messages via a message queue.
+    This requires a beanstalkd server, and a php daemon delivering messages to it.
+    */
+    define('SLOODLE_MESSAGE_QUEUE_SERVER_BEANSTALK', true);
+
+    /*
+    Turn this on to rez and derez asynchronously, using a message queue.
+    */
+    // The rezzer can only rez one object at a time in any case,
+    // ...so there doesn't seem to be much advantage to doing this as a background task.
+    define('SLOODLE_ASYNC_REZZING', false);
+
+    // On OpenSim derezzing replies have been known to timeout
+    // ...so async tends to work better
+    // ...although at the cost of making the user feedback on the rezzer a bit slower to show.
+    define('SLOODLE_ASYNC_DEREZZING', false);
+
+    // In practice I haven't yet found a case where synchronous config-sending doesn't work well.
+    define('SLOODLE_ASYNC_SEND_CONFIG', false);
+
+    // Messages for the scoreboard etc can cause bottlenecks,
+    // eg the quiz chair times out while waiting to update the scoreboard
+    // ...and the scoreboard gets a big queue of messages, most of which are out of date.
+    // These are definitely better done asynchrously.
+    define('SLOODLE_ASYNC_SEND_MESSAGES', true);
+
+//---------------------------------------------------------------------
+
+    // How often the objects should ping the server to tell it they're still here
+    define('SLOODLE_PING_INTERVAL', 3600);
+
+    // How often the rezzer should ping the server to tell it what objects are still rezzed
+    // The     
+    /*
+    NB there may be up to 4 HTTP requests in this time:
+    - 1 request from the rezzer asking for a list of objects not heard from recently that might have been deleted
+    - 1 request from the rezzer telling the server to note that some objects have disappeared
+    - 2 messages from the rezzer screen HTML page to check if any objects have gone missing recently
+    */
+    define('SLOODLE_REZZER_STATUS_CONFIRM_INTERVAL', 9);
+
+//---------------------------------------------------------------------
 ?>
