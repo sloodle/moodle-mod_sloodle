@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 /*
 *  teleporter_using_crystals.lsl
 *  Part of the Sloodle project (www.sloodle.org)

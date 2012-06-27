@@ -1,3 +1,6 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
 // LSL script generated: mod.interaction-1.0.object_scripts.touchobject.lslp Sat May 26 14:41:21 Tokyo Standard Time 2012
 // Sloodle WebIntercom (for Sloodle 0.4)
 // Links in-world SL (text) chat with a Moodle chatroom
