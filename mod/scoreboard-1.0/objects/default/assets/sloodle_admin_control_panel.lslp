@@ -16,4 +16,4 @@ default
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/sloodle_admin_control_panel.lsl
+// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/objects/default/assets/sloodle_admin_control_panel.lslp

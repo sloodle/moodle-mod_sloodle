@@ -179,4 +179,4 @@ default{
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/building-1.0/object_scripts/hot_floor.lsl
+// SLOODLE LSL Script Git Location: mod/building-1.0/objects/avatarclassroomfloors234/assets/hot_floor.lslp

@@ -94,5 +94,5 @@ default
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/furniture-1.0/object_scripts/chalkboard.lsl
+// SLOODLE LSL Script Git Location: mod/furniture-1.0/objects/chalkboard/assets/chalkboard.lslp
 

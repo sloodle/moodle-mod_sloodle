@@ -76,4 +76,4 @@ default {
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/gaming-1.0/object_scripts/sharks/bloodbath.lsl 
+// SLOODLE LSL Script Git Location: mod/gaming-1.0/objects/shark/assets/bloodbath.lslp 

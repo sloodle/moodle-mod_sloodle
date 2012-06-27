@@ -910,5 +910,5 @@ state quizzing
     
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/quiz_pile_on-1.0/sloodle_mod_quiz_pile_on-1.0.lsl 
+// SLOODLE LSL Script Git Location: mod/quiz_pile_on-1.0/objects/default/assets/sloodle_mod_quiz_pile_on-1.0.lslp 
 

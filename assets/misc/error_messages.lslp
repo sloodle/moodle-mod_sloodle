@@ -209,4 +209,4 @@ default {
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: lib/lsl/error_messages.lsl 
+// SLOODLE LSL Script Git Location: assets/misc/error_messages.lslp 

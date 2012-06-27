@@ -394,4 +394,4 @@ default
     }
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: lib/lsl/mem_array.lsl 
+// SLOODLE LSL Script Git Location: assets/misc/mem_array.lslp 

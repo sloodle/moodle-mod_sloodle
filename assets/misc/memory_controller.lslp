@@ -129,4 +129,4 @@ default {
     }
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: lib/lsl/memory_controller.lsl 
+// SLOODLE LSL Script Git Location: assets/misc/memory_controller.lslp 

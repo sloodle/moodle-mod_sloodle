@@ -819,4 +819,4 @@ state send
         }
     }
 }// Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: toolbar/lsl/sloodle_blog_hud.lsl 
+// SLOODLE LSL Script Git Location: mod/toolbar_giver-1.0/objects/toolbar/assets/sloodle_blog_hud.lslp 

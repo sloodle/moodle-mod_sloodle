@@ -885,4 +885,4 @@ state take
     }
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/primdrop-1.0/sloodle_mod_primdrop-1.0_FULL.lsl 
+// SLOODLE LSL Script Git Location: mod/primdrop-1.0/objects/default/assets/sloodle_mod_primdrop-1.0_FULL.lslp 

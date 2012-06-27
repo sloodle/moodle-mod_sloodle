@@ -301,4 +301,4 @@ on_rez(integer start_param) {
     } 
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/interaction-1.0/object_scripts/jellyfishswim.lslp 
+// SLOODLE LSL Script Git Location: mod/interaction-1.0/objects/jellyfish/assets/jellyfishswim.lslp 

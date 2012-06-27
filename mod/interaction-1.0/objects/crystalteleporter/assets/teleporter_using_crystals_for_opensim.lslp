@@ -347,4 +347,4 @@ default {
 }
  
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/interaction-1.0/object_scripts/teleporter_using_crystals_for_opensim.lsl 
+// SLOODLE LSL Script Git Location: mod/interaction-1.0/objects/crystalteleporter/assets/teleporter_using_crystals_for_opensim.lslp 

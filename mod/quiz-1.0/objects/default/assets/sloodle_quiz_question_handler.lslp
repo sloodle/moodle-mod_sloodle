@@ -449,4 +449,4 @@
             
         }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/quiz-1.0/sloodle_quiz_question_handler.lsl
+// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/default/assets/sloodle_quiz_question_handler.lslp

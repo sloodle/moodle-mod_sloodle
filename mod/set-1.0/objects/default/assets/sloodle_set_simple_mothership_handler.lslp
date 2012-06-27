@@ -365,4 +365,4 @@ state rezzed_one {
         
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/set-1.0/sloodle_set_simple_mothership_handler.lsl 
+// SLOODLE LSL Script Git Location: mod/set-1.0/objects/default/assets/sloodle_set_simple_mothership_handler.lslp 

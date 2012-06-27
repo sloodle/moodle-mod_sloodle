@@ -320,5 +320,5 @@ state ready
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/object_scripts/zztext/zztext_scoreboard-1.0.lsl
+// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/objects/default/assets/zztext_scoreboard-1.0.lslp
 

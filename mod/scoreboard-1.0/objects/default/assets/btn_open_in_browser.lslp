@@ -56,4 +56,4 @@ touch_start( integer total_number){
 
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/object_scripts/zztext/btn_open_in_browser.lsl
+// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/objects/default/assets/btn_open_in_browser.lslp

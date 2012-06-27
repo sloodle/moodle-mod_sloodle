@@ -329,4 +329,4 @@ default {
     }
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/interaction-1.0/object_scripts/sloodle_quiz_router.lslp 
+// SLOODLE LSL Script Git Location: mod/interaction-1.0/objects/enemyrezzer/assets/sloodle_quiz_router.lslp 

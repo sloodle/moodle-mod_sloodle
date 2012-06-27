@@ -137,4 +137,4 @@ default {
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/interaction-1.0/object_scripts/magicplant.lslp 
+// SLOODLE LSL Script Git Location: mod/interaction-1.0/objects/magicplant/assets/magicplant.lslp 

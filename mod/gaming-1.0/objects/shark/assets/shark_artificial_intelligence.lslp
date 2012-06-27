@@ -389,4 +389,4 @@ on_rez(integer start_param) {
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/gaming-1.0/object_scripts/sharks/shark_artificial_intelligence.lslp 
+// SLOODLE LSL Script Git Location: mod/gaming-1.0/objects/shark/assets/shark_artificial_intelligence.lslp 

@@ -167,4 +167,4 @@ default {
 
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/interaction-1.0/object_scripts/magicchest.lslp 
+// SLOODLE LSL Script Git Location: mod/interaction-1.0/objects/magicchest/assets/magicchest.lslp 

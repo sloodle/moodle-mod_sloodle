@@ -141,4 +141,4 @@ default
 
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/set-1.0/sloodle_setup_notecard_httpin.lsl 
+// SLOODLE LSL Script Git Location: mod/set-1.0/objects/default/assets/sloodle_setup_notecard_httpin.lslp 

@@ -91,4 +91,4 @@ debug(str);
     }
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/enrolbooth-1.0/_setText.lsl 
+// SLOODLE LSL Script Git Location: mod/enrolbooth-1.0/objects/default/assets/_setText.lslp 

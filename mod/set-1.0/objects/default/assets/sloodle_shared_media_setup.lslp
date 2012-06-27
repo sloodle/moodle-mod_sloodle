@@ -508,5 +508,5 @@ state rezz_and_reply
 
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/set-1.0/sloodle_shared_media_setup.lsl
+// SLOODLE LSL Script Git Location: mod/set-1.0/objects/default/assets/sloodle_shared_media_setup.lslp
 

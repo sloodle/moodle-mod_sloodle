@@ -24,4 +24,4 @@ llSetPrimitiveParams([6, zfirE,8, <0.24763,-0.66231,0.66242,0.24742> / llGetRoot
 
 if(stat){llSetStatus(1,1);}}}
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/interaction-1.0/object_scripts/anim_magic_chest.lslp 
+// SLOODLE LSL Script Git Location: mod/interaction-1.0/objects/magicchest/assets/anim_magic_chest.lslp 

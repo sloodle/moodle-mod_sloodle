@@ -6,4 +6,4 @@ default
     }
 } 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/gaming-1.0/object_scripts/sharks/shark_pool_surface.lslp 
+// SLOODLE LSL Script Git Location: mod/gaming-1.0/objects/sharkpool/assets/shark_pool_surface.lslp 

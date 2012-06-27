@@ -322,4 +322,4 @@ default
 
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/object_scripts/zztext/_zztext_efficient_board_control.lsl
+// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/objects/default/assets/_zztext_efficient_board_control.lslp

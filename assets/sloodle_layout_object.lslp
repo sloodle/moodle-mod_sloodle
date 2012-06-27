@@ -418,4 +418,4 @@ state success
 
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: lsl/sloodle_layout_object.lsl 
+// SLOODLE LSL Script Git Location: assets/sloodle_layout_object.lslp 

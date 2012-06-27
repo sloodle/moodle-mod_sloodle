@@ -816,4 +816,4 @@ state idle
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: lsl/sloodle_setup_web.lsl 
+// SLOODLE LSL Script Git Location: assets/sloodle_setup_web.lslp 

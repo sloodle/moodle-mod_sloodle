@@ -69,4 +69,4 @@ default
     }
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: lsl/sloodle_parallel_url_loader_0.lsl 
+// SLOODLE LSL Script Git Location: assets/misc/sloodle_parallel_url_loader_0.lslp 

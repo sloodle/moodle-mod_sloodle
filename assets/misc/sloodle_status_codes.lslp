@@ -112,4 +112,4 @@ integer SLOODLE_CHANNEL_ENEMY_ATTACK= -163928666;//Channel to communicate on whe
 integer SLOODLE_CHANNEL_OPEN_IN_BROWSER = -1639277000;
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: lib/lsl/sloodle_status_codes.lsl.lsl 
+// SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 

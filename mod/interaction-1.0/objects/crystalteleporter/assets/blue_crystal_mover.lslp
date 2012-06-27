@@ -333,4 +333,4 @@ state finish{
 }
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/interaction-1.0/object_scripts/blue_crystal_mover.lslp 
+// SLOODLE LSL Script Git Location: mod/interaction-1.0/objects/crystalteleporter/assets/blue_crystal_mover.lslp 
