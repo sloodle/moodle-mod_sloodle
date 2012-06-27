@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Scoreboard Shared Media';
-$sloodleconfig->object_code= 'sharedmedia.php';
-$sloodleconfig->modname    = 'scoreboard-1.0';
 $sloodleconfig->group      = 'activity';
 $sloodleconfig->collections= array('SLOODLE 2.0 Deprecated');
 $sloodleconfig->aliases    = array('SLOODLE 1.1 Scoreboard');

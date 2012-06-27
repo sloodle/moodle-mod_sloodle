@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'Twitter Wall';
-$sloodleconfig->object_code= 'Twitterwall';
-$sloodleconfig->modname    = 'furniture-1.0';
 $sloodleconfig->group      = 'misc';
 $sloodleconfig->aliases    = array('Twitterwall');
 $sloodleconfig->collections= array('Avatar Classroom 2.0 Furniture A');

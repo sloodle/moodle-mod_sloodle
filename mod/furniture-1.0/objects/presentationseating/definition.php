@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'Presentation Seating';
-$sloodleconfig->object_code= 'PresentationSeating';
-$sloodleconfig->modname    = 'furniture-1.0';
 $sloodleconfig->group      = 'misc';
 $sloodleconfig->aliases    = array('PresentationSeating');
 $sloodleconfig->collections= array('Avatar Classroom 2.0 Furniture A');

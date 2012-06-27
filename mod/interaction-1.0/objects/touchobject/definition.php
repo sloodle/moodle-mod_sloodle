@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Touch Object';
-$sloodleconfig->object_code= 'touchobject';
-$sloodleconfig->modname    = 'interaction-1.0';
 $sloodleconfig->group      = 'activity';
 $sloodleconfig->collections= array('SLOODLE 2.0');
 $sloodleconfig->aliases    = array();

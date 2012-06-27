@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'Liquid (Yellow)';
-$sloodleconfig->object_code= 'yellowliquid';
-$sloodleconfig->modname    = 'interaction-1.0';
 $sloodleconfig->group      = 'activity';
 $sloodleconfig->collections= array('Devil Island A');
 $sloodleconfig->aliases    = array();

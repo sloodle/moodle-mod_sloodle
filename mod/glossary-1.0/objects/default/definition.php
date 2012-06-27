@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE MetaGloss';
-$sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'glossary-1.0';
 $sloodleconfig->module     = 'glossary';
 $sloodleconfig->module_choice_message = 'selectglossary';
 $sloodleconfig->module_no_choices_message = 'noglossaries'; 

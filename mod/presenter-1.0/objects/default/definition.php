@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Presenter';
-$sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'presenter-1.0';
 $sloodleconfig->module     = 'sloodle';
 $sloodleconfig->module_choice_message = 'selectpresenter';
 $sloodleconfig->module_no_choices_message = 'nopresenters'; 

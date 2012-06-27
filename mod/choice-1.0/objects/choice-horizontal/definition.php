@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Choice (Horizontal)';
-$sloodleconfig->object_code= 'choice-horizontal';
-$sloodleconfig->modname    = 'choice-1.0';
 $sloodleconfig->module     = 'choice';
 $sloodleconfig->module_choice_message = 'selectchoice';
 $sloodleconfig->module_no_choices_message= 'nochoices';

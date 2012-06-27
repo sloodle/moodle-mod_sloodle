@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Vending Machine';
-$sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'distributor-2.0';
 $sloodleconfig->module     = 'sloodle';
 $sloodleconfig->module_choice_message = 'selectdistributor';
 $sloodleconfig->module_no_choices_message= 'nodistributorinterface';

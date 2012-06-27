@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE WebIntercom';
-$sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'chat-1.0';
 $sloodleconfig->module     = 'chat';
 $sloodleconfig->module_choice_message = 'selectchatroom';
 $sloodleconfig->module_no_choices_message= 'nochatrooms';

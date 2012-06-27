@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Scoreboard';
-$sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'scoreboard-1.0';
 $sloodleconfig->group      = 'activity';
 $sloodleconfig->collections= array('SLOODLE 2.0');
 $sloodleconfig->aliases    = array();

@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Demo Object';
-$sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'demo-1.0';
 $sloodleconfig->group      = 'misc';
 $sloodleconfig->collections= array('SLOODLE 1.0'); // Not currently displayed in SLOODLE 2.0
 $sloodleconfig->aliases    = array('SLOODLE 1.1 Demo Object');

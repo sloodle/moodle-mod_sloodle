@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'Magic Plant (Pink)';
-$sloodleconfig->object_code= 'pinkmagicplant';
-$sloodleconfig->modname    = 'interaction-1.0';
 $sloodleconfig->group      = 'activity';
 $sloodleconfig->collections= array('Avatar Classroom 2.0 Gaming A');
 $sloodleconfig->aliases    = array();

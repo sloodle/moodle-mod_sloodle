@@ -1,8 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Quiz Pile-On';
-$sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'quiz_pile_on-1.0';
 $sloodleconfig->module     = 'quiz';
 $sloodleconfig->module_choice_message = 'selectquiz';// TODO: There's some extra craziness to make sure we only have sloodle stuff
 $sloodleconfig->module_no_choices_message = 'noquizzes';

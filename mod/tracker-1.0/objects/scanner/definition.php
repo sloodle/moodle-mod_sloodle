@@ -1,10 +1,8 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Tracker - Scanner';
-$sloodleconfig->object_code= 'scanner';
-$sloodleconfig->modname    = 'tracker-1.0';
 $sloodleconfig->module     = 'sloodle';
-$sloodleconfig->module_choice_message = 'selecttracker';// TODO: There's some extra craziness to make sure we only have sloodle stuff
+$sloodleconfig->module_choice_message = 'selecttracker';
 $sloodleconfig->module_no_choices_message = 'notrackers';
 $sloodleconfig->module_filters = array( 'type' => SLOODLE_TYPE_TRACKER);
 $sloodleconfig->group      = 'activity';

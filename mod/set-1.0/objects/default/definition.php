@@ -2,8 +2,6 @@
 // Only used for legacy purposes - you configure the current one with its own screen
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Set';
-$sloodleconfig->object_code= 'default';
-$sloodleconfig->modname    = 'set-1.0';
 $sloodleconfig->module     = 'sloodle';
 $sloodleconfig->module_choice_message = 'selectcontroller';
 $sloodleconfig->module_no_choices_message = 'nocontrollers'; 
