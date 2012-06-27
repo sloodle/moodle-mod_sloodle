@@ -818,5 +818,5 @@ state send
             sloodle_reset();
         }
     }
-}// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: toolbar/lsl/sloodle_blog_hud.lsl 
+}// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: toolbar/lsl/sloodle_blog_hud.lsl 

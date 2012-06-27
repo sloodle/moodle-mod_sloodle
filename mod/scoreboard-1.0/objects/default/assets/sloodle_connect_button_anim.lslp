@@ -31,5 +31,5 @@ llSetPrimitiveParams([6, zfirE,8, <0.0,0.0,-0.00223,1.0> / llGetRootRotation(),9
 
 if(stat){llSetStatus(1,1);}}}
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/scoreboard-1.0/sloodle_connect_button_anim.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/scoreboard-1.0/sloodle_connect_button_anim.lsl 

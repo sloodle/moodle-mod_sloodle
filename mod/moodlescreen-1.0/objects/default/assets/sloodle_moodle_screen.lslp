@@ -184,6 +184,6 @@ state ready
     
 }
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/moodlescreen-1.0/sloodle_moodle_screen.lsl
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/moodlescreen-1.0/sloodle_moodle_screen.lsl
 

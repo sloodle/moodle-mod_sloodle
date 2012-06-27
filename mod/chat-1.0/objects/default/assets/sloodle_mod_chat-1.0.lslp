@@ -687,5 +687,5 @@ state logging
 }
 
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/chat-1.0/sloodle_mod_chat-1.0.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/chat-1.0/sloodle_mod_chat-1.0.lsl 

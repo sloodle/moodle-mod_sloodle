@@ -303,5 +303,5 @@ on_rez(integer start_param) {
         }  
     } 
 }
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/interaction-1.0/object_scripts/zombie_move.lslp 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/interaction-1.0/object_scripts/zombie_move.lslp 

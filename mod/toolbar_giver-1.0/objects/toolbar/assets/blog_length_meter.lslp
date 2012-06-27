@@ -73,5 +73,5 @@ default
     }
 }
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: toolbar/lsl/blog_length_meter.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: toolbar/lsl/blog_length_meter.lsl 

@@ -392,5 +392,5 @@ default
 }
 
 // Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: lang/en_utf8/sloodle_translation_en.lsl 
+// SLOODLE LSL Script Git Location: lang/en_utf8/sloodle_translation_en.lsl 
 

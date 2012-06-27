@@ -340,5 +340,5 @@ state ready
         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [], "pwreset:success", [name, sloodleserverroot, username, password], av, "pwreset");
     }
 }
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/pwreset-1.0/sloodle_mod_pwreset-1.0.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/pwreset-1.0/sloodle_mod_pwreset-1.0.lsl 

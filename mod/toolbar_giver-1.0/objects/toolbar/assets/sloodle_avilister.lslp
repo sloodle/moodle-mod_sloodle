@@ -333,5 +333,5 @@ state searching
     	if (num == SLOODLE_CHANNEL_OBJECT_DIALOG && sval == "do:reset") llResetScript();
     }
 }
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: toolbar/lsl/sloodle_avilister.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: toolbar/lsl/sloodle_avilister.lsl 

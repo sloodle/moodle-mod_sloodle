@@ -90,5 +90,5 @@ debug(str);
         llSetText("", <0,0,0>, 1.0);
     }
 }
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/enrolbooth-1.0/_setText.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/enrolbooth-1.0/_setText.lsl 

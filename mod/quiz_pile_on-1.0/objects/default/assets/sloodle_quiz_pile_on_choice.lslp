@@ -104,5 +104,5 @@ default
     }
 }
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/quiz_pile_on-1.0/sloodle_quiz_pile_on_choice.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/quiz_pile_on-1.0/sloodle_quiz_pile_on_choice.lsl 

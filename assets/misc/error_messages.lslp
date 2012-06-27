@@ -208,5 +208,5 @@ default {
     }
 }
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: lib/lsl/error_messages.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: lib/lsl/error_messages.lsl 

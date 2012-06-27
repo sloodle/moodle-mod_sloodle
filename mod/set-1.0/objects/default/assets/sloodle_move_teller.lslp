@@ -57,5 +57,5 @@ start_rot = to_rot;
 }
 
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_move_teller.lsl
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/set-1.0/sloodle_move_teller.lsl

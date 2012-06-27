@@ -317,4 +317,4 @@ default {
        }
    }
 } // Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: lsl/xytext/xytext.lsl.23
+// SLOODLE LSL Script Git Location: lsl/xytext/xytext.lsl.23

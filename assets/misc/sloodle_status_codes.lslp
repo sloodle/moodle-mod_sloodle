@@ -68,7 +68,7 @@ integer SLOODLE_OBJECT_GIVE_POINTS= -1639271136; //linked message channel to tel
 integer SLOODLE_LOAD_CURRENT_URL= -1639271137; //send message to shared media to open url that it is currently displaying in a browser.
 integer SLOODLE_CHANNEL_DISTRIBUTOR_REQUEST_GIVE_OBJECT = -1639271151; // start the process to give the specified object to the specified avatar, if they are allowed it.
 integer SLOODLE_CHANNEL_DISTRIBUTOR_DO_GIVE_OBJECT = 1639271152; // actually do give the specified object to the specified avatar
-// Please leave the following line intact to show where the script lives in Subversion:
+// Please leave the following line intact to show where the script lives in Git:
 =======
 integer SLOODLE_CHANNEL_SCOREBOARD_UPDATE_COMPLETE = 1639271140;
 integer SLOODLE_CHANNEL_SCOREBOARD_SCORES_CONFIG = -1639272000;
@@ -111,5 +111,5 @@ integer SLOODLE_CHANNEL_ENEMY_ATTACK= -163928666;//Channel to communicate on whe
 
 integer SLOODLE_CHANNEL_OPEN_IN_BROWSER = -1639277000;
 
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: lib/lsl/sloodle_status_codes.lsl.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: lib/lsl/sloodle_status_codes.lsl.lsl 
