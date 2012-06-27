@@ -88,11 +88,15 @@ class SloodleObjectConfig {
 			return false;
 		}
 	
-                $definition_file = SLOODLE_DIRROOT.'/mod/'.$modname.'/object_definitions/'.$objcode.'.php';
+        $definition_file = SLOODLE_DIRROOT.'/mod/'.$modname.'/objects/'.$objcode.'/definition.php';
 		if (!file_exists($definition_file)) {
 			return null;
 		}
 		include($definition_file); // Will define a variable called $sloodleconfig
+
+        $sloodleconfig->object_code= $objcode;
+        $sloodleconfig->modname    = $modname;
+
 		return $sloodleconfig;
 
 	}
@@ -138,34 +142,41 @@ class SloodleObjectConfig {
 		if (!$dh = opendir($modtopdir)) {
 			return false;
 		}
-		while (($file = readdir($dh)) !== false) {
-			if ($file == '.') { 
+		while (($moddir = readdir($dh)) !== false) {
+
+			if ($moddir == '.') { 
 				continue;
 			}
-			if ($file == '..') { 
+
+			if ($moddir == '..') { 
 				continue;
 			}
-			$object_definition_dir = $modtopdir.'/'.$file.'/object_definitions';
-			if ( !file_exists( $object_definition_dir ) || !is_dir($object_definition_dir) ) {
+
+			$object_dir = $modtopdir.'/'.$moddir.'/objects';
+			if ( !file_exists( $object_dir ) || !is_dir($object_dir) ) {
 				continue;
 			}
-			if (!$dh2 = opendir($object_definition_dir)) {
+
+			if (!$dh2 = opendir($object_dir)) {
 				continue;
 			}
-			while (($def_include = readdir($dh2)) !== false) {
-				if (!preg_match('/\.php$/', $def_include)) {
-					continue;
-				}
-                $sloodleconfig = null;
-                // Should define $sloodleconfig, which should be a SloodleObjectConfig object.
-				include($object_definition_dir.'/'.$def_include);
-                if (!$sloodleconfig) {
+
+			while (($object_code = readdir($dh2)) !== false) {
+    
+                if ($object_code == '.') { 
                     continue;
                 }
-                if (!$sloodleconfig->do_show()) {
+
+                if ($object_code == '..') { 
                     continue;
                 }
-				$object_configs[$sloodleconfig->$key] = $sloodleconfig;
+
+                $object_type = "$moddir/$object_code";
+
+                if ($sloodleconfig = SloodleObjectConfig::ForObjectType($object_type)) {
+                    $object_configs[$sloodleconfig->$key] = $sloodleconfig;
+                }
+
 			}
 			closedir($dh2);
 		}
@@ -308,14 +319,6 @@ class SloodleObjectConfig {
 
 		return $sloodleconfig;
 
-	}
-
-	// returns a SloodleObjectConfig object for the specified tool (eg. chat-1.0).
-	// TODO: This currently pulls the config out of a single big list.
-	// The list needs to be split into each module directory, and pulled in from there.
-	// This is intended to be used where we're currently include()ing a file from its mod/object_config.php
-	function ForModName( $modname ) {
-			
 	}
 
 	function possibleObjectNames() {

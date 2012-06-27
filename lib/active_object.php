@@ -65,7 +65,7 @@
         /**
         * The code of this object. 
         * If we have multiple objects sharing the same linked, they will have different codes.	
-        * Corresponds to the files inside object_definitions/
+        * Corresponds to the name of the directory inside objects
         * eg. Two quiz chairs, one of which was a rocket would both have the type of quiz-1.0
         * ...and be distinguished as 'quiz-chair' and 'quiz-rocket'.
         * NB For backwards compatibility, this can be undefined
