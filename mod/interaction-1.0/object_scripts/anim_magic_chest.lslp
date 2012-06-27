@@ -23,3 +23,5 @@ vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
 llSetPrimitiveParams([6, zfirE,8, <0.24763,-0.66231,0.66242,0.24742> / llGetRootRotation(),9,1,0,<0.500000, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0]); }
 
 if(stat){llSetStatus(1,1);}}}
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: mod/interaction-1.0/object_scripts/anim_magic_chest.lslp 
