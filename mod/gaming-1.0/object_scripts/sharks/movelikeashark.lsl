@@ -1,4 +1,3 @@
-// LSL script generated: mod.gaming-1.0.object_scripts.sharks.movelikeashark.lslp Wed Jun 20 03:40:58 Tokyo Standard Time 2012
 /*
 *  Part of the Sloodle project (www.sloodle.org)
 *  movelikeashark.lsl
@@ -37,37 +36,47 @@
 *
 *  DESCRIPTION
 *  makes the object's movements look like a fish 
-*/ 
+*/
 
 
-vector degrees_of_swish = <0.0,0.0,10.0>;
-vector degrees_of_antiswish = <0.0,0.0,-10.0>;
+vector degrees_of_swish = < 0.0, 0.0, 10.0 >;
+vector degrees_of_antiswish = < 0.0, 0.0, -10.0 >;
 
 rotation quat_of_swish;
 rotation quat_of_antiswish;
 integer side = 0;
 
-default {
-
-    state_entry() {
-        (degrees_of_swish *= DEG_TO_RAD);
-        (degrees_of_antiswish *= DEG_TO_RAD);
-        (quat_of_swish = llEuler2Rot(degrees_of_swish));
-        (quat_of_antiswish = llEuler2Rot(degrees_of_antiswish));
-        llSetTimerEvent(1.5);
-        (side = 1);
+default
+{
+    state_entry()
+    {
+        degrees_of_swish *= DEG_TO_RAD;
+        degrees_of_antiswish *= DEG_TO_RAD;
+        
+        quat_of_swish = llEuler2Rot( degrees_of_swish );
+        quat_of_antiswish = llEuler2Rot( degrees_of_antiswish );
+        
+        llSetTimerEvent( 1.5 );
+        side = 1;
     }
 
-
-    timer() {
-        if ((side != 1)) {
-            llSetPrimitiveParams([PRIM_ROTATION,(quat_of_swish * llGetRootRotation())]);
-            (side = 1);
+    timer()
+    {
+        if ( side != 1 )
+        {
+            //llSetLocalRot( llGetLocalRot() * quat_of_swish  );
+            //llSetPrimitiveParams([ PRIM_ROTATION, ( (llGetRot() * quat_of_swish) / llGetRootRotation() ) ]);
+            llSetPrimitiveParams([ PRIM_ROTATION, ( quat_of_swish * llGetRootRotation() ) ]);
+            side = 1;
         }
-        else  {
-            llSetPrimitiveParams([PRIM_ROTATION,(quat_of_antiswish * llGetRootRotation())]);
-            (side = 2);
+        else
+        {
+            //llSetLocalRot( llGetLocalRot() * quat_of_antiswish );
+            //llSetPrimitiveParams([ PRIM_ROTATION, ( (llGetRot() * quat_of_antiswish) / llGetRootRotation() ) ]);
+            llSetPrimitiveParams([ PRIM_ROTATION, ( quat_of_antiswish * llGetRootRotation() ) ]);
+            side = 2;
         }
+        
     }
 }
 
