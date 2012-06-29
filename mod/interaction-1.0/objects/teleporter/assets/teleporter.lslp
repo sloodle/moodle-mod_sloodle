@@ -182,8 +182,17 @@ integer sloodle_handle_command(string str){
      
     } 
         if (name == "set:destination") {
-              MYDEST= getVector(llList2String(bits,1));
-              llOwnerSay("Teleporter Destination: "+(string)MYDEST); 
+        	
+        	  string dataStr = llList2String(bits,1);
+        	  llOwnerSay("dataStr: "+dataStr);
+        	  if (llGetSubString(dataStr, 0, 0)=="<"){
+        	  	MYDEST= getVector(dataStr);
+        	  }else{
+        	  	list data = llParseString2List(dataStr, ["/"], []);
+              	MYDEST= <llList2Float(data, 0),llList2Float(data, 1),llList2Float(data, 2)>;
+              }
+        	  llOwnerSay("Teleporter Destination: "+(string)MYDEST);
+        	   
 
         }else
          if (name == "set:position") {        
