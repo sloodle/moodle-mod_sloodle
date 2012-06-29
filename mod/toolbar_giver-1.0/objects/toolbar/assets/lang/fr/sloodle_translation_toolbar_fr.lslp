@@ -365,5 +365,5 @@ default
         }
     }
 }
-// Please leave the following line intact to show where the script lives in Subversion:
+// Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: mod/toolbar_giver-1.0/objects/toolbar/assets/lang/fr/sloodle_translation_toolbar_fr.lslp
