@@ -362,6 +362,9 @@ function print_rezzable_item_li( $e, $cid, $contid, $layout, $isrezzed) {
 }
 
 function print_add_object_item_li( $object_title, $config, $cid, $contid, $layout) {
+    if (!$config->do_show()) {
+        return false;
+    }
 	$object_title = preg_replace('/^SLOODLE /', '', $object_title);
 	$id = "linkto_addobject_{$cid}-{$contid}-{$layout->id}_{$config->type_for_link()}";
 ?>
@@ -443,6 +446,9 @@ But once it's been added, it will be clone()d to make a form to update the objec
 }
 
 function print_add_object_form( $config, $cid, $contid, $layout, $object_title, $rezzeruuid ) {
+    if (!$config->do_show()) {
+        return false;
+    }
 	$id = "addobject_{$cid}-{$contid}-{$layout->id}_{$config->type_for_link()}";
 ?>
 <form data-parent="addobjectgroup_<?php echo  $config->group ?>_<?php echo  intval($cid)?>-<?php echo  intval($contid) ?>-<?php echo  intval($layout->id) ?>" class="add_object_form panel addobject_layout_<?php echo  intval($layout->id) ?>_<?php echo  $config->type_for_link()?>" id="<?php echo $id?>" title="<?php echo  s($object_title) ?>" data-primname="<?php echo  s($config->primname)?>" data-courseid="<?php echo intval($cid)?>"  >
