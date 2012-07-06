@@ -63,12 +63,7 @@ $sbconfig = array(
 );
 
 */
-//$sb = new Socket_Beanstalk( $sbconfig );
-$sb = new Socket_Beanstalk( );
-if (!$sb->connect()) {
-    print "connect failed";
-    return false;
-}
+
 
 $args = $argv;
 array_shift($args); // remove the script name
@@ -85,6 +80,18 @@ $args = array_diff($args, array('-m') );
 
 $list_tubes = in_array( '-t', $args );
 $args = array_diff($args, array('-t') );
+
+//$sb = new Socket_Beanstalk( $sbconfig );
+$sb = new Socket_Beanstalk( );
+if (!$sb->connect()) {
+    if ($verbose) {
+        print "Initial connect failed\n";
+    }
+    // Normally we'd give up if we can't connect, but in manage mode we'll keep trying every second until beanstalkd comes up.
+    if (!$manage) {
+        exit(1);
+    }
+}
 
 if ( $stats ) {
     var_dump($sb->stats());
@@ -116,59 +123,75 @@ if ($manage) {
     while(1) {
 
         $tubes = $sb->listTubes();
-        if ($verbose) {
-            print "List found ".count($tubes)."\n";
+
+        if (!is_array($tubes)) {
+            // Beanstalk server has gone away.
+            if ($verbose) {
+                print "Error: Could not get list of tubes from beanstalkd. Will disconnect and try again.\n";
+            }
+            $sb->disconnect();
+            if ($sb->connect()) {
+                $tubes = $sb->listTubes();
+            }
         }
 
-        foreach($tubes as $tube) {
-
-            if ($verbose) { 
-                print "Checking tube $tube\n";
+        if ($verbose) {
+            if (is_array($tubes)) {
+                print "List found ".count($tubes)."\n";
             }
+        }
 
-            /*
-            We'll go through the active tubes, check if they have a worker process spawned for them, and if they don't, start one.
+        if ( ( is_array($tubes) ) && ( count($tubes) > 0 ) ) {
+            foreach($tubes as $tube) {
 
-            We'll tell each script to run until the check_after time, then exit once it's finished the task it's working on.
-            That will avoid the need to keep checking on all the tubes, all the time.
-
-            If a worker process dies prematurely for some reason, it will get restarted when the check_after time comes around.
-
-            There will be a short window between the time we tell a worker to end and the time when it actually exists, as it has to finish what it's doing.
-            During that time, we'll just keep checking the process table.
-            */
-
-            $untilts = time() + $check_after;
-
-            // Unset any records we have of tubes whose time is up.
-            if (isset($tubes_watched[$tube])) {
-                // Time's up, the process should be exiting right about now.
-                if ( $tubes_watched[$tube] < time() ) {
-                    unset($tubes_watched[$tube]);
-                } 
-            }
-
-            // Should already be running, won't bother to check.
-            if (isset($tubes_watched[$tube])) {
-                continue;
-            }
-
-            if (sloodle_is_child_process_running($tube)) {
-                continue;
-            }
-
-            if ($verbose) {
-                print "No child process found for tube $tube - spawning\n";
-            }
-
-            if (sloodle_spawn_child_process($tube, $untilts)) {
-                // Make a note of the tube we spawned a worker for so we don't have to keep checking.
-                $tubes_watched[$tube] = $untilts;
                 if ($verbose) { 
-                    print "Spawned for tube $tube \n";
+                    print "Checking tube $tube\n";
                 }
-            }
 
+                /*
+                We'll go through the active tubes, check if they have a worker process spawned for them, and if they don't, start one.
+
+                We'll tell each script to run until the check_after time, then exit once it's finished the task it's working on.
+                That will avoid the need to keep checking on all the tubes, all the time.
+
+                If a worker process dies prematurely for some reason, it will get restarted when the check_after time comes around.
+
+                There will be a short window between the time we tell a worker to end and the time when it actually exists, as it has to finish what it's doing.
+                During that time, we'll just keep checking the process table.
+                */
+
+                $untilts = time() + $check_after;
+
+                // Unset any records we have of tubes whose time is up.
+                if (isset($tubes_watched[$tube])) {
+                    // Time's up, the process should be exiting right about now.
+                    if ( $tubes_watched[$tube] < time() ) {
+                        unset($tubes_watched[$tube]);
+                    } 
+                }
+
+                // Should already be running, won't bother to check.
+                if (isset($tubes_watched[$tube])) {
+                    continue;
+                }
+
+                if (sloodle_is_child_process_running($tube)) {
+                    continue;
+                }
+
+                if ($verbose) {
+                    print "No child process found for tube $tube - spawning\n";
+                }
+
+                if (sloodle_spawn_child_process($tube, $untilts)) {
+                    // Make a note of the tube we spawned a worker for so we don't have to keep checking.
+                    $tubes_watched[$tube] = $untilts;
+                    if ($verbose) { 
+                        print "Spawned for tube $tube \n";
+                    }
+                }
+
+            }
         }
 
         sleep(1);
