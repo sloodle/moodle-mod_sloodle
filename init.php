@@ -44,7 +44,7 @@
     define('SLOODLE_LIBROOT', $CFG->dirroot.'/mod/sloodle/lib');
     
     /** The Sloodle version number. */
-    define('SLOODLE_VERSION', 2.0); // This is the release version, not the module version (which is in version.php)
+    define('SLOODLE_VERSION', 2.1); // This is the release version, not the module version (which is in version.php)
 
     // The following tells us whether Moodle is at > version 2  or not. 
     define('SLOODLE_IS_ENVIRONMENT_MOODLE_2', ($CFG->version >= 2010060800) );
