@@ -227,7 +227,7 @@ state ask_for_site {
 
                 string data =  "<html><body style=\"width:1000px;height:1000px;background-color:#595c67;color:white;font-weight:bold;\"><div style=\"position:relative;top:200px;text-align:center;width:1000px;height:750px;font-size:200%\" >Contacting site<br /><br />"+sloodleserverroot+"</div></body></html>";
     
-                // llSetContentType( id, CONTENT_TYPE_HTML ); // Remove This Line On OpenSim
+                llSetContentType( id, CONTENT_TYPE_HTML ); // Remove This Line On OpenSim
                 llHTTPResponse( id, 200, data );
                                            
                 // llOwnerSay(sloodleserverroot);
@@ -516,6 +516,6 @@ state rezz_and_reply
 
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/set-1.0/objects/default/assets/sloodle_shared_media_setup.lslp
+// SLOODLE LSL Script Git Location: mod/set-1.0/objects/default/assets/sloodle_shared_media_setup.sl.lslp
 
 
