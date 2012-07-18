@@ -64,7 +64,7 @@ if ($childobjectuuid == $rezzeruuid) {
     // first time we way it
     $ao = new SloodleActiveObject();
     if(!$ao->loadByUUID( $childobjectuuid )) {
-        $primpassword = sloodle_random_web_password();
+        $primpassword = sloodle_random_prim_password();
         $httpinpassword = sloodle_random_prim_password();
         if ( !$authid = $controller->register_object($childobjectuuid, $objectname, $sloodle->user, $primpassword, $httpinpassword, $objecttype) ) {
             $sloodle->response->set_status_code(-217);//Could not save HTTP In URL for rezzed object
