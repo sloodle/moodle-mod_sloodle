@@ -877,8 +877,15 @@
         /*
         Notify any active objects that are interested in the action $action.
         ...so that an object can tell us what it's interested in hearing about.
+        @notification_action - the name of whatever action just happened. Interested objects state this in their definition.php.
+        @success_code - the code to be sent to the object.
+        @controllerid - the controller we should filter for, if there is one.
+        @userid - the ID of the user concerned. Probably only used in callbacks.
+        @params - any parameters to be sent to the objects, in name=>value pairs.
+        @addtimestampparams - tells us to append a timestamp to the bottom of the message to help the object tell if it's getting the latest message, or if messages are out of order.
+        @exactlyonce -  tells the function to return as soon as it successfully sends. This is used when trying to send an IM to the user, which we only want to do once even if there are multiple objects in-world that could handle it.
         */
-        function NotifySubscriberObjects( $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) {
+        function NotifySubscriberObjects( $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams, $exactlyonce = false ) {
 
             global $CFG;
 
@@ -886,20 +893,28 @@
 
             //$interested_object_types = array('SLOODLE Scoreboard');
             if (count($interested_object_types) == 0) {
-                // nobody cares, we're done..
-                return true;
+                // Nobody cares.
+                // This is a failure if we had to send exactly one message, as with instant message notifications.
+                // Otherwise it's a success: We notified everybody who cared, which turned out to be nobody.
+                return !$exactlyonce;
             }
 
             $instr = '';
             $delim = '';
-            $queryparams = array(intval($controllerid));
+            $queryparams = $controllerid ? array(intval($controllerid)) : array();
             foreach($interested_object_types as $ot) {
                 $queryparams[] = $ot;
                 $instr .= $delim.'?';
                 $delim = ',';
             }
             $queryparams[] = time() - (3600+600); // Ping time and then some. All objects that are alive should have updated within this time.
+
             $sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=? and a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? order by a.timeupdated desc;";
+
+            if (!$controllerid) {
+                $sql = "select a.* from {$CFG->prefix}sloodle_active_object a WHERE a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? order by a.timeupdated desc;";
+            }
+
             $recs = sloodle_get_records_sql_params($sql, $queryparams);
 
             $msg = "$success_code\n"; 
@@ -958,6 +973,9 @@
                     if($resarr['info']['http_code'] == 200){
                         $ao->lastmessagetimestamp = time();
                         $ao->save();
+                        if ($exactlyonce) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -967,10 +985,19 @@
                 foreach($callback_objects as $callback => $aoarr) {
 
                 //SloodleDebugLogger::log('DEBUG', "calling callback $callback for ".count($aoarr)." objects");
-                    call_user_func_array( $callback, array( $aoarr, $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) );
+                    $result = call_user_func_array( $callback, array( $aoarr, $notification_action, $success_code, $controllerid, $userid, $params, $addtimestampparams ) );
+                    if ($result && $exactlyonce) {
+                        return true;
+                    }
                 } 
             }
 
+            // If we were supposed to do this exactly once and not have succeeded, that's a failure.
+            if ($exactlyonce) {
+                return false;
+            }
+
+            // If we didn't specify the number and nothing went wrong, that's a success, even if we managed to contact zero objects.
             return true;
             
         }

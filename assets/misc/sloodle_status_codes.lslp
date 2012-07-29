@@ -108,6 +108,7 @@ integer SLOODLE_CHANNEL_POOL_BOUNDARIES_RESPONSE= -163928001;//pool whispers on 
 integer SLOODLE_CHANNEL_ENEMY_AIM = -163928665;//Channel to communicate on when enemy is aming at target, ie:delivering a laserbeam
 integer SLOODLE_CHANNEL_ENEMY_ATTACK= -163928666;//Channel to communicate on when attack occurs by an enemy
 
+integer SLOODLE_CHANNEL_MESSAGER_INSTANT_MESSAGE = 163290001;
 
 integer SLOODLE_CHANNEL_OPEN_IN_BROWSER = -1639277000;
 
