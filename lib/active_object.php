@@ -968,8 +968,12 @@
                 $renderStr="";
                 $response->render_to_string($renderStr);
 
+                // If we're doing exactly once, we'll need to send synchronously so we can check the notification worked.
+                // Otherwise, send asynchronously if it's turned on.
+                $async = (defined('SLOODLE_ASYNC_SEND_MESSAGES') && SLOODLE_ASYNC_SEND_MESSAGES && !$exactlyonce);
+
                 // If this stuff fails, tough. We did our best.
-                if ($resarr = $ao->sendMessage($renderStr, true, true)) {
+                if ($resarr = $ao->sendMessage($renderStr, $async, $async)) {
                     if($resarr['info']['http_code'] == 200){
                         $ao->lastmessagetimestamp = time();
                         $ao->save();
