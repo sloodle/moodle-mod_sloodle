@@ -56,15 +56,3 @@ $settings->add( new admin_setting_configtext(
                 '',
                 ''));
 
-/*
-$settings->add( new admin_setting_configselect(
-                'freemail_usepassword',
-                get_string('freemail:usepass','freemail'),
-                '',
-                0,
-                array('0' => 'No', '1' => 'Yes')
-));
-*/
-
-
-?>

@@ -41,9 +41,9 @@ require_once $freemail_dir.'/lib/freemail_moodle_importer.php';
 $noticeTable = new html_table();
 $noticeTable->head = array('SLOODLE Freemail - Postcard Blogger');
 $r = array();
-$body = get_string('freemail_explanation_wheretosend','freemail', $CFG->freemail_mail_user_name);
+$body = get_string('freemail:explanation_wheretosend','freemail', $CFG->freemail_mail_user_name);
 $body .= ' ';
-$body .= get_string('freemail_explanation_howtoblog','freemail');
+$body .= get_string('freemail:explanation_howtoblog','freemail');
 $r[] = $body;
 
 $courseTable = new stdClass();
@@ -65,10 +65,10 @@ if (isset($_POST['nodelete'])) {
 <input type="hidden" value="1" name="do_test" />
 <input type="checkbox" name="nodelete" value="1" <?php echo $nodelete ? ' checked="checked" ' : ''?>/>
 <?php
-echo get_string('freemail_delete_message', 'freemail');
+echo get_string('freemail:delete_message', 'freemail');
 ?>
 <br />
-<input type="submit" value="<?php echo get_string('freemail_testbutton', 'freemail')?>" />
+<input type="submit" value="<?php echo get_string('freemail:testbutton', 'freemail')?>" />
 </form>
 </div>
 
