@@ -4,33 +4,33 @@
  
 $settings->add( new admin_setting_configtext(
                 'freemail_mail_email_address',
-                get_string('freemail:emailtosend', 'freemail'),
+                get_string('freemail:emailtosend', 'sloodle'),
                 '',
                 ''));
 
 
 $settings->add( new admin_setting_configtext(
                 'freemail_mail_user_name',
-                get_string('freemail:mailaccount', 'freemail'),
+                get_string('freemail:mailaccount', 'sloodle'),
                 '',
                 ''));
                 
 $settings->add( new admin_setting_configtext(
                 'freemail_mail_user_pass',
-                get_string('freemail:mailaccountpassword', 'freemail'),
+                get_string('freemail:mailaccountpassword', 'sloodle'),
                 '',
                 ''));
   
 $settings->add( new admin_setting_configtext(
                 'freemail_mail_box_settings',
-                get_string('freemail:mailboxsettings', 'freemail'),
-                get_string('freemail:gmailuse','freemail').'{imap.gmail.com:993/imap/ssl}INBOX',
+                get_string('freemail:mailboxsettings', 'sloodle'),
+                get_string('freemail:gmailuse','sloodle').'{imap.gmail.com:993/imap/ssl}INBOX',
                 ''));
  
 /*
 $settings->add( new admin_setting_configselect(
                 'freemail_pop3_or_imap',
-                get_string('freemail:mailaccounttype','freemail'),
+                get_string('freemail:mailaccounttype','sloodle'),
                 '',
                 0,
                 array('pop3' => 'POP3', 'imap' => 'IMAP')
@@ -39,20 +39,20 @@ $settings->add( new admin_setting_configselect(
   
 $settings->add( new admin_setting_configtext(
                 'freemail_mail_admin_email',
-                get_string('freemail:adminmail', 'freemail'),
+                get_string('freemail:adminmail', 'sloodle'),
                 '',
                 ''));
   
   
 $settings->add( new admin_setting_configtext(
                 'freemail_mail_maxcheck',
-                get_string('freemail:maxcheck', 'freemail'),
+                get_string('freemail:maxcheck', 'sloodle'),
                 '',
                 ''));
  
 $settings->add( new admin_setting_configtext(
                 'freemail_mail_maxsize',
-                get_string('freemail:delete', 'freemail'),
+                get_string('freemail:delete', 'sloodle'),
                 '',
                 ''));
 
