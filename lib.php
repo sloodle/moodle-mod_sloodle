@@ -346,6 +346,9 @@
      * @todo Use a custom delay for expiries of users/objects
      **/
     function sloodle_cron () {
+
+        global $CFG;
+
         echo "\nProcessing Sloodle cron tasks:\n";
         
         // Delete any pending user entries which have expired (more than 30 minutes old)
@@ -403,14 +406,14 @@
 
         if (defined('SLOODLE_FREEMAIL_ACTIVATE') && SLOODLE_FREEMAIL_ACTIVATE) {
 
+            echo "Checking for freemail emails...\n";
+
             require_once 'freemail/lib/freemail_imap_message_handler.php';
             require_once 'freemail/lib/freemail_email_processor.php';
             require_once 'freemail/lib/freemail_moodle_importer.php';
-            freemail_email_processor::read_mail($CFG, false, false, null, false, true);
+            sloodle_freemail_email_processor::read_mail($CFG, false, false, null, false, true);
 
         }
-
-
 
         echo "Done processing Sloodle cron tasks.\n\n";
         return true;

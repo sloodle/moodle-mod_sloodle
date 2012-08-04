@@ -209,6 +209,10 @@ class sloodle_freemail_email_processor {
         // This is useful to us at Avatar Classroom in a multi-site setting, but probably not to anybody else.
         $cfg = isset($cfg->sloodle_freemail_force_settings) ? $cfg->sloodle_freemail_force_settings : $cfg;
 
+        if ($cfg->sloodle_freemail_mail_box_settings == '') {
+            return false;
+        }
+
         $statuses = array(
             'result' => array(),
             'errors' => array(),
