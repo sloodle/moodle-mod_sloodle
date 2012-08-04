@@ -42,14 +42,14 @@ if ($nodelete && $daemon) {
 
 if ($daemon) {
 
-    while ($handler = freemail_email_processor::read_mail($CFG, $verbose, $daemon, $handler, false)) {
-        freemail_email_processor::verbose_output($verbose, "Handling run done, sleeping");
+    while ($handler = sloodle_freemail_email_processor::read_mail($CFG, $verbose, $daemon, $handler, false)) {
+        sloodle_freemail_email_processor::verbose_output($verbose, "Handling run done, sleeping");
         sleep(2);
     }
 
 } else {
 
-    freemail_email_processor::read_mail($CFG, $verbose, $daemon, null, $nodelete);
+    sloodle_freemail_email_processor::read_mail($CFG, $verbose, $daemon, null, $nodelete);
 
 }
 

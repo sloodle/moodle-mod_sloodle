@@ -1,5 +1,5 @@
 <?php
-class freemail_imap_message_handler {
+class sloodle_freemail_imap_message_handler {
 
     var $_connection = null;
 

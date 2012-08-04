@@ -2,7 +2,7 @@
 /*
 Importer for getting the results of a message into a blog.
 */
-class freemail_blog_moodle_importer extends freemail_moodle_importer {
+class sloodle_freemail_blog_moodle_importer extends sloodle_freemail_moodle_importer {
 
     /*
     var $_title;

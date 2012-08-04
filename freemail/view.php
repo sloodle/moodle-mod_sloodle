@@ -19,7 +19,7 @@ if (!defined('SLOODLE_FREEMAIL_ACTIVATE') || !SLOODLE_FREEMAIL_ACTIVATE) {
 $PAGE->set_context(get_system_context());
 $PAGE->set_context(get_context_instance(CONTEXT_COURSE, SITEID));
 
-$PAGE->set_url('/mod/freemail/view.php');
+$PAGE->set_url('/mod/sloodle/freemail/view.php');
 $PAGE->set_title('Postcard Blogger');
 $PAGE->set_heading('Postcard Blogger.');
 
@@ -82,7 +82,7 @@ if (isset($_POST['do_test'])) {
     $daemon = false;
 
     echo '<textarea rows="10" style="width:100%">';
-    freemail_email_processor::read_mail($CFG, $verbose, $daemon, null, $nodelete);
+    sloodle_freemail_email_processor::read_mail($CFG, $verbose, $daemon, null, $nodelete);
     echo '</textarea>';
 }
 if ($nodelete && $daemon) {

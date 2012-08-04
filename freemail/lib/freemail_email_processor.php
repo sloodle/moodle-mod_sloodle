@@ -3,7 +3,7 @@
 This is a base class for email processors.
 It needs to be extended by a specific email processor, stored in the email_processors directory.
 */
-class freemail_email_processor {
+class sloodle_freemail_email_processor {
 
     // The following hold the raw data from the email.
     var $_subject;
@@ -33,7 +33,7 @@ class freemail_email_processor {
 
         while (($processor_file = readdir($dh)) !== false) {
 
-            if (preg_match('/^(freemail_\w+_email_processor).php$/', $processor_file, $matches)) {
+            if (preg_match('/^(sloodle_freemail_\w+_email_processor).php$/', $processor_file, $matches)) {
                 
                 $clsname = $matches[1];
                 require_once($processor_dir.'/'.$processor_file);
@@ -151,7 +151,7 @@ class freemail_email_processor {
 
     function load_importer() {
         
-        $importers = freemail_moodle_importer::available_moodle_importers();
+        $importers = sloodle_freemail_moodle_importer::available_moodle_importers();
         if (!count($importers)) {
             return false;
         }
@@ -207,7 +207,7 @@ class freemail_email_processor {
 
         // This allows you to hard-code some settings in your config.php and use them in preference to whatever might be set in the web UI.
         // This is useful to us at Avatar Classroom in a multi-site setting, but probably not to anybody else.
-        $cfg = isset($cfg->freemail_force_settings) ? $cfg->freemail_force_settings : $cfg;
+        $cfg = isset($cfg->sloodle_freemail_force_settings) ? $cfg->sloodle_freemail_force_settings : $cfg;
 
         $statuses = array(
             'result' => array(),
@@ -219,21 +219,21 @@ class freemail_email_processor {
         $giveup = false;
         $msgcount = 0;
 
-        $email_processors = freemail_email_processor::available_email_processors();
+        $email_processors = sloodle_freemail_email_processor::available_email_processors();
         if (!count($email_processors)) {
-            freemail_email_processor::verbose_output($verbose, "No email processors available, aborting.");
+            sloodle_freemail_email_processor::verbose_output($verbose, "No email processors available, aborting.");
             $statuses['errors']["-1"] = "No email processors available, aborting.";
             $giveup = true;
         }
 
         // In daemon mode, the handler is kept alive between calls to this function with its connection open.
-        freemail_email_processor::verbose_output($verbose, "Trying to get connection...");
-        $handler = !is_null($handler) ? $handler : new freemail_imap_message_handler();
+        sloodle_freemail_email_processor::verbose_output($verbose, "Trying to get connection...");
+        $handler = !is_null($handler) ? $handler : new sloodle_freemail_imap_message_handler();
 
         if (!$giveup) {
-            freemail_email_processor::verbose_output($verbose, "Connecting...");
-            if (!$handler->connect($cfg->freemail_mail_box_settings, $cfg->freemail_mail_user_name, $cfg->freemail_mail_user_pass)) {
-                freemail_email_processor::verbose_output($verbose, "Connection failed.");
+            sloodle_freemail_email_processor::verbose_output($verbose, "Connecting...");
+            if (!$handler->connect($cfg->sloodle_freemail_mail_box_settings, $cfg->sloodle_freemail_mail_user_name, $cfg->sloodle_freemail_mail_user_pass)) {
+                sloodle_freemail_email_processor::verbose_output($verbose, "Connection failed.");
                 $statuses['errors']["-2"] = "Connection failed. Could not fetch email.";
                 $giveup = true;
             }
@@ -246,7 +246,7 @@ class freemail_email_processor {
                     return $handler;
                 }
                 $handler->close();
-                freemail_email_processor::verbose_output($verbose, "No messages found.");
+                sloodle_freemail_email_processor::verbose_output($verbose, "No messages found.");
                 $statuses['result']["1"] = "No messages.";
                 $giveup = true;
             }
@@ -254,19 +254,19 @@ class freemail_email_processor {
 
         if (!$giveup) {
 
-            freemail_email_processor::verbose_output($verbose, "Got $msgcount messages.");
+            sloodle_freemail_email_processor::verbose_output($verbose, "Got $msgcount messages.");
 
             if ($msgcount > 0)  {  
 
-                if ($msgcount > $cfg->freemail_mail_maxcheck) {
-                    $msgcount = $cfg->freemail_mail_maxcheck;
+                if ($msgcount > $cfg->sloodle_freemail_mail_maxcheck) {
+                    $msgcount = $cfg->sloodle_freemail_mail_maxcheck;
                 }
 
                 for ($mid = 1; $mid <= $msgcount; $mid++) {
 
                     $statuses['messages'] = array();
 
-                    freemail_email_processor::verbose_output($verbose, "Considering loading message with ID :$mid:");
+                    sloodle_freemail_email_processor::verbose_output($verbose, "Considering loading message with ID :$mid:");
 
                     // Load the header first so that we can check what we need to know before downloading the rest. 
                     if (!$handler->load_header($mid)) {
@@ -280,7 +280,7 @@ class freemail_email_processor {
                     $fromaddress = $handler->get_from_address();
 
                     $toaddress = $handler->get_to_address();
-                    if (!strtolower($toaddress) == strtolower($cfg->freemail_mail_email_address)) {
+                    if (!strtolower($toaddress) == strtolower($cfg->sloodle_freemail_mail_email_address)) {
                         print "not for us: $toaddress";
                         // Not for us.
                         continue;
@@ -292,14 +292,14 @@ class freemail_email_processor {
                     );
 
                     $size_in_bytes = $handler->get_size_in_bytes();
-                    if ($size_in_bytes > $cfg->freemail_mail_maxsize) {
+                    if ($size_in_bytes > $cfg->sloodle_freemail_mail_maxsize) {
                         $statuses['messages'][] = array( 
                             'errors' => array('-101' => 'Could not load header.'),
                             'info' => $info
                         );
                         continue;
                     }
-                    freemail_email_processor::verbose_output($verbose, "Message size :$size_in_bytes: small enough - continuing.");
+                    sloodle_freemail_email_processor::verbose_output($verbose, "Message size :$size_in_bytes: small enough - continuing.");
 
                     // TODO: Separate load_header and load_body so we don't load the whole thing if it's too big.
                     if (!$handler->load($mid)) {
@@ -310,7 +310,7 @@ class freemail_email_processor {
 
                         continue;
                     }
-                    freemail_email_processor::verbose_output($verbose, "Loaded message...");
+                    sloodle_freemail_email_processor::verbose_output($verbose, "Loaded message...");
 
                     $htmlmsg = $handler->get_html_message();;
                     $plainmsg = $handler->get_plain_message();; 
@@ -319,7 +319,7 @@ class freemail_email_processor {
 
                     foreach($email_processors as $processor) {
 
-                        freemail_email_processor::verbose_output($verbose, "Trying processor...");
+                        sloodle_freemail_email_processor::verbose_output($verbose, "Trying processor...");
 
                         $processor->set_subject($subject);
                         $processor->set_from_address($fromaddress);
@@ -331,7 +331,7 @@ class freemail_email_processor {
                             $processor->add_attachment($attachment_filename, $attachment_body);
                         }
 
-                        freemail_email_processor::verbose_output($verbose, "Preparing message...");
+                        sloodle_freemail_email_processor::verbose_output($verbose, "Preparing message...");
                         // Couldn't make sense of it, skip
                         if (!$processor->prepare()) {
 
@@ -339,13 +339,13 @@ class freemail_email_processor {
                                 'errors' => array('-103' => 'Could not prepare email.') ,
                                 'info' => $info
                             );
-                            freemail_email_processor::verbose_output($verbose, "Could not prepare email.");
+                            sloodle_freemail_email_processor::verbose_output($verbose, "Could not prepare email.");
                             continue;
                         }
 
                         // Couldn't find anyone to process it, skip.
                         if (!$processor->load_importer()) {
-                            freemail_email_processor::verbose_output($verbose, "Could not load importer.");
+                            sloodle_freemail_email_processor::verbose_output($verbose, "Could not load importer.");
 
                             $statuses['messages'][] = array( 
                                 'errors' => array('-104' => 'Could not load importer.'),
@@ -356,7 +356,7 @@ class freemail_email_processor {
 
                         // Processor can't handle this kind of email.
                         if (!$processor->is_email_processable()) {
-                            freemail_email_processor::verbose_output($verbose, "Processor cannot handle this email. Will let others try.");
+                            sloodle_freemail_email_processor::verbose_output($verbose, "Processor cannot handle this email. Will let others try.");
 
                             $statuses['messages'][] = array( 
                                 'errors' => array('-104' => 'Could not load importer.'),
@@ -372,9 +372,9 @@ class freemail_email_processor {
                         // Mark the message as flagged 
                         // $handler->mark_flagged($mid);
 
-                        freemail_email_processor::verbose_output($verbose, "Importing...");
+                        sloodle_freemail_email_processor::verbose_output($verbose, "Importing...");
                         if (!$processor->import()) {
-                            freemail_email_processor::verbose_output($verbose, "Importing failed.");
+                            sloodle_freemail_email_processor::verbose_output($verbose, "Importing failed.");
                             $statuses['messages'][] = array( 
                                 'errors' => array('-105' => 'Importing failed.'),
                                 'info' => $info
@@ -382,7 +382,7 @@ class freemail_email_processor {
                             continue;
                         }
 
-                        freemail_email_processor::verbose_output($verbose, "Notifying user...");
+                        sloodle_freemail_email_processor::verbose_output($verbose, "Notifying user...");
                         if (!$processor->notify_user()) {
                             $statuses['messages'][] = array( 
                                 'success' => array('107' => 'Imported, but could not notify user..'),
@@ -392,7 +392,7 @@ class freemail_email_processor {
                             break;
                         }
 
-                        freemail_email_processor::verbose_output($verbose, "Handling of this email complete.");
+                        sloodle_freemail_email_processor::verbose_output($verbose, "Handling of this email complete.");
                         $statuses['messages'][] = array( 
                             'success' => array('107' => 'Imported, but could not notify user..'),
                             'errors' => array('-106' => 'Imported, but could not notify user..'),
@@ -407,11 +407,11 @@ class freemail_email_processor {
                     // list($subcomm, $messcomm) = freemail_getcommands($msg->header[$mid]['subject'], $messagebody['message'], $commands);
 
                     if ($nodelete) {
-                        freemail_email_processor::verbose_output($verbose, "Skipping deletion of message $mid because you asked for nodelete.");
+                        sloodle_freemail_email_processor::verbose_output($verbose, "Skipping deletion of message $mid because you asked for nodelete.");
                     } else {
-                        freemail_email_processor::verbose_output($verbose, "Deleting message $mid.");
+                        sloodle_freemail_email_processor::verbose_output($verbose, "Deleting message $mid.");
                         if (!$handler->delete($mid)) {
-                            freemail_email_processor::verbose_output($verbose, "Deletion of message $mid failed.");
+                            sloodle_freemail_email_processor::verbose_output($verbose, "Deletion of message $mid failed.");
                         }
                     }
                     //imap_delete($mailbox, $mid);
@@ -426,12 +426,12 @@ class freemail_email_processor {
 
         }
 
-        if ($cfg->freemail_mail_admin_email) {
+        if ($cfg->sloodle_freemail_mail_admin_email) {
             // in daemon mode, only send a report if some messages were actually processed.
             if ( (!$daemon & !$cron) || $msgcount) { 
                 $subject = "Email processing report";
-                $body = freemail_email_processor::status_text($statuses);
-                mail($cfg->freemail_mail_admin_email, $subject, $body); 
+                $body = sloodle_freemail_email_processor::status_text($statuses);
+                mail($cfg->sloodle_freemail_mail_admin_email, $subject, $body); 
             }
         }
 

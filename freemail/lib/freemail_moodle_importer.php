@@ -3,7 +3,7 @@
 This is a base class for email processors.
 It needs to be extended by a specific moodle importer, stored in the moodle_importers directory.
 */
-abstract class freemail_moodle_importer {
+abstract class sloodle_freemail_moodle_importer {
 
     var $_title;
     var $_body;
@@ -111,8 +111,7 @@ abstract class freemail_moodle_importer {
 
     static function available_moodle_importers() {
 
-        global $CFG;
-        $importer_dir = $CFG->dirroot.'/mod/freemail/moodle_importers';
+        $importer_dir = dirname(__FILE__).'/moodle_importers';
 
         if (!$dh = opendir($importer_dir)) {
             return false;
@@ -123,7 +122,7 @@ abstract class freemail_moodle_importer {
         while (($importer_file = readdir($dh)) !== false) {
             //print "looking at $importer_file";
 
-            if (preg_match('/^(freemail_\w+_moodle_importer).php$/', $importer_file, $matches)) {
+            if (preg_match('/^(sloodle_freemail_\w+_moodle_importer).php$/', $importer_file, $matches)) {
                 
                 $clsname = $matches[1];
                 require_once($importer_dir.'/'.$importer_file);

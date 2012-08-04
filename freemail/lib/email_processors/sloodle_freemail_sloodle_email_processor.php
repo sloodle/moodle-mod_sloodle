@@ -3,14 +3,14 @@
 * Sloodle email processfor for the freemail mod (for Sloodle 0.4).
 * Various functions to extract info from sl postcards
 *
-* @package freemail
+* @package sloodle
 * @copyright Copyright (c) 2009 various contributors 
 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
 *
 * @contributor Paul G. Preibisch - aka Fire Centaur in Second Life
 * @contributor Edmund Edgar
 */
-class freemail_sloodle_email_processor extends freemail_email_processor {
+class sloodle_freemail_sloodle_email_processor extends sloodle_freemail_email_processor {
 
     var $_avatar_uuid = null;
 
