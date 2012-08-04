@@ -67,4 +67,12 @@ $settings->add( new admin_setting_configtext(
                 21));
 // This selection box determines whether or not auto-enrolment is allowed on the site
 
+// Pull in the freemail config, if we're using it.
+if ( (defined('SLOODLE_FREEMAIL_ACTIVATE') && SLOODLE_FREEMAIL_ACTIVATE) && ( (!defined('SLOODLE_FREEMAIL_HIDE_CONFIG') || !SLOODLE_FREEMAIL_HIDE_CONFIG)) ) {
+
+    include($CFG->dirroot.'/mod/sloodle/freemail/settings.php');
+
+}
+
+
 ?>

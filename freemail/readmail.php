@@ -14,7 +14,11 @@
 if (isset($argv)) {
     define('CLI_SCRIPT', true);
 }
-require_once "../../config.php";
+require_once "../init.php";
+
+if (!defined('SLOODLE_FREEMAIL_ACTIVATE') || !SLOODLE_FREEMAIL_ACTIVATE) {
+        die("Freemail is turned off. Enable SLOODLE_FREEMAIL_ACTIVATE in sloodle_config to turn it on.");
+}
 
 // Class for handling an imap message connection, and fetching and parsing emails one by one.
 require_once 'lib/freemail_imap_message_handler.php'; 

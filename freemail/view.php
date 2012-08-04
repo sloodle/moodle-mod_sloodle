@@ -11,7 +11,10 @@
 */
 
 
-require_once "../../config.php";
+require_once "/../init.php";
+if (!defined('SLOODLE_FREEMAIL_ACTIVATE') || !SLOODLE_FREEMAIL_ACTIVATE) {
+    die("Freemail is turned off. Enable SLOODLE_FREEMAIL_ACTIVATE in sloodle_config to turn it on.");
+}
 
 $PAGE->set_context(get_system_context());
 $PAGE->set_context(get_context_instance(CONTEXT_COURSE, SITEID));

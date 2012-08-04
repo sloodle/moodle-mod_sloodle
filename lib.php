@@ -400,6 +400,18 @@
         echo "Sending out login notifications...\n";
         sloodle_process_login_notifications();
 
+
+        if (defined('SLOODLE_FREEMAIL_ACTIVATE') && SLOODLE_FREEMAIL_ACTIVATE) {
+
+            require_once 'freemail/freemail_imap_message_handler.php';
+            require_once 'freemail/freemail_email_processor.php';
+            require_once 'freemail/freemail_moodle_importer.php';
+            freemail_email_processor::read_mail($CFG, false, false, null, false, true);
+
+        }
+
+
+
         echo "Done processing Sloodle cron tasks.\n\n";
         return true;
     }

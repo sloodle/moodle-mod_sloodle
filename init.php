@@ -184,7 +184,12 @@
         define('SLOODLE_REZZER_STATUS_CONFIRM_INTERVAL', 15);
     }
 
-
+    // This activates freemail blogging.
+    // This is off by default in sloodle 2.1, as we haven't tested it properly yet.
+    // We will probably turn it on in 2.2.
+    if ( !defined('SLOODLE_FREEMAIL_ACTIVATE')) {
+        define('SLOODLE_FREEMAIL_ACTIVATE', false);
+    }
 
 //---------------------------------------------------------------------
 

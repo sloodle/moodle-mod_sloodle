@@ -1,9 +1,6 @@
 Moodle Email Importer Module, SLOODLE Virtual World->Blog version
 
-You probably don't want to install this as is.
-We plan to incorporate this into the SLOODLE core, in which case you can just use SLOODLE.
-Freemail originally had non-SLOODLE uses, which could fairly easily be put back.
-This module is left here in case anyone wants to do that.
+This is the freemail module, incorporated into SLOODLE so that you won't need the extra install.
 
 
 Copyright (c) various contributors (see below) based on original work by Serafim Panov
