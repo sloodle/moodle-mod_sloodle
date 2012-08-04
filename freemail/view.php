@@ -11,7 +11,7 @@
 */
 
 
-require_once "/../init.php";
+require_once "../init.php";
 if (!defined('SLOODLE_FREEMAIL_ACTIVATE') || !SLOODLE_FREEMAIL_ACTIVATE) {
     die("Freemail is turned off. Enable SLOODLE_FREEMAIL_ACTIVATE in sloodle_config to turn it on.");
 }
@@ -38,17 +38,39 @@ require_once $freemail_dir.'/lib/freemail_imap_message_handler.php';
 require_once $freemail_dir.'/lib/freemail_email_processor.php'; 
 require_once $freemail_dir.'/lib/freemail_moodle_importer.php'; 
 
+$freemail_cfg = isset($CFG->sloodle_freemail_force_settings) ? $CFG->sloodle_freemail_force_settings : $CFG;
+
 $noticeTable = new html_table();
 $noticeTable->head = array('SLOODLE Freemail - Postcard Blogger');
 $r = array();
-$body = get_string('freemail:explanation_wheretosend','sloodle', $CFG->freemail_mail_user_name);
-$body .= ' ';
+
+if ( $freemail_cfg->sloodle_freemail_mail_box_settings == '' ) {
+    $body = get_string('freemail:confignotset','sloodle', '');
+
+    $noticeTable->width='100%';
+    $noticeTable->cellpadding=10;
+    $noticeTable->cellspacing=10; 
+    $noticeTable->data[] = $r;  
+    echo html_writer::table($noticeTable);
+
+
+    echo $OUTPUT->footer();
+    exit;
+}
+
+$body = get_string('freemail:explanation_wheretosend','sloodle', '');
+$body .= '<br />';
+$body .= '<br />';
+$body .= '<b>'.htmlentities($freemail_cfg->sloodle_freemail_mail_email_address).'</b>';
+$body .= '<br />';
+$body .= '<br />';
 $body .= get_string('freemail:explanation_howtoblog','sloodle');
 $r[] = $body;
 
 $courseTable = new stdClass();
 $courseTable->class="course-view";
 
+$noticeTable->width='100%';
 $noticeTable->cellpadding=10;
 $noticeTable->cellspacing=10; 
 $noticeTable->data[] = $r;  

@@ -822,6 +822,7 @@ $string['sloodle:courseparticipate'] = 'Allow access to a course via SLOODLE (vi
 $string['sloodle:controllerparticipate'] = 'Use activities under a SLOODLE controller';
 
 // The following are for Freemail
+$string['freemail:confignotset']='This site has not been set up to use postcard blogging.';
 $string['freemail:mailaccount']='Mail Account Name';
 $string['freemail:mailaccountpassword']='Mail account password';
 $string['freemail:mailboxsettings']='Mailbox settings';
@@ -831,7 +832,7 @@ $string['freemail:maxcheck']='Max. number of email messages that script checks e
 $string['freemail:delete']='Delete messages that are larger than (bytes)';
 $string['freemail:adminmail']='Send Error Reports and Security bulletins to:';
 $string['freemail:gmailuse']='For Gmail use:  ';
-$string['freemail:explanation_wheretosend'] = 'To blog from Second Life or OpenSim, email a postcard to {$a}.';
+$string['freemail:explanation_wheretosend'] = 'To blog from Second Life or OpenSim, email a postcard to:';
 $string['freemail:explanation_howtoblog'] = 'Put the title of your blog in the subject line and the text in the body of the email.';
 $string['freemail:testbutton'] = 'Click this button to test.';
 $string['freemail:delete_message'] = 'Skip message deletion. (May result in duplicate blog entries.';
