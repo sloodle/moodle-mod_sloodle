@@ -57,7 +57,7 @@ class sloodle_freemail_sloodle_email_processor extends sloodle_freemail_email_pr
         $y = intval($sl_info['local_y']);
         $z = intval($sl_info['local_z']);
 
-        $slurl = 'http://slurl.com/secondlife/'.urlencode($simname).'/'.$x.'/'.$y.'/'.$z;
+        $slurl = 'http://maps.secondlife.com/secondlife/'.urlencode($simname).'/'.$x.'/'.$y.'/'.$z;
 
         $messagebody = $this->_plain_body;
 
@@ -74,6 +74,12 @@ class sloodle_freemail_sloodle_email_processor extends sloodle_freemail_email_pr
 
         //now remove unwanted text - FIRE            
         $messagebody = str_replace($toDelete," ",$messagebody);           
+
+        $messagebody .= "\n";
+        $messagebody .= '<a href="'.$slurl.'">'.$slurl.'</a>.'."\n";
+
+        // Consolidate any multiple line returns into one.
+        $messagebody = preg_replace("/[\n\r]+/s","\n",$messagebody);           
 
         $this->_prepared_body = $messagebody;
         $this->_prepared_subject = $this->_subject;

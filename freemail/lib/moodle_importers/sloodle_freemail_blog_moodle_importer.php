@@ -50,9 +50,12 @@ class sloodle_freemail_blog_moodle_importer extends sloodle_freemail_moodle_impo
         require_once($CFG->dirroot.'/blog/locallib.php');
         require_once($CFG->dirroot.'/tag/lib.php');
 
+        $format = 0; // Moodle format - some tags and links.
+        $options = array('overflowdiv'=>true); // Blog did this, we probably should too.
+
         $data = array(
-            'subject' => $this->_title,
-            'summary' => $this->_body,
+            'subject' => format_string($this->_title),
+            'summary' => format_text($this->_body, $format, $options),
             'userid'  => $this->_userid,
             'publishstate' => 'draft'
             //'tags' => array('SLOODLE')
