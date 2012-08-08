@@ -260,7 +260,7 @@ class sloodle_view_currency extends sloodle_base_view
                       $editText.= "</a>";
                     
                           $editText.= "&nbsp&nbsp";
-                          $editText.= "<a href=\"".SLOODLE_WWWROOT."/mod/sloodle/view.php?&";
+                          $editText.= "<a href=\"".SLOODLE_WWWROOT."/view.php?&";
                           $editText.= "_type=currency";
                           $editText.= "&currencyid=".$c->id;
                           $editText.= "&currencyname=".urlencode($c->name);
@@ -387,7 +387,7 @@ class sloodle_view_currency extends sloodle_base_view
         //print header box
         print_box_start('generalbox boxaligncenter center boxwidthnarrow boxheightnarrow leftpara');
         echo "<h1 color=\"Red\"><img align=\"center\" src=\"{SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
-        echo get_string('currency:Edit Currency', 'sloodle')."</h1>";
+        echo get_string('currency:editcurrency', 'sloodle')."</h1>";
         print_box_end();
 
         //display all currencies
