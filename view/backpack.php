@@ -59,18 +59,30 @@ class sloodle_view_backpack extends sloodle_base_view
     {
         global $USER;
 
-        $userIds = optional_param('userIds', 0, PARAM_INT);
         $id = required_param('id', PARAM_INT);
-
-        //has itemAdd forum been submitted?
-        $isItemAdd= optional_param('isItemAdd',0, PARAM_INT);
-
         //check if valid course
         if (!$this->course = sloodle_get_record('course', 'id', $id)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
+ 
+    }
+
+
+    function process_form() {
+
+        $id = required_param('id', PARAM_INT);
+        //has itemAdd forum been submitted?
+
+        $isItemAdd= optional_param('isItemAdd',0, PARAM_INT);
+
+        $userIds = optional_param('userIds', 0, PARAM_INT);
+
         //itemAdd form has been submitted
         if ($isItemAdd) {
+
+            if (!$this->can_edit) {
+                print_error("Permission denied");
+            }
 
             $controllerid = required_param('controllerid', PARAM_INT);
 
@@ -115,7 +127,7 @@ class sloodle_view_backpack extends sloodle_base_view
                     sloodle_insert_record('sloodle_award_points',$backpack_item);
                 } 
             } 
-        } 
+        }
     }
 
     /**
@@ -259,7 +271,7 @@ class sloodle_view_backpack extends sloodle_base_view
 	foreach($all_currencies as $currencyid => $currencyname) {
 		$headerrow[] = s($currencyname);
 	}
-        $headerrow[] = '<input type="checkbox" id="checkall" checked>';
+        $headerrow[] = $this->can_edit ? '<input type="checkbox" id="checkall" checked>' : '&nbsp;';
 	    
         //now add the header we just built
     	$sloodletable->head = $headerrow;
@@ -289,11 +301,14 @@ class sloodle_view_backpack extends sloodle_base_view
 				$row[] = ' 0 ';
 			}
 		}
-		$row[] = '<input type="checkbox" checked name="userIds[]" value="'.intval($userid).'">';
+		$row[] = $this->can_edit ? '<input type="checkbox" checked name="userIds[]" value="'.intval($userid).'">' : '&nbsp;';
 		$sloodletable->data[] = $row;
 	}
 
         $sloodletable->data[] = $trowData; 
+
+    if ($this->can_edit) {
+
         //create an extra row for the modify currency fields
         $row = array();
         $row[] = ' &nbsp; ';
@@ -308,50 +323,52 @@ class sloodle_view_backpack extends sloodle_base_view
         
         // Make sure we have at least one controller
         if ($recs == false || count($recs) == 0) {
-		error(get_string('objectauthnocontrollers','sloodle'));
-		exit();
+            error(get_string('objectauthnocontrollers','sloodle'));
+            exit();
         }
 
         foreach ($recs as $controller){
-		$cm = get_coursemodule_from_instance('sloodle', $controller->id);
-                $rowText.='<option name="controllerid" value="'.intval($cm->id).'">'.s($controller->name).'</option>';
-	}
-	$rowText.='</select>';
+            $cm = get_coursemodule_from_instance('sloodle', $controller->id);
+            $rowText.='<option name="controllerid" value="'.intval($cm->id).'">'.s($controller->name).'</option>';
+        }
+        $rowText.='</select>';
 
-	//add controller select cell to row       
-	$row[] =$rowText; 
+        //add controller select cell to row       
+        $row[] =$rowText; 
 
-	//now add the row to the table
-	$sloodletable->data[] = $row; 
+        //now add the row to the table
+        $sloodletable->data[] = $row; 
 
-	//create another row for the submit button 
-	$row = array();
-	$row[] = '&nbsp;';
-	$row[] = '&nbsp;';
-	foreach($all_currencies as $currencyid => $currencynames) {
-		$row[] = '<input type="text" name="currency_'.$currencyid.'">';
-	} 
-	$row[]='<input type="submit" value="Update Backpacks">';
+        //create another row for the submit button 
+        $row = array();
+        $row[] = '&nbsp;';
+        $row[] = '&nbsp;';
+        foreach($all_currencies as $currencyid => $currencynames) {
+            $row[] = '<input type="text" name="currency_'.$currencyid.'">';
+        } 
+        $row[]='<input type="submit" value="Update Backpacks">';
+
+    }
 	$sloodletable->data[] = $row;  
 
-        print('<form action="" method="POST">');
-        echo '<input type="hidden" name="isItemAdd" value="1">';
+    print('<form action="" method="POST">');
+    echo '<input type="hidden" name="isItemAdd" value="1">';
 	print_table($sloodletable); 
 	print '</form>';
 
 	print_box_end(); 
     }
   
+
     /**
     * Print the footer for this course.
-    */
     function print_footer()
     {
         global $CFG;
         echo "<p style=\"text-align:center; margin-top:32px; font-size:90%;\"><a href=\"{$CFG->wwwroot}/course/view.php?id={$this->course->id}\">&lt;&lt;&lt; ".get_string('backtocoursepage','sloodle')."</a></h2>";
         print_footer($this->course);
     }
-
+    */
 }
 
 ?>

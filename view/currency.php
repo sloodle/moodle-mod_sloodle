@@ -71,6 +71,10 @@ class sloodle_view_currency extends sloodle_base_view
 	//mode is for the different editing tasks of the currency screen (add, modify, delete)
         $mode = optional_param('mode', "view", PARAM_TEXT); 
 
+        if ( ($mode != 'view') &&  (!$this->can_edit) ) {
+            print_error('Permission denied');
+        }
+
         switch($mode){
 
             case "modify":
@@ -269,7 +273,7 @@ class sloodle_view_currency extends sloodle_base_view
                           $editText.= "\">";
                           $editText.="<img src=\"".SLOODLE_WWWROOT."/lib/media/garbage.png\" height=\"32\" width=\"32\" height=\"16\" alt=\"".s(get_string('currencies:delete', 'sloodle'))."\"/> ";
                           $editText.= "</a>";
-                          $rowData[]=$editText;
+                          $rowData[]= $this->can_edit ? $editText : '&nbsp;';
                         
                   
                   $sloodletable->data[]=$rowData;
@@ -295,7 +299,10 @@ class sloodle_view_currency extends sloodle_base_view
                 $sloodletable->width="55%";
                 //set size of table cells
                 $sloodletable->size = array('10%','5%','50%','45%','25%');       
-                print('<form action="" method="POST">');
+
+                if ($this->can_edit) {
+
+                    print('<form action="" method="POST">');
                   //create cells for add row
                    $cells = array();
                    //cell 1 -display order
@@ -322,6 +329,8 @@ class sloodle_view_currency extends sloodle_base_view
                    print_table($sloodletable);
 
                    print("</form>");
+
+                }
                    print_box_end();
       }
       
@@ -422,15 +431,6 @@ class sloodle_view_currency extends sloodle_base_view
         print("</form>");
       }
 
-    /**
-    * Print the footer for this course.
-    */
-    function print_footer()
-    {
-        global $CFG;
-        echo "<p style=\"text-align:center; margin-top:32px; font-size:90%;\"><a href=\"{$CFG->wwwroot}/course/view.php?id={$this->course->id}\">&lt;&lt;&lt; ".get_string('backtocoursepage','sloodle')."</a></h2>";
-        print_footer($this->course);
-    }
 
 }
 
