@@ -206,7 +206,7 @@ class sloodle_view_backpack extends sloodle_base_view
         
         //build usersql
         $usersql = "select max(u.id) as userid, u.firstname as firstname, u.lastname as lastname, 
-		su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id 
+		su.avname as avname from {$prefix}user u inner join ${prefix}role_assignments ra on u.id=ra.userid
 		left outer join ${prefix}sloodle_users su on u.id=su.userid where ra.contextid=?
 		group by u.id order by avname asc;
 	";
@@ -304,7 +304,7 @@ class sloodle_view_backpack extends sloodle_base_view
         $rowText='<select style="left:20px;text-align:left;" name="controllerid">';
 
         //get all controllers
-        $recs = sloodle_get_records('sloodle', 'type', SLOODLE_TYPE_CTRL);
+        $recs = sloodle_get_records_sql_params("select * from {$CFG->prefix}sloodle where type=? AND course=?", array(SLOODLE_TYPE_CTRL, $courseid));
         
         // Make sure we have at least one controller
         if ($recs == false || count($recs) == 0) {
