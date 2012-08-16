@@ -230,7 +230,8 @@
         */
         function get_intro()
         {
-            return $this->moodle_choice_instance->text;
+            // Seems to have changed somewhere before Moodle 2.3
+            return isset($this->moodle_choice_instance->text) ? $this->moodle_choice_instance->text : $this->moodle_choice_instance->intro;
         }
         
         /**
