@@ -2,7 +2,7 @@
 $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE Touch Object';
 $sloodleconfig->group      = 'activity';
-$sloodleconfig->collections= array('SLOODLE 2.0');
+$sloodleconfig->collections= array('Future');
 $sloodleconfig->aliases    = array();
 $sloodleconfig->field_sets = array( 
 	'accesslevel' => array(
