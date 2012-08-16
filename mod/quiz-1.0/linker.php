@@ -77,13 +77,12 @@
 
     // Prior to Moodle 2.1 this information had to be passed in through an obscure $_POST var called $resp.
     // We didn't handle it - we just called the relevant functions that did.
-    // Moodle >= 2.1 is structured better, so we can set this explicitly.
-    // Moodle <= 2.0 will ignore this variable.
+    // TODO: Update the quiz to set "response" instead of making this crazy variable name.
     $quizresponse = optional_param('response', -1, PARAM_RAW);
 
     // Backwards compatibility for old LSL scripts that send us data the < 2.0 way:
     if ( $isnotify && ($quizresponse < 0) ) {
-            $responseparam = 'resp'.$questionids;
+            $responseparam = 'resp'.$questionids.'_';
             $quizresponse = optional_param($responseparam, -1, PARAM_RAW);
     }
     // Remove the above when we no longer need to support old objects
