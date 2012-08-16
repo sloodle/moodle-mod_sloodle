@@ -177,11 +177,6 @@ class sloodle_view_user extends sloodle_base_view
         $this->course_context = get_context_instance(CONTEXT_COURSE, $this->courseid);
         $this->system_context = get_context_instance(CONTEXT_SYSTEM);
 
-	// The "all" view should be only available to admins
-        if ( !has_capability('moodle/site:viewparticipants', $this->system_context) ){
-            error(get_string('insufficientpermissiontoviewpage', 'sloodle'));
-            exit();
-        }
         $this->viewingself = false;
         $this->canedit = false;
         // Is the user trying to view their own profile?
@@ -189,6 +184,13 @@ class sloodle_view_user extends sloodle_base_view
             $this->viewingself = true;
             $this->canedit = true;
         } else {
+
+        // The "all" view should be only available to admins
+            if ( !has_capability('moodle/site:viewparticipants', $this->system_context) ){
+                error(get_string('insufficientpermissiontoviewpage', 'sloodle'));
+                exit();
+            }
+
             // Does the user have permission to edit other peoples' profiles in the system and/or course?
             // If not, can they at least view others' profiles for the system or course?
             if (has_capability('moodle/user:editprofile', $this->system_context) || has_capability('moodle/user:editprofile', $this->course_context)) {
