@@ -28,7 +28,7 @@
     */
 
 	/** Grab the Sloodle/Moodle configuration. */
-	require_once('../../../init.php');
+	require_once('../../../sl_config.php');
 	/** Include the Sloodle PHP API. */
 	/** Sloodle core library functionality */
 	require_once(SLOODLE_DIRROOT.'/lib.php');
@@ -51,7 +51,6 @@
 
 	// Register the set using URL parameters
 
-    $error = '';
 	$content = array();
 
         $object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
@@ -59,6 +58,7 @@
 
         $is_logged_in = isset($USER) && ($USER->id > 0);
         $is_admin = $is_logged_in && has_capability('moodle/course:manageactivities', $sao->context);
+
 
         $student_scores = $sao->get_student_scores($include_scoreless_users = $is_admin);
 

@@ -14,7 +14,7 @@
 	*/
 
 	/** Grab the Sloodle/Moodle configuration. */
-	require_once('../../../init.php');
+	require_once('../../../sl_config.php');
 	/** Include the Sloodle PHP API. */
 	/** Sloodle core library functionality */
 	require_once(SLOODLE_DIRROOT.'/lib.php');
@@ -32,7 +32,7 @@
 
         require_once('scoreboard_active_object.inc.php');
 
-        $object_uuid = required_param('sloodleobjuuid');
+        $object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
         $sao = SloodleScoreboardActiveObject::ForUUID( $object_uuid );
 
         $is_logged_in = isset($USER) && ($USER->id > 0);
