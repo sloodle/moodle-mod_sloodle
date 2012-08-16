@@ -529,7 +529,13 @@ if ($finishattempt) {
 
     try {
 
-        $attemptobj->process_finish(time(), false);
+        // This seems to have changed somewhere between Moodle 2.1 and 2.3.
+        // Try the old method first, then the new method if that fails.
+        if (method_exists($attemptobj, 'finish_attempt')) {
+            $attemptobj->finish_attempt(time());
+        } else {
+            $attemptobj->process_finish(time(), false);
+        }
 
     /*
     } catch (question_out_of_sequence_exception $e) {
