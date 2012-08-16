@@ -44,7 +44,7 @@ $quizobj = quiz::create($cm->instance, $USER->id);
 
 // if no questions have been set up yet redirect to edit.php or display an error.
 if (!$quizobj->has_questions()) {
-    $sloodle->response->quick_output(-712, 'QUIZ', 'The quiz does not have any questions', FALSE);
+    $sloodle->response->quick_output(-12312, 'QUIZ', 'The quiz does not have any questions', FALSE);
     exit();
 }
 
@@ -94,7 +94,7 @@ if ($lastattempt && !$lastattempt->timefinish) {
 
 // Check access.
 if (!$quizobj->is_preview_user() && $messages) {
-    $sloodle->response->quick_output(-712, 'QUIZ', 'You do not have permission to use this quiz.', FALSE);
+    $sloodle->response->quick_output(-12313, 'QUIZ', 'You do not have permission to use this quiz.', FALSE);
     exit();
 }
 
@@ -137,7 +137,7 @@ if ($currentattemptid) {
                 $question = question_bank::get_qtype('random')->choose_other_question(
                         $questiondata, $questionsinuse, $quizobj->get_quiz()->shuffleanswers);
                 if (is_null($question)) {
-                    $sloodle->response->quick_output(-712, 'QUIZ', 'The quiz did not have enough questions.', FALSE);
+                    $sloodle->response->quick_output(-1, 'QUIZ', 'The quiz did not have enough questions.', FALSE);
                     exit();
                 }
             }
@@ -242,7 +242,7 @@ $quiz = $attemptobj->get_quiz();
 $slots = $attemptobj->get_slots('all');
 
 if (empty($slots)) {
-    $sloodle->response->quick_output(-712, 'QUIZ', 'The quiz does not have any questions', FALSE);
+    $sloodle->response->quick_output(-12312, 'QUIZ', 'The quiz does not have any questions', FALSE);
     exit();
 }
 
@@ -253,7 +253,7 @@ $title = get_string('attempt', 'quiz', $attemptobj->get_attempt_number());
 
 // Check that this attempt belongs to this user.
 if ($attemptobj->get_userid() != $USER->id) {
-    $sloodle->response->quick_output(-712, 'QUIZ', 'The attempt did not appear to belong to you.', FALSE);
+    $sloodle->response->quick_output(-12314, 'QUIZ', 'The attempt did not appear to belong to you.', FALSE);
     exit();
 }
 
@@ -264,7 +264,7 @@ if (!$attemptobj->is_preview_user()) {
 
 } else {
     //navigation_node::override_active_url($attemptobj->start_attempt_url());
-    $sloodle->response->quick_output(-712, 'QUIZ', 'Something unexpected went wrong with the quiz.', FALSE);
+    $sloodle->response->quick_output(-12315, 'QUIZ', 'Something unexpected went wrong with the quiz.', FALSE);
     exit();
 }
 
@@ -272,7 +272,7 @@ if (!$attemptobj->is_preview_user()) {
 if ($attemptobj->is_finished()) {
     // TODO SLOODLE Error
     //redirect($attemptobj->review_url(null, $page));
-    $sloodle->response->quick_output(-712, 'QUIZ', 'This quiz attempt has already finished.', FALSE);
+    $sloodle->response->quick_output(-12316, 'QUIZ', 'This quiz attempt has already finished.', FALSE);
     exit();
 }
 
@@ -280,7 +280,7 @@ if ($attemptobj->is_finished()) {
 $accessmanager = $attemptobj->get_access_manager(time());
 $messages = $accessmanager->prevent_access();
 if (count($messages)) {
-    $sloodle->response->quick_output(-712, 'QUIZ', 'Access to this quiz is restricted.', FALSE);
+    $sloodle->response->quick_output(-12317, 'QUIZ', 'Access to this quiz is restricted.', FALSE);
     exit();
 }
 
@@ -308,11 +308,11 @@ if ($isnotify) {
     $transaction = $DB->start_delegated_transaction();
 
     if (!$questionid = $questionids[0]) {
-        $sloodle->response->quick_output(-712, 'QUIZ', 'Question ID not set.', FALSE);
+        $sloodle->response->quick_output(-12318, 'QUIZ', 'Question ID not set.', FALSE);
         exit();
     }
     if (!$quizresponse) {
-        $sloodle->response->quick_output(-712, 'QUIZ', 'Question response not set.', FALSE);
+        $sloodle->response->quick_output(-12319, 'QUIZ', 'Question response not set.', FALSE);
         exit();
     }
 
@@ -334,7 +334,7 @@ if ($isnotify) {
             $responseoptionindex = array_search( $quizresponse, $order );
 
             if ($responseoptionindex < 0) {
-                $sloodle->response->quick_output(-712, 'QUIZ', 'Response index not found.', FALSE);
+                $sloodle->response->quick_output(-12318, 'QUIZ', 'Response index not found.', FALSE);
                 exit();
             }
 
