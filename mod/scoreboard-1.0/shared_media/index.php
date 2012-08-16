@@ -34,7 +34,7 @@
 
      require_once('scoreboard_active_object.inc.php');
 
-        $object_uuid = required_param('sloodleobjuuid');
+        $object_uuid = required_param('sloodleobjuuid', PARAM_RAW);
         $sao = SloodleScoreboardActiveObject::ForUUID( $object_uuid );
 
         //$is_admin = $is_logged_in && has_capability('moodle/course:manageactivities', $sao->context);
