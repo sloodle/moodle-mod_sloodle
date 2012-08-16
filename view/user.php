@@ -358,7 +358,7 @@ class sloodle_view_user extends sloodle_base_view
 
             // Search entries
             $moodleuserdata = null;
-            $LIKE = 'LIKE';
+            $LIKE = sloodle_sql_ilike();
             $params = array('%'.$this->searchstr.'%', '%'.$this->searchstr.'%');
             global $CFG;
             $fullsloodleentries = sloodle_get_records_sql_params("select * from {$CFG->prefix}sloodle_users where avname $LIKE ? OR uuid $LIKE ?", $params);

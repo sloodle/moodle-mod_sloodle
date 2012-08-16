@@ -190,6 +190,10 @@ function sloodle_sql_ilike() {
 
    if ( sloodle_do_use_db_object() ) {
       global $DB;
+      // Probably not a very good solution, but I'm having a hard time keeping up with all these API changes...
+      if (!method_exists($DB, 'sql_ilike')) {
+          return 'LIKE';
+      }
       return $DB->sql_ilike();
    } else {
       return sql_ilike();
