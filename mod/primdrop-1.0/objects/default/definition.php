@@ -3,7 +3,7 @@ $sloodleconfig = new SloodleObjectConfig();
 $sloodleconfig->primname   = 'SLOODLE PrimDrop';
 $sloodleconfig->module     = 'assignment';
 $sloodleconfig->module_choice_message = 'selectassignment';
-$sloodleconfig->module_no_choices_message = 'noassignments'; 
+$sloodleconfig->module_no_choices_message = 'nosloodleassignments'; 
 $sloodleconfig->module_filters = array( 'assignmenttype' => 'sloodleobject');
 $sloodleconfig->group      = 'communication';
 $sloodleconfig->collections= array('SLOODLE 2.0');
