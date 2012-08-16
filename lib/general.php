@@ -1010,7 +1010,19 @@
     */
     function sloodle_clean_for_output($str)
     {
-        return strip_tags(stripcslashes(@html_entity_decode($str, ENT_QUOTES, 'UTF-8')));
+        return sloodle_strip_new_lines(strip_tags(stripcslashes(@html_entity_decode($str, ENT_QUOTES, 'UTF-8'))));
+    }
+
+    /**
+    * Returns the given string with new line characters removed
+    * Removes new line characters
+    * @param string data The string to clean.
+    * @return string
+    */
+    function sloodle_strip_new_lines($data) {
+        $data=str_replace("\r","",$data);
+        $data=str_replace("\n","",$data); 
+        return $data;
     }
 
     /**
