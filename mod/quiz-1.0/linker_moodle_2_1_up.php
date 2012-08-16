@@ -307,6 +307,10 @@ if ($isnotify) {
 
     $transaction = $DB->start_delegated_transaction();
 
+    if ($questionids != '') {
+        $questionids = explode(',', $questionids);
+    }
+
     if (!$questionid = $questionids[0]) {
         $sloodle->response->quick_output(-12318, 'QUIZ', 'Question ID not set.', FALSE);
         exit();
@@ -324,6 +328,7 @@ if ($isnotify) {
     // We get passed the quiz ID, so we'll have to work through them to find the slot.
     // TOOD: It would probably make more sense to have the LSL script know which slot and send us it itself.
     foreach($slots as $slot) {
+
         $qa = $attemptobj->get_question_attempt($slot);
         $q = $qa->get_question();
 
@@ -341,11 +346,32 @@ if ($isnotify) {
             $submitteddata = array('answer'=>$responseoptionindex);
             //print "processing for $slot, $questionid $responseoptionindex";
             $attemptobj->process_all_actions_for_slot($slot, $submitteddata, time());
-            $transaction->allow_commit();
 
+            $transaction->allow_commit();
+            
             break;
         }
     }
+
+    // We have now finished processing form data
+
+    // With post sloodle-2.0 quiz chairs, we should be told what happened to the score.
+    // In theory we should be able to get this from the data we already have, but it seems complex...
+    // The process_events allows us to award points if there is an instruction to do so in the object config.
+    $scorechange = floatval(optional_param( 'scorechange', 0, PARAM_TEXT));
+    if ($scorechange == 0) {
+        $scorechange = 1;
+    }
+
+    //SloodleDebugLogger::log('DEBUG', "active object check");
+    if (!is_null($sloodle->active_object)) {
+                //SloodleDebugLogger::log('DEBUG', "quiz has an active object");
+
+        $sloodle->process_interaction('answerquestion', $scorechange);
+        //$transaction->allow_commit();
+
+    }
+
 
     $output = array();
 
@@ -500,8 +526,10 @@ if ($finishattempt) {
             $attemptobj->get_quizid(), $attemptobj->get_cmid());
 
     // Update the quiz attempt record.
+
     try {
-        $attemptobj->finish_attempt(time());
+
+        $attemptobj->process_finish(time(), false);
 
     /*
     } catch (question_out_of_sequence_exception $e) {
@@ -509,10 +537,12 @@ if ($finishattempt) {
                 $attemptobj->attempt_url(null, $thispage));
     */
 
+
     } catch (Exception $e) {
         $sloodle->response->quick_output(-701, 'QUIZ', 'Closing quiz failed: '.$e->getMessage(), FALSE);
         exit();
     }
+
 
     // Send the user to the review page.
     $transaction->allow_commit();
