@@ -122,6 +122,8 @@ class sloodle_view_users extends sloodle_base_view
         if (!$this->course = sloodle_get_record('course', 'id', $this->courseid)) error('Could not find course.');
         $this->sloodle_course = new SloodleCourse();
         if (!$this->sloodle_course->load($this->course)) error(get_string('failedcourseload', 'sloodle'));
+
+        $this->course_context = get_context_instance(CONTEXT_COURSE, $this->course->id);
         
         // Construct the course URL, and fetch the names
         $this->courseurl = $CFG->wwwroot.'/course/view.php?id='.$this->courseid;
@@ -153,16 +155,6 @@ class sloodle_view_users extends sloodle_base_view
     {
         global $CFG, $USER;
     
-        // Ensure the user logs in
-        require_login();
-        if (isguestuser()) error(get_string('noguestaccess', 'sloodle'));
-        //add_to_log($this->course->id, 'course', 'view sloodle user', '', "{$this->course->id}");
-
-        
-        // We need to establish some permissions here
-        $this->course_context = get_context_instance(CONTEXT_COURSE, $this->courseid);
-        $this->system_context = get_context_instance(CONTEXT_SYSTEM);
-        // Make sure the user has permission to view this course (but let anybody view the site course details)
         if ($this->courseid != SITEID) require_capability('mod/sloodle:courseparticipate', $this->course_context);
     }
 
@@ -200,11 +192,14 @@ class sloodle_view_users extends sloodle_base_view
 // // SEARCH FORMS // //
         echo '<tr>';
 
+        /*
+        Ed: Dropping this for now - breaking on Moodle 2, and it's weird to have a full site search under your course.
         // COURSE SELECT FORM //
         echo '<td style="width:350px; border:solid 1px #bbbbbb; padding:4px; vertical-align:top; width:33%;">';
         
         echo "<form action=\"{$CFG->wwwroot}/mod/sloodle/view.php\" method=\"get\">";
         echo '<input type="hidden" name="_type" value="users" />';
+
         echo '<span style="font-weight:bold;">'.get_string('changecourse','sloodle').'</span><br/>';
         
         echo '<select name="course" size="1">';
@@ -231,6 +226,7 @@ class sloodle_view_users extends sloodle_base_view
         echo '</form>';
         
         echo '</td>';
+        */
         
         // USER SEARCH FORM //
         echo '<td style="width:350px; border:solid 1px #bbbbbb; padding:4px; vertical-align:top; width:33%;">';    
@@ -306,16 +302,18 @@ class sloodle_view_users extends sloodle_base_view
             // Display the search term
             echo '<br/><span style="font-size:16pt; font-weight:bold;">'.get_string('usersearch','sloodle').': '.$this->searchstr.'</span><br/><br/>';
             // Search the list of users
-            $fulluserlist = get_users(true, $this->searchstr);
+           // $fulluserlist = get_users(true, $this->searchstr);
+
+            //$fulluserlist = get_users_by_capability('mod/sloodle:courseparticipate', $this->course_context);
+            $fulluserlist = get_users_by_capability($this->course_context, 'mod/sloodle:courseparticipate', 'u.id, u.firstname, u.lastname', 'u.firstname, u.lastname');
+
             if (!$fulluserlist) $fulluserlist = array();
             $userlist = array();
             // Filter it down to members of the course
             foreach ($fulluserlist as $ful) {
-                if (has_capability('mod/sloodle:courseparticipate', $this->course_context, $ful->id)) {
-                    // Copy it to our filtered list
+                if ( ($ful->firstname == $this->searchstr) || ($ful->lastname == $this->searchstr) ) {
                     $userlist[] = $ful;
-                } else {
-		}
+                } 
             }
             
             
@@ -324,7 +322,9 @@ class sloodle_view_users extends sloodle_base_view
             // Display the name of the course
             echo '<br/><span style="font-size:18pt; font-weight:bold;">'.s($this->coursefullname).'</span><br/><br/>';
             // Obtain a list of all Moodle users enrolled in the specified course
-            $userlist = get_course_users($this->courseid, 'lastname, firstname', '', 'u.id, firstname, lastname');
+            //$userlist = get_course_users($this->courseid, 'lastname, firstname', '', 'u.id, firstname, lastname');
+
+            $userlist = get_users_by_capability($this->course_context, 'mod/sloodle:courseparticipate', 'u.id, u.firstname, u.lastname', 'u.firstname, u.lastname');
         }
         
         // Construct and display a table of Sloodle entries

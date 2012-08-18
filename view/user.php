@@ -131,6 +131,17 @@ class sloodle_view_user extends sloodle_base_view
     */
     function process_request()
     {
+
+        // Ensure the user logs in
+        require_login();
+        if (isguestuser()) error(get_string('noguestaccess', 'sloodle'));
+        //add_to_log($this->course->id, 'course', 'view sloodle user', '', "{$this->course->id}");
+
+        
+        // We need to establish some permissions here
+        $this->course_context = get_context_instance(CONTEXT_COURSE, $this->courseid);
+        $this->system_context = get_context_instance(CONTEXT_SYSTEM);
+        // Make sure the user has permission to view this course (but let anybody view the site course details)
         // Fetch some parameters
         $this->moodleuserid = required_param('id', PARAM_RAW);
         $this->deletesloodleentry = optional_param('delete', null, PARAM_INT);
@@ -157,6 +168,7 @@ class sloodle_view_user extends sloodle_base_view
 			$PAGE->set_course($this->course);
 		}
 	}
+
     }
 
     /**
@@ -177,11 +189,6 @@ class sloodle_view_user extends sloodle_base_view
         $this->course_context = get_context_instance(CONTEXT_COURSE, $this->courseid);
         $this->system_context = get_context_instance(CONTEXT_SYSTEM);
 
-	// The "all" view should be only available to admins
-        if ( !has_capability('moodle/site:viewparticipants', $this->system_context) ){
-            error(get_string('insufficientpermissiontoviewpage', 'sloodle'));
-            exit();
-        }
         $this->viewingself = false;
         $this->canedit = false;
         // Is the user trying to view their own profile?
@@ -189,6 +196,13 @@ class sloodle_view_user extends sloodle_base_view
             $this->viewingself = true;
             $this->canedit = true;
         } else {
+
+        // The "all" view should be only available to admins
+            if ( !has_capability('moodle/site:viewparticipants', $this->system_context) ){
+                error(get_string('insufficientpermissiontoviewpage', 'sloodle'));
+                exit();
+            }
+
             // Does the user have permission to edit other peoples' profiles in the system and/or course?
             // If not, can they at least view others' profiles for the system or course?
             if (has_capability('moodle/user:editprofile', $this->system_context) || has_capability('moodle/user:editprofile', $this->course_context)) {
@@ -202,6 +216,7 @@ class sloodle_view_user extends sloodle_base_view
                 }
             }
         }
+
     }
 
     /**
@@ -340,14 +355,18 @@ class sloodle_view_user extends sloodle_base_view
             // Fetch a list of all Sloodle user entries
             $sloodleentries = sloodle_get_records('sloodle_users');
         } else if ($searchentries && !empty($this->searchstr)) {
+
             // Search entries
             $moodleuserdata = null;
             $LIKE = sloodle_sql_ilike();
-            $params = array('%{$this->searchstr}%', '%{$this->searchstr}%');
-            $fullsloodleentries = sloodle_get_records_select('sloodle_users', "avname $LIKE ? OR uuid $LIKE ?", 'avname', $params);
+            $params = array('%'.$this->searchstr.'%', '%'.$this->searchstr.'%');
+            global $CFG;
+            $fullsloodleentries = sloodle_get_records_sql_params("select * from {$CFG->prefix}sloodle_users where avname $LIKE ? OR uuid $LIKE ?", $params);
+
             if (!$fullsloodleentries) $fullsloodleentries = array();
             $sloodleentries = array();
             // Eliminate entries belonging to avatars who are not in the current course
+
             foreach ($fullsloodleentries as $fse) {
                 // Does the Moodle user have permission?
                 if (has_capability('mod/sloodle:courseparticipate', $this->course_context, $fse->userid)) {

@@ -432,7 +432,7 @@ if ($isnotify) {
                 $q->id,
                 $q->parent,
                 sloodle_clean_for_output($q->questiontext),
-                $q->defaultgrade,
+                $q->defaultgrade ? $q->defaultgrade : 1,
                 $q->penalty,
                 $qtype,
                 $q->hidden,

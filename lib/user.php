@@ -504,6 +504,7 @@
             // Fetch all avatar records which are linked to the user
             $recs = sloodle_get_records('sloodle_users', 'userid', $this->user_data->id);
             if (!is_array($recs)) return false;
+            if (!count($recs)) return false;
             if (count($recs) > 1) return 'multi';
             
             // Store the avatar data
