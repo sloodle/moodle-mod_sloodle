@@ -571,6 +571,7 @@ $string['awards:gobackgameslist']='Go back to Games List';
 $string['awards:group']='Group';  
 $string['awards:round']='Round';  
 $string['awards:showallcontrollers']='Show points for whole site, not just this controller.';  
+$string['awards:nocontrollers']='Please add a controller to the course if you want to assign points.';  
 
 $string['awards:questioncorrectplus']='When you get a question correct you get';
 $string['awards:questionincorrectminus']='When you get a question wrong you lose'; 
