@@ -100,6 +100,14 @@ default
         llResetScript();
     }
 
+    changed(integer change) {
+
+        if (change & CHANGED_REGION_START) {
+            llResetScript();
+        }
+
+    }
+
 }
 
 state ready {
@@ -123,6 +131,10 @@ state ready {
         list statusfields = llParseStringKeepNulls( llList2String(lines,0), ["|"], [] );
         // Get the statuscode
         integer statuscode = llList2Integer(statusfields,0);
+        if (statuscode < 0) {
+            llResetScript();
+        }
+        
         float refreshseconds = 60;
        // llOwnerSay(body);
         if (llGetListLength(statusfields) >= 12) {
@@ -189,9 +201,19 @@ state ready {
 
         }
     }
+
     on_rez(integer start_param) {
         llResetScript();
-    } 
+    }
+    
+    changed(integer change) {
+
+        if (change & CHANGED_REGION_START) {
+            llResetScript();
+        }
+
+    }     
+    
 }
 
 // Please leave the following line intact to show where the script lives in Git:
