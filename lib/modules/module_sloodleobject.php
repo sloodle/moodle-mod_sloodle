@@ -247,7 +247,8 @@
         */
         function get_intro()
         {
-            return $this->moodle_assignment_instance->description;
+            // Changed in Moodle somewhere between 1.9 and 2.3.
+            return isset($this->moodle_assignment_instance->description) ? $this->moodle_assignment_instance->description : $this->moodle_assignment_instance->intro;
         }
         
         /**
