@@ -264,7 +264,7 @@ if (!$attemptobj->is_preview_user()) {
 
 } else {
     //navigation_node::override_active_url($attemptobj->start_attempt_url());
-    $sloodle->response->quick_output(-12315, 'QUIZ', 'Something unexpected went wrong with the quiz.', FALSE);
+    $sloodle->response->quick_output(-12315, 'QUIZ', 'You do not have permission to take the quiz. Moodle quizzes are often only open to students, not teachers.', FALSE);
     exit();
 }
 
