@@ -185,6 +185,7 @@ integer sloodle_kick_off_inventory_giving_or_say_error(key avatartogiveto, strin
     string body = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
     body += "&sloodleobjuuid=" + (string)llGetKey();        
     body += "&sloodleuuid=" + (string)avatartogiveto;
+    body += "&sloodleavname=" + llEscapeURL(llKey2Name(avatartogiveto));
     body += "&sloodlepwd=" + sloodlepwd;
     body += "&sloodlemoduleid=" + (string)sloodlemoduleid;
     body += "&sloodlegiveobject=" + objecttogive;
@@ -722,3 +723,4 @@ state ready
 
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: mod/distributor-2.0/objects/default/assets/sloodle_vendor.lslp
+
