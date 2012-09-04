@@ -359,9 +359,6 @@ if ($isnotify) {
     // In theory we should be able to get this from the data we already have, but it seems complex...
     // The process_events allows us to award points if there is an instruction to do so in the object config.
     $scorechange = floatval(optional_param( 'scorechange', 0, PARAM_TEXT));
-    if ($scorechange == 0) {
-        $scorechange = 1;
-    }
 
     //SloodleDebugLogger::log('DEBUG', "active object check");
     if (!is_null($sloodle->active_object)) {
