@@ -113,7 +113,7 @@
         list users_score_change;    
         list users_questions;
         list users_menu_channels;
-        list users_active_question;
+        list users_active_question_index;
         list users_num_correct;
          list user_feedback_requests;
         
@@ -183,19 +183,19 @@
         *
         *  get_active_question will return the question_id of the current question for the user_key input
         *  each users user_key is stored in the "users" list
-        *  each users active question is stored in the "users_active_question" list
+        *  each users active question index is stored in the "users_active_question_index" list
         *  each users questions are stored as a string separated by "|" in "users_questions" list
         *  The index of each of these lists pertain to one user.  A user is added to the system when they first touch the prim
         *  in the quiz_loaded state, and we need to get a question for them to answer.  This script will check if their key exists in the 
         *  users list, and if not add them.  To understand how the data for the first user's data is stored, review the following
         *
         *  users[0] = 2102f5ab-6854-4ec3-aec5-6cd6233c31c6
-        *  users_active_question[0] = 0
-        *  users_questions_list[0]  = 9|2|7|4|3|6|5|8|1 
+        *  users_active_question_index[0] = 5
+        *  users_questions_list[0]  = 9|2|7|4|3|8|5|6|1 
         *
         *  Here you can see we are using a common index in each of these lists to refer to one user in the system.  In this case
-        *  we are refering to the first user who is in the system, at index 0. We refer to this index as "user_id"
-        * 
+        *  we are refering to the first user who is in the system, at index 0. We refer to this index as "user_id".  This users active question index is 5
+        *  that means they are on the sixth question, which in the users_question_list has the question id "8" 
         */  
         
         integer get_active_question(key user_key){
@@ -215,7 +215,7 @@
                 //store new question list into an array for this user
                 users_questions+=new_user_questions;
                 //set the new users active question to the first question in the list
-                users_active_question+=llList2Integer(question_ids,0);
+                users_active_question_index+=0;
                 //add the new user to the system
                 users+=user_key;
                 users_num_correct+=0;
@@ -240,10 +240,10 @@
                   
                   We can retreive this list like this: llList2String(users_questions, user_id)
                   then parse it into a list using llParseString2List, and then retreive the active question by
-                  examining users_active_question at the index user_id
+                  examining users_active_question_index at the index user_id
                 */
                 list question_list = llParseString2List(llList2String(users_questions, user_id), ["|"], []);
-                integer active_question_index = llList2Integer(users_active_question,user_id);
+                integer active_question_index = llList2Integer(users_active_question_index,user_id);
                 integer active_question = llList2Integer(question_list, active_question_index);
                 //Update the active question index once the user has given a response
                 debug("Active Question for "+ llKey2Name(user_key)+ " is: "+(string)active_question);
@@ -371,7 +371,8 @@
             string body = sloodlehttpvars;
             body += "&finishattempt=1";
             llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
-            
+            users_num_correct=llListReplaceList(users_num_correct, [0], user_id, user_id);
+            users_active_question_index=llListReplaceList(users_active_question_index, [0], user_id, user_id);
          //   llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR, (string)num_correct + "/" + (string)num_questions, user_key);
             
         }
@@ -529,7 +530,7 @@
                     string rowtype = llList2String( thisline, 0 ); 
         
                     // Check what type of line this is
-                    if ( rowtype == "quizzer" ) {
+                    if ( rowtype == "quiz" ) {
                         
                         // Get the quiz ID and name
                         quiz_id = (integer)llList2String(thisline, 4);
@@ -542,7 +543,6 @@
                         // Extract the list of questions ID's
                         list question_ids_str = llCSV2List(llList2String(thisline, 3));
                         num_questions = llGetListLength(question_ids_str);
-                        quiz_name = llList2String(thisline, 2);
                         integer qiter = 0;
                         question_ids = [];
                         // Store all our question IDs
@@ -618,11 +618,7 @@
                         key user_key = llList2Key(statusfields,6);
                         //the user who initiated this request
                         integer user_id = llListFindList(users, [user_key]);
-                        list questions = llParseString2List(llList2String(users_questions, user_id), ["|"], []);
-                        integer active_question_index = llList2Integer(users_active_question,user_id);
-                        //get the active question for the user who initiated this question request 
-                        integer question_id = llList2Integer(users_active_question,active_question_index);
-                        // Was it an error code?
+                        integer active_question_index = llList2Integer(users_active_question_index,user_id);
                         if (statuscode == -10301) {
                             sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "quizzer");
                        //     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_ATTEMPTS_LEFT, (string)question_id, user_key);//todo add to dia
@@ -711,10 +707,6 @@
                         users_current_question_optext=llListReplaceList(users_current_question_optext, [optext_string], user_id, user_id); 
                         users_current_question_opgrade=llListReplaceList(users_current_question_opgrade, [opgrade_string], user_id, user_id); 
                         users_current_question_opfeedback=llListReplaceList(users_current_question_opfeedback, [opfeedback_string], user_id, user_id); 
-                                    
-                        
-                        
-                        // Automatically ask this question
                         integer menu_channel = llList2Integer(users_menu_channels, user_id);               
                         // Are we using dialogs?
                         if (doDialog == 1) {
@@ -722,7 +714,7 @@
                             //  and numbers on the buttons
                             integer qi;
                             list qdialogoptions = [];
-                            string qdialogtext = qtext + "\n";
+                            string qdialogtext = "Question "+(string)(active_question_index+1)+" of "+(string)num_questions+"\n"+ qtext + "\n";
                             // Go through each option
                             integer num_options = llGetListLength(optext);
                             
@@ -755,17 +747,20 @@
                 }
             listen(integer channel, string name, key user_key, string user_response){
                 // If using dialogs, then only listen to the dialog channel
-                integer user_id=llListFindList(users, [user_key]);
+               
                 if (doDialog && ((qtype == "multichoice") || (qtype == "truefalse"))) {
                     if (llListFindList(users_menu_channels, [channel])==-1) {
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "usedialogs", [llKey2Name(user_key)], user_key, "quizzer");
                         return;
                     }
                 } 
-            
                 string opid; // used when the feedback is too long, and we have to fetch it off the server
                 // Only listen to the sitter
                 if (llListFindList(users, [user_key])!=-1) {
+                	/* Determine the user_id so we can access the current question the user is on, as wel as access other info about this user
+                	*  which is stored in this script
+                	*/
+                	integer user_id=llListFindList(users, [user_key]);
                     // Handle the answer...
                     float scorechange = 0;
                     string feedback = "";
@@ -774,9 +769,12 @@
                     list optext = llParseString2List(llList2String(users_current_question_optext,user_id), ["|"], []);
                     list opgrade = llParseString2List(llList2String(users_current_question_opgrade,user_id), ["|"], []);
                     list opfeedback = llParseString2List(llList2String(users_current_question_opfeedback,user_id), ["|"], []);
-                    integer active_question_index = llList2Integer(users_active_question,user_id);
+                    //determine which question this user is on
+                    integer active_question_index = llList2Integer(users_active_question_index,user_id);
+                    //get this users question list
                     list question_list = llParseString2List(llList2String(users_questions, user_id), ["|"], []);
-                    integer active_question = llList2Integer(question_list, active_question_index);
+                    //get the MOODLE question_id 
+                    integer question_id = llList2Integer(question_list, active_question_index);
                     debug("users_current_question_opids: "+llList2CSV(users_current_question_opids));
                     debug("opids: "+llList2CSV(opids));
                     
@@ -794,7 +792,7 @@
                             answeroptext = llList2String(optext, answer_num);
 
                             // Notify the server of the response
-                            notify_server(qtype, active_question, llList2String(opids, answer_num),scorechange);
+                            notify_server(qtype, question_id, llList2String(opids, answer_num),scorechange);
                         } else {
                            
                           sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidchoice",  [llKey2Name(user_key)],user_key, "quizzer");
@@ -811,7 +809,7 @@
                                       opid = llList2String(opids, x);
                                       answeroptext = llList2String(optext, x);
                                    }
-                               notify_server(qtype, active_question, user_response, scorechange);
+                               notify_server(qtype, question_id, user_response, scorechange);
                                }        
                     } else if (qtype == "numerical") {
                                // Notify the server of the response
@@ -825,7 +823,7 @@
                                       opid = llList2String(opids, x);
                                       answeroptext = llList2String(optext, x);                                      
                                    }
-                                   notify_server(qtype, active_question, user_response, scorechange);
+                                   notify_server(qtype, question_id, user_response, scorechange);
                                }        
                     } 
                     
@@ -837,26 +835,42 @@
                     //llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR, opid+"|"+answeroptext, sitter);    
                     
                     if (feedback == "[[LONG]]") // special long feedback placeholder for when there is too much feedback to give to the script
-                        user_feedback_requests+= request_feedback( active_question, opid,user_key );
+                        user_feedback_requests+= request_feedback( question_id, opid,user_key );
                     else if (feedback != "") llInstantMessage(user_key, feedback); // Text feedback
                     else if (scorechange > 0.0) {                                                    
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct", [llKey2Name(user_key)], user_key, "quizzer");
-                        //num_correct += 1; SAL commented out this
+                        num_correct = llList2Integer(users_num_correct,user_id);
+                        //save the number of questions correct for this user
+                        users_num_correct=llListReplaceList(users_num_correct, [num_correct+1], user_id, user_id);
                     } else {
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "incorrect",  [llKey2Name(user_key)], user_key, "quizzer");
                     }
-                    if (correctToContinue==1){
-                    	
+                    //before asking the next question, check if the quiz is complete
+                    if (active_question_index==num_questions-1){
+                    	finish_quiz(user_key);
+                    	//if it is complete, should we repeat the quiz?
+                    	if (doRepeat!=1){
+                    		return;
+                    	}
+                    }else{
+                    	//we are not at the end of the quiz, so should we advance to the next question?
+                    	  if (correctToContinue!=1){
+                    	  	//last question doesn't have to be answered correctly before advancing to the next question so increase their active question index
+                    	  	users_active_question_index= llListReplaceList(users_active_question_index, [active_question_index+1], user_id, user_id);
+                    	  }
+                    	  //now ask the question
+                    	   llSleep(1.);  //wait to finish the sloodle_translation_request before next question.
+                    	   // Clear out our current data (a feeble attempt to save memory!)
+		                   qtext = "";
+		                   qtype = "";
+		                   opids = [];
+		                   optext = [];
+		                   opgrade = [];
+		                   opfeedback = [];   
+                    	   request_question(user_key,get_active_question(user_key));
                     }
-                    llSleep(1.);  //wait to finish the sloodle_translation_request before next question.
-                    
-                    // Clear out our current data (a feeble attempt to save memory!)
-                    qtext = "";
-                    qtype = "";
-                    opids = [];
-                    optext = [];
-                    opgrade = [];
-                    opfeedback = [];              
+                   
+                  
                     
                 //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)scorechange, user_key);                                                                              
     
