@@ -11,6 +11,7 @@ $sloodleconfig->field_sets = array(
 		'sloodlerepeat' => new SloodleConfigurationOptionYesNo( 'sloodlerepeat', 'repeatquiz', null, 0 ),
 		'sloodlerandomize' => new SloodleConfigurationOptionYesNo( 'sloodlerandomize', 'randomquestionorder', null, 1 ),
 		'sloodledialog' => new SloodleConfigurationOptionYesNo( 'sloodledialog', 'usedialogs', null, 1 ),
+		'sloodlecorrecttocontinue' => new SloodleConfigurationOptionYesNo( 'sloodlecorrecttocontinue', 'correcttocontinue', null, 1 ),
 		'sloodleplaysound' => new SloodleConfigurationOptionYesNo( 'sloodleplaysound', 'playsounds', null, 0 ),
 	),
 	'accesslevel' => array(

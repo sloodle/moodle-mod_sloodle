@@ -475,6 +475,7 @@ $string['userobjectlifetime'] = 'User object lifetime (days)';
 $string['userobjectlifetime:info'] = 'The number of days before which a user-centric object (such as the Toolbar) will expire if not used.';
 $string['userobjectauth'] = 'SLOODLE User Object Authorization';
 $string['usedialogs'] = 'Use dialogs (instead of chat)?';
+$string['correcttocontinue'] = 'Must a user get a correct answer before they can advance to the next question? ';
 $string['url']  = 'URL';
 $string['unknowntype'] = 'Unknown type';
 

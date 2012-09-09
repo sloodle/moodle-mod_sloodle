@@ -20,6 +20,7 @@
         integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
         integer doRepeat = 0; // whether we should run through the questions again when we're done
         integer doDialog = 1; // whether we should ask the questions using dialog rather than chat
+        integer correctToContinue=0; //must get question correct before next question is asked
         integer doPlaySound = 1; // whether we should play sound
         integer doRandomize = 1; // whether we should ask the questions in random order
         string sloodleserverroot = "";
@@ -72,6 +73,8 @@
         string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";      // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
         string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
         integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
+        string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
+        
         integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
         integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
         string SLOODLE_OBJECT_TYPE = "quiz-1.0";
@@ -127,7 +130,8 @@
               
         initialize_variables(){
         // Starting again with a new configuration
-                llSetText("", <0.0,0.0,0.0>, 0.0);
+                
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [YELLOW, 1.0], "initializing", [], llGetOwner(), "quizzer");
                 isconfigured = FALSE;
                 eof = FALSE;
                 // Reset our configuration data
@@ -249,7 +253,7 @@
         load_quiz(key user_key){
             // llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", userKey);
                 
-                sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "fetchingquiz",  [llKey2Name(user_key)], user_key, "quiz");
+                sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "fetchingquiz",  [llKey2Name(user_key)], user_key, "quizzer");
                 // Request the quiz data from Moodle
                 sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
                 sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
@@ -264,7 +268,7 @@
          request_question(key user_key,integer question){
             // llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", userKey);
                 
-                sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "Asking a questions",  [llKey2Name(user_key)], user_key, "quiz");
+                sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "Asking a questions",  [llKey2Name(user_key)], user_key, "quizzer");
             
                 // Request the quiz data from Moodle
                 sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
@@ -333,6 +337,7 @@
             else if (name == "set:sloodlerepeat") doRepeat = (integer)value1;
             else if (name == "set:sloodlerandomize") doRandomize = (integer)value1;
             else if (name == "set:sloodledialog") doDialog = (integer)value1;
+            else if (name == "set:correctToContinue") correctToContinue = (integer)value1;
             else if (name == "set:sloodleplaysound") doPlaySound = (integer)value1;
             else if (name == SLOODLE_EOF) eof = TRUE;
             
@@ -359,7 +364,7 @@
         finish_quiz(key user_key) {
             integer user_id = llListFindList(users, [user_key]);
             integer num_correct = llList2Integer(users_num_correct,user_id);
-            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "complete", [llKey2Name(user_key), (string)num_correct + "/" + (string)num_questions], user_key, "quiz");
+            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "complete", [llKey2Name(user_key), (string)num_correct + "/" + (string)num_questions], user_key, "quizzer");
             //move_to_start(); // Taking this out here leaves the quiz chair at its final position until the user stands up.
             
             // Notify the server that the attempt was finished
@@ -441,6 +446,8 @@
                 After this data is collected from the server response we will move into the quiz_loaded state.
             */
             state_entry(){
+            	sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [RED, 1.0], "clickmetoloadthequiz", [], llGetOwner(), "quizzer");
+                
                 llSetText("Click me to load the quiz", RED, 1);     
                
             }
@@ -449,7 +456,8 @@
                      //take the first touch, extract the user-uuid, and request from the server, the question_id's and quiz name
                   toucher = llDetectedKey(0);
                   load_quiz(toucher);
-                  llSetText("Loading Quiz", YELLOW, 1);     
+                  sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [YELLOW, 1.0], "loadingquiz", [], llGetOwner(), "quizzer");
+            
             }
 
             on_rez(integer par){
@@ -491,7 +499,7 @@
                     return;
                     
                 } else if (statuscode == -10302) {
-                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quiz");
+                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quizzer");
                   //  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", user_key);
                     return;
                     
@@ -521,17 +529,20 @@
                     string rowtype = llList2String( thisline, 0 ); 
         
                     // Check what type of line this is
-                    if ( rowtype == "quiz" ) {
+                    if ( rowtype == "quizzer" ) {
                         
                         // Get the quiz ID and name
                         quiz_id = (integer)llList2String(thisline, 4);
                         quiz_name = llList2String(thisline, 2);
-                        llSetText(quiz_name, BLUE, 1);
+                       
+                        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [BLUE, 1.0], "quizname", [quiz_name], llGetOwner(), "quizzer");
+            
                     } else if ( rowtype == "quizpages" ) {
                         
                         // Extract the list of questions ID's
                         list question_ids_str = llCSV2List(llList2String(thisline, 3));
                         num_questions = llGetListLength(question_ids_str);
+                        quiz_name = llList2String(thisline, 2);
                         integer qiter = 0;
                         question_ids = [];
                         // Store all our question IDs
@@ -547,8 +558,8 @@
                 
                 // Make sure we have all the data we need
                 if (quiz_name == "" || num_questions == 0) {
-                    
-                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quiz");
+                   
+                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quizzer");
                  //   llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FAILURE_NOTHING_MORE_TO_DO_WITH_AVATAR, "", user_key);//add to dia
                 
                     return;
@@ -556,7 +567,7 @@
                 
                 // Report the status to the user
                 
-                sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "ready",  [llKey2Name(user_key)],user_key, "quiz");
+                sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "ready",  [llKey2Name(user_key)],user_key, "quizzer");
         //        llMessageLinked(LINK_SET,  SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_READY, "", "");
               state quiz_ready;
             }
@@ -572,7 +583,8 @@
             }
             
             state_entry(){
-                llSetText("Quiz: "+ quiz_name + " is ready.\nNumber of questions in this quiz: ("+(string)num_questions+")", GREEN, 1.0);
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [GREEN, 1.0], "quizisready", [quiz_name,num_questions], llGetOwner(), "quizzer");
+            
                 num_correct = 0;
             
                 // Make sure we have some questions
@@ -612,12 +624,12 @@
                         integer question_id = llList2Integer(users_active_question,active_question_index);
                         // Was it an error code?
                         if (statuscode == -10301) {
-                            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "quiz");
+                            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "quizzer");
                        //     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_ATTEMPTS_LEFT, (string)question_id, user_key);//todo add to dia
                             return;
                             
                         } else if (statuscode == -10302) {
-                           sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quiz");
+                           sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quizzer");
                       //      llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_QUESTIONS, (string)question_id, user_key);//todo add to dia
                            return;
                             
@@ -649,10 +661,10 @@
                         list opgrade = []; // Grades
                         list opfeedback = []; // Feedback if this option is selected
                         //clear users current question option data
-                        llListReplaceList(users_current_question_opids, [""], user_id, user_id);
-                        llListReplaceList(users_current_question_optext, [""], user_id, user_id); 
-                        llListReplaceList(users_current_question_opgrade, [""], user_id, user_id); 
-                        llListReplaceList(users_current_question_opfeedback, [""], user_id, user_id); 
+                        users_current_question_opids=llListReplaceList(users_current_question_opids, [""], user_id, user_id);
+                        users_current_question_optext=llListReplaceList(users_current_question_optext, [""], user_id, user_id); 
+                        users_current_question_opgrade=llListReplaceList(users_current_question_opgrade, [""], user_id, user_id); 
+                        users_current_question_opfeedback=llListReplaceList(users_current_question_opfeedback, [""], user_id, user_id); 
                         for (i = 1; i < numlines; i++) {
                 
                             // Extract and parse the current line
@@ -668,7 +680,7 @@
                                     qtype = llList2String(thisline, 7);
                                     // Make sure it's a valid question type
                                     if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
-                                      sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "quiz");
+                                      sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "quizzer");
                                   //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
                                       return;
                                     }
@@ -686,14 +698,19 @@
                                 opfeedback += [llList2String(thisline, 6)];
                             }
                         }
+                        opids_string=llGetSubString(opids_string, 0, -2);
+                        optext_string=llGetSubString(optext_string, 0, -2);
+                        opgrade_string=llGetSubString(opgrade_string, 0, -2);
+                        opfeedback_string=llGetSubString(opfeedback_string, 0, -2);
                         debug("opids_string: "+opids_string);
                         debug("optext_string: "+optext_string);
                         debug("opgrad_string: "+opgrade_string);
                         debug("opfeedback_string: "+opfeedback_string);
-                        llListReplaceList(users_current_question_opids, [opids_string], user_id, user_id);
-                        llListReplaceList(users_current_question_optext, [optext_string], user_id, user_id); 
-                        llListReplaceList(users_current_question_opgrade, [opgrade_string], user_id, user_id); 
-                        llListReplaceList(users_current_question_opfeedback, [opfeedback_string], user_id, user_id); 
+                        
+                        users_current_question_opids=llListReplaceList(users_current_question_opids, [opids_string], user_id, user_id);
+                        users_current_question_optext=llListReplaceList(users_current_question_optext, [optext_string], user_id, user_id); 
+                        users_current_question_opgrade=llListReplaceList(users_current_question_opgrade, [opgrade_string], user_id, user_id); 
+                        users_current_question_opfeedback=llListReplaceList(users_current_question_opfeedback, [opfeedback_string], user_id, user_id); 
                                     
                         
                         
@@ -741,7 +758,7 @@
                 integer user_id=llListFindList(users, [user_key]);
                 if (doDialog && ((qtype == "multichoice") || (qtype == "truefalse"))) {
                     if (llListFindList(users_menu_channels, [channel])==-1) {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "usedialogs", [llKey2Name(user_key)], user_key, "quiz");
+                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "usedialogs", [llKey2Name(user_key)], user_key, "quizzer");
                         return;
                     }
                 } 
@@ -758,9 +775,11 @@
                     list opgrade = llParseString2List(llList2String(users_current_question_opgrade,user_id), ["|"], []);
                     list opfeedback = llParseString2List(llList2String(users_current_question_opfeedback,user_id), ["|"], []);
                     integer active_question_index = llList2Integer(users_active_question,user_id);
-                     list question_list = llParseString2List(llList2String(users_questions, user_id), ["|"], []);
+                    list question_list = llParseString2List(llList2String(users_questions, user_id), ["|"], []);
                     integer active_question = llList2Integer(question_list, active_question_index);
+                    debug("users_current_question_opids: "+llList2CSV(users_current_question_opids));
                     debug("opids: "+llList2CSV(opids));
+                    
                     // Check the type of question this was
                     if ((qtype == "multichoice") || (qtype == "truefalse")) {
                         // Multiple choice - the response should be a number from the dialog box (1-based)
@@ -778,7 +797,7 @@
                             notify_server(qtype, active_question, llList2String(opids, answer_num),scorechange);
                         } else {
                            
-                          sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidchoice",  [llKey2Name(user_key)],user_key, "quiz");
+                          sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidchoice",  [llKey2Name(user_key)],user_key, "quizzer");
                            // ask_question();
                         }        
                      } else if (qtype == "shortanswer") {
@@ -812,7 +831,7 @@
                     
                     
                      else {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM , [0], "invalidtype" , [], user_key, "quiz" );
+                        sloodle_translation_request(SLOODLE_TRANSLATE_IM , [0], "invalidtype" , [], user_key, "quizzer" );
                     }                
                     
                     //llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR, opid+"|"+answeroptext, sitter);    
@@ -821,10 +840,13 @@
                         user_feedback_requests+= request_feedback( active_question, opid,user_key );
                     else if (feedback != "") llInstantMessage(user_key, feedback); // Text feedback
                     else if (scorechange > 0.0) {                                                    
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct", [llKey2Name(user_key)], user_key, "quiz");
+                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct", [llKey2Name(user_key)], user_key, "quizzer");
                         //num_correct += 1; SAL commented out this
                     } else {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "incorrect",  [llKey2Name(user_key)], user_key, "quiz");
+                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "incorrect",  [llKey2Name(user_key)], user_key, "quizzer");
+                    }
+                    if (correctToContinue==1){
+                    	
                     }
                     llSleep(1.);  //wait to finish the sloodle_translation_request before next question.
                     

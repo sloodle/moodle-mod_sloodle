@@ -1,4 +1,4 @@
-// LSL script generated: mod.quiz-1.0.objects.quizzer.assets.sloodle_translation_quizzer_en.lslp Fri Sep  7 10:53:46 Pacific Daylight Time 2012
+// LSL script generated: mod.quiz-1.0.objects.quizzer.assets.sloodle_translation_quizzer_en.lslp Sat Sep  8 21:40:32 Pacific Daylight Time 2012
 // Translation strings for the Sloodle Quiz object(s).
 //
 // The "locstrings" list is pairs of strings.
@@ -25,14 +25,14 @@
 ///// TRANSLATION /////
 
 // Localization batch - indicates the purpose of this file
-string mybatch = "quiz";
+string mybatch = "quizzer";
 
 
 // List of string names and translation pairs.
 // The name is the first of each pair, and should not be translated.
 // The second of each pair is the translation.
 // Additional comments are sometimes given afterward to aid translations.
-list locstrings = ["invalidchoice","Sorry {{0}}. Your selection was not in the list of available choices. Please try again.","invalidtype","Error: this object cannot handle quiz questions of type: {{0}}","complete","Quiz complete {{0}}. Your final score was {{1}}.","repeating","Repeating...","starting","Starting quiz for {{0}}","noquestions","ERROR: there are no questions available","notenrolled","ERROR:  It appears you are not enrolled in this class.  Please make sure you are enrolled AND your avatar is linked to your Moodle account.","noattemptsleft","Sorry {{0}}. You are not allowed to attempt this quiz again.","fetchingquiz","Fetching quiz data...","ready","Ready to attempt: {{0}}.","correct","Correct {{0}}.","usedialogs","Error: You attempted to answer a multiple choice, or a true/false answer by typing on the chat line instead of using the dialog {{0}}.","incorrect","Incorrect {{0}}."];
+list locstrings = ["invalidchoice","Sorry {{0}}. Your selection was not in the list of available choices. Please try again.","invalidtype","Error: this object cannot handle quiz questions of type: {{0}}","complete","Quiz complete {{0}}. Your final score was {{1}}.","repeating","Repeating...","starting","Starting quiz for {{0}}","noquestions","ERROR: there are no questions available","notenrolled","ERROR:  It appears you are not enrolled in this class.  Please make sure you are enrolled AND your avatar is linked to your Moodle account.","noattemptsleft","Sorry {{0}}. You are not allowed to attempt this quiz again.","fetchingquiz","Fetching quiz data...","ready","Ready to attempt: {{0}}.","correct","Correct {{0}}.","usedialogs","Error: You attempted to answer a multiple choice, or a true/false answer by typing on the chat line instead of using the dialog {{0}}.","incorrect","Incorrect {{0}}.","clickmetoloadthequiz","Click me to load the quiz","initializing","Initializing","loadingquiz","Loading Quiz","quizname","Quiz name: {{0}}","quizisready","Quiz: {{0}} is ready.\nNumber of questions in this quiz: ({{1}})"];
 
 ///// ----------- /////
 
