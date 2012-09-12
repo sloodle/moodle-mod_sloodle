@@ -478,7 +478,7 @@ $string['usedialogs'] = 'Use dialogs (instead of chat)?';
 $string['correcttocontinue'] = 'Must a user get a correct answer before they can advance to the next question? ';
 $string['url']  = 'URL';
 $string['unknowntype'] = 'Unknown type';
-
+$string['askquestionscontinuously'] = 'Automatically ask the next question after each question is answered?';
 $string['upload:selectfile'] = 'Select file to upload';
 $string['upload:file'] = 'Upload File';
 $string['upload:maxsize'] = 'Estimated maximum upload size: {$a}';
