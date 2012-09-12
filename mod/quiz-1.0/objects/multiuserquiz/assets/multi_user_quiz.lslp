@@ -145,15 +145,18 @@
                 doRepeat = 1;
                 doDialog = 1;
                 doPlaySound = 1;
-                doRandomize = 1;
+                doRandomize = 1;                
         }
         // Notify the server of a response
-        notify_server(string qtype, integer questioncode, string responsecode, float scorechange){
-            string body =sloodlehttpvars;
+        notify_server(string user_key, string qtype, integer questioncode, string responsecode, float scorechange){
+            string body=sloodlehttpvars;
             body += "&resp" + (string)questioncode + "_=" + responsecode;
             body += "&resp" + (string)questioncode + "_submit=1";
+            body += "&sloodleuuid=" + (string)user_key;
+            body += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
             body += "&questionids=" + (string)questioncode;
             body += "&action=notify";
+            body += "&sloodlerequestdesc="+"QUESTION_RESPONSE";
             body += "&scorechange="+(string)scorechange;
             llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
         }
@@ -162,17 +165,14 @@
         // It does this by substituting the feedback [[[LONG]]]
         key request_feedback( integer qid, string fid,key user_key ) {
             // Request the identified question from Moodle
-            sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
-            sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
-            sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
-            sloodlehttpvars += "&sloodleuuid=" + (string)user_key;
-            sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
-            sloodlehttpvars += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
-            sloodlehttpvars += "&ltq=" + (string)qid;
-            sloodlehttpvars += "&fid=" + (string)fid;  
-            key reqid = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], sloodlehttpvars);
+            string body=sloodlehttpvars;
+            body += "&sloodlerequestdesc="+"REQUESTING_FEEDBACK";
+            body += "&sloodleuuid=" + (string)user_key;
+            body += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
+            body += "&ltq=" + (string)qid;
+            body += "&fid=" + (string)fid;  
+            key reqid = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
             llSleep(3.0); // Hopefully the message will come back before the next question is asked. But if it comes back out of order, we won't insist.
-            
             return reqid;
             
         }
@@ -253,34 +253,29 @@
         }
         load_quiz(key user_key){
             // llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", userKey);
-                
+                string body=sloodlehttpvars;
                 sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "fetchingquiz",  [llKey2Name(user_key)], user_key, "quizzer");
                 // Request the quiz data from Moodle
-                sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
-                sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
-                sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
-                sloodlehttpvars += "&sloodleuuid=" + (string)user_key;
-                sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
-                sloodlehttpvars += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
-                httpquizquery = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], sloodlehttpvars);
-                debug("loading quiz: "+sloodleserverroot + sloodle_quiz_url+"/?"+sloodlehttpvars);
+                body += "&sloodlerequestdesc="+"LOADING_QUIZ";
+                body += "&sloodleuuid=" + (string)user_key;
+                body += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
+                body +="&request_timestamp="+(string)llGetUnixTime(); 
+                httpquizquery = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
+                debug("loading quiz: "+sloodleserverroot + sloodle_quiz_url+"/?"+body);
         }
         
          request_question(key user_key,integer question){
             // llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", userKey);
-                
+                string body=sloodlehttpvars;
                 sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "Asking a questions",  [llKey2Name(user_key)], user_key, "quizzer");
-            
-                // Request the quiz data from Moodle
-                sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
-                sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
-                sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
-                sloodlehttpvars += "&sloodleuuid=" + (string)user_key;
-                sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
-                sloodlehttpvars += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
-                sloodlehttpvars += "&ltq="+(string)question;
-                httpquizquery = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], sloodlehttpvars);
-                debug("request_question: "+sloodleserverroot + sloodle_quiz_url+"/?"+sloodlehttpvars);
+            	// Request the quiz data from Moodle
+                body += "&sloodlerequestdesc="+"REQUESTING_QUESTION";
+                body += "&sloodleuuid=" + (string)user_key;
+                body += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
+                body += "&ltq="+(string)question;
+                body +="&request_timestamp="+(string)llGetUnixTime(); 
+                httpquizquery = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
+                debug("request_question: "+sloodleserverroot + sloodle_quiz_url+"/?"+body);
         }
         
         /******************************************************************************************************************************
@@ -364,18 +359,20 @@
         
         // Report completion to the user
         finish_quiz(key user_key) {
+        	string body = sloodlehttpvars;
             integer user_id = llListFindList(users, [user_key]);
             integer num_correct = llList2Integer(users_num_correct,user_id);
             sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "complete", [llKey2Name(user_key), (string)num_correct + "/" + (string)num_questions], user_key, "quizzer");
-            //move_to_start(); // Taking this out here leaves the quiz chair at its final position until the user stands up.
-            
             // Notify the server that the attempt was finished
-            string body = sloodlehttpvars;
+            body += "&sloodlerequestdesc="+"FINISHING_QUIZ";
+            body += "&sloodleuuid=" + (string)user_key;
+            body += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
+            body +="&request_timestamp="+(string)llGetUnixTime(); 
             body += "&finishattempt=1";
             llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
             users_num_correct=llListReplaceList(users_num_correct, [0], user_id, user_id);
             users_active_question_index=llListReplaceList(users_active_question_index, [0], user_id, user_id);
-         //   llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR, (string)num_correct + "/" + (string)num_questions, user_key);
+         	//   llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR, (string)num_correct + "/" + (string)num_questions, user_key);
             
         }
         // Send a translation request link message
@@ -450,9 +447,13 @@
             */
             state_entry(){
             	sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [RED, 1.0], "clickmetoloadthequiz", [], llGetOwner(), "quizzer");
+                //initialize sloodlehttpvars that will be used in each http request
+                sloodlehttpvars="&sloodlepwd=" + sloodlepwd;
+            	sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
+            	sloodlehttpvars +="sloodlecontrollerid=" + (string)sloodlecontrollerid;
+            	sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
+               sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [RED, 1.0], "clickmetoloadthequiz", [], llGetOwner(), "quizzer");
                 
-                llSetText("Click me to load the quiz", RED, 1);     
-               
             }
             
            touch_start(integer num_detected) {
@@ -617,27 +618,32 @@
                         body = "";
                         list statusfields = llParseStringKeepNulls(llList2String(lines,0), ["|"], []);
                         integer statuscode = llList2Integer(statusfields, 0);
+                        //1|QUIZ||REQUESTING_QUESTION|||2102f5ab-6854-4ec3-aec5-6cd6233c31c6
+                        string  request_descriptor =llList2String(statusfields, 3); 
                         key user_key = llList2Key(statusfields,6);
                         //the user who initiated this request
                         integer user_id = llListFindList(users, [user_key]);
                         integer active_question_index = llList2Integer(users_active_question_index,user_id);
-                        if (statuscode == -10301) {
-                            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "quizzer");
-                       //     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_ATTEMPTS_LEFT, (string)question_id, user_key);//todo add to dia
-                            return;
-                            
-                        } else if (statuscode == -10302) {
-                           sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quizzer");
-                      //      llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_QUESTIONS, (string)question_id, user_key);//todo add to dia
-                           return;
-                            
-                        } else if (statuscode <= 0) {
-                            //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], NULL_KEY, "");
-                            // sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode); //send message to error_message.lsl
-                            // Check if an error message was reported
-                            if (numlines > 1) sloodle_debug("quiz data error: "+llList2String(lines, 1));
-                            return;
-                        }
+                         	debug("*********************request_descriptor: "+request_descriptor);
+                          if (request_descriptor=="REQUESTING_QUESTION"){
+                         		request_descriptor="";
+		                        if (statuscode == -10301) {
+		                            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "quizzer");
+		                       //     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_ATTEMPTS_LEFT, (string)question_id, user_key);//todo add to dia
+		                            return;
+		                            
+		                        } else if (statuscode == -10302) {
+		                           sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quizzer");
+		                      //      llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_NO_QUESTIONS, (string)question_id, user_key);//todo add to dia
+		                           return;
+		                            
+		                        } else if (statuscode <= 0) {
+		                            //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], NULL_KEY, "");
+		                            // sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode); //send message to error_message.lsl
+		                            // Check if an error message was reported
+		                            if (numlines > 1) sloodle_debug("quiz data error: "+llList2String(lines, 1));
+		                            return;
+		                        }
                             integer feedback_request_index = llListFindList(user_feedback_requests, [request_id]);
                             if (feedback_request_index!=-1) {
                                    llInstantMessage( user_key, llList2String(lines, 1) );
@@ -650,102 +656,108 @@
                 
                         // Go through each line of the response
                         integer i = 0;
-                        string opids_string="";
-                        string optext_string="";
-                        string opgrade_string="";
-                        string opfeedback_string="";
-                        list opids = []; // IDs
-                        list optext = []; // Texts
-                        list opgrade = []; // Grades
-                        list opfeedback = []; // Feedback if this option is selected
-                        //clear users current question option data
-                        users_current_question_opids=llListReplaceList(users_current_question_opids, [""], user_id, user_id);
-                        users_current_question_optext=llListReplaceList(users_current_question_optext, [""], user_id, user_id); 
-                        users_current_question_opgrade=llListReplaceList(users_current_question_opgrade, [""], user_id, user_id); 
-                        users_current_question_opfeedback=llListReplaceList(users_current_question_opfeedback, [""], user_id, user_id); 
-                        for (i = 1; i < numlines; i++) {
-                
-                            // Extract and parse the current line
-                            list thisline = llParseStringKeepNulls(llList2String(lines, i),["|"],[]);
-                            string rowtype = llList2String( thisline, 0 );
-                
-                            // Check what type of line this is
-                            if ( rowtype == "question" ) {
-                                
-                                // Grab the question information and reset the options
-        
-                                    qtext = llList2String(thisline, 4);
-                                    qtype = llList2String(thisline, 7);
-                                    // Make sure it's a valid question type
-                                    if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
-                                      sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "quizzer");
-                                  //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
-                                      return;
-                                    }
-                                
-                            } else if ( rowtype == "questionoption" ) {                        
-                                // Add this option to the appropriate place
-                                opids_string += llList2String(thisline, 2)+"|";
-                                optext_string += llList2String(thisline, 4)+"|";
-                                opgrade_string += llList2String(thisline, 5)+"|";
-                                opfeedback_string += llList2String(thisline, 6)+"|";
-                                
-                                opids += [(integer)llList2String(thisline, 2)];
-                                optext += [llList2String(thisline, 4)];
-                                opgrade += [(float)llList2String(thisline, 5)];
-                                opfeedback += [llList2String(thisline, 6)];
-                            }
-                        }
-                        opids_string=llGetSubString(opids_string, 0, -2);
-                        optext_string=llGetSubString(optext_string, 0, -2);
-                        opgrade_string=llGetSubString(opgrade_string, 0, -2);
-                        opfeedback_string=llGetSubString(opfeedback_string, 0, -2);
-                        debug("opids_string: "+opids_string);
-                        debug("optext_string: "+optext_string);
-                        debug("opgrad_string: "+opgrade_string);
-                        debug("opfeedback_string: "+opfeedback_string);
                         
-                        users_current_question_opids=llListReplaceList(users_current_question_opids, [opids_string], user_id, user_id);
-                        users_current_question_optext=llListReplaceList(users_current_question_optext, [optext_string], user_id, user_id); 
-                        users_current_question_opgrade=llListReplaceList(users_current_question_opgrade, [opgrade_string], user_id, user_id); 
-                        users_current_question_opfeedback=llListReplaceList(users_current_question_opfeedback, [opfeedback_string], user_id, user_id); 
-                        integer menu_channel = llList2Integer(users_menu_channels, user_id);               
-                        // Are we using dialogs?
-                        if (doDialog == 1) {
-                            // We want to create a dialog with the option texts embedded into the main text,
-                            //  and numbers on the buttons
-                            integer qi;
-                            list qdialogoptions = [];
-                            string qdialogtext = "Question "+(string)(active_question_index+1)+" of "+(string)num_questions+"\n"+ qtext + "\n";
-                            // Go through each option
-                            integer num_options = llGetListLength(optext);
-                            
-                            if ((qtype == "numerical")|| (qtype == "shortanswer")) {
-                               // Ask the question via IM
-                                llTextBox(user_key,qtext,llList2Integer(users_menu_channels,user_id));   
-                            } else {
-                                for (qi = 1; qi <= num_options; qi++) {
-                                    // Append this option to the main dialog (remebering buttons are 1-based, but lists 0-based)
-                                    qdialogtext += (string)qi + ": " + llList2String(optext,qi-1) + "\n";
-                                    // Add a button for this option
-                                    qdialogoptions = qdialogoptions + [(string)qi];
-                                }
-                                // Present the dialog to the user
-                               
-                                llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
-                            }
-                        } else {
-                          // Offer the options via IM
-                            integer x = 0;
-                            integer num_options = llGetListLength(optext);
-                            string option_string;
-                            for (x = 0; x < num_options; x++) {
-                                option_string+= (string)(x + 1) + ". " + llList2String(optext, x);
-                            }     
-                              llTextBox(user_key,qtext+"\n"+option_string,llList2Integer(users_menu_channels,user_id));   
-                        }
-                        
-                     
+                      
+                        	string opids_string="";
+	                        string optext_string="";
+	                        string opgrade_string="";
+	                        string opfeedback_string="";
+	                        list opids = []; // IDs
+	                        list optext = []; // Texts
+	                        list opgrade = []; // Grades
+	                        list opfeedback = []; // Feedback if this option is selected
+	                        //clear users current question option data
+	                        users_current_question_opids=llListReplaceList(users_current_question_opids, [""], user_id, user_id);
+	                        users_current_question_optext=llListReplaceList(users_current_question_optext, [""], user_id, user_id); 
+	                        users_current_question_opgrade=llListReplaceList(users_current_question_opgrade, [""], user_id, user_id); 
+	                        users_current_question_opfeedback=llListReplaceList(users_current_question_opfeedback, [""], user_id, user_id); 
+	                        for (i = 1; i < numlines; i++) {
+	                
+	                            // Extract and parse the current line
+	                            list thisline = llParseStringKeepNulls(llList2String(lines, i),["|"],[]);
+	                            string rowtype = llList2String( thisline, 0 );
+	                			debug ("rowtype: "+rowtype);
+	                            // Check what type of line this is
+	                            if ( rowtype == "question" ) {
+	                                
+	                                // Grab the question information and reset the options
+	        
+	                                    qtext = llList2String(thisline, 4);
+	                                    qtype = llList2String(thisline, 7);
+	                                    // Make sure it's a valid question type
+	                                    if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
+	                                      sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "quizzer");
+	                                  //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
+	                                      return;
+	                                    }
+	                                
+	                            } else if ( rowtype == "questionoption" ) {                        
+	                                // Add this option to the appropriate place
+	                                opids_string += llList2String(thisline, 2)+"|";
+	                                optext_string += llList2String(thisline, 4)+"|";
+	                                opgrade_string += llList2String(thisline, 5)+"|";
+	                                opfeedback_string += llList2String(thisline, 6)+"|";
+	                                
+	                                opids += [(integer)llList2String(thisline, 2)];
+	                                optext += [llList2String(thisline, 4)];
+	                                opgrade += [(float)llList2String(thisline, 5)];
+	                                opfeedback += [llList2String(thisline, 6)];
+	                            }
+	                        }
+	                        opids_string=llGetSubString(opids_string, 0, -2);
+	                        optext_string=llGetSubString(optext_string, 0, -2);
+	                        opgrade_string=llGetSubString(opgrade_string, 0, -2);
+	                        opfeedback_string=llGetSubString(opfeedback_string, 0, -2);
+	                        debug("opids_string: "+opids_string);
+	                        debug("optext_string: "+optext_string);
+	                        debug("opgrad_string: "+opgrade_string);
+	                        debug("opfeedback_string: "+opfeedback_string);
+	                        
+	                        users_current_question_opids=llListReplaceList(users_current_question_opids, [opids_string], user_id, user_id);
+	                        users_current_question_optext=llListReplaceList(users_current_question_optext, [optext_string], user_id, user_id); 
+	                        users_current_question_opgrade=llListReplaceList(users_current_question_opgrade, [opgrade_string], user_id, user_id); 
+	                        users_current_question_opfeedback=llListReplaceList(users_current_question_opfeedback, [opfeedback_string], user_id, user_id); 
+	                        integer menu_channel = llList2Integer(users_menu_channels, user_id);               
+	                        // Are we using dialogs?
+	                        if (doDialog == 1) {
+	                            // We want to create a dialog with the option texts embedded into the main text,
+	                            //  and numbers on the buttons
+	                            integer qi=1;
+	                            list qdialogoptions = [];
+	                            string qdialogtext = "Question "+(string)(active_question_index+1)+" of "+(string)num_questions+"\n"+ qtext + "\n";
+	                            // Go through each option
+	                            integer num_options = llGetListLength(optext);
+	                            
+	                            if ((qtype == "numerical")|| (qtype == "shortanswer")) {
+	                               // Ask the question via IM
+	                                llTextBox(user_key,qtext,llList2Integer(users_menu_channels,user_id));   
+	                                return;
+	                            } 
+	                            else {
+	                                for (qi = 1; qi <= num_options; qi++) {
+	                                    // Append this option to the main dialog (remebering buttons are 1-based, but lists 0-based)
+	                                    qdialogtext += (string)qi + ": " + llList2String(optext,qi-1) + "\n";
+	                                    // Add a button for this option
+	                                    qdialogoptions = qdialogoptions + [(string)qi];
+	                                }
+	                                // Present the dialog to the user
+	                               
+	                                llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
+	                                debug("qi="+(string)(qi)+" qdialogtext: "+qdialogtext);
+	                                return;
+	                            }
+	                        } else {
+	                          // Offer the options via IM
+	                            integer x = 0;
+	                            integer num_options = llGetListLength(optext);
+	                            string option_string;
+	                            for (x = 0; x < num_options; x++) {
+	                                option_string+= (string)(x + 1) + ". " + llList2String(optext, x);
+	                            }     
+	                              llTextBox(user_key,qtext+"\n"+option_string,llList2Integer(users_menu_channels,user_id));   
+	                              return;
+	                        }         
+                        }     
                 }
             listen(integer channel, string name, key user_key, string user_response){
                 // If using dialogs, then only listen to the dialog channel
