@@ -1,11 +1,12 @@
-// LSL script generated: mod.quiz-1.0.objects.quizzer.assets.sloodle_translation_quizzer_en.lslp Sat Sep  8 21:40:32 Pacific Daylight Time 2012
-// Translation strings for the Sloodle Quiz object(s).
+// LSL script generated: mod.quiz-1.0.objects.quizzer.assets.sloodle_translation_en.lslp Mon Sep 10 11:31:42 Tokyo Standard Time 2012
+// Standard translation script for Sloodle.
+// Contains the common, re-usable words and phrases.
 //
 // The "locstrings" list is pairs of strings.
 // The first of each pair is the name, and second is the translation.
 //
 // This script is part of the Sloodle project.
-// Copyright (c) 2008 Sloodle (various contributors)
+// Copyright (c) 2008-9 Sloodle (various contributors)
 // Released under the GNU GPL v3
 //
 // Contributors:
@@ -25,14 +26,14 @@
 ///// TRANSLATION /////
 
 // Localization batch - indicates the purpose of this file
-string mybatch = "quizzer";
+string mybatch = "";
 
 
 // List of string names and translation pairs.
 // The name is the first of each pair, and should not be translated.
 // The second of each pair is the translation.
 // Additional comments are sometimes given afterward to aid translations.
-list locstrings = ["invalidchoice","Sorry {{0}}. Your selection was not in the list of available choices. Please try again.","invalidtype","Error: this object cannot handle quiz questions of type: {{0}}","complete","Quiz complete {{0}}. Your final score was {{1}}.","repeating","Repeating...","starting","Starting quiz for {{0}}","noquestions","ERROR: there are no questions available","notenrolled","ERROR:  It appears you are not enrolled in this class.  Please make sure you are enrolled AND your avatar is linked to your Moodle account.","noattemptsleft","Sorry {{0}}. You are not allowed to attempt this quiz again.","fetchingquiz","Fetching quiz data...","ready","Ready to attempt: {{0}}.","correct","Correct {{0}}.","usedialogs","Error: You attempted to answer a multiple choice, or a true/false answer by typing on the chat line instead of using the dialog {{0}}.","incorrect","Incorrect {{0}}.","clickmetoloadthequiz","Click me to load the quiz","initializing","Initializing","loadingquiz","Loading Quiz","quizname","Quiz name: {{0}}","quizisready","Quiz: {{0}} is ready.\nNumber of questions in this quiz: ({{1}})"];
+list locstrings = ["yes","Yes","no","No","on","On","off","Off","enabled","Enabled","disabled","Disabled","webconfigmenu","Sloodle Web-Configuration Menu\n\n{{0}} = Access web-configuration page\n{{1}} = Download configuration","configlink","Use this link to configure the object.","chatserveraddress","Please chat the address of your Moodle site, without a trailing slash. For example: http://www.yoursite.blah/moodle","waitingforserveraddress","Waiting for Moodle site address.\nPlease chat it on channel 0 or 1.","checkingserverat","Checking Moodle site at:\n{{0}}","sendingconfig","Sending configuration data...","touchforwebconfig","Touch me to start web-configuration","userauthurl","Please login to Moodle with this URL to authorize the object for your own use.","readynotconnected","Ready\n[Not connected]","shutdown","Shutdown","connected","Connected successfully","readyconnectedto","Ready\n[Connected to: {{0}}]","readyconnectedto:sitecourse","Ready\n[Site: {{0}}]\n[Course: {{1}}]","connectionfailed","Connection failed","httperror","ERROR: HTTP request failed","httperror:code","ERROR: HTTP request failed with code {{0}}","httpempty","ERROR: HTTP response empty","httptimeout","ERROR: HTTP request timed out.","servererror","ERROR: server responded with status code {{0}}","notypeid","ERROR: failed to identify object type ID","gottype","Identified object type as {{0}}","failedcheckcompatibility","ERROR: failed to check compatibility with site","badresponseformat","ERROR: response from server was badly formatted","objectauthfailed:code","ERROR: object authorisation failed with code {{0}}","objectconfigfailed:code","ERROR: object configuration failed with code {{0}}","initobjectauth","Initiating object authorisation...","autoreg:newaccount","A new Moodle account has been automatically generated for you.\nWebsite: {{0}} \nUsername: {{1}}\nPassword: {{2}}","configurationreceived","Configuration received","configdatamissing","ERROR: some required data was missing from the configuration","readingconfignotecard","Reading configuration notecard...","checkingcourse","Checking course...","errortouchtoreset","ERROR\nTouch me to reset","notconfiguredyet","Sorry {{0}}. I am not configured yet.","resetting","Resetting...","noconfigavailable","There is no configuration available to download. Please visit the configuration web-page first.","checkingauth","Checking authorisation...","sloodlenotinstalled","ERROR: Sloodle is not installed on specified site.","sloodleversioninstalled","Sloodle version installed on server: {{0}}","sloodleversionrequired","ERROR: you require at least Sloodle version {{0}}","nopermission:use","Sorry {{0}}. You do not have permission to use this object.","nopermission:ctrl","Sorry {{0}}. You do not have permission to control this object.","nopermission:authobjects","Sorry {{0}}. You do not have permission to authorise objects on this course.","layout:failedretrying","Failed to store layout position. Retrying...","layout:failedaborting","Failed to store layout position. Aborting.","layout:toofar","Failed to store layout position - too far from rezzer.","layout:storedobject","Object stored in layout.","sloodleerror","SLOODLE error ({{0}}): please lookup SLOODLE wiki for error information","sloodleerror:desc","SLOODLE error ({{0}}): {{1}}"];
 
 ///// ----------- /////
 
@@ -72,8 +73,7 @@ string sloodle_get_string(string name){
         (pos = (-1));
     }
     if ((pos < 0)) return (("[[" + name) + "]]");
-    (pos += 1);
-    for (; (pos < numstrings); (pos += 2)) {
+    for ((pos += 1); (pos < numstrings); (pos += 2)) {
         if ((llList2String(locstrings,pos) == name)) {
             if (((pos + 1) < numstrings)) return llList2String(locstrings,(pos + 1));
             (pos = numstrings);
@@ -92,12 +92,12 @@ sloodle_debug(string msg){
 string sloodle_get_string_f(string name,list params){
     string str = sloodle_get_string(name);
     integer numparams = llGetListLength(params);
-    integer curparamnum = 0;
+    integer curparamnum;
     string curparamtok = "{{x}}";
     integer curparamtoklength = 0;
     string curparamstr = "";
     integer tokpos = (-1);
-    for (; (curparamnum < numparams); (curparamnum++)) {
+    for ((curparamnum = 0); (curparamnum < numparams); (curparamnum++)) {
         (curparamtok = (("{{" + ((string)curparamnum)) + "}}"));
         (curparamtoklength = llStringLength(curparamtok));
         (curparamstr = llList2String(params,curparamnum));

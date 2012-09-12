@@ -49,7 +49,8 @@ list locstrings = [
     "initializing","Initializing",
     "loadingquiz","Loading Quiz",
     "quizname","Quiz name: {{0}}",
-    "quizisready","Quiz: {{0}} is ready.\nNumber of questions in this quiz: ({{1}})"
+    "quizisready","Quiz: {{0}} is ready.\nNumber of questions in this quiz: ({{1}})",
+    "clicktogetnextquestion","{{0}}, click to get the next question."
     
 ];
 
