@@ -37,6 +37,8 @@
     
     /** Defines the HTTP parameter name for a request descriptor. */
     define('SLOODLE_PARAM_REQUEST_DESC', 'sloodlerequestdesc');
+    /** Defines the HTTP parameter name for a request timestame. */
+    define('SLOODLE_PARAM_REQUEST_TIMESTAMP', 'sloodlerequesttimestamp');
     /** Defines the HTTP parameter name for indicating a request which relates to an object instead of a user. */
     define('SLOODLE_PARAM_IS_OBJECT', 'sloodleisobject');
     /** Defines the HTTP parameter name for specifying server access level. */
@@ -383,9 +385,8 @@
         function set_request_timestamp($par)
         {
             // Validate
-            if (is_int($par) == false && is_null($par) == false) {
-                $this->_internal_validation_error("Sloodle - LSL response: invalid request timestamp; should be an integer, or null", 0);
-            } else {
+            $par = intval($par);
+            if ($par) {
                 $this->request_timestamp = $par;
             }
         }
@@ -952,6 +953,17 @@
         {
             return $this->get_param(SLOODLE_PARAM_REQUEST_DESC, $required);
         }
+ 
+        /**
+        * Fetches the request timestamp request parameter.
+        * @param bool $required If true (default) then the function will terminate the script with an error message if the HTTP request parameter was not specified.
+        * @return string|null The request descriptor provided in the request parameters, or null if there wasn't one
+        */
+        function get_request_timestamp($required = true)
+        {
+            return $this->get_param(SLOODLE_PARAM_REQUEST_TIMESTAMP, $required);
+        }
+
         
         /**
         * Checks the parameters to determine if the request relates to an object rather than a user
@@ -1007,6 +1019,7 @@
             
             // Store the request descriptor
             $this->_session->response->set_request_descriptor($this->get_request_descriptor(false));
+            $this->_session->response->set_request_timestamp($this->get_request_timestamp(false));
             // Attempt to load the controller, then the course
             // (there is a shortcut, using course->load_by_controller(), 
             //  however, that makes it harder to locate problems)
@@ -1238,6 +1251,10 @@ class SloodleDebugLogger {
             $REMOTE_ADDR  = isset($_SERVER['REMOTE_ADDR'])  ? $_SERVER['REMOTE_ADDR']  : '';
             $REMOTE_PORT  = isset($_SERVER['REMOTE_PORT'])  ? $_SERVER['REMOTE_PORT']  : '';
             $REQUEST_TIME = isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : '';
+
+            if ($REQUEST_URI == '/mod/sloodle/classroom/confirm_active_objects.php') {
+                return true;
+            }
 
             $str = '';
             $str = '------START-'.$type.'-'.$REQUEST_URI.'---'.$REMOTE_ADDR.'---'.$REMOTE_PORT.'---'.$REQUEST_TIME.'------'."\n";
