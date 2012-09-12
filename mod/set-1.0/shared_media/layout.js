@@ -1117,7 +1117,7 @@
                     rezzerControllerID = controllerid;
 					parentjq.attr('data-connection-status', 'connected');
 					update_buttons( parentjq );
-					//refresh_misc_object_group( parentjq );
+					refresh_misc_object_group( parentjq );
 					rezzerControllerID = controllerid;
                     heartbeat_refresh( parentjq, layoutid, rezzer_uuid)
                     parentjq.find('.fatal_error_zone').hide();

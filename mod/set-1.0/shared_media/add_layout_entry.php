@@ -23,8 +23,18 @@ include('index.template.php');
 
 $configVars = array();
 
+$skipvars = array(
+    'controllerid', // Should be in the layout entry
+    'courseid', // Should come from the controller
+    'layoutentryid', // Layout entry
+    'rezzeruuid' // Doesn't belong in layout
+);
+
 $layoutid = null;
 foreach($_POST as $n => $v) {
+    if (in_array($n, $skipvars)) {
+        continue;
+    }
 	if ($n == 'layoutid') {
 		$layoutid = intval($v);
 	} else if ($n == 'objectname') {
@@ -129,4 +139,14 @@ $rand = rand(0,10);
 //sleep($rand);
 print json_encode($content);
 exit;
+
+function error_output($error) {
+    $content = array(
+        'result' => 'failed',
+        'error' => $error,
+    );
+    print json_encode($content);
+    exit;
+}
+
 ?>

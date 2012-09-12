@@ -16,6 +16,8 @@ require_once(SLOODLE_LIBROOT.'/object_configs.php');
 
 require_once '../../../lib/json/json_encoding.inc.php';
 
+$controllerid = optional_param('controllerid', 0, PARAM_INT);
+
 // TODO: What should this be? Probably not 1...
 $controller_context = get_context_instance( CONTEXT_MODULE, $controllerid);
 $can_use_layouts = has_capability('mod/sloodle:uselayouts', $controller_context);

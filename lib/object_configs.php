@@ -59,7 +59,13 @@ class SloodleObjectConfig {
 		if (isset($allconfigs[$objname])) {
 			return $allconfigs[$objname];
 		}
-		return null;
+        // SLOODLE object, but we don't have a definition for it.
+        if (preg_match('/^SLOODLE/', $objname)) {
+            return null;
+        }
+        // Assume it's an object we don't know about, and provide a blank config allowing us to rez and derez.
+        return SloodleObjectConfig::ForNonSloodleObjectWithName($objname);
+		//return null;
 	}
 
 	// Return a SloodleObjectDefinition object for the given mod directory
