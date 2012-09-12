@@ -1,2 +1,5 @@
 sloodle_config.php
 .project
+*.lsl
+.metadata
+.settings
