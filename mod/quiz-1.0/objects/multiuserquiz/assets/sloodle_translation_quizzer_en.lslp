@@ -51,7 +51,7 @@ list locstrings = [
     "quizname","Quiz name: {{0}}",
     "quizisready","Quiz: {{0}} is ready.\nNumber of questions in this quiz: ({{1}})",
     "clicktogetnextquestion","{{0}}, click to get the next question.",
-    "clickmetoloadthequiz","Click me to load the quiz",
+    "clickmetoloadthequiz","Click me to load the quiz"
      
     
 ];

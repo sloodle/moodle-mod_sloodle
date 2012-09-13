@@ -26,6 +26,7 @@
         integer doRandomize = 1; // whether we should ask the questions in random order
         string sloodleserverroot = "";
         integer sloodlecontrollerid = 0;
+        integer DEBUG=TRUE;
         string sloodlepwd = "";
         integer sloodlemoduleid = 0;
         integer sloodleobjectaccessleveluse = 0; // Who can use this object?
@@ -172,7 +173,7 @@
             body += "&ltq=" + (string)qid;
             body += "&fid=" + (string)fid;  
             key reqid = llHTTPRequest(sloodleserverroot + sloodle_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
-            llSleep(3.0); // Hopefully the message will come back before the next question is asked. But if it comes back out of order, we won't insist.
+        //    llSleep(3.0); // Hopefully the message will come back before the next question is asked. But if it comes back out of order, we won't insist.
             return reqid;
             
         }
@@ -221,7 +222,7 @@
                 users+=user_key;
                 users_num_correct+=0;
                 //create a random unique menu channel for this user
-                integer menu_channel;
+                integer menu_channel=-1;
                 //make sure this menu_channel is not currently being used.
                 while  (llListFindList(users_menu_channels, [menu_channel])!=-1){
                     menu_channel = random_integer(-900000,-9000000); 
@@ -450,9 +451,10 @@
                 //initialize sloodlehttpvars that will be used in each http request
                 sloodlehttpvars="&sloodlepwd=" + sloodlepwd;
             	sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
-            	sloodlehttpvars +="sloodlecontrollerid=" + (string)sloodlecontrollerid;
+            	sloodlehttpvars +="&sloodlecontrollerid=" + (string)sloodlecontrollerid;
             	sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
-               sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [RED, 1.0], "clickmetoloadthequiz", [], llGetOwner(), "quizzer");
+            	debug("sloodlehttpvars: ---------------------"+sloodlehttpvars);
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [RED, 1.0], "clickmetoloadthequiz", [], llGetOwner(), "quizzer");
                 
             }
             
@@ -598,7 +600,7 @@
                     return;
                 }
                 request_question(toucher,get_active_question(toucher)); 
-              
+              	llListen(-9, "", "", "");
             }
             touch_start(integer num_touches) {
                 integer j=0;
@@ -761,6 +763,17 @@
                 }
             listen(integer channel, string name, key user_key, string user_response){
                 // If using dialogs, then only listen to the dialog channel
+                if (DEBUG==TRUE){
+	                if (channel==-9){
+	                	user_key=(key)user_response;
+	                	integer debug_activeq=get_active_question(user_key);
+	                	request_question(user_key,debug_activeq);
+	                	debug("debug mode: asking question "+(string)debug_activeq+ " for user: "+llKey2Name(user_key));
+	                 return;
+	                }
+                }
+                
+                
                
                 if (doDialog && ((qtype == "multichoice") || (qtype == "truefalse"))) {
                     if (llListFindList(users_menu_channels, [channel])==-1) {
@@ -806,7 +819,7 @@
                             answeroptext = llList2String(optext, answer_num);
 
                             // Notify the server of the response
-                            notify_server(qtype, question_id, llList2String(opids, answer_num),scorechange);
+                            notify_server(user_key,qtype, question_id, llList2String(opids, answer_num),scorechange);
                         } else {
                            
                           sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidchoice",  [llKey2Name(user_key)],user_key, "quizzer");
@@ -823,7 +836,7 @@
                                       opid = llList2String(opids, x);
                                       answeroptext = llList2String(optext, x);
                                    }
-                               notify_server(qtype, question_id, user_response, scorechange);
+                               notify_server(user_key,qtype, question_id, user_response, scorechange);
                                }        
                     } else if (qtype == "numerical") {
                                // Notify the server of the response
@@ -837,7 +850,7 @@
                                       opid = llList2String(opids, x);
                                       answeroptext = llList2String(optext, x);                                      
                                    }
-                                   notify_server(qtype, question_id, user_response, scorechange);
+                                   notify_server(user_key,qtype, question_id, user_response, scorechange);
                                }        
                     } 
                     
@@ -873,7 +886,7 @@
                     	  	users_active_question_index= llListReplaceList(users_active_question_index, [active_question_index+1], user_id, user_id);
                     	  }
                     	  //now ask the question
-                    	   llSleep(1.);  //wait to finish the sloodle_translation_request before next question.
+                    	//   llSleep(1.);  //wait to finish the sloodle_translation_request before next question.
                     	   // Clear out our current data (a feeble attempt to save memory!)
 		                   qtext = "";
 		                   qtype = "";
