@@ -79,6 +79,10 @@ if ( $objects_in_rezzer === FALSE) {
 
 foreach($objects_in_rezzer as $objname) {
 	$e = SloodleLayoutEntry::ForConfig( $objname, $is_dummy = true); 
+    // If we already know about the object, don't add it again.
+    if (SloodleObjectConfig::ForObjectName($objname, false)) {
+        continue;
+    }
 	$config = SloodleObjectConfig::ForNonSloodleObjectWithName( $objname ); 
 
 	ob_start();

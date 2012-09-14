@@ -54,15 +54,19 @@ class SloodleObjectConfig {
 	var $row_name= '';
 		
 	// static function returning an object configuration for an object with the given name, or none if none is found
-	function ForObjectName($objname) {
+	function ForObjectName($objname, $createDummy = true) {
 		$allconfigs = SloodleObjectConfig::AllAvailableAsArray();
 		if (isset($allconfigs[$objname])) {
 			return $allconfigs[$objname];
 		}
+        if (!$createDummy) {
+            return null;
+        }
         // SLOODLE object, but we don't have a definition for it.
         if (preg_match('/^SLOODLE/', $objname)) {
             return null;
         }
+        
         // Assume it's an object we don't know about, and provide a blank config allowing us to rez and derez.
         return SloodleObjectConfig::ForNonSloodleObjectWithName($objname);
 		//return null;
