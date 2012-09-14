@@ -39,6 +39,9 @@
     define('SLOODLE_PARAM_REQUEST_DESC', 'sloodlerequestdesc');
     /** Defines the HTTP parameter name for a request timestame. */
     define('SLOODLE_PARAM_REQUEST_TIMESTAMP', 'sloodlerequesttimestamp');
+    /** Defines the HTTP parameter name for a request timestame. */
+    define('SLOODLE_PARAM_TRACKING_CODE', 'sloodletrackingcode');
+
     /** Defines the HTTP parameter name for indicating a request which relates to an object instead of a user. */
     define('SLOODLE_PARAM_IS_OBJECT', 'sloodleisobject');
     /** Defines the HTTP parameter name for specifying server access level. */
@@ -134,7 +137,8 @@
         
         /**
         * Tracking code of the request.
-        * Use of this value is undefined. Please do not use it.
+        * This allows scripts to put their own tracking information in the request.
+        * It should be returned as is by the server
         * <b>Optional. Ignored if null.</b>
         * @var mixed
         * @access private
@@ -964,6 +968,17 @@
             return $this->get_param(SLOODLE_PARAM_REQUEST_TIMESTAMP, $required);
         }
 
+        /**
+        * Fetches the tracking code request parameter.
+        * @param bool $required If true (default) then the function will terminate the script with an error message if the HTTP request parameter was not specified.
+        * @return string|null The tracking code provided in the request parameters, or null if there wasn't one
+        */
+        function get_tracking_code($required = true)
+        {
+            return $this->get_param(SLOODLE_PARAM_TRACKING_CODE, $required);
+        }
+
+
         
         /**
         * Checks the parameters to determine if the request relates to an object rather than a user
@@ -1020,6 +1035,7 @@
             // Store the request descriptor
             $this->_session->response->set_request_descriptor($this->get_request_descriptor(false));
             $this->_session->response->set_request_timestamp($this->get_request_timestamp(false));
+            $this->_session->response->set_tracking_code($this->get_tracking_code(false));
             // Attempt to load the controller, then the course
             // (there is a shortcut, using course->load_by_controller(), 
             //  however, that makes it harder to locate problems)
