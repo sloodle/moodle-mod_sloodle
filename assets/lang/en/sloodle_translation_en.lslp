@@ -128,7 +128,7 @@ string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";              // Recipient avatar 
 string SLOODLE_TRANSLATE_LOAD_URL_PARALLEL = "loadurlpar";  // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
 string SLOODLE_TRANSLATE_IM = "instantmessage";             // Recipient avatar should be identified in link message keyval. No output parameters.
-
+string SLOODLE_TRANSLATE_TEXTBOX="textbox";//asks via a text box
 
 // Used for sending parallel URL loading messages
 integer SLOODLE_CHANNEL_OBJECT_LOAD_URL = -1639270041;

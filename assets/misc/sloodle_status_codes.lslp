@@ -20,16 +20,12 @@
 */
 
 integer SLOODLE_CHANNEL_HTTP_RESPONSE = -1639260101  // Tells the sloodle_rezzer_object script to send the contents as an http response, to the key specified as key
-
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER = -1639270111; // set the main shared media panel to the specified URL, accessible to the owner
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP = -1639270112; // set the main shared media panel to the specified URL, accessible to the group
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_ANYONE = -1639270114; // set the main shared media panel to the specified URL, accessible to anyone
 integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_OWNER = -1639270121; // set the open browser button to url, accessible to owner
 integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_GROUP = -1639270122; // set the open browser button to url, accessible to group
 integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_ANYONE = -1639270124; // set the open browser button to url, accessible to anyone
-
-
-
 integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102; //Tells us to start a quiz for the avatar, if possible.; Ordinary quiz chair will have a second script that detects and avatar sitting      on it and sends it. Awards-integrated version waits for a game ID to be set before doing this.
 integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103; //Sent by main quiz script to tell UI scripts that quiz has started for avatar with key
 integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104; //Sent by main quiz script to tell UI scripts that quiz has finished for avatar with key, with x/y correct in string
@@ -68,8 +64,6 @@ integer SLOODLE_OBJECT_GIVE_POINTS= -1639271136; //linked message channel to tel
 integer SLOODLE_LOAD_CURRENT_URL= -1639271137; //send message to shared media to open url that it is currently displaying in a browser.
 integer SLOODLE_CHANNEL_DISTRIBUTOR_REQUEST_GIVE_OBJECT = -1639271151; // start the process to give the specified object to the specified avatar, if they are allowed it.
 integer SLOODLE_CHANNEL_DISTRIBUTOR_DO_GIVE_OBJECT = 1639271152; // actually do give the specified object to the specified avatar
-// Please leave the following line intact to show where the script lives in Git:
-=======
 integer SLOODLE_CHANNEL_SCOREBOARD_UPDATE_COMPLETE = 1639271140;
 integer SLOODLE_CHANNEL_SCOREBOARD_SCORES_CONFIG = -1639272000;
 integer  SLOODLE_CHANNEL_SCOREBOARD_SCORES_SET_CELL_INFO=-1639272001; 
@@ -78,7 +72,6 @@ integer  SLOODLE_CHANNEL_SCOREBOARD_SCORES_RESET_INDICIES=-1639272003;
 integer  SLOODLE_CHANNEL_SCOREBOARD_SCORES_SET_THICKNESS=-1639272004;
 integer  SLOODLE_CHANNEL_SCOREBOARD_SCORES_SET_COLOR=-1639272005;
 integer SLOODLE_CHANNEL_SCOREBOARD_SCORES = 1639272100;
-
 integer SLOODLE_CHANNEL_SCOREBOARD_TEAM_CONFIG = -1639273000;
 integer SLOODLE_CHANNEL_SCOREBOARD_TEAM_SET_CELL_INFO = -1639273001;
 integer SLOODLE_CHANNEL_SCOREBOARD_TEAM_REMAP_INDICIES = -1639273002;
@@ -86,7 +79,6 @@ integer SLOODLE_CHANNEL_SCOREBOARD_TEAM_RESET_INDICIES = -1639273003;
 integer SLOODLE_CHANNEL_SCOREBOARD_TEAM_SET_THICKNESS = -1639273004;
 integer SLOODLE_CHANNEL_SCOREBOARD_TEAM_SET_COLOR = -1639273005;
 integer SLOODLE_CHANNEL_SCOREBOARD_TEAM = 1639273100;
-
 integer SLOODLE_CHANNEL_SCOREBOARD_CURRENCY_CONFIG = -1639274000;
 integer SLOODLE_CHANNEL_SCOREBOARD_CURRENCY_SET_CELL_INFO  = -1639274001;
 integer SLOODLE_CHANNEL_SCOREBOARD_CURRENCY_REMAP_INDICIES  = -1639274002;
@@ -94,7 +86,6 @@ integer SLOODLE_CHANNEL_SCOREBOARD_CURRENCY_RESET_INDICIES = -1639274003;
 integer SLOODLE_CHANNEL_SCOREBOARD_CURRENCY_SET_THICKNESS  = -1639274004;
 integer SLOODLE_CHANNEL_SCOREBOARD_CURRENCY_SET_COLOR = -1639274005;
 integer SLOODLE_CHANNEL_SCOREBOARD_CURRENCY = 1639274100;
-
 integer SLOODLE_CHANNEL_SCOREBOARD_TITLE_CONFIG = -1639275000;
 integer SLOODLE_CHANNEL_SCOREBOARD_TITLE_SET_CELL_INFO = -1639275001;
 integer SLOODLE_CHANNEL_SCOREBOARD_TITLE_REMAP_INDICIES = -1639275002;
@@ -107,10 +98,12 @@ integer SLOODLE_CHANNEL_POOL_BOUNDARIES_QUERY= -163928000;//sharks whisper on th
 integer SLOODLE_CHANNEL_POOL_BOUNDARIES_RESPONSE= -163928001;//pool whispers on this channel telling sharks the boundaries from the shark pool
 integer SLOODLE_CHANNEL_ENEMY_AIM = -163928665;//Channel to communicate on when enemy is aming at target, ie:delivering a laserbeam
 integer SLOODLE_CHANNEL_ENEMY_ATTACK= -163928666;//Channel to communicate on when attack occurs by an enemy
-
 integer SLOODLE_CHANNEL_MESSAGER_INSTANT_MESSAGE = 163290001;
-
 integer SLOODLE_CHANNEL_OPEN_IN_BROWSER = -1639277000;
+integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
+integer SLOODLE_CHANNEL_QUIZ_LOAD_QUIZ= -1639277003;//user touched object
+integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
+integer SLOODLE_CHANNEL_QUIZ_FEED_BACK_REQUEST= -1639277005;
 
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 
