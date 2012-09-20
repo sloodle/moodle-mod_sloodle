@@ -1,7 +1,7 @@
 //
 // The line above should be left blank to avoid script errors in OpenSim.
 
-// Sloodle quiz chair UI
+// sloodle_quiz_ui
 // Controls the movement of the quiz chair, based on linked messages from the main script.
 // It should be possible to radically alter the object, eg. change it into an aeroplane etc - by altering this script.
 // Part of the Sloodle project (www.sloodle.org)
@@ -13,7 +13,6 @@
 //  Edmund Edgar
 //  Paul Preibisch
 //  Peter R. Bloomfield
-//
 
 integer SLOODLE_CHANNEL_OBJECT_DIALOG= -3857343;
 
@@ -116,6 +115,7 @@ default{
     	integer i=0;
     	key user_key;
     	for (i=0;i<number_of_times_clicked;i++){
+    		user_key=llDetectedKey(i);
     		llMessageLinked(LINK_SET, SLOODLE_CHANNEL_USER_TOUCH,"", user_key);
     	}
     }    
@@ -123,4 +123,4 @@ default{
 
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/default/assets/sloodle_quiz_ui.lslp
+// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/multi_user_quiz/assets/sloodle_quiz_ui.lslp

@@ -264,7 +264,7 @@
                             }
                           
                             debug("quiz data: "+quiz_data);
-                            httpquizquery = NULL_KEY;
+                           
                            // Make sure the response was OK
                             if (status != 200) {
                                     sloodle_error_code(SLOODLE_TRANSLATE_SAY, NULL_KEY,status, ""); //send message to error_message.lsl

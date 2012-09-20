@@ -11,7 +11,6 @@
         // Contributors:
         //  Edmund Edgar
         //  Paul Preibisch
-        //  Peter R. Bloomfield
 
         // Once configured in the usual way, this script waits for a request to ask a question in the form of a linked message with num SLOODLE_CHANNEL_QUIZ_ASK_QUESTION.
         // When the student answers the question, it sends out a linked message with num SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR.
@@ -21,11 +20,12 @@
         integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
         integer doRepeat = 0; // whether we should run through the questions again when we're done
         integer doDialog = 1; // whether we should ask the questions using dialog rather than chat
-        string sloodlehttpvars;
+        string  sloodlehttpvars;
         integer answerDialogListenHandler;
         integer answerChatListenHandler;
         integer answerChatListenHandlerNonPublic;
-        string SEPARATOR="****";
+        string  SEPARATOR="****";
+        integer num_questions;
         integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
         integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;  //Sent by main quiz script to tell UI scripts that question has been answered by avatar with key. String contains selected option ID + "|" + option text + "|"
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107; 
@@ -35,10 +35,18 @@
         integer SLOODLE_CHANNEL_QUIZ_ERROR_NO_ATTEMPTS_LEFT= -1639271123;  //
         integer SLOODLE_CHANNEL_QUIZ_ERROR_NO_QUESTIONS= -1639271124;  //          
         integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_CHAT = -1639271125; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA CHAT.
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG = -1639271126; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
-          integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_TEXT_BOX=-1639277000;
-          integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
-          integer SLOODLE_CHANNEL_QUIZ_FEED_BACK_REQUEST= -1639277005;
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG;// Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_TEXT_BOX=-1639277000;
+        integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
+        integer SLOODLE_CHANNEL_QUIZ_FEED_BACK_REQUEST= -1639277005;
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG0 = -170000; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG1 = -1700001; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG2 = -1700002; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG3= -1700003; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG4 = -1700004; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG5 = -1700005; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG6 = -1700006; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        list server_requests;          
         ///// TRANSLATION /////
         // Link message channels
         integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
@@ -67,6 +75,8 @@
         list users;  
         list user_question_options; 
         list users_question_id;
+        list users_listen_handler;
+        list users_current_question_index;
         ///// FUNCTIONS /////
         /******************************************************************************************************************************
         * sloodle_error_code - 
@@ -104,27 +114,93 @@
             on_rez(integer param){
                 llResetScript();
             }
-            
+            state_entry() {
+                string script_name = llGetScriptName();
+                integer myNum = (integer)llGetSubString(script_name, -1,-1);
+                if (myNum ==0){
+                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG0;
+                }else
+                if (myNum ==1){
+                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG1;
+                }else
+                if (myNum ==2){
+                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG2;
+                }else
+                if (myNum ==3){
+                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG3;
+                }else
+                if (myNum ==4){
+                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG4;
+                }else
+                if (myNum ==5){
+                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG5;
+                }else
+                if (myNum ==6){
+                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG6;
+                }
+                llSay(0,"My num is : "+(string)myNum+" my channel is : "+(string)SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG);
+                
+                
+            }
             link_message(integer sender_num, integer num, string str, key user_key){
+                    if (num!=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG&&num!=SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR){
+                    
+                        return;
+                    }
+                //  llList2String(question_ids, current_question_index)+"|"+(string)users_question_index+"|"+(string)num_questions+"|"+(string)menu_channel+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,user_key );//todo add to dia    
                 if (num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG||num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_TEXT_BOX) {//todo add to dia
                     integer menu_channel;                   
-                    //llList2String(question_ids, active_question)+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars
                     list data = llParseString2List(str, ["|"], []);
+                    /*  llList2String(question_ids, current_question_index)
+                      +"|"+(string)users_question_index
+                      +"|"+(string)num_questions
+                      +"|"+(string)menu_channel
+                      +"|"+sloodleserverroot+sloodle_quiz_url
+                      +"|"+sloodlehttpvars,user_key );//todo add to dia
+              */
+                    //question_id - data,0
+                    //users_question_index - data,1
+                    //num_questions - data 2 
+                    //menu_channel - data 3
+                    //sloodle_full_quiz_url - data 4
+                    //sloodlehttpvars data 5 
                     integer question_id = llList2Integer(data, 0);
-                    menu_channel = llList2Integer(data, 2);
-                    sloodle_full_quiz_url = llList2String(data, 2);//todo add to dia
-                    integer offset = llStringLength(llList2String(data,0)+"|"+llList2String(data,1)+"|"+sloodle_full_quiz_url+"|");
+                    integer users_question_index = llList2Integer(data, 1);
+                    num_questions = llList2Integer(data, 2);
+                    menu_channel = llList2Integer(data, 3);
+                    sloodle_full_quiz_url = llList2String(data, 4);
+                    integer offset = llStringLength((string)question_id+"|"+(string)users_question_index+"|"+(string)num_questions);
+                    offset+=llStringLength("|"+(string)menu_channel+"|"+(string)sloodle_full_quiz_url)+1;
                     sloodlehttpvars = llGetSubString(str, offset, -1);//-1 is the end of the list
+                    //****0****10****-8610976****http://englishvillage.avatarclassroom.com/mod/sloodle/mod/quiz-1.0/linker.php****sloodlecontrollerid=2&sloodlepwd=0fcf04ac-4504-6209-050e-6267014c38b8|922621267&sloodlemoduleid=8&sloodleserveraccesslevel=0
+                    string db_str ="*********************************************\n";
+                    db_str+="* str = "+str+"\n";
+                    db_str+="* \n";
+                    db_str+="* question_id = "+(string)question_id+"\n";
+                    db_str+="* users_question_idex = "+(string)users_question_index+"\n";
+                    db_str+="* num_questions = "+(string)num_questions+"\n";
+                    db_str+="* menu_channel = "+(string)menu_channel+"\n";
+                    db_str+="* sloodle_full_quiz_url = "+(string)sloodle_full_quiz_url+"\n";
+                    db_str+="* sloodlehttpvars = "+(string)sloodlehttpvars+"\n";
+                    db_str +="*********************************************\n";
+                    debug(db_str);
                     integer user_id = llListFindList(users, [user_key]);
+                    integer listen_handler= llListen(menu_channel, "", user_key, "");
+                    debug("listening to user: "+llKey2Name(user_key));
                     if (user_id==-1){
                             //if we have never seen this user before, add them to the system
                             users+=user_key;
                             //store this unique channel for this user
                             users_menu_channels+=menu_channel;
                             users_question_id+=question_id;
+                            users_listen_handler +=listen_handler;
+                            users_current_question_index+=users_question_index;
+                            
                     }else{
                         users_question_id=llListReplaceList(users_question_id, [question_id], user_id, user_id);
                         users_menu_channels=llListReplaceList(users_menu_channels, [menu_channel], user_id, user_id);
+                        users_listen_handler =llListReplaceList(users_listen_handler , [listen_handler], user_id, user_id);
+                        users_current_question_index =llListReplaceList(users_current_question_index , [users_question_index], user_id, user_id);
                     }
                     if (num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG) {//todo add to dia
                         doDialog=TRUE; 
@@ -140,13 +216,20 @@
                     body += "&ltq="+(string)question_id;
                     body +="&request_timestamp="+(string)llGetUnixTime(); 
                     debug("request_question: "+sloodle_full_quiz_url+"/?"+body);
-                    httpfetchquestionquery = llHTTPRequest(sloodle_full_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);   
+                    server_requests+=  llHTTPRequest(sloodle_full_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);   
               } 
             }
             
                    
         
             http_response(key request_id, integer status, list metadata, string body) {
+                  integer placeinlist=llListFindList(server_requests, [request_id]);        
+                    if (placeinlist!=-1){
+                        server_requests= llDeleteSubList(server_requests, placeinlist, placeinlist);
+                     }else {
+                         return;
+                     }
+                     
                     // Questions are comming into our http_response from SLOODLE.  Split this data into several lines
                         list lines = llParseStringKeepNulls(body, ["\n"], []);
                         integer numlines = llGetListLength(lines);
@@ -157,11 +240,13 @@
                         string  request_descriptor =llList2String(statusfields, 3); 
                         
                         key user_key = llList2Key(statusfields,6);
+                        
                         integer user_id =llListFindList(users,[user_key]);
                      
                         //the user who initiated this request
                             debug("*********************request_descriptor: "+request_descriptor);
                           if (request_descriptor=="REQUESTING_QUESTION"){
+                                  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, "", user_key);
                                  request_descriptor="";
                                 if (statuscode == -10301) {
                                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "quizzer");
@@ -233,25 +318,24 @@
                             optext_string=llGetSubString(optext_string, 0, -2);
                             opgrade_string=llGetSubString(opgrade_string, 0, -2);
                             opfeedback_string=llGetSubString(opfeedback_string, 0, -2);
-                             
-                             
-                                if (user_id!=-1){
+                            if (user_id!=-1){
                                     //save question options for this user from this question
                                     user_question_options=llListReplaceList(user_question_options,[opids_string+SEPARATOR+optext_string+SEPARATOR+opgrade_string+SEPARATOR+opfeedback_string],user_id,user_id);
                                 }            
                             // Are we using dialogs?
+                            integer users_question_index=llList2Integer(users_current_question_index,user_id);
                             if (doDialog == 1) {
                                 // We want to create a dialog with the option texts embedded into the main text,
                                 //  and numbers on the buttons
                                 integer qi=1;
                                 list qdialogoptions = [];
-                                string qdialogtext = qtext + "\n";
+                                string qdialogtext = "Question ("+(string)(users_question_index+1)+") of ("+(string)num_questions+")\n"+qtext + "\n";
                                 // Go through each option
                                 integer num_options = llGetListLength(optext);
                                 
                                 if ((qtype == "numerical")|| (qtype == "shortanswer")) {
                                    // Ask the question via IM
-                                    llTextBox(user_key,qtext,llList2Integer(users_menu_channels,user_id));   
+                                    llTextBox(user_key,qdialogtext,llList2Integer(users_menu_channels,user_id));   
                                     return;
                                 } 
                                 else {
@@ -271,11 +355,12 @@
                               // Offer the options via IM
                                 integer x = 0;
                                 integer num_options = llGetListLength(optext);
+                                string qdialogtext = "Question ("+(string)(users_question_index+1)+") of ("+(string)num_questions+")\n"+qtext + "\n";
                                 string option_string;
                                 for (x = 0; x < num_options; x++) {
                                     option_string+= (string)(x + 1) + ". " + llList2String(optext, x);
                                 }     
-                                  llTextBox(user_key,qtext+"\n"+option_string,llList2Integer(users_menu_channels,user_id));   
+                                  llTextBox(user_key,qdialogtext+"\n"+option_string,llList2Integer(users_menu_channels,user_id));   
                                   return;
                             }         
                         }     
@@ -294,6 +379,10 @@
                     *  which is stored in this script
                     */
                     integer user_id=llListFindList(users, [user_key]);
+                    integer listenHandler = llList2Integer(users_listen_handler, user_id);
+                    llListenRemove(listenHandler);
+                    debug("removing Listen Handler");
+                
                     integer question_id = llList2Integer(users_question_id,user_id);
                     // Handle the answer...
                     float scorechange = 0;

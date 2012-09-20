@@ -33,6 +33,7 @@
         integer sloodleserveraccesslevel = 0; // Who can use the server resource? (Value passed straight back to Moodle)
         integer isconfigured = FALSE; // Do we have all the configuration data we need?
         integer eof = FALSE; // Have we reached the end of the configuration data?
+        string  SEPARATOR="****";
         integer SLOODLE_CHANNEL_AVATAR_DIALOG = 1001;
         integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
         integer SLOODLE_CHANNEL_AVATAR_IGNORE = -1639279999;
@@ -63,6 +64,7 @@
         integer SLOODLE_CHANNEL_QUIZ_ERROR_NO_QUESTIONS= -1639271124;  //   
         integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object       
         integer SLOODLE_CHANNEL_QUIZ_LOAD_QUIZ= -1639277003;//user touched object
+        
         ///// COLORS ////
         vector RED =<1.00000, 0.00000, 0.00000>;
         vector ORANGE=<1.00000, 0.43763, 0.02414>;
@@ -95,14 +97,11 @@
         float request_timeout = 20.0;
         string sloodlehttpvars;
         // ID and name of the current quiz
-        integer quizid = -1;
-        string quizname = "";
+        integer quiz_id = -1;
+        string quiz_name = "";
         // This stores the list of question ID's (global ID's)
         list question_ids = [];
         integer num_questions = 0;
-        //quiz id
-        integer quiz_id;
-        string quiz_name;
         // The position where we started. The Chair will use this to get the lowest vertical position it used.
         vector startingposition;
         
@@ -121,28 +120,38 @@
         integer STRIDE_LENGTH_IS_ONE=1;
         key first_user = NULL_KEY;
         integer first_user_active_question;
-        integer askquestionscontinuously=0;   
+        integer askquestionscontinuously=1;   
         integer correctToContinue=0; //must get question correct before next question is asked
         ///// FUNCTIONS /////
         debug (string message ){
-              list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
-              if ( llList2Integer (params ,0)==PRIM_MATERIAL_FLESH ){
-                   llOwnerSay(llGetScriptName ()+": " +message );
-             }
+                 list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
+                 if ( llList2Integer (params ,0)!=PRIM_MATERIAL_FLESH ){
+                     return;
+                 }
+                llOwnerSay(llGetScriptName ()+": " +message );
         }
         integer random_integer( integer min, integer max ){
           return min + (integer)( llFrand( max - min + 1 ) );
         }
-        add_user(key user_key){
+        integer add_user(key user_key){
                 integer q;
                 //randomize the questions for the new user if required
+                list temp=question_ids;
                 if (doRandomize==1){
-                    question_ids=llListRandomize(question_ids, STRIDE_LENGTH_IS_ONE);
+                    temp=llListRandomize(question_ids, STRIDE_LENGTH_IS_ONE);
                 }
                 //now create a question list for this user
                 string new_user_question_string="";
                 for (q=0;q<num_questions;q++){
-                    new_user_question_string+=llList2String(question_ids, q)+"|";
+                    new_user_question_string+=llList2String(temp, q)+"|";
+                }
+                new_user_question_string=llGetSubString(new_user_question_string, 0, -2);
+                //create a random unique menu channel for this user
+                integer menu_channel = random_integer(-900000,-9000000);
+                //make sure this menu_channel is not currently being used.
+                 
+                while  (llListFindList(users_menu_channels, [menu_channel])!=-1){
+                    menu_channel = random_integer(-900000,-9000000); 
                 }
                 ///// add user data ////
                 //add the new user to the system
@@ -152,24 +161,15 @@
                 //set the new users active question to the first question in the list
                 users_question_id_index+=0;
                 users_num_correct+=0;
-                //create a random unique menu channel for this user
-                integer menu_channel=-1;
-                //make sure this menu_channel is not currently being used.
-                while  (llListFindList(users_menu_channels, [menu_channel])!=-1){
-                    menu_channel = random_integer(-900000,-9000000); 
-                }
                 //store this unique channel for this user
                 users_menu_channels+=menu_channel;   
                 //list for the user on a special channel
-                debug("New user added to the system: "+llList2CSV(users));
+                debug("-----------------------------New user added to the system: "+llList2CSV(users));
+                return llGetListLength(users)-1;
         }
         //get active question will add a user to the users list if they have not been added yet, and it will also return a users
         //active question id
         integer get_current_question_id(key user_key){
-            integer user_id=llListFindList(users, [user_key]);
-            if (user_id==-1){
-                add_user(user_key);
-            }
                 /*
                   Each user has its question list stored as a string in the users_questions list;
                   As an example, that string might look like: 9|2|7|4|3|6|5|8|1
@@ -178,14 +178,16 @@
                   then parse it into a list using llParseString2List, and then retreive the active question by
                   examining users_question_id_index at the index user_id
                 */
-                list question_list = llParseString2List(llList2String(users_questions, user_id), ["|"], []);
+                integer user_id=llListFindList(users,[user_key]);
+                string user_question_str=llList2String(users_questions, user_id);
+                list question_list = llParseString2List(user_question_str, ["|"], []);
                 integer question_id_index = llList2Integer(users_question_id_index,user_id);
                 if (question_id_index==0){
-                  llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR, (string)quizid+"|"+quizname, user_key );
+                  llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR, (string)quiz_id+"|"+quiz_name, user_key );
                 }
                 integer question_id = llList2Integer(question_list, question_id_index);
                 //Update the active question index once the user has given a response
-                debug("question_id for "+ llKey2Name(user_key)+ " is: "+(string)question_id);
+                debug("question_id for "+ llKey2Name(user_key)+ " at index: "+(string)question_id_index+" from: "+user_question_str+" is: "+(string)question_id);
                 return question_id ;            
         }
         /******************************************************************************************************************************
@@ -204,14 +206,26 @@
         sloodle_debug(string msg){
             llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
         }  
-        request_question_from_lsl_pipepline(key user_key,integer current_question_id){
+        
+        request_question_from_lsl_pipepline(key user_key, integer users_question_index,integer num_questions){
             integer user_id = llListFindList(users, [user_key]);
             integer menu_channel =  llList2Integer(users_menu_channels, user_id);
+            string users_questions_str=llList2String(users_questions, user_id);
+            integer current_question_id= get_current_question_id(user_key); 
+            integer question_id_index = llList2Integer(users_question_id_index,user_id);
+            //debug("///////// question ids cvs /////////"+llList2CSV(question_ids));
+            debug("////////// users question cvs ///////"+(string)users_questions_str);
+            debug("////////// question_id_index  ///////"+(string)question_id_index);
+            debug("//////// resulting question id /////////"+(string)get_current_question_id(user_key));
+            debug("/////////// full sloodle root ///////////"+(string)sloodleserverroot+sloodle_quiz_url);
+            
+            SEPARATOR="|";
             if (doDialog==1){ //1 = true
-               llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG, llList2String(question_ids, current_question_id)+"|"+(string)menu_channel+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,user_key );//todo add to dia
+                
+               llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
             }else                 
                 if (doDialog==0){ //0= false
-                    llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_TEXT_BOX, llList2String(question_ids, current_question_id)+"|"+(string)menu_channel+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,user_key );//todo add to dia
+                    llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_TEXT_BOX, (string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
              }                
         }  
        
@@ -357,15 +371,18 @@
                     }  
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "quiz");                                                     
                    //load the quiz
+                   first_user=user_key;
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOAD_QUIZ, "", user_key);
                 }else 
-                if (num ==     SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ){
+                //   llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ, (string)quiz_id+"|"+quiz_name+"|"+(string)num_questions+"|"+question_ids_str, user_key);
+                if (num == SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ){
                     list data = llParseString2List(str, ["|"], []);
                     quiz_id=llList2Integer(data,0);
                     quiz_name =llList2String(data,1);
                     num_questions= llList2Integer(data,2);
                     question_ids=llParseString2List(llList2String(data,3), [","], []);
                     first_user_active_question= get_current_question_id(user_key);
+                    debug(" FIRST USER: "+(string)first_user);
                     first_user=user_key;//record the first user, because in the next state we must initate asking the first question
                     state quiz_ready;     
                 }    
@@ -388,7 +405,14 @@
                     return;
                 }
                 //ask first users question
-                request_question_from_lsl_pipepline(first_user,get_current_question_id(first_user));
+                integer user_id=llListFindList(users, [first_user]);
+                if (user_id==-1){
+                    user_id=add_user(first_user);
+                    
+                }
+                integer user_question_index = llList2Integer(users_question_id_index,user_id);
+                //request_question_from_lsl_pipepline(key user_key,integer current_question_index, integer users_question_index,integer num_questions){
+                request_question_from_lsl_pipepline(first_user,user_question_index,num_questions);
                 
             }
             
@@ -402,7 +426,13 @@
                         return;
                     }                
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "quiz");                                                     
-                    request_question_from_lsl_pipepline(user_key,get_current_question_id(user_key));
+                    integer user_id=llListFindList(users, [user_key]);
+                    if (user_id==-1){
+                        user_id=add_user(first_user);
+                    }
+                    user_id = llListFindList(users, [user_key]);
+                    integer user_question_index = llList2Integer(users_question_id_index,user_id);
+                    request_question_from_lsl_pipepline(user_key,user_question_index,num_questions);
                 }      
                    else
                 if (num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR) {
@@ -415,13 +445,22 @@
                         //save the number of questions correct for this user
                         users_num_correct=llListReplaceList(users_num_correct, [num_correct+1], user_id, user_id);
                          // Advance to the next question
-                        users_question_id_index= llListReplaceList(users_question_id_index, [question_id_index+1], user_id, user_id);
+                          if (question_id_index < num_questions-1) {
+                              users_question_id_index= llListReplaceList(users_question_id_index, [question_id_index+1], user_id, user_id);
+                          }
                     }else{
                          sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "incorrect",  [llKey2Name(user_key)], user_key, "quizzer");
+                         //must a user get an answer correctly to continue? (0=no, 1=yes)
+                        if (correctToContinue==0){
+                            // Advance to the next question
+                            if (question_id_index < num_questions-1) {
+                                users_question_id_index= llListReplaceList(users_question_id_index, [question_id_index+1], user_id, user_id);
+                            }
+                        }
                     }
 
                     // Are we are at the end of the quiz?
-                    if (question_id_index >= num_questions) {
+                    if (question_id_index >= num_questions-1) {
                         // Yes - finish off
                         debug("******************************user has finished the quiz");
                         request_finish_quiz_from_lsl_pipeline(user_key);
@@ -432,14 +471,12 @@
                         return;
                     }
                     if (askquestionscontinuously==1){
-                    	request_question_from_lsl_pipepline(user_key,get_current_question_id(user_key));
+                        integer user_question_index = llList2Integer(users_question_id_index,user_id);
+                        request_question_from_lsl_pipepline(user_key,user_question_index,num_questions);
                     }else
-                    if (question_id_index+1<num_questions){
-                    	sloodle_translation_request(SLOODLE_TRANSLATE_IM , [0], "clicktogetnextquestion" , [llKey2Name(user_key)], user_key, "quizzer" );
-                    }
-                        
-                        
-                    
+                    if (question_id_index+1<=num_questions-1){
+                        sloodle_translation_request(SLOODLE_TRANSLATE_IM , [0], "clicktogetnextquestion" , [llKey2Name(user_key)], user_key, "quizzer" );
+                       }
                 } else 
                 if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
                     // Is it a reset command?
