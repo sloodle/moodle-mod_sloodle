@@ -428,7 +428,7 @@
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "quiz");                                                     
                     integer user_id=llListFindList(users, [user_key]);
                     if (user_id==-1){
-                        user_id=add_user(first_user);
+                        user_id=add_user(user_key);
                     }
                     user_id = llListFindList(users, [user_key]);
                     integer user_question_index = llList2Integer(users_question_id_index,user_id);
