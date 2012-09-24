@@ -295,7 +295,7 @@
                                         qtext = llList2String(thisline, 4);
                                         qtype = llList2String(thisline, 7);
                                         // Make sure it's a valid question type
-                                        if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
+                                        if ((qtype != "multichoice") && (qtype != "random") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
                                           sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "quizzer");
                                       //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
                                           return;
