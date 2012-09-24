@@ -3,6 +3,7 @@ integer DELAY;
 integer my_num;
 
 close(integer p){
+	 llSetTimerEvent(0);
 	llTriggerSound("close", 1);
     if (p==1){
 		vector Zfire=llGetScale();
@@ -123,7 +124,7 @@ default{
         list data = llParseString2List(m, ["|"], []);
    		string command = llList2String(data, 0); 
    		list  pie_slices = llParseString2List(llList2String(data, 1), [","], []);
-   		integer found = llListFindList(pie_slices, [my_num]);
+   		integer found = llListFindList(pie_slices, [(string)my_num]);
    		DELAY =llList2Integer(data, 2); 
           if (found==-1) {
             return;
