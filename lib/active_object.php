@@ -909,7 +909,7 @@
             }
             $queryparams[] = time() - (3600+600); // Ping time and then some. All objects that are alive should have updated within this time.
 
-            $sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where c.name='controllerid' and c.value=? and a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? order by a.timeupdated desc;";
+            $sql = "select a.* from {$CFG->prefix}sloodle_active_object a where a.controllerid=? and a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? order by a.timeupdated desc;";
 
             if (!$controllerid) {
                 $sql = "select a.* from {$CFG->prefix}sloodle_active_object a WHERE a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? order by a.timeupdated desc;";
