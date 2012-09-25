@@ -34,7 +34,7 @@ debug (string message ){
      }
 } 
 set_question_prim_text(string text,vector color){
-	llSetLinkPrimitiveParamsFast(question_prim, [PRIM_TEXT,text,color,1] );
+	llSetLinkPrimitiveParams(question_prim, [PRIM_TEXT,text,color,1] );
 }
 default {
     on_rez(integer start_param) {
@@ -43,10 +43,12 @@ default {
     state_entry() {
     	num_links=llGetNumberOfPrims();
     	integer i;
-    	for (i=0;i<num_links;i++){
+    	for (i=0;i<=num_links;i++){
     		if (llGetLinkName(i)=="question_prim"){
     			question_prim=i;
-    			debug("found question prim: "+(string)question_prim);
+    			llShout(0,"-----------------------------found question prim: "+(string)question_prim);
+    		}else{
+    		llShout(0,"-----------------------------: "+(string)i);
     		}
     	}
     	set_question_prim_text("Click, to load a question",GREEN);
