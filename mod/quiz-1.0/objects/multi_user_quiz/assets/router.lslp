@@ -1,4 +1,23 @@
+//
+/* The line above should be left blank to avoid script errors in OpenSim.
 
+  router
+        
+  Part of the Sloodle project (www.sloodle.org)
+  
+  Copyright (c) 2006-9 Sloodle (various contributors)
+  
+  Released under the GNU GPL
+  
+  Contributors:
+  	Edmund Edgar
+  	Paul Preibisch
+
+  This script receives requests from SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG linked message channel, and passes it along to 6 sloodle_quiz_question_handler scripts in waiting
+  After it passes it along, it marks that script as busy, until that script notifies the router it is free again for work.  I created this to help spead up the response time of 
+  http requests 
+     	
+*/
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG = -1639271126; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
 list slots = [NULL_KEY,NULL_KEY,NULL_KEY,NULL_KEY,NULL_KEY,NULL_KEY];
 integer len;

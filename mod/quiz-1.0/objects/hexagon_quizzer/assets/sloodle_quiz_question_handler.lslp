@@ -1,20 +1,25 @@
 //
-// The line above should be left blank to avoid script errors in OpenSim.
+/* The line above should be left blank to avoid script errors in OpenSim.
 
-       // Sloodle quiz chair
-        // Allows SL users to take Moodle quizzes in-world
-        // Part of the Sloodle project (www.sloodle.org)
-        //
-        // Copyright (c) 2006-9 Sloodle (various contributors)
-        // Released under the GNU GPL
-        //
-        // Contributors:
-        //  Edmund Edgar
-        //  Paul Preibisch
+  Sloodle_quiz_question_handler
+        
+  Part of the Sloodle project (www.sloodle.org)
+  
+  Copyright (c) 2006-9 Sloodle (various contributors)
+  
+  Released under the GNU GPL
+  
+  Contributors:
+  	Edmund Edgar
+  	Paul Preibisch
 
-        // Once configured in the usual way, this script waits for a request to ask a question in the form of a linked message with num SLOODLE_CHANNEL_QUIZ_ASK_QUESTION.
-        // When the student answers the question, it sends out a linked message with num SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR.
-        // Note that it doesn't handle timeouts in case the user doesn't respond - all that should be done by the calling script.
+  This script requests questions from the server for a particular user.  If that user has enough attempts left, it will
+  load the questions into either a dialog box, or a textbox, along with that questions options.
+  
+  When the user responds, it reports the scorechange back to the linked message stream.
+     	
+*/
+
         
         integer SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR = -1639271119; //Tells us to STOP a quiz for the avatar
         integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
