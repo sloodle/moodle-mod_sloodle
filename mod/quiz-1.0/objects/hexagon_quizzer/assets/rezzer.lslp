@@ -6,6 +6,7 @@ integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
+integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 string HEXAGON_PLATFORM="Hexagon Platform";
 integer my_start_param;
 debug (string message ){
@@ -95,9 +96,11 @@ default {
         debug("**************************"+message);
         if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST){
         	if (command=="GET QUESTION"){
-            debug("received request from "+llKey2Name(id));
-            llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "A question|"+(string)llGetKey());
-        }
+        		key user_key = llList2Key(data,1);
+				debug("received request from "+llKey2Name(id));
+            	//llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "A question|"+(string)llGetKey());
+            	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", user_key);
+        	}
         }
             
     }
