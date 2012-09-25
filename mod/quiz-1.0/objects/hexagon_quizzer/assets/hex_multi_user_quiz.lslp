@@ -130,6 +130,8 @@
                  }
                 llOwnerSay(llGetScriptName ()+": " +message );
         }
+        
+		
         integer random_integer( integer min, integer max ){
           return min + (integer)( llFrand( max - min + 1 ) );
         }
@@ -354,6 +356,8 @@
                 llResetScript();
             }       
             state_entry(){
+            	//tell other scripts we are loading the quiz;
+            	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ, "", NULL_KEY);
                sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
                 sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
                 sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
@@ -362,7 +366,7 @@
             }
             
             link_message(integer sender_num, integer num, string str, key user_key){
-                if (num == SLOODLE_CHANNEL_USER_TOUCH) {
+                if (num == SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER) {
                    // Make sure the given avatar is allowed to use this object
                     if (!sloodle_check_access_use(user_key)) {
                         sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(user_key)], NULL_KEY, "");

@@ -6,8 +6,21 @@ integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
+integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 string HEXAGON_PLATFORM="Hexagon Platform";
+vector RED =<1.00000, 0.00000, 0.00000>;
+vector ORANGE=<1.00000, 0.43763, 0.02414>;
+vector YELLOW=<1.00000, 1.00000, 0.00000>;
+vector GREEN=<0.00000, 1.00000, 0.00000>;
+vector BLUE=<0.00000, 0.00000, 1.00000>;
+vector BABYBLUE=<0.00000, 1.00000, 1.00000>;
+vector PINK=<1.00000, 0.00000, 1.00000>;
+vector PURPLE=<0.57338, 0.25486, 1.00000>;
+vector BLACK= <0.00000, 0.00000, 0.00000>;
+vector WHITE= <1.00000, 1.00000, 1.00000>;
+vector AVCLASSBLUE= <0.06274,0.247058,0.35294>;
+vector AVCLASSLIGHTBLUG=<0.8549,0.9372,0.9686>;//#daeff7
 integer my_start_param;
 debug (string message ){
      list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
@@ -51,13 +64,41 @@ rez_hexagon(integer edge){
     //rez a new hexagon, and pass my_oppsosite_section as the start_parameter so that the new hexagon wont rez on that the my_oposite_section edge
     llRezAtRoot(HEXAGON_PLATFORM, child_coord, ZERO_VECTOR,  llGetRot(), my_oposite_section);
 }
-
+integer question_prim;
+integer num_links;
+set_question_prim_text(string text,vector color){
+    llSetLinkPrimitiveParamsFast(question_prim, [PRIM_TEXT,text,color,1] );
+}
+get_question_prim(){
+    num_links=llGetNumberOfPrims();
+    integer i;
+    for (i=0;i<=num_links;i++){
+        if (llGetLinkName(i)=="question_prim"){
+            question_prim=i;
+            debug("found ------------------- question prim:"+(string)question_prim);
+        }else{
+        	debug("not found ------------------- :"+(string)i);
+        }
+    }
+}
 default {
     on_rez(integer start_param){
-        
-        
+        llResetScript();
     }
+    state_entry() {
+        get_question_prim();
+        set_question_prim_text("Initializing the quiz. Please wait.",YELLOW);
+        llTriggerSound("SND_STARTING_UP", 1);
+    }
+    link_message(integer sender_num, integer num, string str, key id) {
+        if (num==SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ){
+            state ready;
+        }
+    }
+}
+    state ready{
       state_entry() {
+            set_question_prim_text("Ready. Click a colored orb",GREEN);
           string name=llGetObjectName();
           if (name=="Hexagon Quizzer"){
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|1,2,3,4,5,6|10", NULL_KEY);    

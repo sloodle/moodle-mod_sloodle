@@ -34,23 +34,24 @@ debug (string message ){
      }
 } 
 set_question_prim_text(string text,vector color){
-	llSetLinkPrimitiveParams(question_prim, [PRIM_TEXT,text,color,1] );
+	llSetLinkPrimitiveParamsFast(question_prim, [PRIM_TEXT,text,color,1] );
+}
+get_question_prim(){
+		num_links=llGetNumberOfPrims();
+    	integer i;
+    	for (i=0;i<=num_links;i++){
+    		if (llGetLinkName(i)=="question_prim"){
+    			question_prim=i;
+    		}else{
+    		}
+    	}
 }
 default {
     on_rez(integer start_param) {
          llResetScript();
     }
     state_entry() {
-    	num_links=llGetNumberOfPrims();
-    	integer i;
-    	for (i=0;i<=num_links;i++){
-    		if (llGetLinkName(i)=="question_prim"){
-    			question_prim=i;
-    			llShout(0,"-----------------------------found question prim: "+(string)question_prim);
-    		}else{
-    		llShout(0,"-----------------------------: "+(string)i);
-    		}
-    	}
+    	get_question_prim();
     	set_question_prim_text("Click, to load a question",GREEN);
     	master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, HEXAGON_MASTER, "", "");
       
