@@ -5,13 +5,16 @@ integer PIN=7961;
 integer SLOODLE_CHANNEL_ANIM= -1639277007; 
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
+integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 string HEXAGON_PLATFORM="Hexagon Platform";
+integer my_start_param;
 debug (string message ){
      list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
      if (llList2Integer (params ,0)==PRIM_MATERIAL_FLESH){
            llOwnerSay("memory: "+(string)llGetFreeMemory()+" Script name: "+llGetScriptName ()+": " +message );
      }
 } 
+
 rez_hexagon(integer edge){
      integer my_oposite_section;
      vector my_coord=llGetPos();
@@ -47,11 +50,13 @@ rez_hexagon(integer edge){
     //rez a new hexagon, and pass my_oppsosite_section as the start_parameter so that the new hexagon wont rez on that the my_oposite_section edge
     llRezAtRoot(HEXAGON_PLATFORM, child_coord, ZERO_VECTOR,  llGetRot(), my_oposite_section);
 }
+
 default {
     on_rez(integer start_param){
-        llResetScript();
+        
+        
     }
-  state_entry() {
+  	state_entry() {
           string name=llGetObjectName();
           if (name=="Hexagon Quizzer"){
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|1,2,3,4,5,6|10", NULL_KEY);    
@@ -61,29 +66,39 @@ default {
         if (link_message_channel ==SLOODLE_CHANNEL_USER_TOUCH){
             list data= llParseString2List(str, ["|"], []);
             string type = llList2String(data,0);
+            //this is a rez edge attempt
             if (type!="edge"){
                  return;
             }
-            integer edge=llList2Integer(data, 1);
-            rez_hexagon(edge);
-            //after a user presses an edge selector, hide the selector
-            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand hide|"+(string)edge, NULL_KEY);
+            if (type=="edge"){
+            	// a user touched an edge selector, so rez an edge
+            	integer edge=llList2Integer(data, 1);
+	            rez_hexagon(edge);
+	            //after a user presses an edge selector, hide the selector
+	            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand hide|"+(string)edge, NULL_KEY);
+            }
+            
         }
     }
     object_rez(key platform) {
-    	llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "", platform, "");
-        rezzed_hexes+=platform;
-        llGiveInventory(platform, HEXAGON_PLATFORM);
-        debug("giving platform script");
-        llRemoteLoadScriptPin(platform, "platform", PIN, TRUE,0);
+    	//a new hex was rezzed, listen to the new hex platform
+    		llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "", platform, "");
+        	rezzed_hexes+=platform;
+        	llGiveInventory(platform, HEXAGON_PLATFORM);
+        	debug("giving platform script");
+        	llRemoteLoadScriptPin(platform, "platform", PIN, TRUE,0);
         
     }
     listen(integer channel, string name, key id, string message) {
         list data = llParseString2List(message, ["|"], []);
         string command = llList2String(data, 0);
         debug("**************************"+message);
-        if (command=="GET QUESTION"){
+        if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST){
+        	if (command=="GET QUESTION"){
             debug("received request from "+llKey2Name(id));
-        }    
+            llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "A question|"+(string)llGetKey());
+        }
+        }
+            
     }
 }

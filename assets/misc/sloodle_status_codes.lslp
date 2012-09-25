@@ -112,6 +112,7 @@ integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG4 = -1700004; // Tells the quest
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG5 = -1700005; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG6 = -1700006; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
-integer SLOODLE_CHANNEL_ANIM= -1639277007;          
+integer SLOODLE_CHANNEL_ANIM= -1639277007;
+integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 
