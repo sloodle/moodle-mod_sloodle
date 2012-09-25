@@ -1,15 +1,16 @@
 //
 // The line above should be left blank to avoid script errors in OpenSim.
 
-/* Sloodle quiz chair
+/*  hex_multi_user_quiz
 
     Copyright (c) 2006-9 Sloodle (various contributors)
     Released under the GNU GPL
     
 
-    This files lists all the status codes we use for sloodle.
-    They have been written in LSL format so that you can plunk them into your source
-    code if needed. 
+    This file is the main brain of the multi user quiz.  It keeps track of which users are taking the quiz, and what stage 
+    that user is at. It will keep track of which question the current user is on. When the last question is answered, it will
+    dispatch request_finish_quiz_from_lsl_pipeline, which calls the finish_quiz script.  It also dispatches all request_question_from_lsl_pipepline
+    which requests questions from the question_handler script
 
     Contributors:
     Edmund Edgar
