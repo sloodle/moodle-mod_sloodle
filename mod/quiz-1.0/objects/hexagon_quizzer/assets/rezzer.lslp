@@ -87,6 +87,7 @@ default {
     }
     state_entry() {
         get_question_prim();
+        
         set_question_prim_text("Initializing the quiz. Please wait.",YELLOW);
         llTriggerSound("SND_STARTING_UP", 1);
     }
