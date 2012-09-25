@@ -57,7 +57,7 @@ default {
         
         
     }
-  	state_entry() {
+      state_entry() {
           string name=llGetObjectName();
           if (name=="Hexagon Quizzer"){
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|1,2,3,4,5,6|10", NULL_KEY);    
@@ -72,22 +72,22 @@ default {
                  return;
             }
             if (type=="edge"){
-            	// a user touched an edge selector, so rez an edge
-            	integer edge=llList2Integer(data, 1);
-	            rez_hexagon(edge);
-	            //after a user presses an edge selector, hide the selector
-	            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand hide|"+(string)edge, NULL_KEY);
+                // a user touched an edge selector, so rez an edge
+                integer edge=llList2Integer(data, 1);
+                rez_hexagon(edge);
+                //after a user presses an edge selector, hide the selector
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand hide|"+(string)edge, NULL_KEY);
             }
             
         }
     }
     object_rez(key platform) {
-    	//a new hex was rezzed, listen to the new hex platform
-    		llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "", platform, "");
-        	rezzed_hexes+=platform;
-        	llGiveInventory(platform, HEXAGON_PLATFORM);
-        	debug("giving platform script");
-        	llRemoteLoadScriptPin(platform, "platform", PIN, TRUE,0);
+        //a new hex was rezzed, listen to the new hex platform
+            llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "", platform, "");
+            rezzed_hexes+=platform;
+            llGiveInventory(platform, HEXAGON_PLATFORM);
+            debug("giving platform script");
+            llRemoteLoadScriptPin(platform, "platform", PIN, TRUE,0);
         
     }
     listen(integer channel, string name, key id, string message) {
@@ -95,12 +95,12 @@ default {
         string command = llList2String(data, 0);
         debug("**************************"+message);
         if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST){
-        	if (command=="GET QUESTION"){
-        		key user_key = llList2Key(data,1);
-				debug("received request from "+llKey2Name(id));
-            	//llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "A question|"+(string)llGetKey());
-            	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", user_key);
-        	}
+            if (command=="GET QUESTION"){
+                key user_key = llList2Key(data,1);
+                debug("received request from "+llKey2Name(id)+" for user: "+llKey2Name(user_key));
+                //llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "A question|"+(string)llGetKey());
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", user_key);
+            }
         }
             
     }
