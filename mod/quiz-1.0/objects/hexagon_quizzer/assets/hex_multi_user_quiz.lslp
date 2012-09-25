@@ -132,7 +132,7 @@
                 llOwnerSay(llGetScriptName ()+": " +message );
         }
         
-		
+        
         integer random_integer( integer min, integer max ){
           return min + (integer)( llFrand( max - min + 1 ) );
         }
@@ -357,8 +357,8 @@
                 llResetScript();
             }       
             state_entry(){
-            	//tell other scripts we are loading the quiz;
-            	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ, "", NULL_KEY);
+                //tell other scripts we are loading the quiz;
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ, "", NULL_KEY);
                sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
                 sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
                 sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
@@ -499,5 +499,5 @@
                                         
 
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/default/assets/sloodle_mod_quiz-1.0.lslp
+// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/hexagon_quizzer/assets/hex_multi_user_quiz.lslp
 
