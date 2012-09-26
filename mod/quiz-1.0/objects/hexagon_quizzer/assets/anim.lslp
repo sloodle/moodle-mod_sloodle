@@ -5,106 +5,121 @@ integer my_num;
 close(integer p){
 	 llSetTimerEvent(0);
 	llTriggerSound("close", 1);
+	if (p==0){
+		vector Zfire=llGetScale();
+		vector zFire=<2.77730,-0.00770,-0.05180>;
+		vector zfIre=<1.26456,1.26456,1.26456>;
+		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
+		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
+		llSetPrimitiveParams([6, zfirE,8, <0.0,0.0,0.97030,0.24192> / llGetRootRotation(),9,3,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,23,1,<1.000000, 0.000000, 0.000000>,1.000000,10.100000,0.000000,25,0,0.101961]);        
+    }else
     if (p==1){
 		vector Zfire=llGetScale();
-		vector zFire=<0.09540,2.36231,1.35922>;
+		vector zFire=<1.42570,2.36230,-0.07440>;
 		vector zfIre=<6.19295,0.19941,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <0.35354,0.35345,-0.61250,0.61230> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>]);        
+		llSetPrimitiveParams([6, zfirE,8, <-0.18311,0.68289,-0.68310,0.18304> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 		        
     }else
     if (p==2){
 		vector Zfire=llGetScale();
-		vector zFire=<0.09540,2.36337,4.03922>;
+		vector zFire=<4.10570,2.36340,-0.07440>;
 		vector zfIre=<6.19295,0.19941,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <0.61241,0.61221,-0.35347,0.35385> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>]);        
+		llSetPrimitiveParams([6, zfirE,8, <0.18310,0.68311,-0.68298,-0.18269> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 		        
     }
     if (p==3){
 		vector Zfire=llGetScale();
-		vector zFire=<0.09540,0.04298,5.38055>;
+		vector zFire=<5.44710,0.04300,-0.07440>;
 		vector zfIre=<6.19295,0.19941,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <0.70710,0.70712,0.00015,0.0> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>]); 
-    
+		llSetPrimitiveParams([6, zfirE,8, <0.50010,0.50001,-0.49989,-0.50001> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 	 
     }else
     if (p==4){
-        vector Zfire=llGetScale();
-		vector zFire=<0.09540,-2.27855,4.04102>;
+		vector Zfire=llGetScale();
+		vector zFire=<4.10750,-2.27860,-0.07440>;
 		vector zfIre=<0.19941,6.19295,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <-0.86608,-0.00001,-0.00013,0.49990> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>]);    
+		llSetPrimitiveParams([6, zfirE,8, <-0.61250,0.35348,0.61232,0.35349> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 
     }else
     if (p==5){
 		vector Zfire=llGetScale();
-		vector zFire=<0.09540,-2.27956,1.36104>;
+		vector zFire=<1.42750,-2.27960,-0.07440>;
 		vector zfIre=<0.19941,6.19295,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <-0.49990,-0.00010,-0.00031,0.86608> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>]);                
+		llSetPrimitiveParams([6, zfirE,8, <-0.35370,0.61234,0.35326,0.61248> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]);
     }else
     if (p==6){
-     	vector Zfire=llGetScale();
- 	 	vector zFire=<0.09538,0.04023,0.01480>;
-	 	vector zfIre=<0.19941,6.19295,5.36619>;
-	 	vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
-	 	vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-	 	llSetPrimitiveParams([6, zfirE,8, <0.0,0.0,0.0,1.0> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>]);          
+		vector Zfire=llGetScale();
+		vector zFire=<0.08130,0.04020,-0.07440>;
+		vector zfIre=<0.19941,6.19295,5.36619>;
+		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
+		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
+		llSetPrimitiveParams([6, zfirE,8, <0.0,0.70711,0.0,0.70711> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 
     }
 
 }
 open(integer p){
 	llTriggerSound("open", 1);
+	if (p==0){
+		vector Zfire=llGetScale();
+		vector zFire=<2.77730,-0.00770,-0.05180>;
+		vector zfIre=<1.26456,1.26456,1.26456>;
+		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
+		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
+		llSetPrimitiveParams([6, zfirE,8, <0.0,0.0,0.97030,0.24192> / llGetRootRotation(),9,3,0,<0.230000, 0.250000, 0.0>,0.949970,<0.0, 0.0, 0.0>,<0.480000, 0.520000, 0.0>,23,1,<1.000000, 0.000000, 0.000000>,1.000000,10.100000,0.000000,25,0,0.101961,25,1,0.101961,25,2,0.101961,25,3,0.101961,25,4,0.101961,25,5,0.101961]);         
+    }else
     if (p==1){
 		vector Zfire=llGetScale();
-		vector zFire=<2.68034,4.68430,0.01843>;
+		vector zFire=<0.15818,4.56322,-0.02004>;
 		vector zfIre=<6.19295,0.19941,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <-0.18908,0.68168,-0.18765,0.68143> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>]);         
+		llSetPrimitiveParams([6, zfirE,8, <0.25826,-0.96603,0.00904,0.0> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]);		         
     }else
     if (p==2){
 		vector Zfire=llGetScale();
-		vector zFire=<2.68030,4.42282,5.22885>;
+		vector zFire=<5.36464,4.54609,-0.01989>;
 		vector zfIre=<6.19295,0.19941,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <0.21243,0.69019,0.15296,0.67462> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>]);  
+		llSetPrimitiveParams([6, zfirE,8, <-0.25862,-0.96594,0.00831,0.00178> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 
     }else
     if (p==3){
 		vector Zfire=llGetScale();
-		vector zFire=<2.68030,0.04229,7.89137>;
+		vector zFire=<8.00394,0.04244,-0.02004>;
 		vector zfIre=<6.19295,0.19941,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <0.50866,0.50856,0.49131,0.49117> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>]);       
+		llSetPrimitiveParams([6, zfirE,8, <0.70718,0.70703,0.00007,0.0> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 
     }else
     if (p==4){
 		vector Zfire=llGetScale();
-		vector zFire=<2.68030,-4.47172,5.30817>;
+		vector zFire=<5.39636,-4.50922,-0.02004>;
 		vector zfIre=<0.19941,6.19295,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <-0.61766,0.35038,-0.60714,0.35653> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>]);     
+		llSetPrimitiveParams([6, zfirE,8, <-0.86600,0.49998,0.00756,0.00437> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 		     
     }else
     if (p==5){
 		vector Zfire=llGetScale();
-		vector zFire=<2.67835,-4.45476,0.10533>;
+		vector zFire=<0.13931,-4.51117,-0.02004>;
 		vector zfIre=<0.19941,6.19295,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <-0.36245,0.59608,-0.34438,0.62827> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>]);
+		llSetPrimitiveParams([6, zfirE,8, <-0.50000,0.86603,0.0,0.0> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 
     }else
     if (p==6){
 		vector Zfire=llGetScale();
-		vector zFire=<2.67788,0.04023,-2.73273>;
+		vector zFire=<-2.44546,0.04020,-0.02004>;
 		vector zfIre=<0.19941,6.19295,5.36619>;
 		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
 		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <0.00008,0.71479,-0.00013,0.69934> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>]);	                 
+		llSetPrimitiveParams([6, zfirE,8, <0.0,-1.0,0.0,0.0> / llGetRootRotation(),9,0,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.0, 0.0>,<0.0, 0.0, 0.0>,23,0,<0.000000, 0.000000, 0.000000>,0.000000,0.000000,0.000000,25,0,0.0,25,1,0.0,25,2,0.0,25,3,0.0,25,4,0.0,25,5,0.0]); 
     }
     llSetTimerEvent(DELAY);
 }
