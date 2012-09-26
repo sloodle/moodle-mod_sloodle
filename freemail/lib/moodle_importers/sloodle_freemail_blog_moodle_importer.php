@@ -53,11 +53,13 @@ class sloodle_freemail_blog_moodle_importer extends sloodle_freemail_moodle_impo
         $format = 0; // Moodle format - some tags and links.
         $options = array('overflowdiv'=>true); // Blog did this, we probably should too.
 
+        $publishstate = defined('SLOODLE_FREEMAIL_PUBLISH_STATE') ? SLOODLE_FREEMAIL_PUBLISH_STATE : 'draft'; // Can be 'site' or 'public'.
+
         $data = array(
             'subject' => format_string($this->_title),
             'summary' => format_text($this->_body, $format, $options),
             'userid'  => $this->_userid,
-            'publishstate' => 'draft'
+            'publishstate' => $publishstate
             //'tags' => array('SLOODLE')
         );
 
@@ -106,13 +108,21 @@ class sloodle_freemail_blog_moodle_importer extends sloodle_freemail_moodle_impo
             return false;
         }
 
+        $publishstate = defined('SLOODLE_FREEMAIL_PUBLISH_STATE') ? SLOODLE_FREEMAIL_PUBLISH_STATE : 'draft'; // Can be 'site' or 'public'.
+
         global $CFG;
         //$url = $CFG->wwwroot.'/blog/index.php?entryid='.$blogid;
         $editurl = $CFG->wwwroot.'/blog/edit.php?action=edit&entryid='.$blogid;
 
         $str  = 'This is the blog import program at '.$CFG->wwwroot."\n";
-        $str .= 'Your blog entry has been created as a draft'."\n";
-        $str .= 'To publish your blog entry, go to:'."\n";
+
+        if ($publishstate == 'draft') {
+            $str .= 'Your blog entry has been created as a draft'."\n";
+            $str .= 'To publish your blog entry, go to:'."\n";
+        } else {
+            $str .= 'Your blog entry has been created'."\n";
+            $str .= 'To edit it, go to:'."\n";
+        }
         $str .= $editurl."\n";
 
         return $str;
