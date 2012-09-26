@@ -5,15 +5,7 @@ integer my_num;
 close(integer p){
 	 llSetTimerEvent(0);
 	llTriggerSound("close", 1);
-	if (p==0){
-		vector Zfire=llGetScale();
-		vector zFire=<2.77730,-0.00770,-0.05180>;
-		vector zfIre=<1.26456,1.26456,1.26456>;
-		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
-		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <0.0,0.0,0.97030,0.24192> / llGetRootRotation(),9,3,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,23,1,<1.000000, 0.000000, 0.000000>,1.000000,10.100000,0.000000,25,0,0.101961]);        
-    }else
-    if (p==1){
+	  if (p==1){
 		vector Zfire=llGetScale();
 		vector zFire=<1.42570,2.36230,-0.07440>;
 		vector zfIre=<6.19295,0.19941,5.36619>;
@@ -65,14 +57,7 @@ close(integer p){
 }
 open(integer p){
 	llTriggerSound("open", 1);
-	if (p==0){
-		vector Zfire=llGetScale();
-		vector zFire=<2.77730,-0.00770,-0.05180>;
-		vector zfIre=<1.26456,1.26456,1.26456>;
-		vector zfiRe=< zFire.x/zfIre.x,zFire.y/zfIre.y,zFire.z/zfIre.z>;
-		vector zfirE=< Zfire.x*zfiRe.x,Zfire.y*zfiRe.y,Zfire.z*zfiRe.z>;
-		llSetPrimitiveParams([6, zfirE,8, <0.0,0.0,0.97030,0.24192> / llGetRootRotation(),9,3,0,<0.230000, 0.250000, 0.0>,0.949970,<0.0, 0.0, 0.0>,<0.480000, 0.520000, 0.0>,23,1,<1.000000, 0.000000, 0.000000>,1.000000,10.100000,0.000000,25,0,0.101961,25,1,0.101961,25,2,0.101961,25,3,0.101961,25,4,0.101961,25,5,0.101961]);         
-    }else
+	
     if (p==1){
 		vector Zfire=llGetScale();
 		vector zFire=<0.15818,4.56322,-0.02004>;
