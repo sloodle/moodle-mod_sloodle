@@ -181,13 +181,14 @@ default{
     state_entry() {
         string name = llGetObjectName();
         my_num = (integer)llGetSubString(name, -1, -1);
-        open(my_num);
+        close(my_num);
         
     }
     touch_start(integer num_detected) {
         integer j;
         for (j=0;j<num_detected;j++){
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_USER_TOUCH, "edge|"+(string)my_num, llDetectedKey(j));
+            debug("edge|"+(string)my_num);
         }
     }
     link_message(integer s, integer n, string m, key id){

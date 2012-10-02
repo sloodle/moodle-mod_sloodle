@@ -1,7 +1,6 @@
-float size_x_half;
-float size_x;
-float size_y;
 float edge_length;
+float edge_length_half;
+float tip_to_edge;
 list rezzed_hexes;
 integer PIN=7961;
 integer SLOODLE_CHANNEL_ANIM= -1639277007; 
@@ -41,36 +40,39 @@ debug (string message ){
 
 rez_hexagon(integer edge){
      integer my_oposite_section;
-     vector my_coord= get_my_coord();
+     vector my_coord= llGetPos();//get_my_coord();
     
      vector child_coord=my_coord;
      integer DIVISER=1;
-     if (edge==1){
-        child_coord.y=my_coord.y+2*(size_y);  
+     if (edge==1){//yellow
+        child_coord.y=my_coord.y+edge_length+edge_length/2;  
+        child_coord.x=my_coord.x-tip_to_edge;
         my_oposite_section=4;                              
      }else
-     if (edge==2){
-        child_coord.x=my_coord.x+3*(size_x_half);
-        child_coord.y=my_coord.y+1*(size_y);
+     if (edge==2){//pink
+       child_coord.y=my_coord.y+edge_length+edge_length/2;  
+       child_coord.x=my_coord.x+tip_to_edge;
         my_oposite_section=5;
      }else
      if (edge==3){
-         child_coord.x=my_coord.x+3*(size_x_half);
-         child_coord.y=my_coord.y-1*(size_y);
+        child_coord.y=my_coord.y;  
+        child_coord.x=my_coord.x+2*tip_to_edge; 
         my_oposite_section=6;
      }else
      if (edge==4){
-         child_coord.y=my_coord.y-2*(size_y);
+        child_coord.y=my_coord.y-edge_length-edge_length/2;  
+        child_coord.x=my_coord.x+tip_to_edge; 
         my_oposite_section=1;
      }else 
      if (edge==5){
-         child_coord.x=my_coord.x-3*(size_x_half);
-        child_coord.y=my_coord.y-1*(size_y);
+        child_coord.y=my_coord.y-edge_length-edge_length/2;  
+        child_coord.x=my_coord.x-tip_to_edge; 
         my_oposite_section=2;
      }else
      if (edge==6){
-         child_coord.x=my_coord.x-3*(size_x_half);
-        child_coord.y=my_coord.y+1*(size_y);
+        child_coord.y=my_coord.y;  
+        child_coord.x=my_coord.x-2*tip_to_edge; 
+        my_oposite_section=3;
      }
     //rez a new hexagon, and pass my_oppsosite_section as the start_parameter so that the new hexagon wont rez on that the my_oposite_section edge
     llRezAtRoot(HEXAGON_PLATFORM, child_coord, ZERO_VECTOR,  llGetRot(), my_oposite_section);
@@ -78,76 +80,59 @@ rez_hexagon(integer edge){
 
 list get_verticies(integer pie_slice){
      vector my_coord=get_my_coord();
-     vector v0;
+     vector v0 = my_coord;
      vector v1;
      vector v2;
-     if (pie_slice==1){//yellow
-        v0.x=my_coord.x;
-        v0.y=my_coord.y-edge_length;
-        v0.z=my_coord.z;
+     vector v3;
+     vector v4;
+     vector v5;
+     vector v6;
+     
+     v1.x = my_coord.x-tip_to_edge;
+     v1.y = my_coord.y+edge_length/2;
+      v1.z = my_coord.z;
+      
+      v2.x = my_coord.x;
+      v2.y = my_coord.y+edge_length;
+      v2.z = my_coord.z;
 
-        v1.x=my_coord.x+size_y;
-        v1.y=my_coord.y-size_x_half;
-        v1.z=my_coord.z;
-        
-        v2=my_coord;
-        
+      v3.x = my_coord.x+tip_to_edge;
+      v3.y = my_coord.y+edge_length/2;
+      v3.z = my_coord.z;
+      
+      v4.x = my_coord.x+tip_to_edge;
+      v4.y = my_coord.y-edge_length/2;
+      v4.z = my_coord.z;
+      
+      v5.x = my_coord.x;
+      v5.y = my_coord.y-edge_length;
+      v5.z = my_coord.z;           
+      
+      v6.x = my_coord.x-tip_to_edge;
+      v6.y = my_coord.y-edge_length/2;
+      v6.z = my_coord.z;
+      
+     if (pie_slice==1){//yellow
+         return [v0,v1,v2];        
      }else
      if (pie_slice==2){//pink
-        v0.x=my_coord.x;
-        v0.y=my_coord.y-edge_length;
-        v0.z=my_coord.z;
-
-        v1.x=my_coord.x-size_y;
-        v1.y=my_coord.y-size_x_half;
-        v1.z=my_coord.z;
-        
-        v2=my_coord;
+          return [v0,v2,v3];        
      }else
      if (pie_slice==3){//blue
-        v0.x=my_coord.x-size_y;
-        v0.y=my_coord.y+size_x_half;
-        v0.z=my_coord.z;
-
-        v1.x=my_coord.x-size_y;
-        v1.y=my_coord.y-size_x_half;
-        v1.z=my_coord.z;
-        
-        v2=my_coord;
+        return [v0,v3,v4];
      }else
      if (pie_slice==4){//red
-        v0.x=my_coord.x;
-        v0.y=my_coord.y+edge_length;
-        v0.z=my_coord.z;
-
-        v1.x=my_coord.x-size_y;
-        v1.y=my_coord.y+size_x_half;
-        v1.z=my_coord.z;
-        
-        v2=my_coord;     
+        return [v0,v4,v5];        
     }else 
      if (pie_slice==5){//dark blie
-        v0.x=my_coord.x;
-        v0.y=my_coord.y+edge_length;
-        v0.z=my_coord.z;
-
-        v1.x=my_coord.x+size_y;
-        v1.y=my_coord.y+size_x_half;
-        v1.z=my_coord.z;
-        
-        v2=my_coord;
+        return [v0,v5,v6];
      }else
      if (pie_slice==6){
-        v0.x=my_coord.x+size_y;
-        v0.y=my_coord.y-size_x_half;
-        v0.z=my_coord.z;
-
-        v1.x=my_coord.x+size_y;
-        v1.y=my_coord.y+size_x_half;
-        v1.z=my_coord.z;
-        v2=my_coord;
+        return [v0,v6,v1];
      }
-     return [v0,v1,v2];
+     return [];
+     
+     
 }
  
 integer question_prim;
@@ -177,10 +162,8 @@ default {
         integer pie_slice6 = get_prim("pie_slice6");
         list pie_slice_data = llGetLinkPrimitiveParams(pie_slice6, [PRIM_SIZE] );
         vector pie_slice_size=llList2Vector(pie_slice_data, 0);
-        size_y = pie_slice_size.y;
-        size_x_half = pie_slice_size.x/2;
-        size_x= pie_slice_size.x;
-        edge_length=size_x;
+        tip_to_edge = pie_slice_size.z;//since we are looking for the length starting from the tip of the pie_slice to the middle of the edge, we need to choose the z dimension for this particular pie slice
+        edge_length= pie_slice_size.y;//since we are looking for  the length of an edge we need to choose the y dimension for this particular pie slice
         question_prim= get_prim("question_prim");
         set_prim_text(question_prim,"Initializing the quiz. Please wait.",YELLOW);
         llTriggerSound("SND_STARTING_UP", 1);
@@ -193,7 +176,7 @@ default {
 }
     state ready{
       state_entry() {
-            set_prim_text(question_prim,"Ready. Click a colored orb",GREEN);
+          set_prim_text(question_prim,"Ready. Click a colored orb",GREEN);
           string name=llGetObjectName();
           if (name=="Hexagon Quizzer"||"Multi User Quiz"){
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|0,1,2,3,4,5,6|10", NULL_KEY);    
