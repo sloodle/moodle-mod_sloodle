@@ -1,5 +1,7 @@
-float size_x_half=3.0965;
-float size_y=5.3662;
+float size_x_half;
+float size_x;
+float size_y;
+float edge_length;
 list rezzed_hexes;
 integer PIN=7961;
 integer SLOODLE_CHANNEL_ANIM= -1639277007; 
@@ -22,6 +24,14 @@ vector WHITE= <1.00000, 1.00000, 1.00000>;
 vector AVCLASSBLUE= <0.06274,0.247058,0.35294>;
 vector AVCLASSLIGHTBLUG=<0.8549,0.9372,0.9686>;//#daeff7
 integer my_start_param;
+
+vector get_my_coord(){
+    integer center_orb= get_prim("orb0");
+    list center_orb_data = llGetLinkPrimitiveParams(center_orb, [PRIM_POSITION] );
+    vector my_coord = llList2Vector(center_orb_data,0);
+    return my_coord;
+        
+}
 debug (string message ){
      list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
      if (llList2Integer (params ,0)==PRIM_MATERIAL_FLESH){
@@ -31,11 +41,12 @@ debug (string message ){
 
 rez_hexagon(integer edge){
      integer my_oposite_section;
-     vector my_coord=llGetPos();
+     vector my_coord= get_my_coord();
+    
      vector child_coord=my_coord;
      integer DIVISER=1;
      if (edge==1){
-         child_coord.y=my_coord.y+2*(size_y);  
+        child_coord.y=my_coord.y+2*(size_y);  
         my_oposite_section=4;                              
      }else
      if (edge==2){
@@ -64,31 +75,114 @@ rez_hexagon(integer edge){
     //rez a new hexagon, and pass my_oppsosite_section as the start_parameter so that the new hexagon wont rez on that the my_oposite_section edge
     llRezAtRoot(HEXAGON_PLATFORM, child_coord, ZERO_VECTOR,  llGetRot(), my_oposite_section);
 }
+
+list get_verticies(integer pie_slice){
+     vector my_coord=get_my_coord();
+     vector v0;
+     vector v1;
+     vector v2;
+     if (pie_slice==1){//yellow
+        v0.x=my_coord.x;
+        v0.y=my_coord.y-edge_length;
+        v0.z=my_coord.z;
+
+        v1.x=my_coord.x+size_y;
+        v1.y=my_coord.y-size_x_half;
+        v1.z=my_coord.z;
+        
+        v2=my_coord;
+        
+     }else
+     if (pie_slice==2){//pink
+        v0.x=my_coord.x;
+        v0.y=my_coord.y-edge_length;
+        v0.z=my_coord.z;
+
+        v1.x=my_coord.x-size_y;
+        v1.y=my_coord.y-size_x_half;
+        v1.z=my_coord.z;
+        
+        v2=my_coord;
+     }else
+     if (pie_slice==3){//blue
+        v0.x=my_coord.x-size_y;
+        v0.y=my_coord.y+size_x_half;
+        v0.z=my_coord.z;
+
+        v1.x=my_coord.x-size_y;
+        v1.y=my_coord.y-size_x_half;
+        v1.z=my_coord.z;
+        
+        v2=my_coord;
+     }else
+     if (pie_slice==4){//red
+        v0.x=my_coord.x;
+        v0.y=my_coord.y+edge_length;
+        v0.z=my_coord.z;
+
+        v1.x=my_coord.x-size_y;
+        v1.y=my_coord.y+size_x_half;
+        v1.z=my_coord.z;
+        
+        v2=my_coord;     
+    }else 
+     if (pie_slice==5){//dark blie
+        v0.x=my_coord.x;
+        v0.y=my_coord.y+edge_length;
+        v0.z=my_coord.z;
+
+        v1.x=my_coord.x+size_y;
+        v1.y=my_coord.y+size_x_half;
+        v1.z=my_coord.z;
+        
+        v2=my_coord;
+     }else
+     if (pie_slice==6){
+        v0.x=my_coord.x+size_y;
+        v0.y=my_coord.y-size_x_half;
+        v0.z=my_coord.z;
+
+        v1.x=my_coord.x+size_y;
+        v1.y=my_coord.y+size_x_half;
+        v1.z=my_coord.z;
+        v2=my_coord;
+     }
+     return [v0,v1,v2];
+}
+ 
 integer question_prim;
 integer num_links;
-set_question_prim_text(string text,vector color){
-    llSetLinkPrimitiveParamsFast(question_prim, [PRIM_TEXT,text,color,1] );
+set_prim_text(integer prim,string text,vector color){
+    llSetLinkPrimitiveParamsFast(prim, [PRIM_TEXT,text,color,1] );
 }
-get_question_prim(){
+integer get_prim(string name){
     num_links=llGetNumberOfPrims();
     integer i;
+    integer prim=-1;
     for (i=0;i<=num_links;i++){
-        if (llGetLinkName(i)=="question_prim"){
-            question_prim=i;
-            debug("found ------------------- question prim:"+(string)question_prim);
+        if (llGetLinkName(i)==name){
+            prim=i;
+            debug("found ------------------- "+name+": "+(string)name);
         }else{
-        	debug("not found ------------------- :"+(string)i);
+            debug("not found ------------------- "+name+": "+(string)i);
         }
     }
+    return prim;
 }
 default {
     on_rez(integer start_param){
         llResetScript();
     }
     state_entry() {
-        get_question_prim();
-        
-        set_question_prim_text("Initializing the quiz. Please wait.",YELLOW);
+        integer pie_slice6 = get_prim("pie_slice6");
+        list pie_slice_data = llGetLinkPrimitiveParams(pie_slice6, [PRIM_SIZE] );
+        vector pie_slice_size=llList2Vector(pie_slice_data, 0);
+        size_y = pie_slice_size.y;
+        size_x_half = pie_slice_size.x/2;
+        size_x= pie_slice_size.x;
+        edge_length=size_x;
+        question_prim= get_prim("question_prim");
+        set_prim_text(question_prim,"Initializing the quiz. Please wait.",YELLOW);
         llTriggerSound("SND_STARTING_UP", 1);
     }
     link_message(integer sender_num, integer num, string str, key id) {
@@ -99,10 +193,10 @@ default {
 }
     state ready{
       state_entry() {
-            set_question_prim_text("Ready. Click a colored orb",GREEN);
+            set_prim_text(question_prim,"Ready. Click a colored orb",GREEN);
           string name=llGetObjectName();
-          if (name=="Hexagon Quizzer"){
-            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|1,2,3,4,5,6|10", NULL_KEY);    
+          if (name=="Hexagon Quizzer"||"Multi User Quiz"){
+            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|0,1,2,3,4,5,6|10", NULL_KEY);    
           }  
     }
     link_message(integer link_set, integer link_message_channel, string str, key id) {
