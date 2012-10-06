@@ -371,16 +371,17 @@ default
                 else sloodle_debug("ERROR: Insufficient output parameters to load URL with string \"" + string_name + "\".");
             
             } else if (output_method == SLOODLE_TRANSLATE_HOVER_TEXT) {
-            	//example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [BLUE, 1.0], "quizname", [quiz_name], llGetOwner(), "quizzer");
+                //example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [BLUE, 1.0], "quizname", [quiz_name], llGetOwner(), "quizzer");
                 // We need 1 additional parameter, containing the URL to load
                 if (num_output_params >= 2) llSetText(trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1));
                 else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\".");
             } else if (output_method == SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM) {
-            	//example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [BLUE, 1.0,7], "quizname", [quiz_name], llGetOwner(), "quizzer");
+                //example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [BLUE, 1.0,7], "quizname", [quiz_name], llGetOwner(), "quizzer");
                 // We need 1 additional parameter, containing the URL to load
                 if (num_output_params >= 3) {
-                	list rules = [ PRIM_TEXT, trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1) ];
-                	llSetLinkPrimitiveParamsFast( llList2Integer(output_params, 2), list rules );
+                    list rules = [ PRIM_TEXT, trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1) ];
+                    llSetLinkPrimitiveParamsFast( llList2Integer(output_params, 2), rules );
+                }
                 else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\". Expecting translation text, color vector, alpha float.");
             
             }
