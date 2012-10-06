@@ -51,7 +51,8 @@ list locstrings = [
     "incorrect", "Incorrect {{0}}.", // Parameter: name of avatar
      "initquiz","Initializing the quiz. Please wait.",
      "ready_click_colored_orb","Ready. Click a colored orb",
-     "quiz_name","Quiz: {{0}}"
+     "quiz_name","Quiz: {{0}}",
+     "option","{{0}}"
     
 ];
 
