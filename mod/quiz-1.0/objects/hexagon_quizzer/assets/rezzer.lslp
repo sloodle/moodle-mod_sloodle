@@ -174,7 +174,11 @@ default {
             }
             if (type=="edge"){
                 // a user touched an edge selector, so rez an edge
+                
                 integer edge=llList2Integer(data, 1);
+                if (edge==0){
+                	return;
+                }
                 rez_hexagon(edge);
                 //after a user presses an edge selector, hide the selector
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand hide|"+(string)edge, NULL_KEY);
