@@ -839,4 +839,6 @@ $string['freemail:explanation_howtoblog'] = 'Put the title of your blog in the s
 $string['freemail:testbutton'] = 'Click this button to test.';
 $string['freemail:delete_message'] = 'Skip message deletion. (May result in duplicate blog entries.';
 
+$string['ustreamchannel'] = 'UStream Channel';
+
 

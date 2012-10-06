@@ -152,7 +152,16 @@ $string['fieldset:generalconfiguration'] = 'General Configuration';
 $string['help:primpassword'] = 'What is the Prim Password for?';
 $string['help:userediting'] = 'What is the risk?';
 $string['help:autoreg'] = 'What is auto-registration?';
+$string['auto_registration_help'] = 'Turning this on will allow a Moodle account to be created automatically for avatars who use your SLOODLE objects in-world. Note that this will need to be turned on for each course as well as at the site level. If either is off, auto-registration won\'t work.';
+$string['auto_registration'] = 'Auto-registration?';
 $string['help:autoenrol'] = 'What is auto-enrolment?';
+$string['auto_enrolment_help'] = 'Turning this on will make Moodle try to enrol people who use your SLOODLE objects in-world automatically on the relevant course. Note that this will need to be turned on for each course as well as at the site level. If either is off, auto-enrolment won\'t work.';
+$string['auto_enrolment'] = 'Auto-enrolment';
+$string['object_authorization_help'] = 'The number of days before which an active object will expire if not used.';
+$string['object_authorization'] = 'Object Authorization';
+$string['user_objects_help'] = 'The number of days before which a user-centric object (such as the Toolbar) will expire if not used.';
+$string['user_objects'] = 'User-authorized objects';
+
 $string['help:versionnumbers'] = 'What do these numbers mean?';
 $string['help:multipleentries'] = 'Why are there multiple entries? What does it mean?';
 $string['hour'] = 'hour';
@@ -466,9 +475,10 @@ $string['userobjectlifetime'] = 'User object lifetime (days)';
 $string['userobjectlifetime:info'] = 'The number of days before which a user-centric object (such as the Toolbar) will expire if not used.';
 $string['userobjectauth'] = 'SLOODLE User Object Authorization';
 $string['usedialogs'] = 'Use dialogs (instead of chat)?';
+$string['correcttocontinue'] = 'Must a user get a correct answer before they can advance to the next question? ';
 $string['url']  = 'URL';
 $string['unknowntype'] = 'Unknown type';
-
+$string['askquestionscontinuously'] = 'Automatically ask the next question after each question is answered?';
 $string['upload:selectfile'] = 'Select file to upload';
 $string['upload:file'] = 'Upload File';
 $string['upload:maxsize'] = 'Estimated maximum upload size: {$a}';
@@ -562,6 +572,7 @@ $string['awards:gobackgameslist']='Go back to Games List';
 $string['awards:group']='Group';  
 $string['awards:round']='Round';  
 $string['awards:showallcontrollers']='Show points for whole site, not just this controller.';  
+$string['awards:nocontrollers']='Please add a controller to the course if you want to assign points.';  
 
 $string['awards:questioncorrectplus']='When you get a question correct you get';
 $string['awards:questionincorrectminus']='When you get a question wrong you lose'; 
@@ -811,3 +822,23 @@ $string['misc:twitterwallcaption'] = 'Caption';
 $string['activepage'] = 'Page';
 $string['sloodle:courseparticipate'] = 'Allow access to a course via SLOODLE (virtual worlds)';
 $string['sloodle:controllerparticipate'] = 'Use activities under a SLOODLE controller';
+
+// The following are for Freemail
+$string['freemail:confignotset']='This site has not been set up to use postcard blogging.';
+$string['freemail:mailaccount']='Mail Account Name';
+$string['freemail:mailaccountpassword']='Mail account password';
+$string['freemail:mailboxsettings']='Mailbox settings';
+$string['freemail:mailaccounttype']='Mail account Type';
+$string['freemail:emailtosend']='Address people will send their posts to';
+$string['freemail:maxcheck']='Max. number of email messages that script checks each time it is run';
+$string['freemail:delete']='Delete messages that are larger than (bytes)';
+$string['freemail:adminmail']='Send Error Reports and Security bulletins to:';
+$string['freemail:gmailuse']='For Gmail use:  ';
+$string['freemail:explanation_wheretosend'] = 'To blog from Second Life or OpenSim, email a postcard to:';
+$string['freemail:explanation_howtoblog'] = 'Put the title of your blog in the subject line and the text in the body of the email.';
+$string['freemail:testbutton'] = 'Click this button to test.';
+$string['freemail:delete_message'] = 'Skip message deletion. (May result in duplicate blog entries.';
+
+$string['ustreamchannel'] = 'UStream Channel';
+
+
