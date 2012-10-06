@@ -1,18 +1,18 @@
 //
 // The line above should be left blank to avoid script errors in OpenSim.
 
-// Standard translation script for Sloodle.
-// Contains the common, re-usable words and phrases.
+// Translation strings for the Sloodle Quiz object(s).
 //
 // The "locstrings" list is pairs of strings.
 // The first of each pair is the name, and second is the translation.
 //
 // This script is part of the Sloodle project.
-// Copyright (c) 2008-9 Sloodle (various contributors)
+// Copyright (c) 2008 Sloodle (various contributors)
 // Released under the GNU GPL v3
 //
 // Contributors:
 //  Peter R. Bloomfield
+//  Paul G. Preibisch
 //
 
 // Note: where a translation string contains {{x}} (where x is a number),
@@ -28,7 +28,7 @@
 ///// TRANSLATION /////
 
 // Localization batch - indicates the purpose of this file
-string mybatch = ""; // Blank - this is the common Sloodle batch
+string mybatch = "hex_quizzer";
 
 
 // List of string names and translation pairs.
@@ -36,77 +36,24 @@ string mybatch = ""; // Blank - this is the common Sloodle batch
 // The second of each pair is the translation.
 // Additional comments are sometimes given afterward to aid translations.
 list locstrings = [
-    //  Common terms
-    "yes", "Yes",
-    "no", "No",
-    "on", "On",
-    "off", "Off",
-    "enabled", "Enabled",
-    "disabled", "Disabled",
-
-    //  Web-configuration
-    "webconfigmenu", "Sloodle Web-Configuration Menu\n\n{{0}} = Access web-configuration page\n{{1}} = Download configuration", // Parameters are button labels
-    "configlink", "Use this link to configure the object.",
-    "chatserveraddress", "Please chat the address of your Moodle site, without a trailing slash. For example: http://www.yoursite.blah/moodle",
-    "waitingforserveraddress", "Waiting for Moodle site address.\nPlease chat it on channel 0 or 1.",
-    "checkingserverat", "Checking Moodle site at:\n{{0}}", // Parameter gives the address of a Moodle site
-    "sendingconfig", "Sending configuration data...",
-    "touchforwebconfig", "Touch me to start web-configuration",
+    "invalidchoice", "Sorry {{0}}. Your selection was not in the list of available choices. Please try again.", // Parameter: avatar name
+    "invalidtype", "Error: this object cannot handle quiz questions of type: {{0}}", // Parameter: question type name
+    "complete", "Quiz complete {{0}}. Your final score was {{1}}.", // Parameters: avatar name, score
+    "repeating", "Repeating...",
+    "starting", "Starting the quiz.", // Parameter: avatar name
+    "noquestions", "ERROR: there are no questions available",
+    "notenrolled", "ERROR:  It appears you are not enrolled in this class.  Please make sure you are enrolled AND your avatar is linked to your Moodle account.",
+    "noattemptsleft", "Sorry {{0}}. You are not allowed to attempt this quiz again.", // Parameter: avatar name
+    "fetchingquiz", "Fetching quiz data...",
+    "ready", "Ready to attempt: {{0}}.", // Parameter: name of quiz
+    "correct", "Correct {{0}}.", // Parameter: name of avatar
+    "usedialogs", "Error: You attempted to answer a multiple choice, or a true/false answer by typing on the chat line instead of using the dialog {{0}}.", // Parameter: name of avatar
+    "incorrect", "Incorrect {{0}}.", // Parameter: name of avatar
+     "initquiz","Initializing the quiz. Please wait.",
+     "ready_click_colored_orb","Ready. Click a colored orb",
+     "quiz_name","Quiz: {{0}}",
+     "option","{{0}}"
     
-    // User-centric authorisation
-    "userauthurl", "Please login to Moodle with this URL to authorize the object for your own use.",
-
-    //  General connection and authorisation
-    "readynotconnected", "Ready\n[Not connected]",
-    "shutdown", "Shutdown",
-    "connected", "Connected successfully",
-    "readyconnectedto", "Ready\n[Connected to: {{0}}]", // Parameter should identify what is connected to (e.g. URL of website)
-    "readyconnectedto:sitecourse", "Ready\n[Site: {{0}}]\n[Course: {{1}}]", // Parameters: site address, course name
-    "connectionfailed", "Connection failed",
-    "httperror", "ERROR: HTTP request failed",
-    "httperror:code", "ERROR: HTTP request failed with code {{0}}",
-    "httpempty", "ERROR: HTTP response empty",
-    "httptimeout", "ERROR: HTTP request timed out.",
-    "servererror", "ERROR: server responded with status code {{0}}",
-    "notypeid", "ERROR: failed to identify object type ID",
-    "gottype", "Identified object type as {{0}}", // Parameter gives an object type ID
-    "failedcheckcompatibility", "ERROR: failed to check compatibility with site",
-    "badresponseformat", "ERROR: response from server was badly formatted",
-    "objectauthfailed:code", "ERROR: object authorisation failed with code {{0}}",
-    "objectconfigfailed:code", "ERROR: object configuration failed with code {{0}}",
-    "initobjectauth", "Initiating object authorisation...",
-    "autoreg:newaccount", "A new Moodle account has been automatically generated for you.\nWebsite: {{0}} \nUsername: {{1}}\nPassword: {{2}}", // Parameters: site address, username, password
-    "configurationreceived", "Ready",
-    "configdatamissing", "ERROR: some required data was missing from the configuration",
-    "readingconfignotecard", "Reading configuration notecard...",
-    "checkingcourse", "Checking course...",
-    "errortouchtoreset", "ERROR\nTouch me to reset",
-    "notconfiguredyet", "Sorry {{0}}. I am not configured yet.", // Parameter: avatar name
-    "resetting", "Resetting...",
-    "noconfigavailable", "There is no configuration available to download. Please visit the configuration web-page first.",
-    "checkingauth", "Checking authorisation...",
-    "usedescriptioninstead", "If you can't see the shared media screen, please enter your Moodle URL (http://...) in the description field of the rezzer and press \"Reset\"",
-    "openrezzerurl", "Click the URL below to open the rezzer screen in your browser: \n{{0}}",
-
-    //  Sloodle installation/version
-    "sloodlenotinstalled", "ERROR: Sloodle is not installed on specified site.",
-    "sloodleversioninstalled", "Sloodle version installed on server: {{0}}", // Parameter gives a Sloodle version number
-    "sloodleversionrequired", "ERROR: you require at least Sloodle version {{0}}", // Parameter gives a Sloodle version number
-
-    //  Permissions
-    "nopermission:use", "Sorry {{0}}. You do not have permission to use this object.", // Parameter should be the name of an avatar
-    "nopermission:ctrl", "Sorry {{0}}. You do not have permission to control this object.", // Parameter should be the name of an avatar
-    "nopermission:authobjects", "Sorry {{0}}. You do not have permission to authorise objects on this course.", // Parameter should be the name of an avatar
-    
-    // Layout (duplicated deliberately)
-    "layout:failedretrying", "Failed to store layout position. Retrying...",
-    "layout:failedaborting", "Failed to store layout position. Aborting.",
-    "layout:toofar", "Failed to store layout position - too far from rezzer.",
-    "layout:storedobject", "Object stored in layout.",
-    
-    // General error
-    "sloodleerror", "SLOODLE error ({{0}}): please lookup SLOODLE wiki for error information", // Parameters: status code of error
-    "sloodleerror:desc", "SLOODLE error ({{0}}): {{1}}" // Parameters: status code of error, text description of error
 ];
 
 ///// ----------- /////
@@ -127,9 +74,8 @@ string SLOODLE_TRANSLATE_DIALOG = "dialog";                 // Recipient avatar 
 string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";              // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_LOAD_URL_PARALLEL = "loadurlpar";  // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
-integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string SLOODLE_TRANSLATE_IM = "instantmessage";             // Recipient avatar should be identified in link message keyval. No output parameters.
-string SLOODLE_TRANSLATE_TEXTBOX="textbox";//asks via a text box
+
 
 // Used for sending parallel URL loading messages
 integer SLOODLE_CHANNEL_OBJECT_LOAD_URL = -1639270041;
@@ -179,8 +125,8 @@ string sloodle_get_string(string name)
     // As such, we need to resort to searching through the list manually (which can be very slow).
     // To saved time, we can start from the position just beyond where we got to.
     // We advance by 2 each time to skip the translations completely.
-    //pos += 1;
-    for (pos += 1; pos < numstrings; pos += 2) {
+    pos += 1;
+    for (; pos < numstrings; pos += 2) {
         // Do we have a match?
         if (llList2String(locstrings, pos) == name) {
             // Yes - make sure there is a translation following it
@@ -210,12 +156,12 @@ string sloodle_get_string_f(string name, list params)
     integer numparams = llGetListLength(params);
     
     // Go through each parameter we have been provided
-    integer curparamnum;
+    integer curparamnum = 0;
     string curparamtok = "{{x}}";
     integer curparamtoklength = 0;
     string curparamstr = "";
     integer tokpos = -1;
-    for (curparamnum=0; curparamnum < numparams; curparamnum++) {
+    for (; curparamnum < numparams; curparamnum++) {
         // Construct this parameter token
         curparamtok = "{{" + (string)(curparamnum) + "}}";
         curparamtoklength = llStringLength(curparamtok);
@@ -300,6 +246,8 @@ default
             // // OUTPUT STRING // //
             
             // Check what output method has been requested
+            
+    
             if (output_method == SLOODLE_TRANSLATE_LINK) {
                 // Return the string via link message
                 sloodle_translation_response(sender_num, string_name, trans);
@@ -371,21 +319,11 @@ default
                 else sloodle_debug("ERROR: Insufficient output parameters to load URL with string \"" + string_name + "\".");
             
             } else if (output_method == SLOODLE_TRANSLATE_HOVER_TEXT) {
-                //example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [BLUE, 1.0], "quizname", [quiz_name], llGetOwner(), "quizzer");
                 // We need 1 additional parameter, containing the URL to load
                 if (num_output_params >= 2) llSetText(trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1));
                 else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\".");
-            } else if (output_method == SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM) {
-                //example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [BLUE, 1.0,7], "quizname", [quiz_name], llGetOwner(), "quizzer");
-                // We need 1 additional parameter, containing the URL to load
-                if (num_output_params >= 3) {
-                    list rules = [ PRIM_TEXT, trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1) ];
-                    llSetLinkPrimitiveParamsFast( llList2Integer(output_params, 2), rules );
-                }
-                else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\". Expecting translation text, color vector, alpha float.");
             
-            }
-             else if (output_method == SLOODLE_TRANSLATE_IM) {
+            } else if (output_method == SLOODLE_TRANSLATE_IM) {
                 // Send an IM - we need a valid key
                 if (id == NULL_KEY) {
                     sloodle_debug("ERROR: Non-null key value required to send IM with string \"" + string_name + "\".");
@@ -401,7 +339,5 @@ default
         }
     }
 }
-
-// Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: assets/lang/en/sloodle_translation_en.lslp 
-
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: lang/en_utf8/sloodle_translation_quiz_en.lsl 

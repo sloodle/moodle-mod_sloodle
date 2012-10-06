@@ -322,7 +322,7 @@
                                     quiz_id = (integer)llList2String(thisline, 4);
                                     quiz_name = llList2String(thisline, 2);
                                    
-                                    sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [BLUE, 1.0], "quizname", [quiz_name], llGetOwner(), "quizzer");
+                                    sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT, [BLUE, 1.0], "quizname", [quiz_name], llGetOwner(), "hex_quizzer");
                         
                                 } else if ( rowtype == "quizpages" ) {
                                     

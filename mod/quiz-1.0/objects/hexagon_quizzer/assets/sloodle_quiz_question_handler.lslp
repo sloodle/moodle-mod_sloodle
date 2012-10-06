@@ -24,7 +24,6 @@
         integer SLOODLE_CHANNEL_QUIZ_STOP_FOR_AVATAR = -1639271119; //Tells us to STOP a quiz for the avatar
         integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
         integer doRepeat = 0; // whether we should run through the questions again when we're done
-        integer doDialog = 1; // whether we should ask the questions using dialog rather than chat
         string  sloodlehttpvars;
         integer answerDialogListenHandler;
         integer answerChatListenHandler;
@@ -143,7 +142,7 @@
                 if (myNum ==6){
                     SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG6;
                 }
-                llSay(0,"My num is : "+(string)myNum+" my channel is : "+(string)SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG);
+                debug("My num is : "+(string)myNum+" my channel is : "+(string)SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG);
                 
                 
             }
@@ -153,7 +152,7 @@
                         return;
                     }
                 //  llList2String(question_ids, current_question_index)+"|"+(string)users_question_index+"|"+(string)num_questions+"|"+(string)menu_channel+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,user_key );//todo add to dia    
-                if (num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG||num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_TEXT_BOX) {//todo add to dia
+                if (num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG) {//todo add to dia
                     integer menu_channel;                   
                     list data = llParseString2List(str, ["|"], []);
                     /*  llList2String(question_ids, current_question_index)
@@ -207,11 +206,7 @@
                         users_listen_handler =llListReplaceList(users_listen_handler , [listen_handler], user_id, user_id);
                         users_current_question_index =llListReplaceList(users_current_question_index , [users_question_index], user_id, user_id);
                     }
-                    if (num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG) {//todo add to dia
-                        doDialog=TRUE; 
-                    }else{
-                        doDialog=FALSE;
-                    }
+                    
                     string body=sloodlehttpvars;
                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "Asking a questions",  [llKey2Name(user_key)], user_key, "quizzer");
                     // Request the quiz data from Moodle
@@ -243,22 +238,19 @@
                         integer statuscode = llList2Integer(statusfields, 0);
                         //1|QUIZ||REQUESTING_QUESTION|||2102f5ab-6854-4ec3-aec5-6cd6233c31c6
                         string  request_descriptor =llList2String(statusfields, 3); 
-                        
                         key user_key = llList2Key(statusfields,6);
-                        
                         integer user_id =llListFindList(users,[user_key]);
                      
                         //the user who initiated this request
                             debug("*********************request_descriptor: "+request_descriptor);
                           if (request_descriptor=="REQUESTING_QUESTION"){
-                                  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, "", user_key);
                                  request_descriptor="";
                                 if (statuscode == -10301) {
-                                    sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "quizzer");
+                                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                                     return;
                                     
                                 } else if (statuscode == -10302) {
-                                   sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quizzer");
+                                   sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                                    return;
                                     
                                 } else if (statuscode <= 0) {
@@ -301,7 +293,7 @@
                                         qtype = llList2String(thisline, 7);
                                         // Make sure it's a valid question type
                                         if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
-                                          sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "quizzer");
+                                          sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                                       //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
                                           return;
                                         }
@@ -327,9 +319,9 @@
                                     //save question options for this user from this question
                                     user_question_options=llListReplaceList(user_question_options,[opids_string+SEPARATOR+optext_string+SEPARATOR+opgrade_string+SEPARATOR+opfeedback_string],user_id,user_id);
                                 }            
-                            // Are we using dialogs?
+                          
                             integer users_question_index=llList2Integer(users_current_question_index,user_id);
-                            if (doDialog == 1) {
+                          
                                 // We want to create a dialog with the option texts embedded into the main text,
                                 //  and numbers on the buttons
                                 integer qi=1;
@@ -338,37 +330,25 @@
                                 // Go through each option
                                 integer num_options = llGetListLength(optext);
                                 
-                                if ((qtype == "numerical")|| (qtype == "shortanswer")) {
-                                   // Ask the question via IM
-                                    llTextBox(user_key,qdialogtext,llList2Integer(users_menu_channels,user_id));   
-                                    return;
-                                } 
-                                else {
+                               
+                                string qdialogoptions_string="";
                                     for (qi = 1; qi <= num_options; qi++) {
                                         // Append this option to the main dialog (remebering buttons are 1-based, but lists 0-based)
                                         qdialogtext += (string)qi + ": " + llList2String(optext,qi-1) + "\n";
                                         // Add a button for this option
                                         qdialogoptions = qdialogoptions + [(string)qi];
+                                        qdialogoptions_string+=(string)qi+",";
                                     }
+                                    qdialogoptions=llGetSubString(qdialogoptions_string, 0, -2);//remove trailing comma
+                                    
                                     // Present the dialog to the user
-                                   
-                                    llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
+                                    
+                                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
+                                    //llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
                                     debug("qi="+(string)(qi)+" qdialogtext: "+qdialogtext);
-                                    return;
-                                }
-                            } else {
-                              // Offer the options via IM
-                                integer x = 0;
-                                integer num_options = llGetListLength(optext);
-                                string qdialogtext = "Question ("+(string)(users_question_index+1)+") of ("+(string)num_questions+")\n"+qtext + "\n";
-                                string option_string;
-                                for (x = 0; x < num_options; x++) {
-                                    option_string+= (string)(x + 1) + ". " + llList2String(optext, x);
-                                }     
-                                  llTextBox(user_key,qdialogtext+"\n"+option_string,llList2Integer(users_menu_channels,user_id));   
-                                  return;
-                            }         
-                        }     
+                                   
+                               
+                     
                 }
               listen(integer channel, string name, key user_key, string user_response){
                 if (doDialog && ((qtype == "multichoice") || (qtype == "truefalse"))) {

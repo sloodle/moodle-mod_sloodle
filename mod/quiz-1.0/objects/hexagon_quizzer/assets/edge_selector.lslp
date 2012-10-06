@@ -1,3 +1,49 @@
+
+
+/* edge selector.lslp
+*
+*  Part of the Sloodle project (www.sloodle.org)
+*
+*  Copyright (c) 2011-06 contributors (see below)
+*  Released under the GNU GPL v3
+*  -------------------------------------------
+*
+*  This program is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  (at your option) any later version.
+*
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*  All scripts must maintain this copyrite information, including the contributer information listed
+* 
+*  As mentioned, this script has been  licensed under GPL 3.0
+*  Basically, that means, you are free to use the script, commercially etc, but if you include
+*  it in your objects, you must make the source viewable to the person you are distributuing it to -
+*  ie: it can not be closed source - GPL 3.0 means - you must make it open!
+*  This is so that others can modify it and contribute back to the community.
+*  The SLOODLE github can be found here: https://github.com/sloodle
+*
+*  Enjoy!
+*
+*  Contributors:
+*   Paul Preibisch
+*
+*  DESCRIPTION
+*  The main purpose of this script is to power a spherical prim that sits on the edge of a hexagon quizzer's pie slice.  A user can request that a 
+*  new hexagon be joined to this edge (hence the name edge_selector) by clicking on the orb.
+*  When the orb is touched, this script will send a linked message to the hexagon rezzer script telling it who touched
+*  it.  It will also set the prims properties so that the orb reshapes itself small enough to be hidden (close) when needed.
+*
+ 
+*/
+
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer DELAY;
 integer my_num;
@@ -133,15 +179,16 @@ default{
     on_rez(integer r){llResetScript();} 
 
     state_entry() {
-        
-        my_num = (integer)llGetObjectName();
-        open(my_num);
+        string name = llGetObjectName();
+        my_num = (integer)llGetSubString(name, -1, -1);
+        close(my_num);
         
     }
     touch_start(integer num_detected) {
         integer j;
         for (j=0;j<num_detected;j++){
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_USER_TOUCH, "edge|"+(string)my_num, llDetectedKey(j));
+            debug("edge|"+(string)my_num);
         }
     }
     link_message(integer s, integer n, string m, key id){
@@ -157,15 +204,15 @@ default{
            integer found = llListFindList(edges, [(string)my_num]);
     debug("command: "+command+" found: "+(string)found+" mynum: "+(string)my_num+" m: "+m); 
            if (found==-1) {
-            return;
-        }
-        if (command=="edge expand show"){
-             close(my_num);
-        }
-        if (command=="edge expand hide"){
-              open(my_num);
-        }
-        if(stat){llSetStatus(1,1);}
+           	return;
+	       }
+	       if (command=="edge expand show"){
+	       		close(my_num);
+	       }
+	       if (command=="edge expand hide"){
+	              open(my_num);
+	       }
+	       if(stat){llSetStatus(1,1);}
     }
    
 }

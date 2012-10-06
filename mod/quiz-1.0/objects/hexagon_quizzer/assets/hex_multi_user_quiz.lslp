@@ -22,7 +22,6 @@
       
         integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
         integer doRepeat = 0; // whether we should run through the questions again when we're done
-        integer doDialog = 1; // whether we should ask the questions using dialog rather than chat
         integer doPlaySound = 1; // whether we should play sound
         integer doRandomize = 1; // whether we should ask the questions in random order
         string sloodleserverroot = "";
@@ -44,6 +43,7 @@
         integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
         integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;  //Sent by main quiz script to tell UI scripts that question has been answered by avatar with key. String contains selected option ID + "|" + option text + "|"
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107; 
+        integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUESTION = -1639271108;
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
@@ -131,12 +131,28 @@
                  }
                 llOwnerSay(llGetScriptName ()+": " +message );
         }
-        
+        // Send a translation request link message
+		sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch){
+			llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
+		}
+        integer get_prim(string name){
+		    integer num_links=llGetNumberOfPrims();
+		    integer i;
+		    integer prim=-1;
+		    for (i=0;i<=num_links;i++){
+		        if (llGetLinkName(i)==name){
+		            prim=i;
+		        }else{
+		        }
+		    }
+		    return prim;
+		}
         
         integer random_integer( integer min, integer max ){
           return min + (integer)( llFrand( max - min + 1 ) );
         }
         integer add_user(key user_key){
+        		llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING, "", user_key);
                 integer q;
                 //randomize the questions for the new user if required
                 list temp=question_ids;
@@ -209,7 +225,7 @@
         sloodle_debug(string msg){
             llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
         }  
-        
+        //requests from the question handler scripts a question
         request_question_from_lsl_pipepline(key user_key, integer users_question_index,integer num_questions){
             integer user_id = llListFindList(users, [user_key]);
             integer menu_channel =  llList2Integer(users_menu_channels, user_id);
@@ -223,13 +239,7 @@
             debug("/////////// full sloodle root ///////////"+(string)sloodleserverroot+sloodle_quiz_url);
             
             SEPARATOR="|";
-            if (doDialog==1){ //1 = true
-                
-               llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
-            }else                 
-                if (doDialog==0){ //0= false
-                    llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_TEXT_BOX, (string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
-             }                
+            llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
         }  
        
          
@@ -260,7 +270,6 @@
             else if (name == "set:sloodleserveraccesslevel") sloodleserveraccesslevel = (integer)value1;
             else if (name == "set:sloodlerepeat") doRepeat = (integer)value1;
             else if (name == "set:sloodlerandomize") doRandomize = (integer)value1;
-            else if (name == "set:sloodledialog") doDialog = (integer)value1;
             else if (name == "set:sloodleplaysound") doPlaySound = (integer)value1;
             else if (name == "set:sloodleaskquestionscontinuously") askquestionscontinuously= (integer)value1;
             else if (name == "set:correctToContinue") correctToContinue = (integer)value1;
@@ -312,7 +321,6 @@
                 sloodleobjectaccessleveluse = 0;
                 sloodleserveraccesslevel = 0;
                 doRepeat = 1;
-                doDialog = 1;
                 doPlaySound = 1;
                 doRandomize = 1;
                 //tell other scripts we are in the default state.
@@ -376,7 +384,7 @@
                     }  
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "quiz");                                                     
                    //load the quiz
-                   first_user=user_key;
+                    first_user=user_key;
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOAD_QUIZ, "", user_key);
                 }else 
                 //   llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ, (string)quiz_id+"|"+quiz_name+"|"+(string)num_questions+"|"+question_ids_str, user_key);
@@ -389,6 +397,7 @@
                     first_user_active_question= get_current_question_id(user_key);
                     debug(" FIRST USER: "+(string)first_user);
                     first_user=user_key;//record the first user, because in the next state we must initate asking the first question
+        			sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,get_prim("quiz_name")], "quiz_name", [quiz_name], "", "hex_quizzer");
                     state quiz_ready;     
                 }    
             }
@@ -400,8 +409,8 @@
             }
             
             state_entry(){
-                llSetText("", <0.0,0.0,0.0>, 0.0);
-                // llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING, "", sitter);
+                
+                
                 // Make sure we have some questions
                 if (num_questions == 0) {
                     sloodle_debug("No questions - cannot run quiz.");
@@ -430,7 +439,7 @@
                         llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE, "", user_key);
                         return;
                     }                
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "quiz");                                                     
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "hex_quizzer");                                                     
                     integer user_id=llListFindList(users, [user_key]);
                     if (user_id==-1){
                         user_id=add_user(user_key);
