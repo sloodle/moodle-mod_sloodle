@@ -40,7 +40,7 @@ list locstrings = [
     "invalidtype", "Error: this object cannot handle quiz questions of type: {{0}}", // Parameter: question type name
     "complete", "Quiz complete {{0}}. Your final score was {{1}}.", // Parameters: avatar name, score
     "repeating", "Repeating...",
-    "starting", "Starting quiz for {{0}}", // Parameter: avatar name
+    "starting", "Starting the quiz.", // Parameter: avatar name
     "noquestions", "ERROR: there are no questions available",
     "notenrolled", "ERROR:  It appears you are not enrolled in this class.  Please make sure you are enrolled AND your avatar is linked to your Moodle account.",
     "noattemptsleft", "Sorry {{0}}. You are not allowed to attempt this quiz again.", // Parameter: avatar name
@@ -49,7 +49,9 @@ list locstrings = [
     "correct", "Correct {{0}}.", // Parameter: name of avatar
     "usedialogs", "Error: You attempted to answer a multiple choice, or a true/false answer by typing on the chat line instead of using the dialog {{0}}.", // Parameter: name of avatar
     "incorrect", "Incorrect {{0}}.", // Parameter: name of avatar
-    "Initializing the quiz. Please wait."
+     "initquiz","Initializing the quiz. Please wait.",
+     "ready_click_colored_orb","Ready. Click a colored orb",
+     "quiz_name","Quiz: {{0}}"
     
 ];
 
