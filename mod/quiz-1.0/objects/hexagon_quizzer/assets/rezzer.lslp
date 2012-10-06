@@ -45,7 +45,9 @@ debug (string message ){
 rez_hexagon(integer edge){
      integer my_oposite_section;
      vector my_coord= llGetPos();//get_my_coord();
-    
+     if (edge==0){
+     	return;
+     }
      vector child_coord=my_coord;
      integer DIVISER=1;
      if (edge==1){//yellow
