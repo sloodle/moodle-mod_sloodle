@@ -8,6 +8,7 @@ integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
+integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string HEXAGON_PLATFORM="Hexagon Platform";
@@ -116,13 +117,16 @@ integer get_prim(string name){
     for (i=0;i<=num_links;i++){
         if (llGetLinkName(i)==name){
             prim=i;
-           // debug("found ------------------- "+name+": "+(string)name);
         }else{
-          //  debug("not found ------------------- "+name+": "+(string)i);
         }
     }
     return prim;
 }
+// Send a translation request link message
+sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch){
+	llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
+}
+        
 init(){
 	//get the dimensions of a pie_slice so we can determin the length of the sides of a pieslice.  In this case, we will choose pie_slice6 (they all have same dimensions)
         integer pie_slice6 = get_prim("pie_slice6");
@@ -131,8 +135,7 @@ init(){
         tip_to_edge = pie_slice_size.z;//since we are looking for the length starting from the tip of the pie_slice to the middle of the edge, we need to choose the z dimension for this particular pie slice
         edge_length= pie_slice_size.y;//since we are looking for  the length of an edge we need to choose the y dimension for this particular pie slice
         question_prim= get_prim("question_prim");
-        Initializing the quiz. Please wait.
-        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,question_prim], "init_quiz", [], "", "hex_quizzer");
+        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
 }
 default {
     on_rez(integer start_param){
@@ -150,11 +153,10 @@ default {
 }
     state ready{
       state_entry() {
-          set_prim_text(question_prim,"Ready. Click a colored orb",GREEN);
+          sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
           string name=llGetObjectName();
-          if (name=="Hexagon Quizzer"||"Multi User Quiz"){
-            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|0,1,2,3,4,5,6|10", NULL_KEY);    
-          }  
+          //show orbs
+          llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|0,1,2,3,4,5,6|10", NULL_KEY);    
     }
     link_message(integer link_set, integer link_message_channel, string str, key id) {
         if (link_message_channel ==SLOODLE_CHANNEL_USER_TOUCH){
