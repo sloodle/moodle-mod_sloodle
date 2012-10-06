@@ -238,22 +238,19 @@
                         integer statuscode = llList2Integer(statusfields, 0);
                         //1|QUIZ||REQUESTING_QUESTION|||2102f5ab-6854-4ec3-aec5-6cd6233c31c6
                         string  request_descriptor =llList2String(statusfields, 3); 
-                        
                         key user_key = llList2Key(statusfields,6);
-                        
                         integer user_id =llListFindList(users,[user_key]);
                      
                         //the user who initiated this request
                             debug("*********************request_descriptor: "+request_descriptor);
                           if (request_descriptor=="REQUESTING_QUESTION"){
-                                  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, "", user_key);
                                  request_descriptor="";
                                 if (statuscode == -10301) {
-                                    sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "quizzer");
+                                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                                     return;
                                     
                                 } else if (statuscode == -10302) {
-                                   sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "noquestions",  [llKey2Name(user_key)],user_key, "quizzer");
+                                   sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                                    return;
                                     
                                 } else if (statuscode <= 0) {
@@ -296,7 +293,7 @@
                                         qtype = llList2String(thisline, 7);
                                         // Make sure it's a valid question type
                                         if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
-                                          sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "quizzer");
+                                          sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                                       //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
                                           return;
                                         }
@@ -322,9 +319,9 @@
                                     //save question options for this user from this question
                                     user_question_options=llListReplaceList(user_question_options,[opids_string+SEPARATOR+optext_string+SEPARATOR+opgrade_string+SEPARATOR+opfeedback_string],user_id,user_id);
                                 }            
-                            // Are we using dialogs?
+                          
                             integer users_question_index=llList2Integer(users_current_question_index,user_id);
-                            if (doDialog == 1) {
+                          
                                 // We want to create a dialog with the option texts embedded into the main text,
                                 //  and numbers on the buttons
                                 integer qi=1;
@@ -334,21 +331,24 @@
                                 integer num_options = llGetListLength(optext);
                                 
                                
-                                
+                                string qdialogoptions_string="";
                                     for (qi = 1; qi <= num_options; qi++) {
                                         // Append this option to the main dialog (remebering buttons are 1-based, but lists 0-based)
                                         qdialogtext += (string)qi + ": " + llList2String(optext,qi-1) + "\n";
                                         // Add a button for this option
                                         qdialogoptions = qdialogoptions + [(string)qi];
+                                        qdialogoptions_string+=(string)qi+",";
                                     }
+                                    qdialogoptions=llGetSubString(qdialogoptions_string, 0, -2);//remove trailing comma
+                                    
                                     // Present the dialog to the user
-                                   
-                                    llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
+                                    
+                                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
+                                    //llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
                                     debug("qi="+(string)(qi)+" qdialogtext: "+qdialogtext);
                                    
                                
-                                  
-                        }     
+                     
                 }
               listen(integer channel, string name, key user_key, string user_response){
                 if (doDialog && ((qtype == "multichoice") || (qtype == "truefalse"))) {
