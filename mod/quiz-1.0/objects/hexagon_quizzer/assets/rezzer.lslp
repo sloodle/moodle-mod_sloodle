@@ -105,6 +105,9 @@ integer num_links;
 set_prim_text(integer prim,string text,vector color){
     llSetLinkPrimitiveParamsFast(prim, [PRIM_TEXT,text,color,1] );
 }
+/*
+Search through all linked prims, and returns the prims link number which matches the name
+*/
 integer get_prim(string name){
     num_links=llGetNumberOfPrims();
     integer i;
@@ -112,25 +115,29 @@ integer get_prim(string name){
     for (i=0;i<=num_links;i++){
         if (llGetLinkName(i)==name){
             prim=i;
-            debug("found ------------------- "+name+": "+(string)name);
+           // debug("found ------------------- "+name+": "+(string)name);
         }else{
-            debug("not found ------------------- "+name+": "+(string)i);
+          //  debug("not found ------------------- "+name+": "+(string)i);
         }
     }
     return prim;
 }
-default {
-    on_rez(integer start_param){
-        llResetScript();
-    }
-    state_entry() {
+init(){
+	//get the dimensions of a pie_slice so we can determin the length of the sides of a pieslice.  In this case, we will choose pie_slice6 (they all have same dimensions)
         integer pie_slice6 = get_prim("pie_slice6");
         list pie_slice_data = llGetLinkPrimitiveParams(pie_slice6, [PRIM_SIZE] );
         vector pie_slice_size=llList2Vector(pie_slice_data, 0);
         tip_to_edge = pie_slice_size.z;//since we are looking for the length starting from the tip of the pie_slice to the middle of the edge, we need to choose the z dimension for this particular pie slice
         edge_length= pie_slice_size.y;//since we are looking for  the length of an edge we need to choose the y dimension for this particular pie slice
         question_prim= get_prim("question_prim");
-        set_prim_text(question_prim,"Initializing the quiz. Please wait.",YELLOW);
+        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,question_prim], "init_quiz", [], "", "hex_quizzer");
+}
+default {
+    on_rez(integer start_param){
+        llResetScript();
+    }
+    state_entry() {
+    	init();
         llTriggerSound("SND_STARTING_UP", 1);
     }
     link_message(integer sender_num, integer num, string str, key id) {
