@@ -77,63 +77,28 @@ rez_hexagon(integer edge){
     //rez a new hexagon, and pass my_oppsosite_section as the start_parameter so that the new hexagon wont rez on that the my_oposite_section edge
     llRezAtRoot(HEXAGON_PLATFORM, child_coord, ZERO_VECTOR,  llGetRot(), my_oposite_section);
 }
+string get_detected_pie_slice(vector avatar){
+    //returns name of pie_slice
+    integer i;
+    float closest_orb_distance=100.0;
+    string  name_of_closest_orb="";
+    integer closest_orb_link_number;
 
-list get_verticies(integer pie_slice){
-     vector my_coord=get_my_coord();
-     vector v0 = my_coord;
-     vector v1;
-     vector v2;
-     vector v3;
-     vector v4;
-     vector v5;
-     vector v6;
-     
-     v1.x = my_coord.x-tip_to_edge;
-     v1.y = my_coord.y+edge_length/2;
-      v1.z = my_coord.z;
-      
-      v2.x = my_coord.x;
-      v2.y = my_coord.y+edge_length;
-      v2.z = my_coord.z;
-
-      v3.x = my_coord.x+tip_to_edge;
-      v3.y = my_coord.y+edge_length/2;
-      v3.z = my_coord.z;
-      
-      v4.x = my_coord.x+tip_to_edge;
-      v4.y = my_coord.y-edge_length/2;
-      v4.z = my_coord.z;
-      
-      v5.x = my_coord.x;
-      v5.y = my_coord.y-edge_length;
-      v5.z = my_coord.z;           
-      
-      v6.x = my_coord.x-tip_to_edge;
-      v6.y = my_coord.y-edge_length/2;
-      v6.z = my_coord.z;
-      
-     if (pie_slice==1){//yellow
-         return [v0,v1,v2];        
-     }else
-     if (pie_slice==2){//pink
-          return [v0,v2,v3];        
-     }else
-     if (pie_slice==3){//blue
-        return [v0,v3,v4];
-     }else
-     if (pie_slice==4){//red
-        return [v0,v4,v5];        
-    }else 
-     if (pie_slice==5){//dark blie
-        return [v0,v5,v6];
-     }else
-     if (pie_slice==6){
-        return [v0,v6,v1];
-     }
-     return [];
-     
-     
+    for (i=1;i<=6;i++){
+        integer orb_link_number = get_prim("orb"+(string)i);
+        list orb_data=llGetLinkPrimitiveParams(orb_link_number, [PRIM_POSITION]);
+        
+        vector pos = llList2Vector(orb_data, 0);
+        float detected_distance_from_avatar_to_orb = llVecDist(pos, avatar);
+        if (detected_distance_from_avatar_to_orb<closest_orb_distance){
+            closest_orb_distance = detected_distance_from_avatar_to_orb;
+            name_of_closest_orb="orb"+(string)i;
+        }
+    }
+    
+    return name_of_closest_orb;
 }
+
  
 integer question_prim;
 integer num_links;
