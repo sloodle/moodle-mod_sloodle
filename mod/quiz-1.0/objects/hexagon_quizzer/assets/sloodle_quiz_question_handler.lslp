@@ -10,14 +10,14 @@
   Released under the GNU GPL
   
   Contributors:
-  	Edmund Edgar
-  	Paul Preibisch
+      Edmund Edgar
+      Paul Preibisch
 
   This script requests questions from the server for a particular user.  If that user has enough attempts left, it will
   load the questions into either a dialog box, or a textbox, along with that questions options.
   
   When the user responds, it reports the scorechange back to the linked message stream.
-     	
+         
 */
 
         
@@ -224,50 +224,41 @@
         
             http_response(key request_id, integer status, list metadata, string body) {
                   integer placeinlist=llListFindList(server_requests, [request_id]);        
-                    if (placeinlist!=-1){
-                        server_requests= llDeleteSubList(server_requests, placeinlist, placeinlist);
-                     }else {
-                         return;
-                     }
-                     
+                    if (placeinlist==-1){
+                        return;
+                    }
+                    server_requests= llDeleteSubList(server_requests, placeinlist, placeinlist);
                     // Questions are comming into our http_response from SLOODLE.  Split this data into several lines
-                        list lines = llParseStringKeepNulls(body, ["\n"], []);
-                        integer numlines = llGetListLength(lines);
-                        body = "";
-                        list statusfields = llParseStringKeepNulls(llList2String(lines,0), ["|"], []);
-                        integer statuscode = llList2Integer(statusfields, 0);
-                        //1|QUIZ||REQUESTING_QUESTION|||2102f5ab-6854-4ec3-aec5-6cd6233c31c6
-                        string  request_descriptor =llList2String(statusfields, 3); 
-                        key user_key = llList2Key(statusfields,6);
-                        integer user_id =llListFindList(users,[user_key]);
-                     
-                        //the user who initiated this request
-                            debug("*********************request_descriptor: "+request_descriptor);
-                          if (request_descriptor=="REQUESTING_QUESTION"){
-                                 request_descriptor="";
-                                if (statuscode == -10301) {
-                                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "hex_quizzer");
-                                    return;
-                                    
-                                } else if (statuscode == -10302) {
-                                   sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions",  [llKey2Name(user_key)],user_key, "hex_quizzer");
-                                   return;
-                                    
-                                } else if (statuscode <= 0) {
-                                    //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], NULL_KEY, "");
-                                    // sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode); //send message to error_message.lsl
-                                    // Check if an error message was reported
-                                    if (numlines > 1) sloodle_debug("quiz data error: "+llList2String(lines, 1));
-                                    return;
-                                }
-                           
-                        // Save a tiny bit of memory!
-                        statusfields = [];
-                
-                        // Go through each line of the response
-                        integer i = 0;
-                        
-                      
+                    list lines = llParseStringKeepNulls(body, ["\n"], []);
+                    integer numlines = llGetListLength(lines);
+                    body = "";
+                    list statusfields = llParseStringKeepNulls(llList2String(lines,0), ["|"], []);
+                    integer statuscode = llList2Integer(statusfields, 0);
+                    //1|QUIZ||REQUESTING_QUESTION|||2102f5ab-6854-4ec3-aec5-6cd6233c31c6
+                    string  request_descriptor =llList2String(statusfields, 3); 
+                    key user_key = llList2Key(statusfields,6);
+                    integer user_id =llListFindList(users,[user_key]);
+                    //the user who initiated this request
+                    debug("*********************request_descriptor: "+request_descriptor);
+                    if (request_descriptor=="REQUESTING_QUESTION"){
+                        request_descriptor="";
+                        if (statuscode == -10301) {
+                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "hex_quizzer");
+                            return;
+                        } else if (statuscode == -10302) {
+                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions",  [llKey2Name(user_key)],user_key, "hex_quizzer");
+                            return;
+                        } else if (statuscode <= 0) {
+                            //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], NULL_KEY, "");
+                            // sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode); //send message to error_message.lsl
+                            // Check if an error message was reported
+                            if (numlines > 1) sloodle_debug("quiz data error: "+llList2String(lines, 1));
+                                return;
+                            }
+                            // Save a tiny bit of memory!
+                            statusfields = [];
+                            // Go through each line of the response
+                            integer i = 0;
                             string opids_string="";
                             string optext_string="";
                             string opgrade_string="";
@@ -276,28 +267,23 @@
                             list optext = []; // Texts
                             list opgrade = []; // Grades
                             list opfeedback = []; // Feedback if this option is selected
-                            
                             //clear users current question option data
                             for (i = 1; i < numlines; i++) {
-                    
                                 // Extract and parse the current line
                                 list thisline = llParseStringKeepNulls(llList2String(lines, i),["|"],[]);
                                 string rowtype = llList2String( thisline, 0 );
                                 debug ("rowtype: "+rowtype);
                                 // Check what type of line this is
                                 if ( rowtype == "question" ) {
-                                    
                                     // Grab the question information and reset the options
-            
                                         qtext = llList2String(thisline, 4);
                                         qtype = llList2String(thisline, 7);
                                         // Make sure it's a valid question type
                                         if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
-                                          sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "hex_quizzer");
+                                              sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                                       //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
-                                          return;
+                                              return;
                                         }
-                                    
                                 } else if ( rowtype == "questionoption" ) {                        
                                     // Add this option to the appropriate place
                                     opids_string += llList2String(thisline, 2)+"|";
@@ -318,45 +304,36 @@
                             if (user_id!=-1){
                                     //save question options for this user from this question
                                     user_question_options=llListReplaceList(user_question_options,[opids_string+SEPARATOR+optext_string+SEPARATOR+opgrade_string+SEPARATOR+opfeedback_string],user_id,user_id);
-                                }            
-                          
+                            }            
                             integer users_question_index=llList2Integer(users_current_question_index,user_id);
-                          
-                                // We want to create a dialog with the option texts embedded into the main text,
-                                //  and numbers on the buttons
-                                integer qi=1;
-                                list qdialogoptions = [];
-                                string qdialogtext = "Question ("+(string)(users_question_index+1)+") of ("+(string)num_questions+")\n"+qtext + "\n";
-                                // Go through each option
-                                integer num_options = llGetListLength(optext);
-                                
-                               
-                                string qdialogoptions_string="";
-                                    for (qi = 1; qi <= num_options; qi++) {
-                                        // Append this option to the main dialog (remebering buttons are 1-based, but lists 0-based)
-                                        qdialogtext += (string)qi + ": " + llList2String(optext,qi-1) + "\n";
-                                        // Add a button for this option
-                                        qdialogoptions = qdialogoptions + [(string)qi];
-                                        qdialogoptions_string+=(string)qi+",";
-                                    }
-                                    qdialogoptions=llGetSubString(qdialogoptions_string, 0, -2);//remove trailing comma
-                                    
-                                    // Present the dialog to the user
-                                    
-                                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
-                                    //llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
-                                    debug("qi="+(string)(qi)+" qdialogtext: "+qdialogtext);
-                                   
-                               
-                     
-                }
+                            // We want to create a dialog with the option texts embedded into the main text,
+                            //  and numbers on the buttons
+                            integer qi=1;
+                            list qdialogoptions = [];
+                            string qdialogtext = "Question ("+(string)(users_question_index+1)+") of ("+(string)num_questions+")\n"+qtext + "\n";
+                            // Go through each option
+                            integer num_options = llGetListLength(optext);
+                            string qdialogoptions_string="";
+                            for (qi = 1; qi <= num_options; qi++) {
+                                // Append this option to the main dialog (remebering buttons are 1-based, but lists 0-based)
+                                qdialogtext += (string)qi + ": " + llList2String(optext,qi-1) + "\n";
+                                // Add a button for this option
+                                qdialogoptions = qdialogoptions + [(string)qi];
+                                qdialogoptions_string+=(string)qi+",";
+                            }
+                            qdialogoptions=llGetSubString(qdialogoptions_string, 0, -2);//remove trailing comma
+                            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions_string, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
+                            //llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
+                            debug("qi="+(string)(qi)+" qdialogtext: "+qdialogtext);
+                            }
+              }
               listen(integer channel, string name, key user_key, string user_response){
-                if (doDialog && ((qtype == "multichoice") || (qtype == "truefalse"))) {
+             
                     if (llListFindList(users_menu_channels, [channel])==-1) {
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "usedialogs", [llKey2Name(user_key)], user_key, "quizzer");
                         return;
                     }
-                } 
+              
                 string opid; // used when the feedback is too long, and we have to fetch it off the server
                 // Only listen to the sitter
                 if (llListFindList(users, [user_key])!=-1) {
@@ -445,4 +422,4 @@
     }
 }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/multi_user_quiz/assets/sloodle_quiz_question_handler.lslp
+// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/hex_quizzer/assets/sloodle_quiz_question_handler.lslp
