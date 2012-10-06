@@ -74,6 +74,7 @@ string SLOODLE_TRANSLATE_DIALOG = "dialog";                 // Recipient avatar 
 string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";              // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_LOAD_URL_PARALLEL = "loadurlpar";  // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
+integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string SLOODLE_TRANSLATE_IM = "instantmessage";             // Recipient avatar should be identified in link message keyval. No output parameters.
 
 
@@ -323,7 +324,17 @@ default
                 if (num_output_params >= 2) llSetText(trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1));
                 else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\".");
             
-            } else if (output_method == SLOODLE_TRANSLATE_IM) {
+              } else if (output_method == SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM) {
+                //example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [BLUE, 1.0,7], "quizname", [quiz_name], llGetOwner(), "quizzer");
+                // We need 1 additional parameter, containing the URL to load
+                if (num_output_params >= 3) {
+                    list rules = [ PRIM_TEXT, trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1) ];
+                    llSetLinkPrimitiveParamsFast( llList2Integer(output_params, 2), rules );
+                }
+                else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\". Expecting translation text, color vector, alpha float.");
+            
+            }
+            else if (output_method == SLOODLE_TRANSLATE_IM) {
                 // Send an IM - we need a valid key
                 if (id == NULL_KEY) {
                     sloodle_debug("ERROR: Non-null key value required to send IM with string \"" + string_name + "\".");
