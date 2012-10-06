@@ -9,6 +9,7 @@ integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
 integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
+        integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string HEXAGON_PLATFORM="Hexagon Platform";
@@ -24,6 +25,7 @@ vector BLACK= <0.00000, 0.00000, 0.00000>;
 vector WHITE= <1.00000, 1.00000, 1.00000>;
 vector AVCLASSBLUE= <0.06274,0.247058,0.35294>;
 vector AVCLASSLIGHTBLUG=<0.8549,0.9372,0.9686>;//#daeff7
+list MY_SLICES;
 integer my_start_param;
 
 vector get_my_coord(){
@@ -124,25 +126,25 @@ integer get_prim(string name){
 }
 // Send a translation request link message
 sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch){
-	llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
+    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
 }
         
 init(){
-	//get the dimensions of a pie_slice so we can determin the length of the sides of a pieslice.  In this case, we will choose pie_slice6 (they all have same dimensions)
+    //get the dimensions of a pie_slice so we can determin the length of the sides of a pieslice.  In this case, we will choose pie_slice6 (they all have same dimensions)
         integer pie_slice6 = get_prim("pie_slice6");
         list pie_slice_data = llGetLinkPrimitiveParams(pie_slice6, [PRIM_SIZE] );
         vector pie_slice_size=llList2Vector(pie_slice_data, 0);
         tip_to_edge = pie_slice_size.z;//since we are looking for the length starting from the tip of the pie_slice to the middle of the edge, we need to choose the z dimension for this particular pie slice
         edge_length= pie_slice_size.y;//since we are looking for  the length of an edge we need to choose the y dimension for this particular pie slice
         question_prim= get_prim("question_prim");
-        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
+        sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
 }
 default {
     on_rez(integer start_param){
         llResetScript();
     }
     state_entry() {
-    	init();
+        init();
         llTriggerSound("SND_STARTING_UP", 1);
     }
     link_message(integer sender_num, integer num, string str, key id) {
@@ -153,7 +155,9 @@ default {
 }
     state ready{
       state_entry() {
-          sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
+            MY_SLICES=[1,2,3,4,5,6];
+            MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
+          sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
           string name=llGetObjectName();
           //show orbs
           llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|0,1,2,3,4,5,6|10", NULL_KEY);    
@@ -174,6 +178,22 @@ default {
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand hide|"+(string)edge, NULL_KEY);
             }
             
+        }else if (link_message_channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
+            list data= llParseString2List(str, ["|"], []);
+            //llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
+            string qdialogtext = llList2String(data,0);
+            list qdialogoptions= llParseString2List(llList2String(data,1), [","], []);
+            key user_key=llList2Key(data,2);
+            integer j=0;
+            integer num_options;
+            //set the hover text of the pie_slices to the questions options 
+            for (j=0;j<num_options;j++){
+                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("option"+llList2String(MY_SLICES,j))], "option", [llList2String(qdialogoptions,j)], "", "hex_quizzer");
+            }
+            //clear the rest of the prims
+            for (j=num_options;j<=6;j++){
+                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("option"+llList2String(MY_SLICES,j))], "option", [""], "", "hex_quizzer");
+            }
         }
     }
     object_rez(key platform) {
