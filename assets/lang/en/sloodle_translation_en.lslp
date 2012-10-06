@@ -77,7 +77,7 @@ list locstrings = [
     "initobjectauth", "Initiating object authorisation...",
     "autoreg:newaccount", "A new Moodle account has been automatically generated for you.\nWebsite: {{0}} \nUsername: {{1}}\nPassword: {{2}}", // Parameters: site address, username, password
     "configurationreceived", "Ready",
-    "configdatamissing", "ERROR: some required data was missing from the configuration",
+    "configdatamissing", "ERROR: some required data was missing from the configuration {{0}}",
     "readingconfignotecard", "Reading configuration notecard...",
     "checkingcourse", "Checking course...",
     "errortouchtoreset", "ERROR\nTouch me to reset",
