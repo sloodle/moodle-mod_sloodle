@@ -143,7 +143,7 @@
                 if (myNum ==6){
                     SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG6;
                 }
-                llSay(0,"My num is : "+(string)myNum+" my channel is : "+(string)SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG);
+                debug("My num is : "+(string)myNum+" my channel is : "+(string)SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG);
                 
                 
             }
