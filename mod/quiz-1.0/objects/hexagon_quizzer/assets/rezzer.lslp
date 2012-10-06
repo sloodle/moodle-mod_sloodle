@@ -9,6 +9,7 @@ integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
+integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string HEXAGON_PLATFORM="Hexagon Platform";
 vector RED =<1.00000, 0.00000, 0.00000>;
 vector ORANGE=<1.00000, 0.43763, 0.02414>;
@@ -130,6 +131,7 @@ init(){
         tip_to_edge = pie_slice_size.z;//since we are looking for the length starting from the tip of the pie_slice to the middle of the edge, we need to choose the z dimension for this particular pie slice
         edge_length= pie_slice_size.y;//since we are looking for  the length of an edge we need to choose the y dimension for this particular pie slice
         question_prim= get_prim("question_prim");
+        Initializing the quiz. Please wait.
         sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,question_prim], "init_quiz", [], "", "hex_quizzer");
 }
 default {
