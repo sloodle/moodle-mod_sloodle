@@ -131,28 +131,26 @@
                  }
                 llOwnerSay(llGetScriptName ()+": " +message );
         }
-        // Send a translation request link message
-		sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch){
-			llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
-		}
+   
+   
         integer get_prim(string name){
-		    integer num_links=llGetNumberOfPrims();
-		    integer i;
-		    integer prim=-1;
-		    for (i=0;i<=num_links;i++){
-		        if (llGetLinkName(i)==name){
-		            prim=i;
-		        }else{
-		        }
-		    }
-		    return prim;
-		}
+            integer num_links=llGetNumberOfPrims();
+            integer i;
+            integer prim=-1;
+            for (i=0;i<=num_links;i++){
+                if (llGetLinkName(i)==name){
+                    prim=i;
+                }else{
+                }
+            }
+            return prim;
+        }
         
         integer random_integer( integer min, integer max ){
           return min + (integer)( llFrand( max - min + 1 ) );
         }
         integer add_user(key user_key){
-        		llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING, "", user_key);
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_QUIZZING, "", user_key);
                 integer q;
                 //randomize the questions for the new user if required
                 list temp=question_ids;
@@ -397,7 +395,7 @@
                     first_user_active_question= get_current_question_id(user_key);
                     debug(" FIRST USER: "+(string)first_user);
                     first_user=user_key;//record the first user, because in the next state we must initate asking the first question
-        			sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,get_prim("quiz_name")], "quiz_name", [quiz_name], "", "hex_quizzer");
+                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("quiz_name")], "quiz_name", [quiz_name], "", "hex_quizzer");
                     state quiz_ready;     
                 }    
             }
