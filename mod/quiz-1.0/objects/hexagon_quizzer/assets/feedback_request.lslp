@@ -160,7 +160,6 @@
             else if (name == "set:sloodleserveraccesslevel") sloodleserveraccesslevel = (integer)value1;
             else if (name == "set:sloodlerepeat") doRepeat = (integer)value1;
             else if (name == "set:sloodlerandomize") doRandomize = (integer)value1;
-            else if (name == "set:sloodledialog") doDialog = (integer)value1;
             else if (name == "set:sloodleplaysound") doPlaySound = (integer)value1;
             else if (name == "set:sloodleaskquestionscontinuously") askquestionscontinuously= (integer)value1;
             else if (name == "set:correctToContinue") correctToContinue = (integer)value1;
@@ -211,7 +210,7 @@
                             state ready;
                         } else {
                             // Go all configuration but, it's not complete... request reconfiguration
-                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
+                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [llGetScriptName()], NULL_KEY, "");
                             llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
                             eof = FALSE;
                         }
