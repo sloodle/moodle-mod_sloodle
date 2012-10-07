@@ -838,7 +838,9 @@ $string['freemail:explanation_wheretosend'] = 'To blog from Second Life or OpenS
 $string['freemail:explanation_howtoblog'] = 'Put the title of your blog in the subject line and the text in the body of the email.';
 $string['freemail:testbutton'] = 'Click this button to test.';
 $string['freemail:delete_message'] = 'Skip message deletion. (May result in duplicate blog entries.';
+$string['freemail:sloodleblogaddress'] = 'Address to send snapshots to';
 
 $string['ustreamchannel'] = 'UStream Channel';
+
 
 
