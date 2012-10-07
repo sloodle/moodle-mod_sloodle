@@ -3,7 +3,8 @@ float edge_length_half;
 float tip_to_edge;
 list rezzed_hexes;
 integer PIN=7961;
-integer SLOODLE_CHANNEL_ANIM= -1639277007; 
+integer SLOODLE_CHANNEL_ANIM= -1639277007;
+integer SLOODLE_SET_TEXTURE= -1639277010; 
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
@@ -18,7 +19,7 @@ vector ORANGE=<1.00000, 0.43763, 0.02414>;
 vector YELLOW=<1.00000, 1.00000, 0.00000>;
 vector GREEN=<0.00000, 1.00000, 0.00000>;
 vector BLUE=<0.00000, 0.00000, 1.00000>;
-vector BABYBLUE=<0.00000, 1.00000, 1.00000>;
+vector BABYBLUE=<0.00000, 1.00000, 1.00000>; 
 vector PINK=<1.00000, 0.00000, 1.00000>;
 vector PURPLE=<0.57338, 0.25486, 1.00000>;
 vector BLACK= <0.00000, 0.00000, 0.00000>;
@@ -46,7 +47,7 @@ rez_hexagon(integer edge){
      integer my_oposite_section;
      vector my_coord= llGetPos();//get_my_coord();
      if (edge==0){
-     	return;
+         return;
      }
      vector child_coord=my_coord;
      integer DIVISER=1;
@@ -105,7 +106,28 @@ string get_detected_pie_slice(vector avatar){
     return name_of_closest_orb;
 }
 
- 
+set_texture_pie_slices(string texture){
+            //clear the rest of the prims
+            integer j;
+            for (j=1;j<=6;j++){
+                integer face=4;
+                if (j==1||j==2||j==3){
+                    face = 1;
+                }
+                llMessageLinked(LINK_SET, SLOODLE_SET_TEXTURE, "pie_slice"+(string)j+"|"+(string)face+"|"+texture,NULL_KEY);
+            }
+
+} 
+set_texture_pie_slice(string texture,integer pie_slice){
+            //clear the rest of the prims
+            integer face=4;
+            if (pie_slice==1||pie_slice==2||pie_slice==3){
+                face = 1;
+            }
+            llMessageLinked(LINK_SET, SLOODLE_SET_TEXTURE, "pie_slice"+(string)pie_slice+"|"+(string)face+"|"+texture,NULL_KEY);
+            
+
+}
 integer question_prim;
 integer num_links;
 set_prim_text(integer prim,string text,vector color){
@@ -140,6 +162,14 @@ init(){
         edge_length= pie_slice_size.y;//since we are looking for  the length of an edge we need to choose the y dimension for this particular pie slice
         question_prim= get_prim("question_prim");
         sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
+        set_texture_pie_slices("blank_white");
+        integer num_prims = llGetNumberOfPrims();
+        integer i=0;
+        //clear text
+        for (i=0;i<num_prims;i++){
+            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,i], "clear", [" "], "", "hex_quizzer");
+        }
+            
 }
 default {
     on_rez(integer start_param){
@@ -156,6 +186,9 @@ default {
     }
 }
     state ready{
+         on_rez(integer start_param){
+        llResetScript();
+    }
       state_entry() {
             MY_SLICES=[1,2,3,4,5,6];
             MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
@@ -177,7 +210,7 @@ default {
                 
                 integer edge=llList2Integer(data, 1);
                 if (edge==0){
-                	return;
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", id);
                 }
                 rez_hexagon(edge);
                 //after a user presses an edge selector, hide the selector
@@ -185,21 +218,26 @@ default {
             }
             
         }else if (link_message_channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
+            
             list data= llParseString2List(str, ["|"], []);
             //llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
             string qdialogtext = llList2String(data,0);
             list qdialogoptions= llParseString2List(llList2String(data,1), [","], []);
+            debug("---------------received question! "+llList2CSV(qdialogoptions)+" "+qdialogtext+" question prim is: "+(string)get_prim("question_prim"));
+            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
             key user_key=llList2Key(data,2);
             integer j=0;
-            integer num_options;
+            integer num_options=llGetListLength(qdialogoptions);
             //set the hover text of the pie_slices to the questions options 
+            set_texture_pie_slices("blank_white");
             for (j=0;j<num_options;j++){
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("option"+llList2String(MY_SLICES,j))], "option", [llList2String(qdialogoptions,j)], "", "hex_quizzer");
+                integer pie_slice=llList2Integer(MY_SLICES,j);
+                integer prim = get_prim("pie_slice"+(string)pie_slice);
+                string option = llList2String(qdialogoptions,j);
+                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,prim], "option", [option], "", "hex_quizzer");
+                set_texture_pie_slice((string)option,pie_slice);
             }
-            //clear the rest of the prims
-            for (j=num_options;j<=6;j++){
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("option"+llList2String(MY_SLICES,j))], "option", [""], "", "hex_quizzer");
-            }
+            
         }
     }
     object_rez(key platform) {
