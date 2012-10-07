@@ -44,14 +44,20 @@ class sloodle_freemail_sloodle_email_processor extends sloodle_freemail_email_pr
         $sl_info = $this->get_sl_info($search_text);
 
         $uuid = $sl_info['agent_id'];
-        if (!$this->_userid = $this->get_user_id_for_avatar_uuid($uuid)) {
+        if ($uuid == '') {
             return false;
         }
-
+        
         $this->_avatar_uuid = $uuid;
 
         $simname = $sl_info['sim_name'];
         $username = $sl_info['username'];
+
+        if (!$this->_userid = $this->get_user_id_for_avatar_uuid($uuid)) {
+            $error = 'Avatar '.$username.' with uuid '.$uuid.' was not registered on this site.';
+            $this->notify_user_by_instant_message($error);
+            return false;
+        }
 
         $x = intval($sl_info['local_x']);
         $y = intval($sl_info['local_y']);
