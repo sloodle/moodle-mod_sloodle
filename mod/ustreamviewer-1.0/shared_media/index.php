@@ -56,7 +56,7 @@
         exit;
     }
 
-    $url = 'http://api.ustream.tv/json/channel/'.urlencode($channel).'/getCustomEmbedTag?key='.SLOODLE_USTREAM_API_KEY.'&params=autoplay:true;mute:false;height:780;width:980';
+    $url = 'http://api.ustream.tv/json/channel/'.urlencode($channel).'/getCustomEmbedTag?key='.SLOODLE_USTREAM_API_KEY.'&params=autoplay:true;mute:false;height:980;width:980';
 
     $ch = curl_init();    // initialize curl handle
     curl_setopt($ch, CURLOPT_URL, $url); // set url to post to
@@ -82,7 +82,7 @@
 
     print '<html>';
     print '<body style="background-color:black; border:0px; margin:0px; text-align:center; vertical-align:middle">';
-    print '<div style="border: 1px solid yellow; background-color:black; text-align:center; vertical-align:middle; width:98%; height:98%">';
+    print '<div style="border:0px; background-color:black; text-align:center; vertical-align:middle; width:98%; height:98%">';
     print $embed;
     print '</div>';
     print '</body>';
