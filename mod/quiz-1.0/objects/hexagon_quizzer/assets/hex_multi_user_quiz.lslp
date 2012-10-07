@@ -307,6 +307,7 @@
         ///// STATES /////
         default{
             state_entry(){
+            	
                 // Starting again with a new configuration
                 llSetText("", <0.0,0.0,0.0>, 0.0);
                 isconfigured = FALSE;
@@ -342,7 +343,7 @@
                             state load;
                         } else {
                             // Go all configuration but, it's not complete... request reconfiguration
-                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [], NULL_KEY, "");
+                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [llGetScriptName()], NULL_KEY, "");
                             llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
                             eof = FALSE;
                         }
@@ -363,6 +364,8 @@
                 llResetScript();
             }       
             state_entry(){
+            	
+           
                 //tell other scripts we are loading the quiz;
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ, "", NULL_KEY);
                sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
@@ -395,7 +398,12 @@
                     first_user_active_question= get_current_question_id(user_key);
                     debug(" FIRST USER: "+(string)first_user);
                     first_user=user_key;//record the first user, because in the next state we must initate asking the first question
-                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("quiz_name")], "quiz_name", [quiz_name], "", "hex_quizzer");
+                    integer prim = get_prim("quiz_name");
+                    if (prim!=-1){
+                    	sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,prim], "quiz_name", [quiz_name], "", "hex_quizzer");
+                    }
+                    
+                    
                     state quiz_ready;     
                 }    
             }
