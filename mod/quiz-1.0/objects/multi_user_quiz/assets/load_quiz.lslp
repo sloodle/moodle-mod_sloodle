@@ -358,5 +358,5 @@
                         }             
         }
 // Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/multi_user_quiz/assets/load_quiz.lslp
+// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/hex_quizzer/assets/load_quiz.lslp
 
