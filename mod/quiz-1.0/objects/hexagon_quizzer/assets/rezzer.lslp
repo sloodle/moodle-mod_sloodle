@@ -3,6 +3,7 @@ float edge_length_half;
 float tip_to_edge;
 list rezzed_hexes;
 integer PIN=7961;
+list option_points;
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_SET_TEXTURE= -1639277010; 
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
@@ -10,10 +11,14 @@ integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
 integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
+integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; //used when this script wants to ask a question and have the results sent to the child hex
 integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string HEXAGON_PLATFORM="Hexagon Platform";
+integer num_options=0;
+list options;//store pie slice correlation. Therefore option[0]=pie_slice# 
+integer quiz_loaded=FALSE;
 vector RED =<1.00000, 0.00000, 0.00000>;
 vector ORANGE=<1.00000, 0.43763, 0.02414>;
 vector YELLOW=<1.00000, 1.00000, 0.00000>;
@@ -106,7 +111,60 @@ string get_detected_pie_slice(vector avatar){
     
     return name_of_closest_orb;
 }
-
+display_questions_for_mother_hex(string str,key id){
+                quiz_loaded=TRUE;
+                llTriggerSound("SND_LOADING_COMPLETE", 1);
+                list data= llParseString2List(str, ["|"], []);
+                string qdialogtext = llList2String(data,0);
+                list qdialogoptions= llParseString2List(llList2String(data,1), [","], []);
+                option_points= llParseString2List(llList2String(data,2), [","], []);
+                debug("---------------received question! "+llList2CSV(qdialogoptions)+" "+qdialogtext+" answers are: "+llList2CSV(option_points));
+                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
+                key user_key=id;
+                integer j=0;
+                //set the hover text of the pie_slices to the questions options
+                num_options=llGetListLength(qdialogoptions); 
+                set_texture_pie_slices("blank_white");
+                for (j=0;j<num_options;j++){
+                     string pie_slice=llStringTrim(llList2String(MY_SLICES,j),STRING_TRIM);
+                     string option = llList2String(qdialogoptions,j);
+                     options+=pie_slice;
+                    //SET PIE_SLICE TO PARTICULAR OPTION
+                     set_texture_pie_slice((string)option,(integer)pie_slice);
+                }
+               /* for (j=1;j<=6;j++){
+                    integer value = pie_slice_value(j);
+                    integer prim_link=get_prim("pie_slice"+(string)j);
+                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,prim_link], "option", [value], "", "hex_quizzer");
+                    debug("value for "+"pie_slice"+(string)j+" is: "+(string)value);
+                }*/
+                
+}
+/*
+*  This function will determine how much a particular pie_slice is worth. 
+*
+*
+*/
+integer pie_slice_value(integer pie_slice){
+    /*
+    * ex. check_correct(pie_slice6)
+    * here a the program is searching to see if pie_slice 6 is in the options list.
+    * If it is, find out which option it is. the index of this list is the actual option id.
+    * We can use the option id (option index) to find out if it is worth any points, by examining the options_points list
+    */    
+    integer option_index = llListFindList(options, [pie_slice]);
+    integer grade;
+    if (option_index==-1){//here the user is standing on a pie_slice that did not even have a number printed on it, so give them a 0 for incorrect 
+        grade=0;
+    }else{//ok, good, the pie_slice they are standing on actually has a grade assigned to it
+        //find how many points the pie_slice is worth  
+        grade = llList2Integer(option_points,option_index);
+        if (grade == -1||grade == 0){//here in moodle, the teacher has assigned a grade of -1 or 0 - so give a grade of 0
+            grade=0;
+        }    
+    }
+    return grade;
+}
 set_texture_pie_slices(string texture){
             //clear the rest of the prims
             integer j;
@@ -193,8 +251,8 @@ default {
         llResetScript();
     }
       state_entry() {
-            MY_SLICES=[1,2,3,4,5,6];
-            MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
+          MY_SLICES=[1,2,3,4,5,6];
+          MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
           sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
           string name=llGetObjectName();
           //show orbs
@@ -202,9 +260,6 @@ default {
     }
     link_message(integer link_set, integer link_message_channel, string str, key id) {
         if (link_message_channel ==SLOODLE_CHANNEL_USER_TOUCH){
-            if (already_received_question==TRUE){
-             //   return;
-            }
             list data= llParseString2List(str, ["|"], []);
             string type = llList2String(data,0);
             //this is a rez edge attempt
@@ -226,30 +281,12 @@ default {
         }else 
         if (link_message_channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
             debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
-            already_received_question=TRUE;
-            llPlaySound("SND_LOADING_COMPLETE", 1);
-            list data= llParseString2List(str, ["|"], []);
-            //llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
-            string qdialogtext = llList2String(data,0);
-            list qdialogoptions= llParseString2List(llList2String(data,1), [","], []);
-            list qGrade= llParseString2List(llList2String(data,2), [","], []);
-            debug("---------------received question! "+llList2CSV(qdialogoptions)+" "+qdialogtext+" answers are: "+llList2CSV(qGrade));
-            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
-            key user_key=id;
-            integer j=0;
+            if (quiz_loaded==FALSE){
+                display_questions_for_mother_hex(str,id);
+            }else{
             
-            //set the hover text of the pie_slices to the questions options
-            integer num_options=llGetListLength(qdialogoptions); 
-            set_texture_pie_slices("blank_white");
-            for (j=0;j<num_options;j++){
-                llSay(0,"setting texture: "+(string)j); 
-                string pie_slice=llStringTrim(llList2String(MY_SLICES,j),STRING_TRIM);
-                integer prim = get_prim("pie_slice"+(string)pie_slice);
-                string option = llList2String(qdialogoptions,j);
-             //   sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,prim], "option", [option], "", "hex_quizzer");
-                set_texture_pie_slice((string)option,(integer)pie_slice);
+            
             }
-            
         }
     }
     object_rez(key platform) {
@@ -270,7 +307,8 @@ default {
                 key user_key = llList2Key(data,1);
                 debug("received request from "+llKey2Name(id)+" for user: "+llKey2Name(user_key));
                 //llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "A question|"+(string)llGetKey());
-                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", user_key);
+              	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, "", user_key);
+                
             }
         }
             
