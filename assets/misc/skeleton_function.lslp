@@ -122,9 +122,9 @@ default {
         isconfigured = FALSE;
         eof = FALSE;
     }
-    link_message( integer sender_num, integer num, string str, key user_key){
+    link_message( integer sender_num, integer chan, string str, key user_key){
         // Check the channel for configuration messages
-        if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
+        if (chan == SLOODLE_CHANNEL_OBJECT_DIALOG) {
             // Split the message into lines
             list lines = llParseString2List(str, ["\n"], []);
             integer numlines = llGetListLength(lines);
@@ -146,6 +146,20 @@ default {
             }
         }
     }
-    
-  
+}
+state ready{
+	on_rez(integer start_param) {
+		llResetScript();
+	}
+	state_entry() {
+	
+	}
+	touch_start(integer n) {
+	
+	}
+	link_message(integer sender_num, integer chan, string str, key id) {
+	
+	}
+	
+
 }
