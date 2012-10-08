@@ -31,6 +31,12 @@ vector BLACK= <0.00000, 0.00000, 0.00000>;
 vector WHITE= <1.00000, 1.00000, 1.00000>;
 vector AVCLASSBLUE= <0.06274,0.247058,0.35294>;
 vector AVCLASSLIGHTBLUG=<0.8549,0.9372,0.9686>;//#daeff7
+integer SLOODLE_TIMER_START= -1639277011; //shoudl be used to starts the timer from its current position
+integer SLOODLE_TIMER_RESTART= -1639277012;//should be used to set the counter to 0 and begin counting down again
+integer SLOODLE_TIMER_STOP= -1639277013;//should stop the timer at its current position
+integer SLOODLE_TIMER_STOP_AND_RESET= -1639277014;//should stop the timer at its current position and reset count to 0
+integer SLOODLE_TIMER_RESET= -1639277015;//shoudl reset the count back to zero but not restart the timer
+integer SLOODLE_TIMER_TIMES_UP= -1639277016;//used to transmit the timer reached its time limit
 list MY_SLICES;
 integer already_received_question=FALSE;
 integer my_start_param;
@@ -111,6 +117,7 @@ string get_detected_pie_slice(vector avatar){
     
     return name_of_closest_orb;
 }
+
 display_questions_for_mother_hex(string str,key id){
                 quiz_loaded=TRUE;
                 llTriggerSound("SND_LOADING_COMPLETE", 1);
@@ -132,6 +139,7 @@ display_questions_for_mother_hex(string str,key id){
                     //SET PIE_SLICE TO PARTICULAR OPTION
                      set_texture_pie_slice((string)option,(integer)pie_slice);
                 }
+                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, "", "");
                /* for (j=1;j<=6;j++){
                     integer value = pie_slice_value(j);
                     integer prim_link=get_prim("pie_slice"+(string)j);
@@ -258,8 +266,8 @@ default {
           //show orbs
           llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|0,1,2,3,4,5,6|10", NULL_KEY);    
     }
-    link_message(integer link_set, integer link_message_channel, string str, key id) {
-        if (link_message_channel ==SLOODLE_CHANNEL_USER_TOUCH){
+    link_message(integer link_set, integer channel, string str, key id) {
+        if (channel ==SLOODLE_CHANNEL_USER_TOUCH){
             list data= llParseString2List(str, ["|"], []);
             string type = llList2String(data,0);
             //this is a rez edge attempt
@@ -279,14 +287,17 @@ default {
             }
             
         }else 
-        if (link_message_channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
+        if (channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
             debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
             if (quiz_loaded==FALSE){
                 display_questions_for_mother_hex(str,id);
             }else{
-            
+            	//send question to child hex
             
             }
+        }else
+        if (channel==SLOODLE_TIMER_TIMES_UP){
+        
         }
     }
     object_rez(key platform) {
