@@ -58,7 +58,7 @@ string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should b
 integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
-
+vector RED =<1.00000, 0.00000, 0.00000>;
 vector ORANGE=<1.00000, 0.43763, 0.02414>;
 vector YELLOW=<1.00000, 1.00000, 0.00000>;
 vector GREEN=<0.00000, 1.00000, 0.00000>;
