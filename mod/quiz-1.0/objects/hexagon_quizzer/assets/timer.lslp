@@ -58,6 +58,7 @@ string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should b
 integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
+vector RED =<1.00000, 0.00000, 0.00000>;
 vector ORANGE=<1.00000, 0.43763, 0.02414>;
 vector YELLOW=<1.00000, 1.00000, 0.00000>;
 vector GREEN=<0.00000, 1.00000, 0.00000>;
@@ -69,10 +70,12 @@ vector BLACK= <0.00000, 0.00000, 0.00000>;
 vector WHITE= <1.00000, 1.00000, 1.00000>;
 vector AVCLASSBLUE= <0.06274,0.247058,0.35294>;
 vector AVCLASSLIGHTBLUG=<0.8549,0.9372,0.9686>;//#daeff7
-integer SLOODLE_TIMER_START= -1639277011;
-integer SLOODLE_TIMER_END= -1639277012;
-integer SLOODLE_TIMER_RESET= -1639277013;
-integer SLOODLE_TIMER_TIMES_UP= -1639277014;
+integer SLOODLE_TIMER_START= -1639277011; //shoudl be used to starts the timer from its current position
+integer SLOODLE_TIMER_RESTART= -1639277012;//should be used to set the counter to 0 and begin counting down again
+integer SLOODLE_TIMER_STOP= -1639277013;//should stop the timer at its current position
+integer SLOODLE_TIMER_STOP_AND_RESET= -1639277014;//should stop the timer at its current position and reset count to 0
+integer SLOODLE_TIMER_RESET= -1639277015;//shoudl reset the count back to zero but not restart the timer
+integer SLOODLE_TIMER_TIMES_UP= -1639277016;//used to transmit the timer reached its time limit
 integer TIME_LIMIT=30;//default, but can be set in config
 integer COUNT=0;
 sloodle_error_code(string method, key avuuid,integer statuscode, string msg){
@@ -84,7 +87,19 @@ sloodle_debug(string msg){
 // Send a translation request link message
 sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch){
     llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
-}        
+}    
+integer get_prim(string name){
+    integer num_links=llGetNumberOfPrims();
+    integer i;
+    integer prim=-1;
+    for (i=0;i<=num_links;i++){
+        if (llGetLinkName(i)==name){
+            prim=i;
+        }else{
+        }
+    }
+    return prim;
+}    
 // Configure by receiving a linked message from another script in the object
 // Returns TRUE if the object has all the data it needs
  integer sloodle_handle_command(string str){
@@ -140,54 +155,50 @@ default {
 }
 
 state ready{
-	on_rez(integer start_param) {
-		llResetScript();
-	}
-	state_entry() {
-	
-	}
-	touch_start(integer n) {
-	
-	}
-	link_message(integer sender_num, integer chan, string str, key id) {
-			if (chan==SLOODLE_TIMER_RESET){
-				COUNT=0;
-			}else
-			if (chan==SLOODLE_TIMER_STOP){
-				llSetTimerEvent(0);
-			}else
-			if (chan==SLOODLE_TIMER_RESET){
-				COUNT=0;
-			}else
-			if (chan==SLOODLE_TIMER_RESET){
-				COUNT=0;
-			}else
-			integer SLOODLE_TIMER_START= -1639277011;
-integer SLOODLE_TIMER_END= -1639277012;
-integer SLOODLE_TIMER_RESET= -1639277013;
-integer SLOODLE_TIMER_TIMES_UP= -1639277014;
-	}
+    on_rez(integer start_param) {
+        llResetScript();
+    }
+    state_entry() {
+        COUNT=0;
+    }
+
+    link_message(integer sender_num, integer chan, string str, key id) {
+            if (chan==SLOODLE_TIMER_START){//starts the timer from its current position
+                llSetTimerEvent(1);
+            }else
+            if (chan==SLOODLE_TIMER_RESTART){//used to set the counter to 0 and begin counting down again
+                COUNT=0;
+                llSetTimerEvent(1);
+            }else
+            if (chan==SLOODLE_TIMER_STOP){//stop the timer at its current position
+                llSetTimerEvent(0);
+            }else
+            if (chan==SLOODLE_TIMER_STOP_AND_RESET){// stop the timer at its current position and reset count to 0
+                llSetTimerEvent(0);
+                COUNT=0;
+            }else
+            if (chan==SLOODLE_TIMER_RESET){// reset the count back to zero but not restart the timer
+                COUNT=0;
+            }
+    
+    }
     timer() {
-        counter++;
+        COUNT++;
+        string timer_text="(" + (string)(TIME_LIMIT - COUNT) + ")";
         vector color;
-        if ((llGetColor(FACE) == YELLOW)) {
-            color = RED;
-        } else {
-            color = YELLOW;
-        }
-        llSetText((("(" + ((string)(TIME_LIMIT - counter))) + ")"),color,1.0);
-        llSetColor(color,FACE);
-        if ((counter >= TIME_LIMIT)) {
-            llSetTimerEvent(0.0);
-            llOffsetTexture(0,BTN_RESET_OFFSET,FACE);
-            llRotateTexture(-90*DEG_TO_RAD, ALL_SIDES);            
-            llSetObjectName("btn:Reset");
-            toggle *= (-1);
-            llSetText("",RED,1.0);
-            llSetColor(WHITE,FACE);
-            llMessageLinked(LINK_SET,SLOODLE_CHANNEL_OBJECT_DIALOG,"do:reset",NULL_KEY);
-            counter = 0;
-        }
-        else  llTriggerSound("beepbeep",0.2);
+        if ((TIME_LIMIT - COUNT)>10){color=GREEN;}
+        if ((TIME_LIMIT - COUNT)<=10){color=YELLOW;}
+        if ((TIME_LIMIT - COUNT)<=5){
+            color=RED;
+            llTriggerSound("SND_BEEPBEEP",0.2);
+           };
+           if ((TIME_LIMIT - COUNT)<=0){
+               llSetTimerEvent(0.0);
+            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("timer_prim")], "times_up", [timer_text], "", "hex_quizzer");
+            llTriggerSound("SND_BUZZER",0.2);
+            llMessageLinked(LINK_SET, SLOODLE_TIMER_TIMES_UP, "", NULL_KEY);
+           }else{
+               sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("timer_prim")], "option", [timer_text], "", "hex_quizzer");
+           }
     }
 }
