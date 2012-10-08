@@ -116,10 +116,12 @@ integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009;
 integer SLOODLE_SET_TEXTURE= -1639277010;
-integer SLOODLE_TIMER_START= -1639277011;
-integer SLOODLE_TIMER_END= -1639277012;
-integer SLOODLE_TIMER_RESET= -1639277013;
-integer SLOODLE_TIMER_TIMES_UP= -1639277014;
+integer SLOODLE_TIMER_START= -1639277011; //shoudl be used to starts the timer from its current position
+integer SLOODLE_TIMER_RESTART= -1639277012;//should be used to set the counter to 0 and begin counting down again
+integer SLOODLE_TIMER_STOP= -1639277013;//should stop the timer at its current position
+integer SLOODLE_TIMER_STOP_AND_RESET= -1639277014;//should stop the timer at its current position and reset count to 0
+integer SLOODLE_TIMER_RESET= -1639277015;//shoudl reset the count back to zero but not restart the timer
+integer SLOODLE_TIMER_TIMES_UP= -1639277016;//used to transmit the timer reached its time limit
 
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 
