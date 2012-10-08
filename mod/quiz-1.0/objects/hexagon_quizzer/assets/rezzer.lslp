@@ -10,7 +10,7 @@ integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
 integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
-        integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
+integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string HEXAGON_PLATFORM="Hexagon Platform";
@@ -27,6 +27,7 @@ vector WHITE= <1.00000, 1.00000, 1.00000>;
 vector AVCLASSBLUE= <0.06274,0.247058,0.35294>;
 vector AVCLASSLIGHTBLUG=<0.8549,0.9372,0.9686>;//#daeff7
 list MY_SLICES;
+integer already_received_question=FALSE;
 integer my_start_param;
 
 vector get_my_coord(){
@@ -124,7 +125,9 @@ set_texture_pie_slice(string texture,integer pie_slice){
             if (pie_slice==1||pie_slice==2||pie_slice==3){
                 face = 1;
             }
-            llMessageLinked(LINK_SET, SLOODLE_SET_TEXTURE, "pie_slice"+(string)pie_slice+"|"+(string)face+"|"+texture,NULL_KEY);
+            
+            debug("sending message on "+(string)SLOODLE_SET_TEXTURE+" "+ "pie_slice"+llStringTrim((string)pie_slice,STRING_TRIM)+"|"+(string)face+"|"+llStringTrim(texture,STRING_TRIM));
+            llMessageLinked(LINK_SET, SLOODLE_SET_TEXTURE, "pie_slice"+llStringTrim((string)pie_slice,STRING_TRIM)+"|"+(string)face+"|"+llStringTrim(texture,STRING_TRIM),NULL_KEY);
             
 
 }
@@ -199,6 +202,9 @@ default {
     }
     link_message(integer link_set, integer link_message_channel, string str, key id) {
         if (link_message_channel ==SLOODLE_CHANNEL_USER_TOUCH){
+            if (already_received_question==TRUE){
+             //   return;
+            }
             list data= llParseString2List(str, ["|"], []);
             string type = llList2String(data,0);
             //this is a rez edge attempt
@@ -217,25 +223,31 @@ default {
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand hide|"+(string)edge, NULL_KEY);
             }
             
-        }else if (link_message_channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
-            
+        }else 
+        if (link_message_channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
+            debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
+            already_received_question=TRUE;
+            llPlaySound("SND_LOADING_COMPLETE", 1);
             list data= llParseString2List(str, ["|"], []);
             //llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
             string qdialogtext = llList2String(data,0);
             list qdialogoptions= llParseString2List(llList2String(data,1), [","], []);
-            debug("---------------received question! "+llList2CSV(qdialogoptions)+" "+qdialogtext+" question prim is: "+(string)get_prim("question_prim"));
+            list qGrade= llParseString2List(llList2String(data,2), [","], []);
+            debug("---------------received question! "+llList2CSV(qdialogoptions)+" "+qdialogtext+" answers are: "+llList2CSV(qGrade));
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
-            key user_key=llList2Key(data,2);
+            key user_key=id;
             integer j=0;
-            integer num_options=llGetListLength(qdialogoptions);
-            //set the hover text of the pie_slices to the questions options 
+            
+            //set the hover text of the pie_slices to the questions options
+            integer num_options=llGetListLength(qdialogoptions); 
             set_texture_pie_slices("blank_white");
             for (j=0;j<num_options;j++){
-                integer pie_slice=llList2Integer(MY_SLICES,j);
+                llSay(0,"setting texture: "+(string)j); 
+                string pie_slice=llStringTrim(llList2String(MY_SLICES,j),STRING_TRIM);
                 integer prim = get_prim("pie_slice"+(string)pie_slice);
                 string option = llList2String(qdialogoptions,j);
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,prim], "option", [option], "", "hex_quizzer");
-                set_texture_pie_slice((string)option,pie_slice);
+             //   sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,prim], "option", [option], "", "hex_quizzer");
+                set_texture_pie_slice((string)option,(integer)pie_slice);
             }
             
         }
