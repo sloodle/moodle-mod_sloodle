@@ -39,17 +39,10 @@
         integer SLOODLE_CHANNEL_QUIZ_ERROR_NO_ATTEMPTS_LEFT= -1639271123;  //
         integer SLOODLE_CHANNEL_QUIZ_ERROR_NO_QUESTIONS= -1639271124;  //          
         integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_CHAT = -1639271125; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA CHAT.
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG;// Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=-1639271126;// Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
         integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_TEXT_BOX=-1639277000;
         integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
         integer SLOODLE_CHANNEL_QUIZ_FEED_BACK_REQUEST= -1639277005;
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG0 = -170000; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG1 = -1700001; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG2 = -1700002; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG3= -1700003; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG4 = -1700004; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG5 = -1700005; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
-        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG6 = -1700006; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
         list server_requests;          
         ///// TRANSLATION /////
         // Link message channels
@@ -119,42 +112,19 @@
                 llResetScript();
             }
             state_entry() {
-                string script_name = llGetScriptName();
-                integer myNum = (integer)llGetSubString(script_name, -1,-1);
-                if (myNum ==0){
-                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG0;
-                }else
-                if (myNum ==1){
-                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG1;
-                }else
-                if (myNum ==2){
-                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG2;
-                }else
-                if (myNum ==3){
-                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG3;
-                }else
-                if (myNum ==4){
-                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG4;
-                }else
-                if (myNum ==5){
-                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG5;
-                }else
-                if (myNum ==6){
-                    SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG6;
-                }
-                debug("My num is : "+(string)myNum+" my channel is : "+(string)SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG);
-                
-                
+
             }
-            link_message(integer sender_num, integer num, string str, key user_key){
-                    if (num!=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG&&num!=SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR){
-                    
-                        return;
-                    }
-                //  llList2String(question_ids, current_question_index)+"|"+(string)users_question_index+"|"+(string)num_questions+"|"+(string)menu_channel+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,user_key );//todo add to dia    
-                if (num == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG) {//todo add to dia
+            link_message(integer sender_num, integer channel, string str, key user_key){
+                
+                   if (channel!=SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG&&channel!=SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR){
+                  //  debug("returning");
+                       return;
+                   }
+                //  this is what was sent: llList2String(question_ids, current_question_index)+"|"+(string)users_question_index+"|"+(string)num_questions+"|"+(string)menu_channel+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,user_key );//todo add to dia    
+                if (channel == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG) {
                     integer menu_channel;                   
                     list data = llParseString2List(str, ["|"], []);
+                    
                     /*  llList2String(question_ids, current_question_index)
                       +"|"+(string)users_question_index
                       +"|"+(string)num_questions
@@ -162,12 +132,7 @@
                       +"|"+sloodleserverroot+sloodle_quiz_url
                       +"|"+sloodlehttpvars,user_key );//todo add to dia
               */
-                    //question_id - data,0
-                    //users_question_index - data,1
-                    //num_questions - data 2 
-                    //menu_channel - data 3
-                    //sloodle_full_quiz_url - data 4
-                    //sloodlehttpvars data 5 
+                   
                     integer question_id = llList2Integer(data, 0);
                     integer users_question_index = llList2Integer(data, 1);
                     num_questions = llList2Integer(data, 2);
@@ -189,21 +154,18 @@
                     db_str +="*********************************************\n";
                     debug(db_str);
                     integer user_id = llListFindList(users, [user_key]);
-                    integer listen_handler= llListen(menu_channel, "", user_key, "");
-                    debug("listening to user: "+llKey2Name(user_key));
                     if (user_id==-1){
                             //if we have never seen this user before, add them to the system
                             users+=user_key;
                             //store this unique channel for this user
-                            users_menu_channels+=menu_channel;
                             users_question_id+=question_id;
-                            users_listen_handler +=listen_handler;
+                         
                             users_current_question_index+=users_question_index;
                             
                     }else{
                         users_question_id=llListReplaceList(users_question_id, [question_id], user_id, user_id);
                         users_menu_channels=llListReplaceList(users_menu_channels, [menu_channel], user_id, user_id);
-                        users_listen_handler =llListReplaceList(users_listen_handler , [listen_handler], user_id, user_id);
+                  
                         users_current_question_index =llListReplaceList(users_current_question_index , [users_question_index], user_id, user_id);
                     }
                     
@@ -223,7 +185,7 @@
                    
         
             http_response(key request_id, integer status, list metadata, string body) {
-                  integer placeinlist=llListFindList(server_requests, [request_id]);        
+                    integer placeinlist=llListFindList(server_requests, [request_id]);        
                     if (placeinlist==-1){
                         return;
                     }
@@ -239,16 +201,17 @@
                     key user_key = llList2Key(statusfields,6);
                     integer user_id =llListFindList(users,[user_key]);
                     //the user who initiated this request
-                    debug("*********************request_descriptor: "+request_descriptor);
                     if (request_descriptor=="REQUESTING_QUESTION"){
                         request_descriptor="";
                         if (statuscode == -10301) {
                             sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noattemptsleft",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                             return;
-                        } else if (statuscode == -10302) {
+                        } else 
+                        if (statuscode == -10302) {
                             sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "noquestions",  [llKey2Name(user_key)],user_key, "hex_quizzer");
                             return;
-                        } else if (statuscode <= 0) {
+                        } else 
+                        if (statuscode <= 0) {
                             //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "servererror", [statuscode], NULL_KEY, "");
                             // sloodle_error_code(SLOODLE_TRANSLATE_IM, sitter,statuscode); //send message to error_message.lsl
                             // Check if an error message was reported
@@ -284,11 +247,12 @@
                                       //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
                                               return;
                                         }
-                                } else if ( rowtype == "questionoption" ) {                        
+                                } else 
+                                if ( rowtype == "questionoption" ) {                        
                                     // Add this option to the appropriate place
                                     opids_string += llList2String(thisline, 2)+"|";
                                     optext_string += llList2String(thisline, 4)+"|";
-                                    opgrade_string += llList2String(thisline, 5)+"|";
+                                    opgrade_string += llList2String(thisline, 5)+",";
                                     opfeedback_string += llList2String(thisline, 6)+"|";   
                                     opids += [(integer)llList2String(thisline, 2)];
                                     optext += [llList2String(thisline, 4)];
@@ -301,6 +265,7 @@
                             optext_string=llGetSubString(optext_string, 0, -2);
                             opgrade_string=llGetSubString(opgrade_string, 0, -2);
                             opfeedback_string=llGetSubString(opfeedback_string, 0, -2);
+                            
                             if (user_id!=-1){
                                     //save question options for this user from this question
                                     user_question_options=llListReplaceList(user_question_options,[opids_string+SEPARATOR+optext_string+SEPARATOR+opgrade_string+SEPARATOR+opfeedback_string],user_id,user_id);
@@ -319,13 +284,16 @@
                                 qdialogtext += (string)qi + ": " + llList2String(optext,qi-1) + "\n";
                                 // Add a button for this option
                                 qdialogoptions = qdialogoptions + [(string)qi];
-                                qdialogoptions_string+=(string)qi+",";
+                                
                             }
-                            qdialogoptions=llGetSubString(qdialogoptions_string, 0, -2);//remove trailing comma
-                            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions_string, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
-                            //llDialog(user_key, qdialogtext, qdialogoptions, llList2Integer(users_menu_channels,user_id));
-                            debug("qi="+(string)(qi)+" qdialogtext: "+qdialogtext);
-                            }
+                            qdialogoptions_string = llList2CSV(qdialogoptions);
+                            string question_data = qdialogtext+"|";//question text
+                            question_data += qdialogoptions_string+"|";//options ie: a,b,c 
+                            question_data += opgrade_string+"|";//grade for each option ie: -1.0,1,-1 (1=correct)
+                            question_data += opfeedback_string;//any feedback
+                            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, question_data, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
+                            debug("question_data: "+question_data);
+                         }
               }
               listen(integer channel, string name, key user_key, string user_response){
              
@@ -376,34 +344,7 @@
                           sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidchoice",  [llKey2Name(user_key)],user_key, "quizzer");
                            // ask_question();
                         }        
-                     } else if (qtype == "shortanswer") {
-                               // Notify the server of the response 
-                               integer x = 0;
-                               integer num_options = llGetListLength(optext);
-                               for (x = 0; x < num_options; x++) {
-                                   if (llToLower(user_response) == llToLower(llList2String(optext, x))) {
-                                      feedback = llList2String(opfeedback, x);
-                                      scorechange = llList2Float(opgrade, x);
-                                      opid = llList2String(opids, x);
-                                      answeroptext = llList2String(optext, x);
-                                   }
-                              llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,(string)qtype+"|"+(string)question_id+"|"+ user_response +"|"+(string)scorechange, user_key);
-                               }        
-                    } else if (qtype == "numerical") {
-                               // Notify the server of the response
-                               float number = (float)user_response;
-                               integer x = 0;
-                               integer num_options = llGetListLength(optext);
-                               for (x = 0; x < num_options; x++) {
-                                   if (number == (float)llList2String(optext, x)) {
-                                      feedback = llList2String(opfeedback, x);
-                                      scorechange = llList2Float(opgrade, x);
-                                      opid = llList2String(opids, x);
-                                      answeroptext = llList2String(optext, x);                                      
-                                   }
-                                   
-                                  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,(string)qtype+"|"+(string)question_id+"|"+ user_response +"|"+(string)scorechange, user_key);
-                               }        
+                      
                     }else {
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM , [0], "invalidtype" , [], user_key, "quizzer" );
                     }                
