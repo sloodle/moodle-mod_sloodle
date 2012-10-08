@@ -237,6 +237,7 @@
             debug("/////////// full sloodle root ///////////"+(string)sloodleserverroot+sloodle_quiz_url);
             
             SEPARATOR="|";
+            debug("sending message on: "+(string)SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG);
             llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
         }  
        
@@ -386,6 +387,10 @@
                     sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "quiz");                                                     
                    //load the quiz
                     first_user=user_key;
+                    /*
+                    * Tell load_quiz.lslp to load the quiz, it will do so, then pass us a message SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ with all the quiz data
+                    * this data will be locked for this hex
+                    */
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOAD_QUIZ, "", user_key);
                 }else 
                 //   llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ, (string)quiz_id+"|"+quiz_name+"|"+(string)num_questions+"|"+question_ids_str, user_key);
@@ -431,8 +436,17 @@
                     
                 }
                 integer user_question_index = llList2Integer(users_question_id_index,user_id);
-                //request_question_from_lsl_pipepline(key user_key,integer current_question_index, integer users_question_index,integer num_questions){
+                
                 request_question_from_lsl_pipepline(first_user,user_question_index,num_questions);
+                /*
+                * request_question will now send a linked message to the question handler script  
+                * that looks like: llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );
+                * the question handler will do an http request, and then send us a linked message back:
+                * llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, qdialogtext+"|"+qdialogoptions_string, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
+                * That message will be received by the rezzer script, which will then take the info and
+                * populate our hex with the question. 
+                */ 
+                
                 
             }
             
