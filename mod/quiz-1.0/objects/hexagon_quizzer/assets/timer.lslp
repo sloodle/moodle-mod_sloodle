@@ -184,21 +184,29 @@ state ready{
     }
     timer() {
         COUNT++;
-        string timer_text="(" + (string)(TIME_LIMIT - COUNT) + ")";
         vector color;
-        if ((TIME_LIMIT - COUNT)>10){color=GREEN;}
-        if ((TIME_LIMIT - COUNT)<=10){color=YELLOW;}
-        if ((TIME_LIMIT - COUNT)<=5){
-            color=RED;
-            llTriggerSound("SND_BEEPBEEP",0.2);
-           };
-           if ((TIME_LIMIT - COUNT)<=0){
-               llSetTimerEvent(0.0);
-            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("timer_prim")], "times_up", [timer_text], "", "hex_quizzer");
+        if ((TIME_LIMIT - COUNT)<=0){
+            llSetTimerEvent(0.0);
+            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "times_up", [], "", "hex_quizzer");
             llTriggerSound("SND_BUZZER",0.2);
             llMessageLinked(LINK_SET, SLOODLE_TIMER_TIMES_UP, "", NULL_KEY);
-           }else{
-               sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("timer_prim")], "option", [timer_text], "", "hex_quizzer");
-           }
+            return;
+        }
+        string timer_text="(" + (string)(TIME_LIMIT - COUNT) + ")";
+     
+        if ((TIME_LIMIT - COUNT)>10){
+            color=GREEN;
+            llTriggerSound("SND_TICK",0.2);
+        }
+        else if ((TIME_LIMIT - COUNT)<=10&&(TIME_LIMIT - COUNT)>5){
+            color=YELLOW;
+            llTriggerSound("SND_TICK",0.2);
+        }
+        else {
+            color=RED;
+            llTriggerSound("SND_BEEPBEEP",0.2);
+        };
+        sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("timer_prim")], "option", [timer_text], "", "hex_quizzer");
+           
     }
 }
