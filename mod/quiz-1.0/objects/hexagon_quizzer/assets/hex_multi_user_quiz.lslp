@@ -45,6 +45,7 @@
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107; 
         integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUESTION = -1639271108;
+        integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; //used when this script wants to ask a question and have the results sent to the child hex
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
         integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
         integer SLOODLE_CHANNEL_QUIZ_GO_TO_STARTING_POSITION = -1639271111;            
@@ -237,7 +238,7 @@
             debug("/////////// full sloodle root ///////////"+(string)sloodleserverroot+sloodle_quiz_url);
             
             SEPARATOR="|";
-            debug("sending message on: "+(string)SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG);
+          
             llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
         }  
        
@@ -452,23 +453,36 @@
             
             link_message(integer sender_num, integer num, string str, key user_key){
                 //a new user is starting the quiz
-                 if (num == SLOODLE_CHANNEL_USER_TOUCH) {
-                   // Make sure the given avatar is allowed to use this object
-                    if (!sloodle_check_access_use(user_key)) {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(user_key)], NULL_KEY, "");
-                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE, "", user_key);
-                        return;
-                    }                
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "hex_quizzer");                                                     
-                    integer user_id=llListFindList(users, [user_key]);
-                    if (user_id==-1){
-                        user_id=add_user(user_key);
-                    }
-                    user_id = llListFindList(users, [user_key]);
-                    integer user_question_index = llList2Integer(users_question_id_index,user_id);
-                    request_question_from_lsl_pipepline(user_key,user_question_index,num_questions);
+                 if (num==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
+            		quiz_loaded=TRUE;
+                 }else
+                 if (num == SLOODLE_CHANNEL_USER_TOUCH||num==SLOODLE_CHANNEL_QUIZ_ASK_QUESTION) {
+                 			list data = llParseString2List(str, ["|"], []);
+                 			string type = llList2String(data,0);
+                 	
+                 	
+		                   // Make sure the given avatar is allowed to use this object
+		                    if (!sloodle_check_access_use(user_key)) {
+		                        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(user_key)], NULL_KEY, "");
+		                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE, "", user_key);
+		                        return;
+		                    }                
+		                    //sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "starting", [llKey2Name(user_key)], NULL_KEY, "hex_quizzer");                                                     
+		                    integer user_id=llListFindList(users, [user_key]);
+		                    if (user_id==-1){
+		                        user_id=add_user(user_key);
+		                    }
+		                    
+		                    integer orb= llList2Integer(data,1);
+                 			//if this is the center orb, load the quiz for this hex
+                 			if (orb==0&&quiz_loaded==FALSE){
+		                    	integer user_question_index = llList2Integer(users_question_id_index,user_id);
+		                    	//rezzer script will handle the retreived question
+		                    	request_question_from_lsl_pipepline(user_key,user_question_index,num_questions);
+                 			}
+		           }
                 }      
-                   else
+                else
                 if (num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR) {
                     integer user_id=llListFindList(users, [user_key]);
                     integer question_id_index = llList2Integer(users_question_id_index,user_id);
