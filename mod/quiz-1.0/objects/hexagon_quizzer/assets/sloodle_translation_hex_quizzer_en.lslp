@@ -56,7 +56,9 @@ list locstrings = [
      "clear","{{0}}",
       "times_up","Times up!",
       "correct_select_orb","Congratulations {{0}}, you got the answer correct! You can now click a colored orb to rez a new hexagon and expand your path!",
-      "incorrect_can_not_select_orb","Sorry {{0}}, but your answer is wrong! You can retry by clicking again on the center orb"
+      "incorrect_can_not_select_orb","Sorry {{0}}, but your answer is wrong! You can retry by clicking again on the center orb",
+      "loading_question","Loading question...",
+       "timer_stopped","Timer Stopped"
     
 ];
 

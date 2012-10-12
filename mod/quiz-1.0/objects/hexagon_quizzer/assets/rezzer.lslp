@@ -378,12 +378,14 @@ default {
             }
             //print names on pie slice hover text in GREEN
             string avatar_names;
-            list grades=[];
+            list grades=[];//retrieve the grade for each pie_slice
             for (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++){
+                    avatar_names=llList2String(pie_slice_hover_text,pie_slice_num);
                     sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
                     integer grade = pie_slice_value(pie_slice_num);
                     grades+=grade;
             }
+            //send the list of grades to the pie_slices so that they open or close.  If grade is 0 for that option, pie_slice will open
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, llList2CSV(grades), NULL_KEY);
                      
     
