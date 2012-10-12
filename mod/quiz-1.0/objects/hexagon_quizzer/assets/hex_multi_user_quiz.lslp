@@ -225,7 +225,7 @@
             llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
         }  
         //requests from the question handler scripts a question
-        request_question_from_lsl_pipepline(key user_key, integer users_question_index,integer num_questions){
+        request_question_from_lsl_pipepline(key user_key, integer users_question_index,integer num_questions, key hex){
             integer user_id = llListFindList(users, [user_key]);
             integer menu_channel =  llList2Integer(users_menu_channels, user_id);
             string users_questions_str=llList2String(users_questions, user_id);
@@ -239,7 +239,7 @@
             
             SEPARATOR="|";
           
-            llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
+            llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+(string)hex+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );//todo add to dia
         }  
        
          
@@ -438,7 +438,7 @@
                 }
                 integer user_question_index = llList2Integer(users_question_id_index,user_id);
                 
-                request_question_from_lsl_pipepline(first_user,user_question_index,num_questions);
+                request_question_from_lsl_pipepline(first_user,user_question_index,num_questions,llGetKey());
                 /*
                 * request_question will now send a linked message to the question handler script  
                 * that looks like: llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,(string)current_question_id+SEPARATOR+(string)users_question_index+SEPARATOR+(string)num_questions+SEPARATOR+(string)menu_channel+SEPARATOR+sloodleserverroot+sloodle_quiz_url+SEPARATOR+sloodlehttpvars,user_key );
@@ -459,7 +459,12 @@
                  if (num == SLOODLE_CHANNEL_USER_TOUCH||num==SLOODLE_CHANNEL_QUIZ_ASK_QUESTION) {
                              list data = llParseString2List(str, ["|"], []);
                              string type = llList2String(data,0);
-                     
+                             key hex;
+                     		if (num==SLOODLE_CHANNEL_QUIZ_ASK_QUESTION){
+                     			hex=(key)str;
+                     		}else{
+                     				hex=llGetKey();
+                     		}
                      
                            // Make sure the given avatar is allowed to use this object
                             if (!sloodle_check_access_use(user_key)) {
@@ -478,13 +483,15 @@
                              if (orb==0&&quiz_loaded==FALSE){
                                 integer user_question_index = llList2Integer(users_question_id_index,user_id);
                                 //rezzer script will handle the retreived question
-                                request_question_from_lsl_pipepline(user_key,user_question_index,num_questions);
+                                key hex=(key)str;//pass the hex's key that asked the question
+                                request_question_from_lsl_pipepline(user_key,user_question_index,num_questions,hex);
                              }
                 }      
                 else
                 if (num == SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR) {
                     integer user_id=llListFindList(users, [user_key]);
                     integer question_id_index = llList2Integer(users_question_id_index,user_id);
+                 
                     float scorechange = (integer)str;
                     if(scorechange>0) {
                            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct", [llKey2Name(user_key)], user_key, "quizzer");
@@ -542,4 +549,5 @@
 
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/hexagon_quizzer/assets/hex_multi_user_quiz.lslp
+
 
