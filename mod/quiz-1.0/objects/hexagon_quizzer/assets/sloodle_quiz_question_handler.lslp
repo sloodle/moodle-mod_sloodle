@@ -30,6 +30,7 @@
         integer answerChatListenHandlerNonPublic;
         string  SEPARATOR="****";
         integer num_questions;
+        list users_hex;
         integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
         integer SLOODLE_CHANNEL_QUESTION_ANSWERED_AVATAR = -1639271106;  //Sent by main quiz script to tell UI scripts that question has been answered by avatar with key. String contains selected option ID + "|" + option text + "|"
         integer SLOODLE_CHANNEL_QUIZ_LOADING_QUESTION = -1639271107; 
@@ -160,13 +161,13 @@
                             users+=user_key;
                             //store this unique channel for this user
                             users_question_id+=question_id;
-                         	users_hex +=hex;
+                             users_hex +=hex;
                             users_current_question_index+=users_question_index;
                             
                     }else{
                         users_question_id=llListReplaceList(users_question_id, [question_id], user_id, user_id);
                         users_menu_channels=llListReplaceList(users_menu_channels, [menu_channel], user_id, user_id);
-                  		users_hex +=llListReplaceList(users_hex, [hex], user_id, user_id);
+                          users_hex +=llListReplaceList(users_hex, [hex], user_id, user_id);
                         users_current_question_index =llListReplaceList(users_current_question_index , [users_question_index], user_id, user_id);
                     }
                     
@@ -290,7 +291,7 @@
                             }
                             qdialogoptions_string = llList2CSV(qdialogoptions);
                             string question_data = qdialogtext+"|";//question text
-                            question_data +(string)hex+"|";
+                            question_data +=(string)hex+"|";
                             question_data += qdialogoptions_string+"|";//options ie: a,b,c 
                             question_data += opgrade_string+"|";//grade for each option ie: -1.0,1,-1 (1=correct)
                             question_data += opfeedback_string;//any feedback
