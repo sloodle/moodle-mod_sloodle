@@ -137,7 +137,8 @@
                     integer users_question_index = llList2Integer(data, 1);
                     num_questions = llList2Integer(data, 2);
                     menu_channel = llList2Integer(data, 3);
-                    sloodle_full_quiz_url = llList2String(data, 4);
+                    key hex=llList2Key(data,4);
+                    sloodle_full_quiz_url = llList2String(data, 5);
                     integer offset = llStringLength((string)question_id+"|"+(string)users_question_index+"|"+(string)num_questions);
                     offset+=llStringLength("|"+(string)menu_channel+"|"+(string)sloodle_full_quiz_url)+1;
                     sloodlehttpvars = llGetSubString(str, offset, -1);//-1 is the end of the list
@@ -159,13 +160,13 @@
                             users+=user_key;
                             //store this unique channel for this user
                             users_question_id+=question_id;
-                         
+                         	users_hex +=hex;
                             users_current_question_index+=users_question_index;
                             
                     }else{
                         users_question_id=llListReplaceList(users_question_id, [question_id], user_id, user_id);
                         users_menu_channels=llListReplaceList(users_menu_channels, [menu_channel], user_id, user_id);
-                  
+                  		users_hex +=llListReplaceList(users_hex, [hex], user_id, user_id);
                         users_current_question_index =llListReplaceList(users_current_question_index , [users_question_index], user_id, user_id);
                     }
                     
@@ -271,6 +272,7 @@
                                     user_question_options=llListReplaceList(user_question_options,[opids_string+SEPARATOR+optext_string+SEPARATOR+opgrade_string+SEPARATOR+opfeedback_string],user_id,user_id);
                             }            
                             integer users_question_index=llList2Integer(users_current_question_index,user_id);
+                            key hex = llList2Key(users_hex,user_id);
                             // We want to create a dialog with the option texts embedded into the main text,
                             //  and numbers on the buttons
                             integer qi=1;
@@ -288,6 +290,7 @@
                             }
                             qdialogoptions_string = llList2CSV(qdialogoptions);
                             string question_data = qdialogtext+"|";//question text
+                            question_data +(string)hex+"|";
                             question_data += qdialogoptions_string+"|";//options ie: a,b,c 
                             question_data += opgrade_string+"|";//grade for each option ie: -1.0,1,-1 (1=correct)
                             question_data += opfeedback_string;//any feedback
