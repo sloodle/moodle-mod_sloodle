@@ -60,38 +60,42 @@ rez_hexagon(integer orb){
      if (orb==0){
          return;
      }
+     float adjustment_x = 0.0402;
+     float adjustment_y = -0.0365;
      vector child_coord=my_coord;
      integer DIVISER=1;
      if (orb==1){//yellow
-        child_coord.y=my_coord.y+edge_length+edge_length/2;  
-        child_coord.x=my_coord.x-tip_to_edge;
+        child_coord.x=my_coord.x + edge_length + edge_length/2;
+        child_coord.y=my_coord.y -tip_to_edge;  
         my_oposite_section=4;                              
      }else
      if (orb==2){//pink
-       child_coord.y=my_coord.y+edge_length+edge_length/2;  
-       child_coord.x=my_coord.x+tip_to_edge;
+        child_coord.x=my_coord.x;
+        child_coord.y=my_coord.y-tip_to_edge * 2;  
         my_oposite_section=5;
      }else
      if (orb==3){
-        child_coord.y=my_coord.y;  
-        child_coord.x=my_coord.x+2*tip_to_edge; 
+        child_coord.x=my_coord.x - edge_length- edge_length/2;
+        child_coord.y=my_coord.y - tip_to_edge; 
         my_oposite_section=6;
      }else
      if (orb==4){
-        child_coord.y=my_coord.y-edge_length-edge_length/2;  
-        child_coord.x=my_coord.x+tip_to_edge; 
+        child_coord.y=my_coord.y+tip_to_edge;   
+        child_coord.x=my_coord.x-edge_length-edge_length/2;
         my_oposite_section=1;
      }else 
      if (orb==5){
-        child_coord.y=my_coord.y-edge_length-edge_length/2;  
-        child_coord.x=my_coord.x-tip_to_edge; 
+        child_coord.x=my_coord.x;
+        child_coord.y=my_coord.y+ tip_to_edge * 2; 
         my_oposite_section=2;
      }else
      if (orb==6){
-        child_coord.y=my_coord.y;  
-        child_coord.x=my_coord.x-2*tip_to_edge; 
+        child_coord.x=my_coord.x+ edge_length+edge_length/2;
+        child_coord.y=my_coord.y+tip_to_edge; 
         my_oposite_section=3;
      }
+    // child_coord.x=child_coord.x+ adjustment_x;
+    // child_coord.y=child_coord.y+ adjustment_y;
     //rez a new hexagon, and pass my_oppsosite_section as the start_parameter so that the new hexagon wont rez on that the my_oposite_section edge
     llRezAtRoot(HEXAGON_PLATFORM, child_coord, ZERO_VECTOR,  llGetRot(), my_oposite_section);
 }
@@ -132,8 +136,9 @@ display_questions_for_mother_hex(string str,key id){
                 llTriggerSound("SND_LOADING_COMPLETE", 1);
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
-                list qdialogoptions= llParseString2List(llList2String(data,1), [","], []);
-                option_points= llParseString2List(llList2String(data,2), [","], []);
+                key hex = llList2Key(data,1);
+                list qdialogoptions= llParseString2List(llList2String(data,2), [","], []);
+                option_points= llParseString2List(llList2String(data,3), [","], []);
                 debug("---------------received question! "+llList2CSV(qdialogoptions)+" "+qdialogtext+" answers are: "+llList2CSV(option_points));
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
                 key user_key=id;
@@ -272,12 +277,12 @@ default {
     }
     touch_start(integer num_detected) {
         if (quiz_loaded==FALSE){
-        	
+            
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "loading_question", [qdialogtext], "", "hex_quizzer");
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", llDetectedKey(0));
         }else{
             if (TIMES_UP){
-            	TIMES_UP=FALSE;
+                TIMES_UP=FALSE;
                 set_all_pie_slice_hover_text(" ");
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
                 llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, "", "");
@@ -319,6 +324,14 @@ default {
                 display_questions_for_mother_hex(str,id);
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
             }else{
+            	//SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR
+            	list data = llParseString2List(str, ["|"], []);
+            	key hex = llList2Key(data,1);
+            	if (llListFindList(rezzed_hexes, [hex])!=-1){
+            		llRegionSayTo(hex,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive question|"+str);
+            		
+            	}
+            	
                 //send question to child hex
             
             }
@@ -378,12 +391,18 @@ default {
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|0,1,2,3,4,5,6|10", NULL_KEY);
                 
             }
-            //print names on pie slice hover text in GREEN
+            //print names on pie slice hover text in GREEN if correct, in RED if incorrect
             string avatar_names;
             list grades=[];//retrieve the grade for each pie_slice
+            vector color;
             for (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++){
+                     if (pie_slice_value(pie_slice_num)>0) {
+                         color=GREEN;
+                     }else{
+                         color=RED;
+                     }
                     avatar_names=llList2String(pie_slice_hover_text,pie_slice_num);
-                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
+                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
                     integer grade = pie_slice_value(pie_slice_num);
                     grades+=grade;
             }
@@ -410,8 +429,8 @@ default {
             if (command=="GET QUESTION"){
                 key user_key = llList2Key(data,1);
                 debug("received request from "+llKey2Name(id)+" for user: "+llKey2Name(user_key));
-                //llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "A question|"+(string)llGetKey());
-                  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, "", user_key);
+                
+                  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, (string)id, user_key);
                 
             }
         }
