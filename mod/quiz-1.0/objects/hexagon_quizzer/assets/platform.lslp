@@ -56,12 +56,9 @@ default {
     	master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, HEXAGON_MASTER, "", "");
       
     }
-    link_message(integer sender_num, integer num, string str, key id) {
-      	if (num==SLOODLE_CHANNEL_USER_TOUCH){
-      		if (str=="QUESTION BUTTON"){
-	      		llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET QUESTION|"+(string)id);
+    touch_start(integer num_detected) {
+      	  		llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET QUESTION|"+(string)llDetectedKey(0));
 	      		set_question_prim_text("Loading question...",YELLOW);
-      		}
       		
       	}
       	
@@ -76,8 +73,10 @@ default {
     			//and only listen to the master on this channel from now on.
     			llListenRemove(master_listener);
     			master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");
-    		}else{
-    				
+    		}
+    		if (command=="receive question"){
+    			debug("received question: "+str);
+    			
     		}
     	
     		
