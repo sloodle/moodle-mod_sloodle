@@ -3,13 +3,13 @@ float edge_length_half;
 float tip_to_edge;
 list rezzed_hexes;
 integer PIN=7961;
-list option_points;
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_SET_TEXTURE= -1639277010; 
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
+        string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
 integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; //used when this script wants to ask a question and have the results sent to the child hex
 integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
@@ -18,6 +18,7 @@ integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output param
 string HEXAGON_PLATFORM="Hexagon Platform";
 integer TIMES_UP=FALSE;
 integer num_options=0;
+list CORRECT_AVATARS;
 list options;//store pie slice correlation. Therefore option[0]=pie_slice# 
 integer quiz_loaded=FALSE;
 vector RED =<1.00000, 0.00000, 0.00000>;
@@ -42,7 +43,9 @@ list MY_SLICES;
 integer already_received_question=FALSE;
 integer my_start_param;
 list pie_slice_hover_text;
-
+string qdialogtext;
+list qdialogoptions;
+list option_points;
 debug (string message ){
      list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
      if (llList2Integer (params ,0)==PRIM_MATERIAL_FLESH){
@@ -268,7 +271,16 @@ default {
         llResetScript();
     }
     touch_start(integer num_detected) {
-        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", llDetectedKey(0));
+        if (quiz_loaded==FALSE){
+            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "loading_question", [qdialogtext], "", "hex_quizzer");
+            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", llDetectedKey(0));
+        }else{
+            if (TIMES_UP){
+                set_all_pie_slice_hover_text(" ");
+                llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
+                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, "", "");
+            }
+        }
                 
     
     }
@@ -335,6 +347,7 @@ default {
                     sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
             }
         }else{
+            //gets triggered when after a countdown and time is up
              llSensorRemove();
              //go through each detected avatar and add their names to the prims they are standing in
             set_all_pie_slice_hover_text(" ");
@@ -342,13 +355,22 @@ default {
             integer pie_slice_num;
             for (avatar=0;avatar<num_avatars_detected;avatar++){
                 string avatar_name=llDetectedName(avatar);
+                key  avatar_key=llDetectedKey(avatar);
                 vector avatar_pos=llDetectedPos(avatar);
                 string pie_slice = get_detected_pie_slice(avatar_pos);
-                if ( pie_slice_value(pie_slice)>0){
-                	//avatar is correct
-                	CORRECT_AVATARS+=avatar_name;
-                }
                 pie_slice_num=(integer)llGetSubString(pie_slice, -1, -1);
+                if (pie_slice_value(pie_slice_num)>0){
+                    //avatar is correct
+                    if (llListFindList(CORRECT_AVATARS, [avatar_name])==-1){ //dont add same name twice
+                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct_select_orb", [avatar_name], avatar_key, "hex_quizzer");
+                        CORRECT_AVATARS+=avatar_name;//record which avatars are correct because only those who are correct can click an orb
+                    }
+                    
+                }else{
+                    sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "incorrect_can_not_select_orb", [avatar_name], avatar_key, "hex_quizzer");
+                    llPushObject(avatar_key,<0,0,100>, <0,0,-100>, TRUE);
+                }
+                
                 string pie_slice_text =llList2String(pie_slice_hover_text,pie_slice_num);
                 pie_slice_hover_text= llListReplaceList(pie_slice_hover_text, [pie_slice_text+"\n"+avatar_name], pie_slice_num, pie_slice_num);
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|0,1,2,3,4,5,6|10", NULL_KEY);
