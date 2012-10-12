@@ -29,10 +29,9 @@
 *  DESCRIPTION
 *  anim.lslp is an animation script for the pie_slices of the hexagon.  The Close function will make the pie slices rotate to a horizontal positon
 *  so the avatars can stand on a full hexagon.
-*
-*  The open position will open each pie slice so the avatars fall through.  
-*  Commands to oepn and close come through on the SLOODLE_CHANNEL_ANIM channel as:
-*  "open|1,2,3"  where 1,2,3 are the prims named pie_slice#  that you want to open or close
+*  This script lists for a linked message in the format: 0,0,0,0,0,1,0
+*  where 0 = incorrect, 1 = correct.
+*  Each pieslice will look at the index in this list that matches their index, and if 0, perform the open animation, if 1 perform close animation
 *
 */
 
@@ -157,20 +156,16 @@ default{
              
         integer stat=llGetStatus(1);
         if (n!=SLOODLE_CHANNEL_ANIM) return;
-        list data = llParseString2List(m, ["|"], []);
-           string command = llList2String(data, 0); 
-           list  pie_slices = llParseString2List(llList2String(data, 1), [","], []);
-           integer found = llListFindList(pie_slices, [(string)my_num]);
-           DELAY =llList2Integer(data, 2); 
-          if (found==-1) {
-            return;
+        //6 integers will be broadcase on the SLOODLE_CHANNEL_ANIM channel ie: 0,1,0,0,0,0
+        //0 indicates the pie_slice represents a false answer, and should open, 1 indicates correct, and should stay closed
+        list  pie_slice_grades = llParseString2List(m, [","], []);
+        integer my_grade=llList2Integer(pie_slice_grades,my_num-1);
+        if (my_grade==0){
+        	open(my_num);
+        }else{
+         	close(my_num);
         }
-        if (command=="open"){
-             open(my_num);
-        }
-        if (command=="close"){
-              close(my_num);
-        }
+        llSetTimerEvent(7);
         if(stat){llSetStatus(1,1);}
     }
     timer() {
