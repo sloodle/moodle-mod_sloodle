@@ -55,40 +55,40 @@ debug (string message ){
      }
 } 
 
-rez_hexagon(integer edge){
+rez_hexagon(integer orb){
      integer my_oposite_section;
      vector my_coord= llGetPos();//get_my_coord();
-     if (edge==0){
+     if (orb==0){
          return;
      }
      vector child_coord=my_coord;
      integer DIVISER=1;
-     if (edge==1){//yellow
+     if (orb==1){//yellow
         child_coord.y=my_coord.y+edge_length+edge_length/2;  
         child_coord.x=my_coord.x-tip_to_edge;
         my_oposite_section=4;                              
      }else
-     if (edge==2){//pink
+     if (orb==2){//pink
        child_coord.y=my_coord.y+edge_length+edge_length/2;  
        child_coord.x=my_coord.x+tip_to_edge;
         my_oposite_section=5;
      }else
-     if (edge==3){
+     if (orb==3){
         child_coord.y=my_coord.y;  
         child_coord.x=my_coord.x+2*tip_to_edge; 
         my_oposite_section=6;
      }else
-     if (edge==4){
+     if (orb==4){
         child_coord.y=my_coord.y-edge_length-edge_length/2;  
         child_coord.x=my_coord.x+tip_to_edge; 
         my_oposite_section=1;
      }else 
-     if (edge==5){
+     if (orb==5){
         child_coord.y=my_coord.y-edge_length-edge_length/2;  
         child_coord.x=my_coord.x-tip_to_edge; 
         my_oposite_section=2;
      }else
-     if (edge==6){
+     if (orb==6){
         child_coord.y=my_coord.y;  
         child_coord.x=my_coord.x-2*tip_to_edge; 
         my_oposite_section=3;
@@ -264,26 +264,26 @@ default {
           sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
           string name=llGetObjectName();
           //show orbs
-          llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand show|0,1,2,3,4,5,6|10", NULL_KEY);    
+          llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|0,1,2,3,4,5,6|10", NULL_KEY);    
     }
     link_message(integer link_set, integer channel, string str, key id) {
         if (channel ==SLOODLE_CHANNEL_USER_TOUCH){
             list data= llParseString2List(str, ["|"], []);
             string type = llList2String(data,0);
             //this is a rez edge attempt
-            if (type!="edge"){
+            if (type!="orb"){
                  return;
             }
-            if (type=="edge"){
+            if (type=="orb"){
                 // a user touched an edge selector, so rez an edge
                 
-                integer edge=llList2Integer(data, 1);
-                if (edge==0){
+                integer orb=llList2Integer(data, 1);
+                if (orb==0){
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", id);
                 }
-                rez_hexagon(edge);
+                rez_hexagon(orb);
                 //after a user presses an edge selector, hide the selector
-                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "edge expand hide|"+(string)edge, NULL_KEY);
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|"+(string)orb, NULL_KEY);
             }
             
         }else 
@@ -292,12 +292,12 @@ default {
             if (quiz_loaded==FALSE){
                 display_questions_for_mother_hex(str,id);
             }else{
-            	//send question to child hex
+                //send question to child hex
             
             }
         }else
         if (channel==SLOODLE_TIMER_TIMES_UP){
-        
+            
         }
     }
     object_rez(key platform) {
@@ -318,7 +318,7 @@ default {
                 key user_key = llList2Key(data,1);
                 debug("received request from "+llKey2Name(id)+" for user: "+llKey2Name(user_key));
                 //llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "A question|"+(string)llGetKey());
-              	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, "", user_key);
+                  llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, "", user_key);
                 
             }
         }
