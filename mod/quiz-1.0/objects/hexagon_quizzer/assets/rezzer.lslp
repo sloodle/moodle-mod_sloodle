@@ -4,6 +4,7 @@ float tip_to_edge;
 list rezzed_hexes;
 integer PIN=7961;
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
+        integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
 integer SLOODLE_SET_TEXTURE= -1639277010; 
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
@@ -180,10 +181,7 @@ integer pie_slice_value(integer pie_slice){
         grade=0;
     }else{//ok, good, the pie_slice they are standing on actually has a grade assigned to it
         //find how many points the pie_slice is worth  
-        grade = llList2Integer(option_points,option_index);
-        if (grade == -1||grade == 0){//here in moodle, the teacher has assigned a grade of -1 or 0 - so give a grade of 0
-            grade=0;
-        }    
+        grade = llList2Integer(option_points,option_index);           
     }
     return grade;
 }
@@ -327,6 +325,7 @@ default {
             	//SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR
             	list data = llParseString2List(str, ["|"], []);
             	key hex = llList2Key(data,1);
+            	integer question_id =llList2Integer(data,5); 
             	if (llListFindList(rezzed_hexes, [hex])!=-1){
             		llRegionSayTo(hex,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive question|"+str);
             		
@@ -374,11 +373,15 @@ default {
                 vector avatar_pos=llDetectedPos(avatar);
                 string pie_slice = get_detected_pie_slice(avatar_pos);
                 pie_slice_num=(integer)llGetSubString(pie_slice, -1, -1);
-                if (pie_slice_value(pie_slice_num)>0){
+                integer value = pie_slice_value(pie_slice_num);
+                if (value>0){
                     //avatar is correct
                     if (llListFindList(CORRECT_AVATARS, [avatar_name])==-1){ //dont add same name twice
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct_select_orb", [avatar_name], avatar_key, "hex_quizzer");
                         CORRECT_AVATARS+=avatar_name;//record which avatars are correct because only those who are correct can click an orb
+                        
+                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,(string)qtype+"|"+(string)question_id+"|"+ llList2String(opids, answer_num)+"|"+(string)value, avatar_key);
+                     	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)value, avatar_key);
                     }
                     
                 }else{
