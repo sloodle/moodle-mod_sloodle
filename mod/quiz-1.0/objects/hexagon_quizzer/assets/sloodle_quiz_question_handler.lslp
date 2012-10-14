@@ -202,6 +202,7 @@
                     string  request_descriptor =llList2String(statusfields, 3); 
                     key user_key = llList2Key(statusfields,6);
                     integer user_id =llListFindList(users,[user_key]);
+                    integer  question_id = llList2Integer(users_question_id,user_id);
                     //the user who initiated this request
                     if (request_descriptor=="REQUESTING_QUESTION"){
                         request_descriptor="";
@@ -294,77 +295,13 @@
                             question_data +=(string)hex+"|";
                             question_data += qdialogoptions_string+"|";//options ie: a,b,c 
                             question_data += opgrade_string+"|";//grade for each option ie: -1.0,1,-1 (1=correct)
-                            question_data += opfeedback_string;//any feedback
+                            question_data += opfeedback_string+"|";//any feedback
+                            question_data +=question_id
                             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, question_data, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
                             debug("question_data: "+question_data);
                          }
               }
-              listen(integer channel, string name, key user_key, string user_response){
-             
-                    if (llListFindList(users_menu_channels, [channel])==-1) {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "usedialogs", [llKey2Name(user_key)], user_key, "quizzer");
-                        return;
-                    }
-              
-                string opid; // used when the feedback is too long, and we have to fetch it off the server
-                // Only listen to the sitter
-                if (llListFindList(users, [user_key])!=-1) {
-                    /* Determine the user_id so we can access the current question the user is on, as wel as access other info about this user
-                    *  which is stored in this script
-                    */
-                    integer user_id=llListFindList(users, [user_key]);
-                    integer listenHandler = llList2Integer(users_listen_handler, user_id);
-                    llListenRemove(listenHandler);
-                    debug("removing Listen Handler");
-                
-                    integer question_id = llList2Integer(users_question_id,user_id);
-                    // Handle the answer...
-                    float scorechange = 0;
-                    string feedback = "";
-                    string answeroptext = "";
-                    list opInfo = llParseString2List(llList2String(user_question_options,user_id), [SEPARATOR], []);
-                    list opids = llParseString2List(llList2String(opInfo,0), ["|"], []);
-                    list optext = llParseString2List(llList2String(opInfo,1), ["|"], []);
-                    list opgrade = llParseString2List(llList2String(opInfo,2), ["|"], []);
-                    list opfeedback = llParseString2List(llList2String(opInfo,3), ["|"], []);
-                    
-                    // Check the type of question this was
-                    if ((qtype == "multichoice") || (qtype == "truefalse")) {
-                        // Multiple choice - the response should be a number from the dialog box (1-based)
-                        integer answer_num = (integer)user_response;
-                        // Make sure it's valid
-                        if ((answer_num > 0) && (answer_num <= llGetListLength(opids))) {
-                            // Correct to 0-based
-                            answer_num -= 1;
-                            feedback = llList2String(opfeedback, answer_num);
-                            scorechange = llList2Float(opgrade, answer_num);
-                            opid = llList2String(opids, answer_num);
-                            answeroptext = llList2String(optext, answer_num);
-
-                            // Notify the server of the response
-                            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,(string)qtype+"|"+(string)question_id+"|"+ llList2String(opids, answer_num)+"|"+(string)scorechange, user_key);
-                        } else {
-                           
-                          sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidchoice",  [llKey2Name(user_key)],user_key, "quizzer");
-                           // ask_question();
-                        }        
-                      
-                    }else {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM , [0], "invalidtype" , [], user_key, "quizzer" );
-                    }                
-                   //handle feedback
-                   
-                    if (feedback == "[[LONG]]") { // special long feedback placeholder for when there is too much feedback to give to the script
-                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FEED_BACK_REQUEST, (string)question_id+"|"+(string)opid,user_key);
-                    }
-                    else if (feedback != ""){
-                         llInstantMessage(user_key, feedback); // Text feedback
-                    }
-                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)scorechange, user_key);
-                   
-                    
-            } 
-    }
+            
 }
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/hex_quizzer/assets/sloodle_quiz_question_handler.lslp

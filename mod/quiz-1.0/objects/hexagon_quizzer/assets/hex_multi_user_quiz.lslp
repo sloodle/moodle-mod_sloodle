@@ -483,7 +483,7 @@
                              if (orb==0&&quiz_loaded==FALSE){
                                 integer user_question_index = llList2Integer(users_question_id_index,user_id);
                                 //rezzer script will handle the retreived question
-                                key hex=(key)str;//pass the hex's key that asked the question
+                                hex=(key)str;//pass the hex's key that asked the question
                                 request_question_from_lsl_pipepline(user_key,user_question_index,num_questions,hex);
                              }
                 }      
