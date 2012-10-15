@@ -374,26 +374,19 @@ default {
             }            
         }else 
         if (channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
-               
+            key hex = llList2Key(data,1);
+            integer question_id =llList2Integer(data,5);  
             debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
-            if (quiz_loaded==FALSE){
+            if (hex==llGetKey()){
                 quiz_loaded=TRUE;
                 display_questions_for_mother_hex(str,id);
-                question_id =llList2Integer(data,5);
                 debug("----my question id is: "+(string)question_id);  
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
             }else{
-                //SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR
-            
-                key hex = llList2Key(data,1);
-                integer question_id =llList2Integer(data,5); 
+				//send question to child hex
                 if (llListFindList(rezzed_hexes, [hex])!=-1){
                     llRegionSayTo(hex,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive question|"+str);
-                    
                 }
-                
-                //send question to child hex
-            
             }
         }else
         if (channel==SLOODLE_TIMER_TIMES_UP){
@@ -441,7 +434,7 @@ default {
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct_select_orb", [avatar_name], avatar_key, "hex_quizzer");
                         CORRECT_AVATARS+=avatar_name;//record which avatars are correct because only those who are correct can click an orb
                         llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,"multichoice|"+(string)question_id+"|"+(string)pie_slice_num+"|"+(string)score_change, avatar_key);
-                         llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)score_change, avatar_key);
+                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)score_change+"|"+(string)llGetKey(), avatar_key);
                     }
                     
                 }else{
