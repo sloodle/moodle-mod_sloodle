@@ -125,15 +125,6 @@
                 if (channel == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG) {
                     integer menu_channel;                   
                     list data = llParseString2List(str, ["|"], []);
-                    
-                    /*  llList2String(question_ids, current_question_index)
-                      +"|"+(string)users_question_index
-                      +"|"+(string)num_questions
-                      +"|"+(string)menu_channel
-                      +"|"+sloodleserverroot+sloodle_quiz_url
-                      +"|"+sloodlehttpvars,user_key );//todo add to dia
-              */
-                   
                     integer question_id = llList2Integer(data, 0);
                     integer users_question_index = llList2Integer(data, 1);
                     num_questions = llList2Integer(data, 2);
@@ -245,9 +236,9 @@
                                         qtext = llList2String(thisline, 4);
                                         qtype = llList2String(thisline, 7);
                                         // Make sure it's a valid question type
-                                        if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
+                                        if ((qtype != "multichoice")) {
                                               sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "hex_quizzer");
-                                      //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
+                                      //     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
                                               return;
                                         }
                                 } else 
