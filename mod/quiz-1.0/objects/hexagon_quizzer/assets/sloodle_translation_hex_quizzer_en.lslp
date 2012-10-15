@@ -103,6 +103,9 @@ sloodle_translation_request(string output_method, list output_params, string str
 {
     llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
 }
+string strReplace(string str, string search, string replace) {
+    return llDumpList2String(llParseStringKeepNulls(str, [search], []), replace);
+}
 
 // Send a translation response link message
 sloodle_translation_response(integer target, string name, string translation)
@@ -169,13 +172,13 @@ string sloodle_get_string_f(string name, list params)
     integer curparamtoklength = 0;
     string curparamstr = "";
     integer tokpos = -1;
-    for (; curparamnum < numparams; curparamnum++) {
+    for (curparamnum=0; curparamnum < numparams; curparamnum++) {
         // Construct this parameter token
         curparamtok = "{{" + (string)(curparamnum) + "}}";
         curparamtoklength = llStringLength(curparamtok);
         // Fetch the parameter text
         curparamstr = llList2String(params, curparamnum);
-        
+     
         // Ensure the parameter text does NOT contain double braces (this avoids an infinite loop!)
         if (llSubStringIndex(curparamstr, "{{") < 0 && llSubStringIndex(curparamstr, "}}") < 0) {            
             // Go through every instance of this parameter's token
@@ -186,7 +189,7 @@ string sloodle_get_string_f(string name, list params)
             }
         }
     }
-    
+    str=strReplace(str,"*%*%*",",");
     return str;
 }
 
