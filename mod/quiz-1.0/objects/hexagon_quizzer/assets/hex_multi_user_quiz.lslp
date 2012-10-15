@@ -332,6 +332,7 @@
                 // Check the channel for configuration messages
                 if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
                     // Split the message into lines
+                    string config = str;
                     list lines = llParseString2List(str, ["\n"], []);
                     integer numlines = llGetListLength(lines);
                     integer i = 0;
