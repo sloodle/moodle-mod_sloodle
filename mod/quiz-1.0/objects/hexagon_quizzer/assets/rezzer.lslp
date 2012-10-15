@@ -356,7 +356,7 @@ default {
               quiz_id=llList2Integer(data,0);
               quiz_name=llList2String(data,1);
               num_questions=llList2Integer(data,2);
-              debug("------quiz loaded: "+(string)quiz_id+" quiz name: "+quiz_name+" num questions: "+num_questions);
+              debug("------quiz loaded: "+(string)quiz_id+" quiz name: "+quiz_name+" num questions: "+(string)num_questions);
         }else
         if (channel ==SLOODLE_CHANNEL_USER_TOUCH){
           
