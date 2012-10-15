@@ -525,13 +525,6 @@
                         }
                         return;
                     }
-                    if (askquestionscontinuously==1){
-                        integer user_question_index = llList2Integer(users_question_id_index,user_id);
-                        request_question_from_lsl_pipepline(user_key,user_question_index,num_questions,hex);
-                    }else
-                    if (question_id_index+1<=num_questions-1){
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM , [0], "clicktogetnextquestion" , [llKey2Name(user_key)], user_key, "quizzer" );
-                       }
                 } else 
                 if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
                     // Is it a reset command?
