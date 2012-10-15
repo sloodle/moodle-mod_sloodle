@@ -361,7 +361,7 @@ default {
     }
       state_entry() {
           MY_SLICES=[1,2,3,4,5,6];
-          //MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
+          MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
           sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
           string name=llGetObjectName();
           //show orbs
@@ -491,6 +491,7 @@ default {
             }
             //send the list of grades to the pie_slices so that they open or close.  If grade is 0 for that option, pie_slice will open
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "pie_slice|"+llList2CSV(grades), NULL_KEY);
+            
             debug("sending grades to pie_slices: "+llList2CSV(grades));         
     
         };
