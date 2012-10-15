@@ -43,7 +43,7 @@ close(integer pie_slice){
     llSetTimerEvent(0);
     llTriggerSound("close", 1);
       if (pie_slice==1){
-          llSay(0,"closing 1");
+          
         vector Zfire=llGetScale();
         vector zFire=<2.30604,-1.45806,-0.02260>;
         vector zfIre=<6.19295,0.19941,5.36619>;
@@ -96,7 +96,7 @@ close(integer pie_slice){
 open(integer pie_slice){
     llTriggerSound("open", 1);
     if (pie_slice==1){
-        llSay(0,"opening 1");
+        
         vector Zfire=llGetScale();
         vector zFire=<5.03571,-3.13984,-2.54680>;
         vector zfIre=<6.19295,0.19941,5.36619>;
