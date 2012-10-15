@@ -232,24 +232,24 @@
             }
             link_message(integer sender_num, integer num, string str, key user_key){
                 if (num == SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE) {
-                    //llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,(string)qtype+"|"+(string)question_id+"|"+ llList2String(opids, answer_num)+"|"+(string)scorechange, user_key);
+                    //multichoice|question_id|optionid|score_change
                     list data = llParseString2List(str, ["|"], []);
                     string qtype=llList2String(data, 0);
                     string questioncode=llList2String(data, 1);
-                    string responsecode=llList2String(data, 2);
+                    string optionid=llList2String(data, 2);
                     string scorechange=llList2String(data, 3);
                     string body =sloodlehttpvars;
                     body += "&sloodlerequestdesc="+"NOTIFY_SERVER";
                     body += "&sloodleuuid=" + (string)user_key;
                     body += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
                     body += "&request_timestamp="+(string)llGetUnixTime(); 
-                    body += "&resp" + (string)questioncode + "_=" + responsecode;
+                    body += "&resp" + (string)questioncode + "_=" + optionid;
                     body += "&resp" + (string)questioncode + "_submit=1";
                     body += "&questionids=" + (string)questioncode;
                     body += "&action=notify";
                     body += "&scorechange="+(string)scorechange;
                     server_requests += llHTTPRequest(sloodle_full_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);
-        
+        			debug("notify_server_of_response: "+sloodle_full_quiz_url+"/?"+body);
                 }else
                 if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
                     // Is it a reset command?
