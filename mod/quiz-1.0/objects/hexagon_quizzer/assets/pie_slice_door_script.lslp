@@ -167,7 +167,7 @@ default{
         }
         list  pie_slice_grades = llParseString2List(llList2String(data,1), [","], []);
         integer my_grade=llList2Integer(pie_slice_grades,my_num-1);
-        if (my_grade==0){
+        if (my_grade<=0){
             open(my_num);
         }else{
              close(my_num);
