@@ -188,15 +188,17 @@ display_questions_for_mother_hex(string str,key id){
                 llTriggerSound("SND_LOADING_COMPLETE", 1);
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
+                qdialogtext = strReplace(llList2String(data,0), ",", "*%*%*");
                 key hex = llList2Key(data,1);
                 list qdialogoptions= llParseString2List(llList2String(data,2), [","], []);
                 option_points= llParseString2List(llList2String(data,3), [","], []);
-                debug("---------------received question! "+llList2CSV(qdialogoptions)+" "+qdialogtext+" answers are: "+llList2CSV(option_points));
+                debug("---------------received question! str: "+str+"\nqdialogtext: "+qdialogtext+"\nhex: "+(string)hex+"\nqdialogoptions: "+llList2CSV(qdialogoptions)+"\noptionpoints: "+llList2CSV(option_points));
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
                 key user_key=id;
                 integer j=0;
                 //set the hover text of the pie_slices to the questions options
                 num_options=llGetListLength(qdialogoptions); 
+                options=[];
                 set_texture_pie_slices("blank_white");
                 for (j=0;j<num_options;j++){
                      string pie_slice=llStringTrim(llList2String(MY_SLICES,j),STRING_TRIM);
@@ -229,7 +231,7 @@ integer pie_slice_value(integer pie_slice){
     integer option_index = llListFindList(options, [pie_slice]);
     integer grade;
     if (option_index==-1){//here the user is standing on a pie_slice that did not even have a number printed on it, so give them a 0 for incorrect 
-        grade=0;
+        grade=-1;
     }else{//ok, good, the pie_slice they are standing on actually has a grade assigned to it
         //find how many points the pie_slice is worth  
         grade = llList2Integer(option_points,option_index);           
@@ -280,6 +282,9 @@ integer get_prim(string name){
     }
     return prim;
 }
+string strReplace(string str, string search, string replace) {
+    return llDumpList2String(llParseStringKeepNulls(str, [search], []), replace);
+}
 // Send a translation request link message
 sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch){
     llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
@@ -293,6 +298,7 @@ init(){
         tip_to_edge = pie_slice_size.z;//since we are looking for the length starting from the tip of the pie_slice to the middle of the edge, we need to choose the z dimension for this particular pie slice
         edge_length= pie_slice_size.y;//since we are looking for  the length of an edge we need to choose the y dimension for this particular pie slice
         question_prim= get_prim("question_prim");
+        
         sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
         set_texture_pie_slices("blank_white");
         integer num_prims = llGetNumberOfPrims();
@@ -326,7 +332,6 @@ default {
     }
     touch_start(integer num_detected) {
         if (quiz_loaded==FALSE){
-            
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "loading_question", [qdialogtext], "", "hex_quizzer");
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER, "", llDetectedKey(0));
         }else{
@@ -342,7 +347,7 @@ default {
     }
       state_entry() {
           MY_SLICES=[1,2,3,4,5,6];
-          MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
+          //MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
           sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
           string name=llGetObjectName();
           //show orbs
@@ -383,7 +388,7 @@ default {
                 debug("----my question id is: "+(string)question_id);  
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
             }else{
-				//send question to child hex
+                //send question to child hex
                 if (llListFindList(rezzed_hexes, [hex])!=-1){
                     llRegionSayTo(hex,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive question|"+str);
                 }
@@ -464,7 +469,7 @@ default {
             }
             //send the list of grades to the pie_slices so that they open or close.  If grade is 0 for that option, pie_slice will open
             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "pie_slice|"+llList2CSV(grades), NULL_KEY);
-                     
+            debug("sending grades to pie_slices: "+llList2CSV(grades));         
     
         };
     }
