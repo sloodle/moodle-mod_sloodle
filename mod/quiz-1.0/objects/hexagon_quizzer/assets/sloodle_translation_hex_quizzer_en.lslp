@@ -49,17 +49,18 @@ list locstrings = [
     "correct", "Correct {{0}}.", // Parameter: name of avatar
     "usedialogs", "Error: You attempted to answer a multiple choice, or a true/false answer by typing on the chat line instead of using the dialog {{0}}.", // Parameter: name of avatar
     "incorrect", "Incorrect {{0}}.", // Parameter: name of avatar
-     "initquiz","Initializing the quiz. Please wait.",
-     "ready_click_colored_orb","Ready. Click the orb to load a question.",
-     "ready_click_colored_orb_to_ask","Ready. Click the orb to start the count down.",
-     "quiz_name","Quiz: {{0}}",
-     "option","{{0}}",
-     "clear","{{0}}",
-      "times_up","Times up!",
-      "correct_select_orb","Congratulations {{0}}, you got the answer correct! You can now click a colored orb to rez a new hexagon and expand your path!",
-      "incorrect_can_not_select_orb","Sorry {{0}}, but your answer is wrong! You can retry by clicking again on the center orb",
-      "loading_question","Loading question...",
-       "timer_stopped","Timer Stopped"
+    "initquiz","Initializing the quiz. Please wait.",
+    "ready_click_colored_orb","Ready. Click the orb to load a question.",
+    "ready_click_colored_orb_to_ask","Ready. Click the orb to start the count down.",
+    "quiz_name","Quiz: {{0}}",
+    "option","{{0}}",
+    "clear","{{0}}",
+    "times_up","Times up!",
+    "correct_select_orb","Congratulations {{0}}, you got the answer correct! You can now click a colored orb to rez a new hexagon and expand your path!",
+    "incorrect_can_not_select_orb","Sorry {{0}}, but your answer is wrong! You can retry by clicking again on the center orb",
+    "loading_question","Loading question...",
+    "timer_stopped","Timer Stopped",
+	"no_more_questions","All the questions in the quiz have been asked. No more questions are available."
     
 ];
 
