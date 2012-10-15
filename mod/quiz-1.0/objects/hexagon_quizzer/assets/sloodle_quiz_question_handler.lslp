@@ -123,6 +123,15 @@
                    }
                 //  this is what was sent: llList2String(question_ids, current_question_index)+"|"+(string)users_question_index+"|"+(string)num_questions+"|"+(string)menu_channel+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,user_key );//todo add to dia    
                 if (channel == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG) {
+                	//
+//0 (string)current_question_id
+//1(string)users_question_index
+//2(string)num_questions
+//3(string)menu_channel
+//4(string)hex
+//5 sloodleserverroot
+//6 sloodle_quiz_url
+//7 sloodlehttpvars,user_key );//todo add to dia
                     integer menu_channel;                   
                     list data = llParseString2List(str, ["|"], []);
                     integer question_id = llList2Integer(data, 0);
@@ -132,9 +141,8 @@
                     key hex=llList2Key(data,4);
                     sloodle_full_quiz_url = llList2String(data, 5);
                     integer offset = llStringLength((string)question_id+"|"+(string)users_question_index+"|"+(string)num_questions);
-                    offset+=llStringLength("|"+(string)menu_channel+"|"+(string)sloodle_full_quiz_url)+1;
+                    offset+=llStringLength("|"+(string)menu_channel+"|"+(string)hex+"|"+(string)sloodle_full_quiz_url)+1;
                     sloodlehttpvars = llGetSubString(str, offset, -1);//-1 is the end of the list
-                    //****0****10****-8610976****http://englishvillage.avatarclassroom.com/mod/sloodle/mod/quiz-1.0/linker.php****sloodlecontrollerid=2&sloodlepwd=0fcf04ac-4504-6209-050e-6267014c38b8|922621267&sloodlemoduleid=8&sloodleserveraccesslevel=0
                     string db_str ="*********************************************\n";
                     db_str+="* str = "+str+"\n";
                     db_str+="* \n";
@@ -146,6 +154,7 @@
                     db_str+="* sloodlehttpvars = "+(string)sloodlehttpvars+"\n";
                     db_str +="*********************************************\n";
                     debug(db_str);
+                    
                     integer user_id = llListFindList(users, [user_key]);
                     if (user_id==-1){
                             //if we have never seen this user before, add them to the system
@@ -162,7 +171,7 @@
                         users_current_question_index =llListReplaceList(users_current_question_index , [users_question_index], user_id, user_id);
                     }
                     
-                    string body=sloodlehttpvars;
+                    string body=sloodlehttpvars+"/?";
                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "Asking a questions",  [llKey2Name(user_key)], user_key, "quizzer");
                     // Request the quiz data from Moodle
                     body += "&sloodlerequestdesc="+"REQUESTING_QUESTION";
@@ -170,6 +179,8 @@
                     body += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
                     body += "&ltq="+(string)question_id;
                     body +="&request_timestamp="+(string)llGetUnixTime(); 
+                    debug("sloodle_full_quiz_url: "+sloodle_full_quiz_url);
+                    debug("body: "+body);
                     debug("request_question: "+sloodle_full_quiz_url+"/?"+body);
                     server_requests+=  llHTTPRequest(sloodle_full_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);   
               } 
@@ -287,7 +298,7 @@
                             question_data += qdialogoptions_string+"|";//options ie: a,b,c 
                             question_data += opgrade_string+"|";//grade for each option ie: -1.0,1,-1 (1=correct)
                             question_data += opfeedback_string+"|";//any feedback
-                            question_data +=question_id
+                            question_data +=question_id;
                             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, question_data, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
                             debug("question_data: "+question_data);
                          }
