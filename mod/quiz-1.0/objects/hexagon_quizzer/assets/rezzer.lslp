@@ -1,8 +1,58 @@
+//
+// The line above should be left blank to avoid script errors in OpenSim.
+
+// LSL script generated: mod.set-1.0.rezzer_reset_btn.lslp Tue Nov 15 15:49:28 Tokyo Standard Time 2011
+/*
+*  Part of the Sloodle project (www.sloodle.org)
+*
+*  Copyright (c) 2011-06 contributors (see below)
+*  Released under the GNU GPL v3
+*  -------------------------------------------
+*
+*  This program is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  (at your option) any later version.
+*
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*  All scripts must maintain this copyrite information, including the contributer information listed
+*
+*  Contributors:
+*  Paul Preibisch
+*
+*  DESCRIPTION
+*  Rezzer.lslp
+*  This script is responsible for:
+*  *** initiating the loading of a quiz
+*  *** getting the first question and loading the options as texture maps on the child prims (pie_slices)
+*  *** initiating a countdown in the timer.lslp script
+*  *** starting a sensor, and using hovertext to display which pie_slice a user is standing over
+*  *** determining the value of each option and telling each pie_slice to open or close when the count down timer reaches zero 
+*  *** determining which pie_slice a user is standing over at the end of the countdown, and submitting their answers to the notify_server.lslp script 
+*  *** rezzing orbs on each of its edges which are clickable by avatars who answered correctly 
+*  *** receive linked messages from the orbs which indicate touch events from avatars who have answered the question correctly, and rez 
+*      rezzing child hexagons along the touched edges 
+*  *** Receive GET QUESTION command from a child hex when its center orb has been touched by an avatar
+*  *** requesting questions from question_handler.lslp and passing retrieved question along to the requesting child hexagon
+*      
+*
+*/
 float edge_length;
 float edge_length_half;
 float tip_to_edge;
 list rezzed_hexes;
 integer PIN=7961;
+integer quiz_id;
+string quiz_name;
+integer question_id;
+integer num_questions;
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
         integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
 integer SLOODLE_SET_TEXTURE= -1639277010; 
@@ -14,6 +64,8 @@ integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
 integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; //used when this script wants to ask a question and have the results sent to the child hex
 integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
+integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
+integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string HEXAGON_PLATFORM="Hexagon Platform";
@@ -133,7 +185,6 @@ string get_detected_pie_slice(vector avatar){
 }
 
 display_questions_for_mother_hex(string str,key id){
-                quiz_loaded=TRUE;
                 llTriggerSound("SND_LOADING_COMPLETE", 1);
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
@@ -298,39 +349,49 @@ default {
           llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|0,1,2,3,4,5,6|10", NULL_KEY);    
     }
     link_message(integer link_set, integer channel, string str, key id) {
+          list data= llParseString2List(str, ["|"], []);
+        if (channel==SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ){
+            
+              data = llParseString2List(str, ["|"], []);
+              quiz_id=llList2Integer(data,0);
+              quiz_name=llList2String(data,1);
+              num_questions=llList2Integer(data,2);
+              debug("------quiz loaded: "+(string)quiz_id+" quiz name: "+quiz_name+" num questions: "+num_questions);
+        }else
         if (channel ==SLOODLE_CHANNEL_USER_TOUCH){
-            list data= llParseString2List(str, ["|"], []);
+          
             string type = llList2String(data,0);
             //this is a rez edge attempt
             if (type!="orb"){
                  return;
             }
             if (type=="orb"){
-                // a user touched an edge selector, so rez an edge
-                
-                integer orb=llList2Integer(data, 1);
-                
+                // a user touched an edge selector, so rez an edge                 
+                integer orb=llList2Integer(data, 1);                
                 rez_hexagon(orb);
                 //after a user presses an edge selector, hide the selector
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|"+(string)orb, NULL_KEY);
-            }
-            
+            }            
         }else 
         if (channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
+               
             debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
             if (quiz_loaded==FALSE){
+                quiz_loaded=TRUE;
                 display_questions_for_mother_hex(str,id);
+                question_id =llList2Integer(data,5);
+                debug("----my question id is: "+(string)question_id);  
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
             }else{
-            	//SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR
-            	list data = llParseString2List(str, ["|"], []);
-            	key hex = llList2Key(data,1);
-            	integer question_id =llList2Integer(data,5); 
-            	if (llListFindList(rezzed_hexes, [hex])!=-1){
-            		llRegionSayTo(hex,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive question|"+str);
-            		
-            	}
-            	
+                //SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR
+            
+                key hex = llList2Key(data,1);
+                integer question_id =llList2Integer(data,5); 
+                if (llListFindList(rezzed_hexes, [hex])!=-1){
+                    llRegionSayTo(hex,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive question|"+str);
+                    
+                }
+                
                 //send question to child hex
             
             }
@@ -373,15 +434,14 @@ default {
                 vector avatar_pos=llDetectedPos(avatar);
                 string pie_slice = get_detected_pie_slice(avatar_pos);
                 pie_slice_num=(integer)llGetSubString(pie_slice, -1, -1);
-                integer value = pie_slice_value(pie_slice_num);
-                if (value>0){
+                integer score_change = pie_slice_value(pie_slice_num);
+                if (score_change>0){
                     //avatar is correct
                     if (llListFindList(CORRECT_AVATARS, [avatar_name])==-1){ //dont add same name twice
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct_select_orb", [avatar_name], avatar_key, "hex_quizzer");
                         CORRECT_AVATARS+=avatar_name;//record which avatars are correct because only those who are correct can click an orb
-                        
-                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,(string)qtype+"|"+(string)question_id+"|"+ llList2String(opids, answer_num)+"|"+(string)value, avatar_key);
-                     	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)value, avatar_key);
+                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,"multichoice|"+(string)question_id+"|"+(string)pie_slice_num+"|"+(string)score_change, avatar_key);
+                         llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)score_change, avatar_key);
                     }
                     
                 }else{
