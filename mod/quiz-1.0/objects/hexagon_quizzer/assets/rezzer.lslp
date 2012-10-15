@@ -48,11 +48,13 @@ float edge_length;
 float edge_length_half;
 float tip_to_edge;
 list rezzed_hexes;
+list opids;
 integer PIN=7961;
 integer quiz_id;
 string quiz_name;
 integer question_id;
 integer num_questions;
+list  sides_rezzed;
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
         integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
 integer SLOODLE_SET_TEXTURE= -1639277010; 
@@ -203,7 +205,7 @@ display_questions_for_mother_hex(string str,key id){
                 for (j=0;j<num_options;j++){
                      string pie_slice=llStringTrim(llList2String(MY_SLICES,j),STRING_TRIM);
                      string option = llList2String(qdialogoptions,j);
-                     options+=pie_slice;
+                     options+=pie_slice;//opid has already been stored
                     //SET PIE_SLICE TO PARTICULAR OPTION
                      set_texture_pie_slice((string)option,(integer)pie_slice);
                 }
@@ -215,6 +217,18 @@ display_questions_for_mother_hex(string str,key id){
                     debug("value for "+"pie_slice"+(string)j+" is: "+(string)value);
                 }*/
                 
+}
+
+integer pie_slice_option_index(integer pie_slice){
+	integer option_index = llListFindList(options, [pie_slice]);
+    integer index;
+    if (option_index==-1){//here the user is standing on a pie_slice that did not even have a number printed on it, so give them a 0 for incorrect 
+        index=-1;
+    }else{//ok, good, the pie_slice they are standing on actually has a grade assigned to it
+        //find how many points the pie_slice is worth  
+        index = llList2Integer(opids,option_index);           
+    }
+    return index;
 }
 /*
 *  This function will determine how much a particular pie_slice is worth. 
@@ -380,12 +394,12 @@ default {
         }else 
         if (channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
             key hex = llList2Key(data,1);
-            integer question_id =llList2Integer(data,5);  
             debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
+            opids=llParseString2List(llList2String(data,6),[","],[]);
             if (hex==llGetKey()){
+            	question_id =llList2Integer(data,5);  
                 quiz_loaded=TRUE;
                 display_questions_for_mother_hex(str,id);
-                debug("----my question id is: "+(string)question_id);  
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
             }else{
                 //send question to child hex
@@ -433,16 +447,18 @@ default {
                 string pie_slice = get_detected_pie_slice(avatar_pos);
                 pie_slice_num=(integer)llGetSubString(pie_slice, -1, -1);
                 integer score_change = pie_slice_value(pie_slice_num);
+                integer opid = pie_slice_option_index(pie_slice_num);
                 if (score_change>0){
                     //avatar is correct
                     if (llListFindList(CORRECT_AVATARS, [avatar_name])==-1){ //dont add same name twice
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct_select_orb", [avatar_name], avatar_key, "hex_quizzer");
-                        CORRECT_AVATARS+=avatar_name;//record which avatars are correct because only those who are correct can click an orb
-                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,"multichoice|"+(string)question_id+"|"+(string)pie_slice_num+"|"+(string)score_change, avatar_key);
+                        CORRECT_AVATARS+=avatar_key;//record which avatars are correct because only those who are correct can click an orb
+                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,"multichoice|"+(string)question_id+"|"+(string)opid+"|"+(string)score_change, avatar_key);
                         llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)score_change+"|"+(string)llGetKey(), avatar_key);
                     }
                     
                 }else{
+                	 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,"multichoice|"+(string)question_id+"|"+(string)opid+"|"+(string)score_change, avatar_key);
                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "incorrect_can_not_select_orb", [avatar_name], avatar_key, "hex_quizzer");
                     llPushObject(avatar_key,<0,0,100>, <0,0,-100>, TRUE);
                 }
@@ -450,6 +466,12 @@ default {
                 string pie_slice_text =llList2String(pie_slice_hover_text,pie_slice_num);
                 pie_slice_hover_text= llListReplaceList(pie_slice_hover_text, [pie_slice_text+"\n"+avatar_name], pie_slice_num, pie_slice_num);
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|0,1,2,3,4,5,6|10", NULL_KEY);
+                integer j;
+                string correct_avatars_str= "Avatars allowed to click:"+strReplace(llList2CSV(CORRECT_AVATARS),",","\n");
+               
+                for(j=1;j<=6;j++){
+                	sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("orb")+(string)j], "option", [correct_avatars_str], "", "hex_quizzer");
+                } 
                 
             }
             //print names on pie slice hover text in GREEN if correct, in RED if incorrect

@@ -30,7 +30,7 @@
 *  DESCRIPTION
 *
 */
-
+integer TIME_LIMIT=10;//default, but can be set in config
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
 string sloodleserverroot = "";
 integer sloodlecontrollerid = 0;
@@ -76,7 +76,7 @@ integer SLOODLE_TIMER_STOP= -1639277013;//should stop the timer at its current p
 integer SLOODLE_TIMER_STOP_AND_RESET= -1639277014;//should stop the timer at its current position and reset count to 0
 integer SLOODLE_TIMER_RESET= -1639277015;//shoudl reset the count back to zero but not restart the timer
 integer SLOODLE_TIMER_TIMES_UP= -1639277016;//used to transmit the timer reached its time limit
-integer TIME_LIMIT=5;//default, but can be set in config
+
 integer COUNT=0;
 sloodle_error_code(string method, key avuuid,integer statuscode, string msg){
     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST, method+"|"+(string)avuuid+"|"+(string)statuscode+"|"+(string)msg, NULL_KEY);
@@ -167,12 +167,12 @@ state ready{
                 llSetTimerEvent(1);
             }else
             if (chan==SLOODLE_TIMER_RESTART){//used to set the counter to 0 and begin counting down again
-            	sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
+                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 COUNT=0;
                 llSetTimerEvent(1);
             }else
             if (chan==SLOODLE_TIMER_STOP){//stop the timer at its current position
-            	            	sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "timer_stopped", [" "], "", "hex_quizzer");
+                                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "timer_stopped", [" "], "", "hex_quizzer");
                 llSetTimerEvent(0);
             }else
             if (chan==SLOODLE_TIMER_STOP_AND_RESET){// stop the timer at its current position and reset count to 0

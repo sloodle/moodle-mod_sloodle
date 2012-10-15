@@ -255,10 +255,10 @@
                                 } else 
                                 if ( rowtype == "questionoption" ) {                        
                                     // Add this option to the appropriate place
-                                    opids_string += llList2String(thisline, 2)+"|";
-                                    optext_string += llList2String(thisline, 4)+"|";
+                                    opids_string += llList2String(thisline, 2)+",";
+                                    optext_string += llList2String(thisline, 4)+",";
                                     opgrade_string += llList2String(thisline, 5)+",";
-                                    opfeedback_string += llList2String(thisline, 6)+"|";   
+                                    opfeedback_string += llList2String(thisline, 6)+",";   
                                     opids += [(integer)llList2String(thisline, 2)];
                                     optext += [llList2String(thisline, 4)];
                                     opgrade += [(float)llList2String(thisline, 5)];
@@ -293,12 +293,14 @@
                                 
                             }
                             qdialogoptions_string = llList2CSV(qdialogoptions);
-                            string question_data = qdialogtext+"|";//question text
-                            question_data +=(string)hex+"|";
-                            question_data += qdialogoptions_string+"|";//options ie: a,b,c 
-                            question_data += opgrade_string+"|";//grade for each option ie: -1.0,1,-1 (1=correct)
-                            question_data += opfeedback_string+"|";//any feedback
-                            question_data +=question_id;
+                            string question_data = qdialogtext+"|";//question textindex 0
+                            question_data +=(string)hex+"|";//index 1
+                            question_data += qdialogoptions_string+"|";//index 2- options ie: a,b,c 
+                            question_data += opgrade_string+"|";//index 3 - grade for each option ie: -1.0,1,-1 (1=correct)
+                            question_data += opfeedback_string+"|";//index 4 - any feedback 
+                            question_data +=(string)question_id+"|";//index 5
+                            question_data +=opids_string; //index 6
+                            debug("+++++++++++++++++++= optioids_str: "+opids_string);
                             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, question_data, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
                             debug("question_data: "+question_data);
                          }
