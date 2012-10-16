@@ -310,7 +310,7 @@ XXXEODXXX;
                   	    //Yes. Activity completed
 						if (!empty($act)){
 						    $timezone = $act->timeupdated - 3600;          
-						    $date = date("F j, Y, g:i a", $timezone);   
+						    $date = date("F j, Y, g:i:s a", $timezone);   
 						    
 						    // Only the admin can reset tasks  
 						    if ($canManage)
