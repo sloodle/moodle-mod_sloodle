@@ -43,7 +43,7 @@ close(integer pie_slice){
     llSetTimerEvent(0);
     llTriggerSound("close", 1);
       if (pie_slice==1){
-          llSay(0,"closing 1");
+          
         vector Zfire=llGetScale();
         vector zFire=<2.30604,-1.45806,-0.02260>;
         vector zfIre=<6.19295,0.19941,5.36619>;
@@ -96,7 +96,7 @@ close(integer pie_slice){
 open(integer pie_slice){
     llTriggerSound("open", 1);
     if (pie_slice==1){
-        llSay(0,"opening 1");
+        
         vector Zfire=llGetScale();
         vector zFire=<5.03571,-3.13984,-2.54680>;
         vector zfIre=<6.19295,0.19941,5.36619>;
@@ -167,7 +167,7 @@ default{
         }
         list  pie_slice_grades = llParseString2List(llList2String(data,1), [","], []);
         integer my_grade=llList2Integer(pie_slice_grades,my_num-1);
-        if (my_grade==0){
+        if (my_grade<=0){
             open(my_num);
         }else{
              close(my_num);

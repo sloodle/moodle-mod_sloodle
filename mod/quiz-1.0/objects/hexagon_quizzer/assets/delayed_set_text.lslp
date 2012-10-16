@@ -28,9 +28,11 @@
 *  Edmund Edgar
 *
 *  DESCRIPTION
-*
+*	delayed_set_text.lslo
+*   After the timer says "Times up!"  Wait a few seconds, then reset the hover text of the timer prim to "Click the Colored Orb" so that new users can initiate the 
+*   question of the hexagon to be re-asked 
 */
-integer TIME_LIMIT=10;//default, but can be set in config
+
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
 string sloodleserverroot = "";
 integer sloodlecontrollerid = 0;
@@ -76,7 +78,7 @@ integer SLOODLE_TIMER_STOP= -1639277013;//should stop the timer at its current p
 integer SLOODLE_TIMER_STOP_AND_RESET= -1639277014;//should stop the timer at its current position and reset count to 0
 integer SLOODLE_TIMER_RESET= -1639277015;//shoudl reset the count back to zero but not restart the timer
 integer SLOODLE_TIMER_TIMES_UP= -1639277016;//used to transmit the timer reached its time limit
-
+integer TIME_LIMIT=5;//default, but can be set in config
 integer COUNT=0;
 sloodle_error_code(string method, key avuuid,integer statuscode, string msg){
     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST, method+"|"+(string)avuuid+"|"+(string)statuscode+"|"+(string)msg, NULL_KEY);
@@ -100,61 +102,7 @@ integer get_prim(string name){
     }
     return prim;
 }    
-// Configure by receiving a linked message from another script in the object
-// Returns TRUE if the object has all the data it needs
- integer sloodle_handle_command(string str){
-    list bits = llParseString2List(str,["|"],[]);
-    integer numbits = llGetListLength(bits);
-    string name = llList2String(bits,0);
-    string value1 = "";
-    string value2 = "";
-    if (numbits > 1) value1 = llList2String(bits,1);
-    if (numbits > 2) value2 = llList2String(bits,2);
-    else if (name == "set:timer_time_limit") TIME_LIMIT= (integer)value1;
-    else if (name == SLOODLE_EOF) eof = TRUE;
-    return TRUE;
-}
- debug (string message ){
-     list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
-     if (llList2Integer (params ,0)==PRIM_MATERIAL_FLESH){
-           llOwnerSay("memory: "+(string)llGetFreeMemory()+" Script name: "+llGetScriptName ()+": " +message );
-     }
-} 
 default {
-    on_rez(integer start_param) {
-        llResetScript();
-    }
-       state_entry(){
-        isconfigured = FALSE;
-        eof = FALSE;
-    }
-    link_message( integer sender_num, integer num, string str, key user_key){
-        // Check the channel for configuration messages
-        if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
-            // Split the message into lines
-            list lines = llParseString2List(str, ["\n"], []);
-            integer numlines = llGetListLength(lines);
-            integer i = 0;
-            for (i=0; i < numlines; i++) {
-                isconfigured = sloodle_handle_command(llList2String(lines, i));
-            }
-            // If we've got all our data AND reached the end of the configuration data (eof), then move on
-            if (eof == TRUE) {
-                if (isconfigured == TRUE) {
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
-                    state ready;
-                } else {
-                    // Go all configuration but, it's not complete... request reconfiguration
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [llGetScriptName()], NULL_KEY, "");
-                    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
-                    eof = FALSE;
-                }
-            }
-        }
-    }
-}
-
-state ready{
     on_rez(integer start_param) {
         llResetScript();
     }
@@ -164,16 +112,17 @@ state ready{
 
     link_message(integer sender_num, integer chan, string str, key id) {
             if (chan==SLOODLE_TIMER_START){//starts the timer from its current position
-                llSetTimerEvent(1);
+                llSetTimerEvent(0);
             }else
             if (chan==SLOODLE_TIMER_RESTART){//used to set the counter to 0 and begin counting down again
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
+            	sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 COUNT=0;
-                llSetTimerEvent(1);
+                llSetTimerEvent(0);
             }else
             if (chan==SLOODLE_TIMER_STOP){//stop the timer at its current position
-                                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "timer_stopped", [" "], "", "hex_quizzer");
-                llSetTimerEvent(0);
+            	            	sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "timer_stopped", [" "], "", "hex_quizzer");
+                COUNT=0;
+                llSetTimerEvent(5);
             }else
             if (chan==SLOODLE_TIMER_STOP_AND_RESET){// stop the timer at its current position and reset count to 0
                 llSetTimerEvent(0);
@@ -181,34 +130,21 @@ state ready{
             }else
             if (chan==SLOODLE_TIMER_RESET){// reset the count back to zero but not restart the timer
                 COUNT=0;
+                llSetTimerEvent(5);
+                
+            }else
+            if (chan==SLOODLE_TIMER_TIMES_UP){// reset the count back to zero but not restart the timer
+                COUNT=0;
+                llSetTimerEvent(5);
+                
             }
+            
     
     }
     timer() {
-        COUNT++;
-        vector color;
-        if ((TIME_LIMIT - COUNT)<=0){
             llSetTimerEvent(0.0);
-            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "times_up", [], "", "hex_quizzer");
-            llTriggerSound("SND_BUZZER",0.2);
-            llMessageLinked(LINK_SET, SLOODLE_TIMER_TIMES_UP, "", NULL_KEY);
+            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("timer_prim")], "ready_click_colored_orb_to_ask", [], "", "hex_quizzer");
             return;
-        }
-        string timer_text="(" + (string)(TIME_LIMIT - COUNT) + ")";
-     
-        if ((TIME_LIMIT - COUNT)>10){
-            color=GREEN;
-            llTriggerSound("SND_TICK",0.2);
-        }
-        else if ((TIME_LIMIT - COUNT)<=10&&(TIME_LIMIT - COUNT)>5){
-            color=YELLOW;
-            llTriggerSound("SND_TICK",0.2);
-        }
-        else {
-            color=RED;
-            llTriggerSound("SND_BEEPBEEP",0.2);
-        };
-        sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("timer_prim")], "option", [timer_text], "", "hex_quizzer");
-           
+            
     }
 }

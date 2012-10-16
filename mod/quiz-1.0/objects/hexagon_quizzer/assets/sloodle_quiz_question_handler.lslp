@@ -123,17 +123,17 @@
                    }
                 //  this is what was sent: llList2String(question_ids, current_question_index)+"|"+(string)users_question_index+"|"+(string)num_questions+"|"+(string)menu_channel+"|"+sloodleserverroot+sloodle_quiz_url+"|"+sloodlehttpvars,user_key );//todo add to dia    
                 if (channel == SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG) {
+                	//
+//0 (string)current_question_id
+//1(string)users_question_index
+//2(string)num_questions
+//3(string)menu_channel
+//4(string)hex
+//5 sloodleserverroot
+//6 sloodle_quiz_url
+//7 sloodlehttpvars,user_key );//todo add to dia
                     integer menu_channel;                   
                     list data = llParseString2List(str, ["|"], []);
-                    
-                    /*  llList2String(question_ids, current_question_index)
-                      +"|"+(string)users_question_index
-                      +"|"+(string)num_questions
-                      +"|"+(string)menu_channel
-                      +"|"+sloodleserverroot+sloodle_quiz_url
-                      +"|"+sloodlehttpvars,user_key );//todo add to dia
-              */
-                   
                     integer question_id = llList2Integer(data, 0);
                     integer users_question_index = llList2Integer(data, 1);
                     num_questions = llList2Integer(data, 2);
@@ -141,9 +141,8 @@
                     key hex=llList2Key(data,4);
                     sloodle_full_quiz_url = llList2String(data, 5);
                     integer offset = llStringLength((string)question_id+"|"+(string)users_question_index+"|"+(string)num_questions);
-                    offset+=llStringLength("|"+(string)menu_channel+"|"+(string)sloodle_full_quiz_url)+1;
+                    offset+=llStringLength("|"+(string)menu_channel+"|"+(string)hex+"|"+(string)sloodle_full_quiz_url)+1;
                     sloodlehttpvars = llGetSubString(str, offset, -1);//-1 is the end of the list
-                    //****0****10****-8610976****http://englishvillage.avatarclassroom.com/mod/sloodle/mod/quiz-1.0/linker.php****sloodlecontrollerid=2&sloodlepwd=0fcf04ac-4504-6209-050e-6267014c38b8|922621267&sloodlemoduleid=8&sloodleserveraccesslevel=0
                     string db_str ="*********************************************\n";
                     db_str+="* str = "+str+"\n";
                     db_str+="* \n";
@@ -155,6 +154,7 @@
                     db_str+="* sloodlehttpvars = "+(string)sloodlehttpvars+"\n";
                     db_str +="*********************************************\n";
                     debug(db_str);
+                    
                     integer user_id = llListFindList(users, [user_key]);
                     if (user_id==-1){
                             //if we have never seen this user before, add them to the system
@@ -171,7 +171,7 @@
                         users_current_question_index =llListReplaceList(users_current_question_index , [users_question_index], user_id, user_id);
                     }
                     
-                    string body=sloodlehttpvars;
+                    string body=sloodlehttpvars+"/?";
                     sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "Asking a questions",  [llKey2Name(user_key)], user_key, "quizzer");
                     // Request the quiz data from Moodle
                     body += "&sloodlerequestdesc="+"REQUESTING_QUESTION";
@@ -179,6 +179,8 @@
                     body += "&sloodleavname=" + llEscapeURL(llKey2Name(user_key));
                     body += "&ltq="+(string)question_id;
                     body +="&request_timestamp="+(string)llGetUnixTime(); 
+                    debug("sloodle_full_quiz_url: "+sloodle_full_quiz_url);
+                    debug("body: "+body);
                     debug("request_question: "+sloodle_full_quiz_url+"/?"+body);
                     server_requests+=  llHTTPRequest(sloodle_full_quiz_url, [HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/x-www-form-urlencoded"], body);   
               } 
@@ -202,6 +204,7 @@
                     string  request_descriptor =llList2String(statusfields, 3); 
                     key user_key = llList2Key(statusfields,6);
                     integer user_id =llListFindList(users,[user_key]);
+                    integer  question_id = llList2Integer(users_question_id,user_id);
                     //the user who initiated this request
                     if (request_descriptor=="REQUESTING_QUESTION"){
                         request_descriptor="";
@@ -244,18 +247,18 @@
                                         qtext = llList2String(thisline, 4);
                                         qtype = llList2String(thisline, 7);
                                         // Make sure it's a valid question type
-                                        if ((qtype != "multichoice") && (qtype != "truefalse") && (qtype != "numerical") && (qtype != "shortanswer")) {
+                                        if ((qtype != "multichoice")) {
                                               sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "hex_quizzer");
-                                      //    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
+                                      //     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ERROR_INVALID_QUESION, (string)question_id, user_key);//todo add to dia
                                               return;
                                         }
                                 } else 
                                 if ( rowtype == "questionoption" ) {                        
                                     // Add this option to the appropriate place
-                                    opids_string += llList2String(thisline, 2)+"|";
-                                    optext_string += llList2String(thisline, 4)+"|";
+                                    opids_string += llList2String(thisline, 2)+",";
+                                    optext_string += llList2String(thisline, 4)+",";
                                     opgrade_string += llList2String(thisline, 5)+",";
-                                    opfeedback_string += llList2String(thisline, 6)+"|";   
+                                    opfeedback_string += llList2String(thisline, 6)+",";   
                                     opids += [(integer)llList2String(thisline, 2)];
                                     optext += [llList2String(thisline, 4)];
                                     opgrade += [(float)llList2String(thisline, 5)];
@@ -290,81 +293,19 @@
                                 
                             }
                             qdialogoptions_string = llList2CSV(qdialogoptions);
-                            string question_data = qdialogtext+"|";//question text
-                            question_data +=(string)hex+"|";
-                            question_data += qdialogoptions_string+"|";//options ie: a,b,c 
-                            question_data += opgrade_string+"|";//grade for each option ie: -1.0,1,-1 (1=correct)
-                            question_data += opfeedback_string;//any feedback
+                            string question_data = qdialogtext+"|";//question textindex 0
+                            question_data +=(string)hex+"|";//index 1
+                            question_data += qdialogoptions_string+"|";//index 2- options ie: a,b,c 
+                            question_data += opgrade_string+"|";//index 3 - grade for each option ie: -1.0,1,-1 (1=correct)
+                            question_data += opfeedback_string+"|";//index 4 - any feedback 
+                            question_data +=(string)question_id+"|";//index 5
+                            question_data +=opids_string; //index 6
+                            debug("+++++++++++++++++++= optioids_str: "+opids_string);
                             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, question_data, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
                             debug("question_data: "+question_data);
                          }
               }
-              listen(integer channel, string name, key user_key, string user_response){
-             
-                    if (llListFindList(users_menu_channels, [channel])==-1) {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "usedialogs", [llKey2Name(user_key)], user_key, "quizzer");
-                        return;
-                    }
-              
-                string opid; // used when the feedback is too long, and we have to fetch it off the server
-                // Only listen to the sitter
-                if (llListFindList(users, [user_key])!=-1) {
-                    /* Determine the user_id so we can access the current question the user is on, as wel as access other info about this user
-                    *  which is stored in this script
-                    */
-                    integer user_id=llListFindList(users, [user_key]);
-                    integer listenHandler = llList2Integer(users_listen_handler, user_id);
-                    llListenRemove(listenHandler);
-                    debug("removing Listen Handler");
-                
-                    integer question_id = llList2Integer(users_question_id,user_id);
-                    // Handle the answer...
-                    float scorechange = 0;
-                    string feedback = "";
-                    string answeroptext = "";
-                    list opInfo = llParseString2List(llList2String(user_question_options,user_id), [SEPARATOR], []);
-                    list opids = llParseString2List(llList2String(opInfo,0), ["|"], []);
-                    list optext = llParseString2List(llList2String(opInfo,1), ["|"], []);
-                    list opgrade = llParseString2List(llList2String(opInfo,2), ["|"], []);
-                    list opfeedback = llParseString2List(llList2String(opInfo,3), ["|"], []);
-                    
-                    // Check the type of question this was
-                    if ((qtype == "multichoice") || (qtype == "truefalse")) {
-                        // Multiple choice - the response should be a number from the dialog box (1-based)
-                        integer answer_num = (integer)user_response;
-                        // Make sure it's valid
-                        if ((answer_num > 0) && (answer_num <= llGetListLength(opids))) {
-                            // Correct to 0-based
-                            answer_num -= 1;
-                            feedback = llList2String(opfeedback, answer_num);
-                            scorechange = llList2Float(opgrade, answer_num);
-                            opid = llList2String(opids, answer_num);
-                            answeroptext = llList2String(optext, answer_num);
-
-                            // Notify the server of the response
-                            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,(string)qtype+"|"+(string)question_id+"|"+ llList2String(opids, answer_num)+"|"+(string)scorechange, user_key);
-                        } else {
-                           
-                          sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "invalidchoice",  [llKey2Name(user_key)],user_key, "quizzer");
-                           // ask_question();
-                        }        
-                      
-                    }else {
-                        sloodle_translation_request(SLOODLE_TRANSLATE_IM , [0], "invalidtype" , [], user_key, "quizzer" );
-                    }                
-                   //handle feedback
-                   
-                    if (feedback == "[[LONG]]") { // special long feedback placeholder for when there is too much feedback to give to the script
-                        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FEED_BACK_REQUEST, (string)question_id+"|"+(string)opid,user_key);
-                    }
-                    else if (feedback != ""){
-                         llInstantMessage(user_key, feedback); // Text feedback
-                    }
-                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)scorechange, user_key);
-                   
-                    
-            } 
-    }
+            
 }
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/hex_quizzer/assets/sloodle_quiz_question_handler.lslp
