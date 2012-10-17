@@ -6,7 +6,7 @@
 *  Part of the Sloodle project (www.sloodle.org)
 *
 *  Copyright (c) 2011-06 contributors (see below)
-*  Released under the GNU GPL v3
+*  Released under the GNU GPL v3 
 *  -------------------------------------------
 *
 *  This program is free software: you can redistribute it and/or modify
@@ -225,7 +225,7 @@ string get_detected_pie_slice(vector avatar){
 }
 
 display_questions(string str,key id){
-	debug("displaying questions");
+    debug("displaying questions");
                 llTriggerSound("SND_LOADING_COMPLETE", 1);
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
@@ -249,6 +249,7 @@ display_questions(string str,key id){
                     //SET PIE_SLICE TO PARTICULAR OPTION
                      set_texture_pie_slice((string)option,(integer)pie_slice);
                 }
+                debug("\n\n\n\n\n\n------------------------------------------------ starting timer sending timelimit: "+(string)TIME_LIMIT);
                 llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART,(string)TIME_LIMIT, "");
                /* for (j=1;j<=6;j++){
                     integer value = pie_slice_value(j);
@@ -361,7 +362,7 @@ integer sloodle_handle_command(string str){
                     sloodlepwd = value1;
                 }
             }
-            else if (name == "set:timer_time_limit") TIME_LIMIT= (integer)value1;
+            else if (name == "set:questiontimelimit") TIME_LIMIT= (integer)value1;
             else if (name == "set:sloodlecontrollerid") sloodlecontrollerid = (integer)value1;
             else if (name == "set:sloodlemoduleid") sloodlemoduleid = (integer)value1;
             else if (name == "set:sloodleobjectaccessleveluse") sloodleobjectaccessleveluse = (integer)value1;
@@ -402,22 +403,33 @@ default {
         llResetScript();
     }
     state_entry() {
+        
         init();
         debug("default state");
         llTriggerSound("SND_STARTING_UP", 1);
+        master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", "", "");
+       
+        debug("asking for config");
         llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
         sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
-        llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)30, "");
-        master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", "", "");
+        llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
+        
+    }
+    touch_start(integer num_detected) {
+        debug("asking for config");
+        llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
+        sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
+        llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
     }
     link_message(integer sender_num, integer channel, string str, key id) {
                 if (channel==SLOODLE_TIMER_TIMES_UP){
                     sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("question_prim")], "failedtoloadconfig", [], "", "hex_quizzer");
                     llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
-                    llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)30, "");  
+                 llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
                 }
         }
      listen(integer channel, string name, key id, string message) {
+         debug("heard something: "+message);
         if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE){
             list data=llParseString2List(message, [HEX_CONFIG_SEPARATOR], []);
             string command = llList2String(data,0);
@@ -429,7 +441,7 @@ default {
                 master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");
             }
             if (command=="receive config"){
-            	llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
+                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "receivingconfig", [], "", "hex_quizzer");
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 debug("received config: "+message);
@@ -461,33 +473,36 @@ default {
             llResetScript();
             }
             state_entry() {
-            	debug("ready state");
+                debug("ready state");
                 sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
                 sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
                 sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
                 sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "loadingquiz", [], "", "hex_quizzer");
-                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)30, "");
+                llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
                 llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");                
-                llRegionSayTo(MASTERS_KEY,SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "LOAD QUIZ");
+                llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "LOAD QUIZ");
                 debug("sending to"+(string)MASTERS_KEY+" : LOAD QUIZ");
             }
             touch_start(integer num_detected) {
-                llRegionSayTo(MASTERS_KEY,SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "LOAD QUIZ");
+                llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "LOAD QUIZ");
             }
             link_message(integer sender_num, integer channel, string str, key id) {
                 if (channel==SLOODLE_TIMER_TIMES_UP){
                     sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("question_prim")], "failedtoloadquiz", [], "", "hex_quizzer");
+                       llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "LOAD QUIZ");
+                       llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
+                       
                 }
             }
             listen(integer channel, string name, key id, string message) {
             if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE){
-            	debug("got quiz data from server: "+message);
+                debug("got quiz data from server: "+message);
                 list data=llParseString2List(message, [HEX_CONFIG_SEPARATOR], []);
                 string command = llList2String(data,0);
                 debug("Command: "+command);
                 if (command=="receive quiz data"){
-                	llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
+                    llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
                     QUIZ_DATA_str= llList2String(data,1);
                     list quiz_data =llParseString2List(QUIZ_DATA_str, ["|"], []);
                     quiz_id=llList2Integer(quiz_data,0);
@@ -528,7 +543,7 @@ default {
             llResetScript();
         }
         state_entry() {
-        	debug("quizzing state");
+            debug("quizzing state");
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("question_prim")], "ready_click_colored_orb", [], "", "hex_quizzer");
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
         }
@@ -573,6 +588,7 @@ default {
                 quiz_loaded=TRUE;
                 display_questions(str,id);
                 llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
+                llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)TIME_LIMIT+"|"+"SND_BUZZER", "");
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
             }
         }else
@@ -666,17 +682,23 @@ default {
     
         };
     }
+    
      object_rez(key platform) {
         //a new hex was rezzed, listen to the new hex platform
-            llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "", platform, "");
+          
             rezzed_hexes+=platform;
             llGiveInventory(platform, HEXAGON_PLATFORM);
             debug("giving platform script");
             //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
             llRemoteLoadScriptPin(platform, "rezzer_platform.lslp",PIN, TRUE, 0);
+            //tell mother hex we rezzed a grandchild!  Mother will be happy!  we need to do this so that the mother hex will listen to her grandchildren when they are requesting questions
             
-           
-    }
+            string hash =  llSHA1String(sloodleserverroot+sloodlecontrollerid+sloodlemoduleid);
+            debug("((((((((((((((((((((((((( "+sloodleserverroot+" "+sloodlecontrollerid+" "+sloodlemoduleid+" " +hash);
+            llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+platform+"|"+hash);
 
+    } 
+
+    
    
 }

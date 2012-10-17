@@ -35,6 +35,7 @@ integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sl
 string sloodleserverroot = "";
 integer sloodlecontrollerid = 0;
 string sloodlepwd = "";
+string END_SOUND;
 integer sloodlemoduleid = 0;
 integer sloodleobjectaccessleveluse = 0; // Who can use this object?
 integer sloodleobjectaccesslevelctrl = 0; // Who can control this object?
@@ -116,16 +117,19 @@ default {
     }
 
     link_message(integer sender_num, integer chan, string str, key id) {
-    		
-    		
+            
+            list data=llParseString2List(str, ["|"], []);
+            
             if (chan==SLOODLE_TIMER_START){//starts the timer from its current position
                 llSetTimerEvent(1);
-                TIME_LIMIT=(integer)str;
+                TIME_LIMIT=(integer)llList2Integer(data,0);
+                END_SOUND=llList2String(data,1);
             }else
             if (chan==SLOODLE_TIMER_RESTART){//used to set the counter to 0 and begin counting down again
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 COUNT=0;
-                TIME_LIMIT=(integer)str;
+                TIME_LIMIT=(integer)llList2Integer(data,0);
+                END_SOUND=llList2String(data,1);
                 llSetTimerEvent(1);
             }else
             if (chan==SLOODLE_TIMER_STOP){//stop the timer at its current position
@@ -148,7 +152,9 @@ default {
         if ((TIME_LIMIT - COUNT)<=0){
             llSetTimerEvent(0.0);
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "times_up", [], "", "hex_quizzer");
-            llTriggerSound("SND_BUZZER",0.2);
+            if (END_SOUND!=""){
+                llTriggerSound(END_SOUND,0.2);
+            }
             llMessageLinked(LINK_SET, SLOODLE_TIMER_TIMES_UP, "", NULL_KEY);
             return;
         }

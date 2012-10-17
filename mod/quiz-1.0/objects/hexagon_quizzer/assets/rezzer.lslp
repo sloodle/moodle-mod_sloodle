@@ -75,6 +75,7 @@ string sloodle_quiz_url = "/mod/sloodle/mod/quiz-1.0/linker.php";
 list  sides_rezzed;
 string QUIZ_DATA;
 integer TIME_LIMIT;
+list GRAND_CHILDREN;
 integer SLOODLE_REMOTE_LOAD_SCRIPT=1639277018;
 string HEX_CONFIG_SEPARATOR="*^*^*^";
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
@@ -245,7 +246,7 @@ display_questions_for_mother_hex(string str,key id){
                      set_texture_pie_slice((string)option,(integer)pie_slice);
                 }
                 debug("\n\n\n\n\n time limit is: "+(string)TIME_LIMIT);
-                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
+                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT+"|SND_BUZZER", "");
                /* for (j=1;j<=6;j++){
                     integer value = pie_slice_value(j);
                     integer prim_link=get_prim("pie_slice"+(string)j);
@@ -452,7 +453,7 @@ state ready{
                     TIMES_UP=FALSE;
                     set_all_pie_slice_hover_text(" ");
                     llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
-                    llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
+                    llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT+"|SND_BUZZER", "");
                 }
             }
                     
@@ -626,10 +627,35 @@ state ready{
     listen(integer channel, string name, key id, string message) {
         list data = llParseString2List(message, ["|"], []);
         string command = llList2String(data, 0);
-        debug("**************************"+message);
+        debug("************************** command is: "+command);
+        if (command=="rezzed grandchild"){
+	       	debug("a grandchild.. i hope its mine!");
+	       	string my_hash =  llSHA1String(sloodleserverroot+sloodlecontrollerid+sloodlemoduleid);
+	        string received_hash=llList2String(data,2);
+	        if (received_hash==my_hash){
+		    	debug("(((((((((server(((((((((((((((( "+sloodleserverroot+" "+sloodlecontrollerid+" "+sloodlemoduleid+" my hash " +my_hash+ " received hash: "+received_hash);
+		        //this is my grandchild because they have the same serverroot, controllerid, and moduleid as me!
+		        key grandchild=llList2Key(data,1);
+		        llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "",grandchild, "");
+		        if (llListFindList(GRAND_CHILDREN,[grandchild])==-1){
+		        	GRAND_CHILDREN+=grandchild;
+		         	
+		         }
+		         debug("\n\n\n\nYay! a grandchild! listening to "+llList2CSV(GRAND_CHILDREN));
+		         
+		        
+    	   }
+        }
+       
+        if (llListFindList(rezzed_hexes, [id])==-1&&llListFindList(GRAND_CHILDREN,[id])==-1){
+        	debug("---------------not my relative!!");
+        	llOwnerSay("---------------not my relative!!");
+		    //return;
+        }
+         debug("continuing");
         if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST){
             if (command=="GET CONFIG"){
-                    debug("sending config data");
+                   debug("sending config data");
                    llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive config"+HEX_CONFIG_SEPARATOR+CONFIG);
                 
             }else
@@ -651,7 +677,7 @@ state ready{
                 debug("sending: "+"receive quiz data"+HEX_CONFIG_SEPARATOR+QUIZ_DATA+"|"+(string)question_id+"|"+(string)current_question);
                 llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive quiz data"+HEX_CONFIG_SEPARATOR+QUIZ_DATA+"|"+(string)question_id+"|"+(string)current_question);
             }
-        }
+         }
             
     }
 }
