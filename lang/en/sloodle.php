@@ -393,6 +393,7 @@ $string['relativeresults'] = 'Show relative results?';
 $string['runningcompatibilitycheck'] = 'Running compatibility check...';
 $string['resettasks'] = 'Reset selected tasks';
 $string['resetallprogress'] = 'Reset all progress';
+$string['questiontimelimit']='Time limit for answering questions';
 
 $string['save'] = 'Save';
 $string['second'] = 'second';
