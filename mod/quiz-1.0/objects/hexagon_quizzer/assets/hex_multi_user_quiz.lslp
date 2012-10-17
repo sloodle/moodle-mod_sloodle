@@ -156,9 +156,9 @@
                 integer q;
                 //randomize the questions for the new user if required
                 list temp=question_ids;
-                if (doRandomize==1){
-                    temp=llListRandomize(question_ids, STRIDE_LENGTH_IS_ONE);
-                }
+              //  if (doRandomize==1){
+                //    temp=llListRandomize(question_ids, STRIDE_LENGTH_IS_ONE);
+             //   }
                 //now create a question list for this user
                 string new_user_question_string="";
                 for (q=0;q<num_questions;q++){
@@ -373,7 +373,7 @@
            
                 //tell other scripts we are loading the quiz;
                 llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ, "", NULL_KEY);
-               sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
+                sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
                 sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
                 sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
                 sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
