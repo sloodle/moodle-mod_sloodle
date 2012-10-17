@@ -61,7 +61,8 @@ list locstrings = [
     "loading_question","Loading question...",
     "timer_stopped","Timer Stopped",
 	"no_more_questions","All the questions in the quiz have been asked. No more questions are available.",
-	"requesting_config","Requesting Configuration ... "
+	"requesting_config","Requesting Configuration ... ",
+	"script_configurationreceived", "Script: {{0}} - Ready"
     
 ];
 

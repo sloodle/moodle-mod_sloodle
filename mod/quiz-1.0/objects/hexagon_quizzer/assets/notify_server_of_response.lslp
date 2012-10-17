@@ -210,7 +210,7 @@
                             state ready;
                         } else {
                             // Go all configuration but, it's not complete... request reconfiguration
-                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [llGetScriptName()], NULL_KEY, "");
+                           	sloodle_translation_request ( SLOODLE_TRANSLATE_SAY , [0], "script_configurationreceived" , [ llGetScriptName()], NULL_KEY , "hex_quizzer");
                             llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
                             eof = FALSE;
                         }
