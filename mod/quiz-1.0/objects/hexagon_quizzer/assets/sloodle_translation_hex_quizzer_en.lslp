@@ -66,7 +66,9 @@ list locstrings = [
 	"receivingconfig","Receiving configuration from master hexagon...",
 	"loadingquiz","Loading quiz...",
 	"quizloaded","Quiz loaded!",
-	"failedtoload","Failed to load quiz. Reconnecting with master hexagon..."
+	"failedtoloadquiz","Failed to load quiz. Reconnecting with master hexagon...",
+	"failedtoloadconfig","Failed to load configuration. Reconnecting with master hexagon..."
+	
     
 ];
 
