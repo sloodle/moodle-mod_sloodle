@@ -58,7 +58,9 @@ integer doPlaySound;
 integer quiz_id;
 string quiz_name;
 integer question_id;
+list question_ids;
 integer num_questions;
+integer current_question;
 string sloodleserverroot = "";
 integer sloodlecontrollerid = 0;
 string sloodlepwd = "";
@@ -79,9 +81,10 @@ integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
 integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
 integer SLOODLE_SET_TEXTURE= -1639277010; 
+integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
-integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
+
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
 string SLOODLE_TRANSLATE_WHISPER = "whisper";               // 1 output parameter: chat channel number
@@ -337,9 +340,10 @@ sloodle_translation_request(string output_method, list output_params, string str
 }
         
 init(){
-		MY_SLICES=[1,2,3,4,5,6];
+        current_question=0;
+        MY_SLICES=[1,2,3,4,5,6];
         MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
-    	//get the dimensions of a pie_slice so we can determin the length of the sides of a pieslice.  In this case, we will choose pie_slice6 (they all have same dimensions)
+        //get the dimensions of a pie_slice so we can determin the length of the sides of a pieslice.  In this case, we will choose pie_slice6 (they all have same dimensions)
         integer pie_slice6 = get_prim("pie_slice6");
         list pie_slice_data = llGetLinkPrimitiveParams(pie_slice6, [PRIM_SIZE] );
         vector pie_slice_size=llList2Vector(pie_slice_data, 0);
@@ -410,7 +414,7 @@ default {
                     // If we've got all our data AND reached the end of the configuration data (eof), then move on
                     if (eof == TRUE) {
                         if (isconfigured == TRUE) {
-                           	sloodle_translation_request ( SLOODLE_TRANSLATE_SAY , [0], "script_configurationreceived" , [ llGetScriptName()], NULL_KEY , "hex_quizzer");
+                               sloodle_translation_request ( SLOODLE_TRANSLATE_SAY , [0], "script_configurationreceived" , [ llGetScriptName()], NULL_KEY , "hex_quizzer");
                             state ready;
                         }
                     }
@@ -427,7 +431,8 @@ state ready{
           sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
           string name=llGetObjectName();
           //show orbs
-          llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|0,1,2,3,4,5,6|10", NULL_KEY);    
+          llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|0,1,2,3,4,5,6|10", NULL_KEY);
+              
         }
         touch_start(integer num_detected) {
             if (quiz_loaded==FALSE){
@@ -457,6 +462,7 @@ state ready{
               quiz_id=llList2Integer(data,0);
               quiz_name=llList2String(data,1);
               num_questions=llList2Integer(data,2);
+              question_ids=llParseString2List(llList2String(data,3), [","], []);
               debug("------quiz loaded: "+(string)quiz_id+" quiz name: "+quiz_name+" num questions: "+(string)num_questions);
         }else
         if (channel ==SLOODLE_CHANNEL_USER_TOUCH){
@@ -592,44 +598,49 @@ state ready{
             llGiveInventory(platform, HEXAGON_PLATFORM);
             debug("giving platform script");
             //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "0|sloodle_translation_en.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "1|sloodle_translation_hex_quizzer_en.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "2|timer.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "3|delayed_set_text.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "4|feedback_request.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "5|finish_quiz.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "6|load_quiz.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "7|notify_server_of_response.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "8|sloodle_quiz_question_handler.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "9|hex_multi_user_quiz.lslp", platform);
-            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "10|rezzer_platform.lslp", platform);
+   /*         llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "0|"+(string)PIN+"|sloodle_translation_en.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "1|"+(string)PIN+"|sloodle_translation_hex_quizzer_en.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "2|"+(string)PIN+"|timer.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "3|"+(string)PIN+"|delayed_set_text.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "4|"+(string)PIN+"|feedback_request.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "5|"+(string)PIN+"|finish_quiz.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "6|"+(string)PIN+"|load_quiz.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "7|"+(string)PIN+"|notify_server_of_response.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "8|"+(string)PIN+"|sloodle_quiz_question_handler.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "9|"+(string)PIN+"|hex_multi_user_quiz.lslp|"+(string)TRUE+"|0", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "10|"+(string)PIN+"|rezzer_platform.lslp|"+(string)TRUE+"|0", platform);
+            */
+            llRemoteLoadScriptPin(platform, "rezzer_platform.lslp",PIN, TRUE, 0);
+            
+           
     }
     listen(integer channel, string name, key id, string message) {
         list data = llParseString2List(message, ["|"], []);
         string command = llList2String(data, 0);
         debug("**************************"+message);
         if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST){
-            if (command=="GET QUESTION"){
-                if (llGetListLength(QUESTIONS_ASKED)>=num_questions){
-                    //quiz finished
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "no_more_questions", [], NULL_KEY, "hex_quizzer");
-                    return;
-                 }
-                key user_key = llList2Key(data,1);
-                debug("received request from "+llKey2Name(id)+" for user: "+llKey2Name(user_key));
-                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION, (string)id, user_key);
-                
-            }else
             if (command=="GET CONFIG"){
                     debug("sending config data");
                    llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive config"+HEX_CONFIG_SEPARATOR+CONFIG);
                 
             }else
             if (command=="LOAD QUIZ"){
-                   debug("sending quiz data");
-                   llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive quiz data"+HEX_CONFIG_SEPARATOR+QUIZ_DATA);
-                   
-                
+                key user_key = llList2Key(data,1);
+                debug("received load quiz - current question is: "+(string)current_question+ " num questions is : "+(string)num_questions);
+                if (current_question>num_questions){
+                    if (doRepeat==TRUE){
+                        current_question=0;
+                    }else{
+                        //TODO finish quiz for all avatars
+                         sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "no_more_questions", [], NULL_KEY, "hex_quizzer");
+                        return;
+                    }
+                }
+                integer question_id = llList2Integer(question_ids,current_question);
+                current_question++;
+                debug("sending quiz data");
+                debug("sending: "+"receive quiz data"+HEX_CONFIG_SEPARATOR+QUIZ_DATA+"|"+(string)question_id+"|"+(string)current_question);
+                llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive quiz data"+HEX_CONFIG_SEPARATOR+QUIZ_DATA+"|"+(string)question_id+"|"+(string)current_question);
             }
         }
             
