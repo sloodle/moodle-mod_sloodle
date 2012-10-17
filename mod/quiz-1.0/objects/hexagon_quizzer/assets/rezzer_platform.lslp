@@ -403,6 +403,7 @@ default {
     }
     state_entry() {
         init();
+        debug("default state");
         llTriggerSound("SND_STARTING_UP", 1);
         llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
         sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
@@ -460,6 +461,7 @@ default {
             llResetScript();
             }
             state_entry() {
+            	debug("ready state");
                 sloodlehttpvars = "sloodlecontrollerid=" + (string)sloodlecontrollerid;
                 sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
                 sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
@@ -526,7 +528,7 @@ default {
             llResetScript();
         }
         state_entry() {
-        	
+        	debug("quizzing state");
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("question_prim")], "ready_click_colored_orb", [], "", "hex_quizzer");
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
         }
@@ -534,7 +536,7 @@ default {
             if (TIMES_UP){//re-ask question
                 TIMES_UP=FALSE;
                 set_all_pie_slice_hover_text(" ");
-                llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,qstring,id);
+                llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,qstring,llDetectedKey(0));
                 
             }
         }
@@ -664,7 +666,17 @@ default {
     
         };
     }
-    
+     object_rez(key platform) {
+        //a new hex was rezzed, listen to the new hex platform
+            llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "", platform, "");
+            rezzed_hexes+=platform;
+            llGiveInventory(platform, HEXAGON_PLATFORM);
+            debug("giving platform script");
+            //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
+            llRemoteLoadScriptPin(platform, "rezzer_platform.lslp",PIN, TRUE, 0);
+            
+           
+    }
 
    
 }
