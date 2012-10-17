@@ -244,6 +244,7 @@ display_questions_for_mother_hex(string str,key id){
                     //SET PIE_SLICE TO PARTICULAR OPTION
                      set_texture_pie_slice((string)option,(integer)pie_slice);
                 }
+                debug("\n\n\n\n\n time limit is: "+(string)TIME_LIMIT);
                 llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
                /* for (j=1;j<=6;j++){
                     integer value = pie_slice_value(j);
@@ -383,7 +384,10 @@ init(){
                     sloodlepwd = value1;
                 }
             }
-            else if (name == "set:timer_time_limit") TIME_LIMIT= (integer)value1;
+            else if (name == "set:questiontimelimit"){
+            	 TIME_LIMIT= (integer)value1;
+            	   debug("\n\n\n\n\n we got time limit is: "+(string)TIME_LIMIT);
+            }
             else if (name == "set:sloodlecontrollerid") sloodlecontrollerid = (integer)value1;
             else if (name == "set:sloodlemoduleid") sloodlemoduleid = (integer)value1;
             else if (name == "set:sloodleobjectaccessleveluse") sloodleobjectaccessleveluse = (integer)value1;
@@ -400,7 +404,12 @@ default {
         llResetScript();
     }
     state_entry() {
-        
+        integer n=llGetNumberOfPrims();
+        integer j=0;
+        for (j=0;j<n;j++){
+            llSetLinkPrimitiveParamsFast( j,[PRIM_TEXT," ",GREEN,1]);
+        }
+        llSetScriptState( "rezzer_platform.lslp", FALSE);
     }
     link_message(integer sender_num, integer num, string str, key id) {
         if (num==SLOODLE_CHANNEL_OBJECT_DIALOG){
@@ -502,8 +511,8 @@ state ready{
             }
         }else
         if (channel==SLOODLE_TIMER_TIMES_UP){
-           
             TIMES_UP=TRUE;
+            
         }
     }
     sensor(integer num_avatars_detected) {

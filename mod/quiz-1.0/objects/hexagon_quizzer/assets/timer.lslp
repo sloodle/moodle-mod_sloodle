@@ -116,14 +116,16 @@ default {
     }
 
     link_message(integer sender_num, integer chan, string str, key id) {
-    		TIME_LIMIT=(integer)str;
+    		
     		
             if (chan==SLOODLE_TIMER_START){//starts the timer from its current position
                 llSetTimerEvent(1);
+                TIME_LIMIT=(integer)str;
             }else
             if (chan==SLOODLE_TIMER_RESTART){//used to set the counter to 0 and begin counting down again
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 COUNT=0;
+                TIME_LIMIT=(integer)str;
                 llSetTimerEvent(1);
             }else
             if (chan==SLOODLE_TIMER_STOP){//stop the timer at its current position
@@ -136,6 +138,7 @@ default {
             }else
             if (chan==SLOODLE_TIMER_RESET){// reset the count back to zero but not restart the timer
                 COUNT=0;
+                 llSetTimerEvent(0);
             }
     
     }
