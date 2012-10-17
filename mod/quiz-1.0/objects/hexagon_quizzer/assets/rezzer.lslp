@@ -56,11 +56,22 @@ integer quiz_id;
 string quiz_name;
 integer question_id;
 integer num_questions;
+string sloodleserverroot = "";
+integer sloodlecontrollerid = 0;
+string sloodlepwd = "";
+integer sloodlemoduleid = 0;
+integer sloodleobjectaccessleveluse = 0; // Who can use this object?
+integer sloodleobjectaccesslevelctrl = 0; // Who can control this object?
+integer sloodleserveraccesslevel = 0; // Who can use the server resource? (Value passed straight back to Moodle)
+integer isconfigured = FALSE; // Do we have all the configuration data we need?
+integer eof = FALSE; // Have we reached the end of the configuration data?
+string SLOODLE_EOF = "sloodleeof";
+string sloodle_quiz_url = "/mod/sloodle/mod/quiz-1.0/linker.php";
 list  sides_rezzed;
 string QUIZ_DATA;
 string HEX_CONFIG_SEPARATOR="*^*^*^";
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
-        integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
+integer SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR = -1639271113; // Tells anyone who might be interested that we scored the answer. Score in string, avatar in key.
 integer SLOODLE_SET_TEXTURE= -1639277010; 
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
@@ -224,7 +235,7 @@ display_questions_for_mother_hex(string str,key id){
                     //SET PIE_SLICE TO PARTICULAR OPTION
                      set_texture_pie_slice((string)option,(integer)pie_slice);
                 }
-                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, "", "");
+                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
                /* for (j=1;j<=6;j++){
                     integer value = pie_slice_value(j);
                     integer prim_link=get_prim("pie_slice"+(string)j);
@@ -341,6 +352,40 @@ init(){
         }
             
 }
+   // Configure by receiving a linked message from another script in the object
+   // Returns TRUE if the object has all the data it needs
+   integer sloodle_handle_command(string str){
+            list bits = llParseString2List(str,["|"],[]);
+            integer numbits = llGetListLength(bits);
+            string name = llList2String(bits,0);
+            string value1 = "";
+            string value2 = "";
+            if (numbits > 1) value1 = llList2String(bits,1);
+            if (numbits > 2) value2 = llList2String(bits,2);
+            if (name == "set:sloodleserverroot") sloodleserverroot = value1;
+            else if (name == "set:sloodlepwd") {
+                // The password may be a single prim password, or a UUID and a password
+                if (value2 != "") {
+                   sloodlepwd = value1 + "|" + value2;
+                }
+                else {
+                    sloodlepwd = value1;
+                }
+            }
+            else if (name == "set:timer_time_limit") TIME_LIMIT= (integer)value1;
+            else if (name == "set:sloodlecontrollerid") sloodlecontrollerid = (integer)value1;
+            else if (name == "set:sloodlemoduleid") sloodlemoduleid = (integer)value1;
+            else if (name == "set:sloodleobjectaccessleveluse") sloodleobjectaccessleveluse = (integer)value1;
+            else if (name == "set:sloodleserveraccesslevel") sloodleserveraccesslevel = (integer)value1;
+            else if (name == "set:sloodlerepeat") doRepeat = (integer)value1;
+            else if (name == "set:sloodlerandomize") doRandomize = (integer)value1;
+            else if (name == "set:sloodleplaysound") doPlaySound = (integer)value1;
+            else if (name == "set:sloodleaskquestionscontinuously") askquestionscontinuously= (integer)value1;
+            else if (name == "set:correctToContinue") correctToContinue = (integer)value1;
+            else if (name == SLOODLE_EOF) eof = TRUE;
+            return (sloodleserverroot != "" && sloodlepwd != "" && sloodlecontrollerid > 0 && sloodlemoduleid > 0);
+       }
+
 default {
     on_rez(integer start_param){
         llResetScript();
@@ -351,11 +396,24 @@ default {
     }
     link_message(integer sender_num, integer num, string str, key id) {
         if (num==SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ){
-            state ready;
+        	CONFIG=str;
+        	list lines = llParseString2List(CONFIG, ["\n"], []);
+                    integer numlines = llGetListLength(lines);
+                    integer i = 0;
+                    for (i=0; i < numlines; i++) {
+                        isconfigured = sloodle_handle_command(llList2String(lines, i));
+                    }
+                    // If we've got all our data AND reached the end of the configuration data (eof), then move on
+                    if (eof == TRUE) {
+                        if (isconfigured == TRUE) {
+                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                            state ready;
+                        }
+                    }
         }
     }
 }
-    state ready{
+state ready{
         on_rez(integer start_param){
         	llResetScript();
     	}
@@ -366,7 +424,7 @@ default {
           string name=llGetObjectName();
           //show orbs
           llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|0,1,2,3,4,5,6|10", NULL_KEY);    
-    }
+    	}
 	    touch_start(integer num_detected) {
 	        if (quiz_loaded==FALSE){
 	            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "loading_question", [qdialogtext], "", "hex_quizzer");
@@ -376,7 +434,7 @@ default {
 	                TIMES_UP=FALSE;
 	                set_all_pie_slice_hover_text(" ");
 	                llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
-	                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, "", "");
+	                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
 	            }
 	        }
 	                

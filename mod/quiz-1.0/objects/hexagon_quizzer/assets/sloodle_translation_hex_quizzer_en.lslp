@@ -60,7 +60,8 @@ list locstrings = [
     "incorrect_can_not_select_orb","Sorry {{0}}, but your answer is wrong! You can retry by clicking again on the center orb",
     "loading_question","Loading question...",
     "timer_stopped","Timer Stopped",
-	"no_more_questions","All the questions in the quiz have been asked. No more questions are available."
+	"no_more_questions","All the questions in the quiz have been asked. No more questions are available.",
+	"requesting_config","Requesting Configuration ... "
     
 ];
 

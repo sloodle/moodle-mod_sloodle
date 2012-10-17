@@ -100,20 +100,6 @@ integer get_prim(string name){
     }
     return prim;
 }    
-// Configure by receiving a linked message from another script in the object
-// Returns TRUE if the object has all the data it needs
- integer sloodle_handle_command(string str){
-    list bits = llParseString2List(str,["|"],[]);
-    integer numbits = llGetListLength(bits);
-    string name = llList2String(bits,0);
-    string value1 = "";
-    string value2 = "";
-    if (numbits > 1) value1 = llList2String(bits,1);
-    if (numbits > 2) value2 = llList2String(bits,2);
-    else if (name == "set:timer_time_limit") TIME_LIMIT= (integer)value1;
-    else if (name == SLOODLE_EOF) eof = TRUE;
-    return TRUE;
-}
  debug (string message ){
      list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
      if (llList2Integer (params ,0)==PRIM_MATERIAL_FLESH){
@@ -124,45 +110,14 @@ default {
     on_rez(integer start_param) {
         llResetScript();
     }
-       state_entry(){
-        isconfigured = FALSE;
-        eof = FALSE;
-    }
-    link_message( integer sender_num, integer num, string str, key user_key){
-        // Check the channel for configuration messages
-        if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {
-            // Split the message into lines
-            list lines = llParseString2List(str, ["\n"], []);
-            integer numlines = llGetListLength(lines);
-            integer i = 0;
-            for (i=0; i < numlines; i++) {
-                isconfigured = sloodle_handle_command(llList2String(lines, i));
-            }
-            // If we've got all our data AND reached the end of the configuration data (eof), then move on
-            if (eof == TRUE) {
-                if (isconfigured == TRUE) {
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
-                    state ready;
-                } else {
-                    // Go all configuration but, it's not complete... request reconfiguration
-                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [llGetScriptName()], NULL_KEY, "");
-                    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
-                    eof = FALSE;
-                }
-            }
-        }
-    }
-}
-
-state ready{
-    on_rez(integer start_param) {
-        llResetScript();
-    }
+   
     state_entry() {
         COUNT=0;
     }
 
     link_message(integer sender_num, integer chan, string str, key id) {
+    		TIME_LIMIT=(integer)str;
+    		
             if (chan==SLOODLE_TIMER_START){//starts the timer from its current position
                 llSetTimerEvent(1);
             }else

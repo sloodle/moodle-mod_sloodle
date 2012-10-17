@@ -33,6 +33,9 @@
         integer sloodleserveraccesslevel = 0; // Who can use the server resource? (Value passed straight back to Moodle)
         integer isconfigured = FALSE; // Do we have all the configuration data we need?
         integer eof = FALSE; // Have we reached the end of the configuration data?
+        string SLOODLE_EOF = "sloodleeof";
+        string sloodle_quiz_url = "/mod/sloodle/mod/quiz-1.0/linker.php";
+        integer TIME_LIMIT;
         string  SEPARATOR="****";
         integer SLOODLE_CHANNEL_AVATAR_DIALOG = 1001;
         integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
@@ -93,8 +96,6 @@
         integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
         integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
         string SLOODLE_OBJECT_TYPE = "quiz-1.0";
-        string SLOODLE_EOF = "sloodleeof";
-        string sloodle_quiz_url = "/mod/sloodle/mod/quiz-1.0/linker.php";
         key httpquizquery = NULL_KEY;
         float request_timeout = 20.0;
         string sloodlehttpvars;
@@ -264,6 +265,7 @@
                     sloodlepwd = value1;
                 }
             }
+            else if (name == "set:timer_time_limit") TIME_LIMIT= (integer)value1;
             else if (name == "set:sloodlecontrollerid") sloodlecontrollerid = (integer)value1;
             else if (name == "set:sloodlemoduleid") sloodlemoduleid = (integer)value1;
             else if (name == "set:sloodleobjectaccessleveluse") sloodleobjectaccessleveluse = (integer)value1;
