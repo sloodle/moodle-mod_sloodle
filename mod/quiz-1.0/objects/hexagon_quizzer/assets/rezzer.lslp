@@ -73,6 +73,7 @@ string sloodle_quiz_url = "/mod/sloodle/mod/quiz-1.0/linker.php";
 list  sides_rezzed;
 string QUIZ_DATA;
 integer TIME_LIMIT;
+integer SLOODLE_REMOTE_LOAD_SCRIPT=1639277018;
 string HEX_CONFIG_SEPARATOR="*^*^*^";
 integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
@@ -409,7 +410,7 @@ default {
                     // If we've got all our data AND reached the end of the configuration data (eof), then move on
                     if (eof == TRUE) {
                         if (isconfigured == TRUE) {
-                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [llGetScriptName()], NULL_KEY, "");
+                           	sloodle_translation_request ( SLOODLE_TRANSLATE_SAY , [0], "script_configurationreceived" , [ llGetScriptName()], NULL_KEY , "hex_quizzer");
                             state ready;
                         }
                     }
@@ -590,8 +591,18 @@ state ready{
             rezzed_hexes+=platform;
             llGiveInventory(platform, HEXAGON_PLATFORM);
             debug("giving platform script");
-            llRemoteLoadScriptPin(platform, "platform", PIN, TRUE,0);
-        
+            //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "0|sloodle_translation_en.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "1|sloodle_translation_hex_quizzer_en.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "2|timer.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "3|delayed_set_text.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "4|feedback_request.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "5|finish_quiz.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "6|load_quiz.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "7|notify_server_of_response.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "8|sloodle_quiz_question_handler.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "9|hex_multi_user_quiz.lslp", platform);
+            llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "10|rezzer_platform.lslp", platform);
     }
     listen(integer channel, string name, key id, string message) {
         list data = llParseString2List(message, ["|"], []);
