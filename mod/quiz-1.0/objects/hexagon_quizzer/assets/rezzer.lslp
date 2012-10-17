@@ -336,14 +336,15 @@ sloodle_translation_request(string output_method, list output_params, string str
 }
         
 init(){
-    //get the dimensions of a pie_slice so we can determin the length of the sides of a pieslice.  In this case, we will choose pie_slice6 (they all have same dimensions)
+		MY_SLICES=[1,2,3,4,5,6];
+        MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
+    	//get the dimensions of a pie_slice so we can determin the length of the sides of a pieslice.  In this case, we will choose pie_slice6 (they all have same dimensions)
         integer pie_slice6 = get_prim("pie_slice6");
         list pie_slice_data = llGetLinkPrimitiveParams(pie_slice6, [PRIM_SIZE] );
         vector pie_slice_size=llList2Vector(pie_slice_data, 0);
         tip_to_edge = pie_slice_size.z;//since we are looking for the length starting from the tip of the pie_slice to the middle of the edge, we need to choose the z dimension for this particular pie slice
         edge_length= pie_slice_size.y;//since we are looking for  the length of an edge we need to choose the y dimension for this particular pie slice
         question_prim= get_prim("question_prim");
-        
         sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
         set_texture_pie_slices("blank_white");
         integer num_prims = llGetNumberOfPrims();
@@ -394,11 +395,10 @@ default {
         llResetScript();
     }
     state_entry() {
-        init();
-        llTriggerSound("SND_STARTING_UP", 1);
+        
     }
     link_message(integer sender_num, integer num, string str, key id) {
-        if (num==SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ){
+        if (num==SLOODLE_CHANNEL_OBJECT_DIALOG){
             CONFIG=str;
             list lines = llParseString2List(CONFIG, ["\n"], []);
                     integer numlines = llGetListLength(lines);
@@ -409,7 +409,7 @@ default {
                     // If we've got all our data AND reached the end of the configuration data (eof), then move on
                     if (eof == TRUE) {
                         if (isconfigured == TRUE) {
-                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [llGetScriptName()], NULL_KEY, "");
                             state ready;
                         }
                     }
@@ -421,8 +421,8 @@ state ready{
             llResetScript();
         }
         state_entry() {
-          MY_SLICES=[1,2,3,4,5,6];
-          MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
+          init();
+          llTriggerSound("SND_STARTING_UP", 1);
           sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,question_prim], "ready_click_colored_orb", [], "", "hex_quizzer");
           string name=llGetObjectName();
           //show orbs
