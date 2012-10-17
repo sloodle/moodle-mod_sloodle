@@ -62,7 +62,11 @@ list locstrings = [
     "timer_stopped","Timer Stopped",
 	"no_more_questions","All the questions in the quiz have been asked. No more questions are available.",
 	"requesting_config","Requesting Configuration ... ",
-	"script_configurationreceived", "Script: {{0}} - Ready"
+	"script_configurationreceived", "Script: {{0}} - Ready",
+	"receivingconfig","Receiving configuration from master hexagon...",
+	"loadingquiz","Loading quiz...",
+	"quizloaded","Quiz loaded!",
+	"failedtoload","Failed to load quiz. Reconnecting with master hexagon..."
     
 ];
 
