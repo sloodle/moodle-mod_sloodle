@@ -80,78 +80,7 @@ class sloodle_view_controller extends sloodle_base_view_module
         
         // Can the user access protected data?
         if ($this->canedit) {
-        
-            // Display a link to the configuration notecard page, as a popup window
-            print_box_start('generalbox boxaligncenter boxwidthwide');
-            echo '<h3>'.get_string('objectconfig:header', 'sloodle').'</h3>';
-            echo '<p>'.get_string('objectconfig:body', 'sloodle').'</p>';
-            
-            // Is Prim Password access available?
-            if (empty($this->controller->password)) {
-                // No - display an error message
-                echo '<span style="color:red; font-weight:bold;">'.get_string('objectconfig:noprimpassword','sloodle').'</span>';
-            } else {
-                print_string('objectconfig:select','sloodle');
-                // Go through each installed type to produce our own array of objects.
-                // (Our array will associate translated names and version numbers with complete object ID's).
-                $objects = array();
-                $mods = SloodleObjectConfig::AllAvailableAsNameVersionHash();
-                if (!$mods) error('Error fetching installed object types.');
-                
-                foreach ($mods as $name => $versions) {
-                    // Get the translated name
-                    $translatedname = get_string("object:$name", 'sloodle');
-                    // Reverse-sort the version
-                    $sortedversions = $versions;
-                    krsort($sortedversions);
-                    foreach ($sortedversions as $v => $cfg) {
-                        // Construct and store the complete object ID
-                        $objectid = "$name-$v";
-                        $objects[$translatedname][$v] = $objectid;
-                    }
-                }
-                
-                // Sort the objects by name
-                ksort($objects);
-                
-                // Display our list of objects
-                echo '<br><br><table style="text-align:left; margin-left:auto; margin-right:auto;">';
-                foreach ($objects as $name => $versions) {
-                    // The primary link will always be the latest version
-                    $num = 0;
-                    echo '<tr><td>';
-                    $multipleversions = (count($versions) > 1);
-                    // Go through each version (this will be latest first)
-                    foreach ($versions as $v => $objectid) {
-                        // Construct a link for this object's configuration
-                        $link = SLOODLE_WWWROOT."/classroom/notecard_configuration_form.php?sloodlecontrollerid={$this->cm->id}&sloodleobjtype=$objectid";
-                    
-                        // Is this the latest version?
-                        if ($num == 0) {
-                            // Yes - display the object name for the link
-                            echo "<span style=\"font-size:14pt;\"><a href=\"$link\">$name</a>";
-                        }
-                        // Do we have multiple versions available?
-                        if ($multipleversions) {
-                            // Yes - add the version in brackets afterwards
-                            if ($num == 0) echo ' <span style="font-size:11pt; font-style:italic;">[';
-                            else if ($num > 0) echo ', ';
-                            echo "<a href=\"$link\">$v</a>";
-                        }
-                        
-                        $num++;
-                    }
-                    
-                    // Close the extra versions section if necessary
-                    if ($multipleversions) echo "]</span>";
-                    echo "</td></tr>";
-                }
-                
-                echo '</table>';
-            }
-
-            print_box_end();
-            
+       
             // Active (authorised) objects
             print_box_start('generalbox boxaligncenter boxwidthwide');
             echo '<h3>'.get_string('authorizedobjects','sloodle').'</h3>';
