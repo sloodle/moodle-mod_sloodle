@@ -69,7 +69,9 @@ list locstrings = [
     "failedtoloadquiz","Failed to load quiz. Reconnecting with master hexagon...",
     "failedtoloadconfig","Failed to load configuration. Reconnecting with master hexagon...",
     "click_to_start_timer","Click to start the timer, and submit your answer.",
-    "loadingquestion","Loading question..."
+    "loadingquestion","Loading question...",
+    "rez_hex_denied","Sorry, only those who have answered the question correctly may rez a hexagon",
+    "rez_hex_granted","Rezzing a hexagon, please wait..."
     
     
 ];

@@ -128,5 +128,6 @@ integer SLOODLE_REMOTE_LOAD_SCRIPT=1639277018;//remote loader channel used by sc
 integer SLOODLE_BLINKER=1639277019;//used to send commands to a prim which should blink
 integer SLOODLE_HTTPIN_MESSAGE_RECEIVED=1639277020;//used to tell other scripts a message has been received
 
+
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 
