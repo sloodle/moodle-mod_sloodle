@@ -9,7 +9,7 @@
 *  This script is part of the SLOODLE Project see http://sloodle.org
 *
 *  sloodle_shared_media_setup
-*  Copyright:
+*  Copyright: 
 *  Paul G. Preibisch (Fire Centaur in SL) fire@b3dMultiTech.com
 *
 *  Edmund Edgar (Edmund Earp in SL) ed@socialminds
@@ -19,6 +19,7 @@
 
 integer SLOODLE_CHANNEL_OBJECT_DIALOG                   = -3857343;//configuration channel
 integer SLOODLE_CHANNEL_OBJECT_CREATOR_REQUEST_CONFIGURATION_VIA_HTTP_IN_URL = -1639270089; //Object creator telling itself it wants to rez an object at a position (specified as key)
+integer SLOODLE_HTTPIN_MESSAGE_RECEIVED=1639277020;//used to tell other scripts a message has been received
 
 string SLOODLE_EOF = "sloodleeof";
 string inventorystr = "";
@@ -155,7 +156,6 @@ default {
     }
 
     on_rez(integer start_param) {
-
         llResetScript();
     }
 
@@ -174,7 +174,11 @@ default {
 }
     
 state ask_for_site {
-
+ on_rez(integer start_param) {                
+    
+            llResetScript();
+        
+        }
     state_entry() {
         
         if (llGetFreeURLs() == 0) {
@@ -226,10 +230,9 @@ state ask_for_site {
                 }
 
                 string data =  "<html><body style=\"width:1000px;height:1000px;background-color:#595c67;color:white;font-weight:bold;\"><div style=\"position:relative;top:200px;text-align:center;width:1000px;height:750px;font-size:200%\" >Contacting site<br /><br />"+sloodleserverroot+"</div></body></html>";
-    
-                llSetContentType( id, CONTENT_TYPE_HTML ); // Remove This Line On OpenSim
+                //llSetContentType( id, CONTENT_TYPE_HTML ); // Remove This Line On OpenSim     
                 llHTTPResponse( id, 200, data );
-                                           
+                                            
                 // llOwnerSay(sloodleserverroot);
                 llReleaseURL(publicurl);
             
@@ -249,16 +252,12 @@ state ask_for_site {
             if (str == "do:reset") llResetScript();
         }
     }
-                    
-    on_rez(integer start_param) {                
-
-        llResetScript();
-    
-    }
 
 }
     
 state got_site_url {
+                        
+       
 
     state_entry() {                    
 
@@ -375,7 +374,7 @@ state ready {
     http_request(key id, string method, string body){
 
         if (method == "POST"){
-
+        llMessageLinked(LINK_SET, SLOODLE_HTTPIN_MESSAGE_RECEIVED, "", NULL_KEY);
                //this is where we receive data from from our server
                 list lines;
                 lines = llParseStringKeepNulls( body, ["\n"], [] );
@@ -515,7 +514,6 @@ state rezz_and_reply
 }
 
 
-// Please leave the following line intact to show where the script lives in Git:
-// SLOODLE LSL Script Git Location: mod/set-1.0/objects/default/assets/sloodle_shared_media_setup.sl.lslp
-
+// Please leave the following line intact to show where the script lives in Subversion:
+// SLOODLE LSL Script Subversion Location: mod/set-1.0/sloodle_shared_media_setup.lsl
 
