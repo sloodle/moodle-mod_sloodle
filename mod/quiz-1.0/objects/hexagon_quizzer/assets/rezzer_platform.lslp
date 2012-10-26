@@ -46,6 +46,7 @@
 */
 string HEX_CONFIG_SEPARATOR="*^*^*^";
 float edge_length;
+key ROOT_HEX;
 list QUESTIONS_ASKED;
 integer TIME_LIMIT;
 integer doRepeat;
@@ -445,7 +446,8 @@ default {
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "receivingconfig", [], "", "hex_quizzer");
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 debug("received config: "+message);
-                string config = llList2String(data,1);
+                ROOT_HEX= llList2Key(data,1);
+                string config = llList2String(data,2);
                 // Split the message into lines
                 list lines = llParseString2List(message, ["\n"], []);
                 integer numlines = llGetListLength(lines);
@@ -698,9 +700,7 @@ default {
             llRemoteLoadScriptPin(platform, "rezzer_platform.lslp",PIN, TRUE, 0);
             //tell mother hex we rezzed a grandchild!  Mother will be happy!  we need to do this so that the mother hex will listen to her grandchildren when they are requesting questions
             
-            string hash =  llSHA1String(sloodleserverroot+sloodlecontrollerid+sloodlemoduleid);
-            debug("((((((((((((((((((((((((( "+sloodleserverroot+" "+sloodlecontrollerid+" "+sloodlemoduleid+" " +hash);
-            llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+platform+"|"+hash);
+            llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+platform);
 
     } 
 

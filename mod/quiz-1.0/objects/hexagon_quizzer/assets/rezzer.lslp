@@ -386,8 +386,8 @@ init(){
                 }
             }
             else if (name == "set:questiontimelimit"){
-            	 TIME_LIMIT= (integer)value1;
-            	   debug("\n\n\n\n\n we got time limit is: "+(string)TIME_LIMIT);
+                 TIME_LIMIT= (integer)value1;
+                   debug("\n\n\n\n\n we got time limit is: "+(string)TIME_LIMIT);
             }
             else if (name == "set:sloodlecontrollerid") sloodlecontrollerid = (integer)value1;
             else if (name == "set:sloodlemoduleid") sloodlemoduleid = (integer)value1;
@@ -630,28 +630,20 @@ state ready{
         string command = llList2String(data, 0);
         debug("************************** command is: "+command);
         if (command=="rezzed grandchild"){
-	       	debug("a grandchild.. i hope its mine!");
-	       	string my_hash =  llSHA1String(sloodleserverroot+sloodlecontrollerid+sloodlemoduleid);
-	        string received_hash=llList2String(data,2);
-	        if (received_hash==my_hash){
-		    	debug("(((((((((server(((((((((((((((( "+sloodleserverroot+" "+sloodlecontrollerid+" "+sloodlemoduleid+" my hash " +my_hash+ " received hash: "+received_hash);
-		        //this is my grandchild because they have the same serverroot, controllerid, and moduleid as me!
-		        key grandchild=llList2Key(data,1);
-		        llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "",grandchild, "");
-		        if (llListFindList(GRAND_CHILDREN,[grandchild])==-1){
-		        	GRAND_CHILDREN+=grandchild;
-		         	
-		         }
-		         debug("\n\n\n\nYay! a grandchild! listening to "+llList2CSV(GRAND_CHILDREN));
-		         
-		        
-    	   }
+               debug("a grandchild.. ");
+               key grandchild=llList2Key(data,1);
+            llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "",grandchild, "");
+            if (llListFindList(GRAND_CHILDREN,[grandchild])==-1){
+                GRAND_CHILDREN+=grandchild;
+            }
+            debug("\n\n\n\nYay! a grandchild! listening to "+llList2CSV(GRAND_CHILDREN));
+
         }
        
         if (llListFindList(rezzed_hexes, [id])==-1&&llListFindList(GRAND_CHILDREN,[id])==-1){
-        	debug("---------------not my relative!!");
-        	llOwnerSay("---------------not my relative!!");
-		    //return;
+            debug("---------------not my relative!!");
+            llOwnerSay("---------------not my relative!!");
+            //return;
         }
          debug("continuing");
         if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST){
