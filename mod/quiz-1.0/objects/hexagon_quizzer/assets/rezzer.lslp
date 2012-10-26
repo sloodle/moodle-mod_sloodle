@@ -620,6 +620,7 @@ state ready{
             llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "9|"+(string)PIN+"|hex_multi_user_quiz.lslp|"+(string)TRUE+"|0", platform);
             llMessageLinked(LINK_SET, SLOODLE_REMOTE_LOAD_SCRIPT, "10|"+(string)PIN+"|rezzer_platform.lslp|"+(string)TRUE+"|0", platform);
             */
+            llRemoteLoadScriptPin(platform, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
             llRemoteLoadScriptPin(platform, "rezzer_platform.lslp",PIN, TRUE, 0);
             
            
