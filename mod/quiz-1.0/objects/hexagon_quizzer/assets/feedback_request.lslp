@@ -206,7 +206,7 @@
                     // If we've got all our data AND reached the end of the configuration data (eof), then move on
                     if (eof == TRUE) {
                         if (isconfigured == TRUE) {
-                            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                            sloodle_translation_request ( SLOODLE_TRANSLATE_SAY , [0], "script_configurationreceived" , [ llGetScriptName()], NULL_KEY , "hex_quizzer");
                             state ready;
                         } else {
                             // Go all configuration but, it's not complete... request reconfiguration
