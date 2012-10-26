@@ -585,13 +585,17 @@ default {
             integer orb=llList2Integer(data, 1);                
             //check if toucher is permitted to rez an orb
             debug("received user touch: "+(string)id);
+            debug("sending dialog message to user: "+(string)id);
             if (llListFindList(CORRECT_AVATARS, llKey2Name(id))!=-1){
             	rez_hexagon(orb);
             	//after a user presses an edge selector, hide the selector
             	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|"+(string)orb, NULL_KEY);
             	sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "rez_hex_granted", [llKey2Name(id)], id, "hex_quizzer");
+            	
             }else{
+            	
             	sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "rez_hex_denied", [llKey2Name(id)], id, "hex_quizzer");
+            	sloodle_translation_request (SLOODLE_TRANSLATE_DIALOG, [1 , "Ok"], "rez_hex_denied" , ["Ok"], id , "hex_quizzer");
             }
         }else 
         if (channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
