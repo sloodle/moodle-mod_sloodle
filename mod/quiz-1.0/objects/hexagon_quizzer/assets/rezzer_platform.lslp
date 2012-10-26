@@ -546,12 +546,14 @@ default {
             debug("quizzing state");
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("question_prim")], "ready_click_colored_orb", [], "", "hex_quizzer");
             sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
+            
         }
         touch_start(integer num_detected) {
             if (TIMES_UP){//re-ask question
                 TIMES_UP=FALSE;
                 set_all_pie_slice_hover_text(" ");
                 llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,qstring,llDetectedKey(0));
+                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "loadingquestion", [" "], "", "hex_quizzer");
                 
             }
         }
@@ -576,19 +578,21 @@ default {
             }            
         }else 
         if (channel==SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR){
+        	//user has either clicked the central orb, and this message has returned from other scripts, or this is the first time the question has been
+        	//asked and we need to populate pie_slices with options
             key hex = llList2Key(data,1);
-            
             debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
             opids=llParseString2List(llList2String(data,6),[","],[]);
             if (hex==llGetKey()){
+            	//get the question id
                 question_id =llList2Integer(data,5);
                 if (llListFindList(QUESTIONS_ASKED, [question_id])==-1){
                     QUESTIONS_ASKED+=question_id;
-                }  
+                } 
+                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
+	            llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)TIME_LIMIT+"|"+"SND_BUZZER", ""); 
                 quiz_loaded=TRUE;
                 display_questions(str,id);
-                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
-                llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)TIME_LIMIT+"|"+"SND_BUZZER", "");
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
             }
         }else
@@ -690,6 +694,7 @@ default {
             llGiveInventory(platform, HEXAGON_PLATFORM);
             debug("giving platform script");
             //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
+            llRemoteLoadScriptPin(platform, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
             llRemoteLoadScriptPin(platform, "rezzer_platform.lslp",PIN, TRUE, 0);
             //tell mother hex we rezzed a grandchild!  Mother will be happy!  we need to do this so that the mother hex will listen to her grandchildren when they are requesting questions
             
