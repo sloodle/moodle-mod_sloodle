@@ -227,7 +227,7 @@ string get_detected_pie_slice(vector avatar){
 
 display_questions(string str,key id){
     debug("displaying questions");
-                llTriggerSound("SND_LOADING_COMPLETE", 1);
+               
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
                 qdialogtext = strReplace(llList2String(data,0), ",", "*%*%*");
@@ -413,20 +413,20 @@ default {
         debug("asking for config");
         llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
         sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
-        llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
+        llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"||requesting config", "");
         
     }
     touch_start(integer num_detected) {
         debug("asking for config");
         llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
         sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
-        llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
+        llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"||requesting config", "");
     }
     link_message(integer sender_num, integer channel, string str, key id) {
                 if (channel==SLOODLE_TIMER_TIMES_UP){
                     sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("question_prim")], "failedtoloadconfig", [], "", "hex_quizzer");
                     llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
-                 llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
+                 	llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"||requesting config", "");
                 }
         }
      listen(integer channel, string name, key id, string message) {
@@ -442,12 +442,13 @@ default {
                 master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");
             }
             if (command=="receive config"){
+            	llTriggerSound("SND_FAX", 1);
                 llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
+                
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "receivingconfig", [], "", "hex_quizzer");
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 debug("received config: "+message);
-                ROOT_HEX= llList2Key(data,1);
-                string config = llList2String(data,2);
+                string config = llList2String(data,1);
                 // Split the message into lines
                 list lines = llParseString2List(message, ["\n"], []);
                 integer numlines = llGetListLength(lines);
@@ -488,6 +489,7 @@ default {
             }
             touch_start(integer num_detected) {
                 llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "LOAD QUIZ");
+                
             }
             link_message(integer sender_num, integer channel, string str, key id) {
                 if (channel==SLOODLE_TIMER_TIMES_UP){
@@ -504,6 +506,8 @@ default {
                 string command = llList2String(data,0);
                 debug("Command: "+command);
                 if (command=="receive quiz data"){
+                	llTriggerSound("SND_FAX_2", 1);
+                	llTriggerSound("SND_FAX", 1);
                     llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
                     QUIZ_DATA_str= llList2String(data,1);
                     list quiz_data =llParseString2List(QUIZ_DATA_str, ["|"], []);
@@ -591,15 +595,17 @@ default {
                 if (llListFindList(QUESTIONS_ASKED, [question_id])==-1){
                     QUESTIONS_ASKED+=question_id;
                 } 
-                llMessageLinked(LINK_SET, SLOODLE_TIMER_RESTART, (string)TIME_LIMIT, "");
-	            llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)TIME_LIMIT+"|"+"SND_BUZZER", ""); 
+                
+	            llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)TIME_LIMIT+"|"+"SND_BUZZER|QUESTION TIME LIMIT REACHED", ""); 
                 quiz_loaded=TRUE;
                 display_questions(str,id);
                 llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
             }
         }else
         if (channel==SLOODLE_TIMER_TIMES_UP){
-           
+        	if (str=="QUESTION TIME LIMIT REACHED"){
+        		llTriggerSound("SND_BUZZER", 1);
+        	}
             TIMES_UP=TRUE;
         }
     }
@@ -609,6 +615,7 @@ default {
             set_all_pie_slice_hover_text(" ");
             integer avatar;
             integer pie_slice_num;
+            //get avatar names who are hovering over pie_slices, and print their names on pie_slices
             for (avatar=0;avatar<num_avatars_detected;avatar++){
                 string avatar_name=llDetectedName(avatar);
                 vector avatar_pos=llDetectedPos(avatar);
@@ -624,6 +631,7 @@ default {
                     sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
             }
         }else{
+        
             //gets triggered when after a countdown and time is up
              llSensorRemove();
              //go through each detected avatar and add their names to the prims they are standing in
@@ -639,7 +647,8 @@ default {
                 integer score_change = pie_slice_value(pie_slice_num);
                 integer opid = pie_slice_option_index(pie_slice_num);
                 if (score_change>0){
-                    //avatar is correct
+                	llTriggerSound("SND_WINNER", 1);
+                	//avatar is correct
                     if (llListFindList(CORRECT_AVATARS, [avatar_name])==-1){ //dont add same name twice
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct_select_orb", [avatar_name], avatar_key, "hex_quizzer");
                         CORRECT_AVATARS+=avatar_key;//record which avatars are correct because only those who are correct can click an orb
