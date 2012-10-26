@@ -537,6 +537,7 @@ state ready{
                     sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
             }
         }else{
+        	llTriggerSound("SND_BUZZER", 1);
             //gets triggered when after a countdown and time is up
              llSensorRemove();
              //go through each detected avatar and add their names to the prims they are standing in
@@ -552,6 +553,7 @@ state ready{
                 integer score_change = pie_slice_value(pie_slice_num);
                 integer opid = pie_slice_option_index(pie_slice_num);
                 if (score_change>0){
+                	llTriggerSound("SND_WINNER", 1);
                     //avatar is correct
                     if (llListFindList(CORRECT_AVATARS, [avatar_name])==-1){ //dont add same name twice
                         sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "correct_select_orb", [avatar_name], avatar_key, "hex_quizzer");
