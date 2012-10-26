@@ -35,7 +35,7 @@
 */
 integer SLOODLE_SET_TEXTURE= -1639277010;
 init(){
-	llSetTexture("BLANK", ALL_SIDES);
+	llSetTexture("blank_white", ALL_SIDES);
 }
 default {
 	on_rez(integer start_param) {
