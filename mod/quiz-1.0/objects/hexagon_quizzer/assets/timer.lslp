@@ -28,7 +28,7 @@
 *  Edmund Edgar
 *
 *  DESCRIPTION
-*
+*  llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)TIME_LIMIT+"|"+"SND_BUZZER|QUESTION TIME LIMIT REACHED", "");
 */
 integer TIME_LIMIT=10;//default, but can be set in config
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
@@ -37,6 +37,7 @@ integer sloodlecontrollerid = 0;
 string sloodlepwd = "";
 string END_SOUND;
 integer sloodlemoduleid = 0;
+string TIMES_UP_MESSAGE;
 integer sloodleobjectaccessleveluse = 0; // Who can use this object?
 integer sloodleobjectaccesslevelctrl = 0; // Who can control this object?
 integer sloodleserveraccesslevel = 0; // Who can use the server resource? (Value passed straight back to Moodle)
@@ -124,12 +125,14 @@ default {
                 llSetTimerEvent(1);
                 TIME_LIMIT=(integer)llList2Integer(data,0);
                 END_SOUND=llList2String(data,1);
+                TIMES_UP_MESSAGE=llList2String(data,2);
             }else
             if (chan==SLOODLE_TIMER_RESTART){//used to set the counter to 0 and begin counting down again
                 sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 COUNT=0;
                 TIME_LIMIT=(integer)llList2Integer(data,0);
                 END_SOUND=llList2String(data,1);
+                TIMES_UP_MESSAGE=llList2String(data,2);
                 llSetTimerEvent(1);
             }else
             if (chan==SLOODLE_TIMER_STOP){//stop the timer at its current position
@@ -151,11 +154,12 @@ default {
         vector color;
         if ((TIME_LIMIT - COUNT)<=0){
             llSetTimerEvent(0.0);
-            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "times_up", [], "", "hex_quizzer");
+            
             if (END_SOUND!=""){
-                llTriggerSound(END_SOUND,0.2);
+                llTriggerSound(END_SOUND,1);
+                END_SOUND="";
             }
-            llMessageLinked(LINK_SET, SLOODLE_TIMER_TIMES_UP, "", NULL_KEY);
+            llMessageLinked(LINK_SET, SLOODLE_TIMER_TIMES_UP, TIMES_UP_MESSAGE, NULL_KEY);
             return;
         }
         string timer_text="(" + (string)(TIME_LIMIT - COUNT) + ")";
