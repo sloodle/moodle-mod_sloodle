@@ -60,15 +60,17 @@ list locstrings = [
     "incorrect_can_not_select_orb","Sorry {{0}}, but your answer is wrong! You can retry by clicking again on the center orb",
     "loading_question","Loading question...",
     "timer_stopped","Timer Stopped",
-	"no_more_questions","All the questions in the quiz have been asked. No more questions are available.",
-	"requesting_config","Requesting Configuration ... ",
-	"script_configurationreceived", "Script: {{0}} - Ready",
-	"receivingconfig","Receiving configuration from master hexagon...",
-	"loadingquiz","Loading quiz...",
-	"quizloaded","Quiz loaded!",
-	"failedtoloadquiz","Failed to load quiz. Reconnecting with master hexagon...",
-	"failedtoloadconfig","Failed to load configuration. Reconnecting with master hexagon..."
-	
+    "no_more_questions","All the questions in the quiz have been asked. No more questions are available.",
+    "requesting_config","Requesting Configuration ... ",
+    "script_configurationreceived", "Script: {{0}} - Ready",
+    "receivingconfig","Receiving configuration from master hexagon...",
+    "loadingquiz","Loading quiz...",
+    "quizloaded","Quiz loaded!",
+    "failedtoloadquiz","Failed to load quiz. Reconnecting with master hexagon...",
+    "failedtoloadconfig","Failed to load configuration. Reconnecting with master hexagon...",
+    "click_to_start_timer","Click to start the timer, and submit your answer.",
+    "loadingquestion","Loading question..."
+    
     
 ];
 
