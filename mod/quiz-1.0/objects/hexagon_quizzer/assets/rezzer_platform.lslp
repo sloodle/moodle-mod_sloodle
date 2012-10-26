@@ -337,7 +337,6 @@ integer get_prim(string name){
     for (i=0;i<=num_links;i++){
         if (llGetLinkName(i)==name){
             prim=i;
-        }else{
         }
     }
     return prim;
@@ -669,13 +668,18 @@ default {
 	                		llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)score_change+"|"+(string)llGetKey(), avatar_key);
 	                	//issue the command to show all of the orbs so users can click on them to rez other hexagons	
 			                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|0,1,2,3,4,5,6|10", NULL_KEY);
-	                	//print the names of the avatars who were correct overtop the orbs so users know who is allowed to click the orbs
-	                		integer j;
-		                	string correct_avatars_str= "Avatars allowed to click:\n"+strReplace(llList2CSV(CORRECT_AVATARS),",","\n");
-	                		for(j=1;j<=6;j++){
-	                			sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("orb")+(string)j], "option", [correct_avatars_str], "", "hex_quizzer");
-	                		}//for (j=1;j<=6;j++)
+	                	
+		                	
 	            	}//for (avatar=0;avatar<num_avatars_detected;avatar++)
+	            	//print the names of the avatars who were correct overtop the orbs so users know who is allowed to click the orbs
+	                		integer j;
+	            	string correct_avatars_str= "Avatars allowed to click:\n"+strReplace(llList2CSV(CORRECT_AVATARS),",","\n");
+	                		debug("\n\n\n\n\ncorrect_avatars_str:"+correct_avatars_str);
+	                		
+	                		for(j=1;j<=6;j++){
+	                			debug("sending message to: "+(string)get_prim("orb"+(string)j));
+	                			sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("orb"+(string)j)], "option", [correct_avatars_str], "", "hex_quizzer");
+	                		}//for (j=1;j<=6;j++)
             //open/close the pie_slices
             list grades=[];//retrieve the grade for each pie_slice
             for (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++){
