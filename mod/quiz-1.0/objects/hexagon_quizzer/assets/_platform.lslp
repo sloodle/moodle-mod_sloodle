@@ -755,15 +755,15 @@ default {
     
      object_rez(key platform) {
         //a new hex was rezzed, listen to the new hex platform
-          
+          	llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+platform);
             rezzed_hexes+=platform;
             llGiveInventory(platform, HEXAGON_PLATFORM);
             debug("giving platform script");
             //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
             llRemoteLoadScriptPin(platform, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
-            llRemoteLoadScriptPin(platform, "rezzer_platform.lslp",PIN, TRUE, 0);
+            llRemoteLoadScriptPin(platform, "_platform.lslp",PIN, TRUE, 0);
             //tell mother hex we rezzed a grandchild!  Mother will be happy!  we need to do this so that the mother hex will listen to her grandchildren when they are requesting questions
-            llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+platform);
+            
 
     } 
 

@@ -369,7 +369,7 @@ state quiz_loaded{
             debug("giving platform script");
             //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
             llRemoteLoadScriptPin(platform, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
-            llRemoteLoadScriptPin(platform, "rezzer_platform.lslp",PIN, TRUE, 0);
+            llRemoteLoadScriptPin(platform, "_platform.lslp",PIN, TRUE, 0);
     }
     listen(integer channel, string name, key id, string message) {
         list data = llParseString2List(message, ["|"], []);
