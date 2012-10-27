@@ -27,7 +27,7 @@
 ///// TRANSLATION /////
 
 // Localization batch - indicates the purpose of this file
-string mybatch = "quiz";
+string mybatch = "hex_quizzer";
 
 
 // List of string names and translation pairs.
@@ -50,6 +50,7 @@ list locstrings = [
     "incorrect", "Incorrect {{0}}.", // Parameter: name of avatar
     "initquiz","Initializing the quiz. Please wait.",
     "ready_click_colored_orb","Ready. Click the orb to load a question.",
+    "click_to_load","Click to load the quiz.",
     "ready_click_colored_orb_to_ask","Ready. Click the orb to start the count down.",
     "quiz_name","Quiz: {{0}}",
     "option","{{0}}",
@@ -164,6 +165,7 @@ string sloodle_get_string(string name)
 // Send a debug link message
 sloodle_debug(string msg)
 {
+//	llSay(0,msg);
     llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
 }
 
@@ -214,6 +216,7 @@ default
     
     link_message(integer sender_num, integer num, string str, key id)
     {
+    	
         // Check the channel
         if (num == SLOODLE_CHANNEL_TRANSLATION_REQUEST) {            
             
@@ -227,7 +230,6 @@ default
             string batch = "";
             if (numfields > 4) batch = llList2String(fields, 4);
             if (batch != mybatch) return;
-            
             // We expect at least 3 fields
             // ... or 4 if there are insertion parameters...
             // ... anybody up for a 6th parameter? :)
@@ -238,6 +240,7 @@ default
             
             // Extract the key parts of the request
             string output_method = llList2String(fields, 0);
+          
             list output_params = llCSV2List(llList2String(fields, 1));
             integer num_output_params = llGetListLength(output_params);
             string string_name = llList2String(fields, 2);
@@ -346,14 +349,18 @@ default
             
             }
              else if (output_method == SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM) {
-            	   
+             	
+                   
                 //example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [BLUE, 1.0,7], "quizname", [quiz_name], llGetOwner(), "quizzer");
                 // We need 1 additional parameter, containing the URL to load
                 if (num_output_params >= 3) {
                     list rules = [ PRIM_TEXT, trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1) ];
                     llSetLinkPrimitiveParamsFast( llList2Integer(output_params, 2), rules );
+                                  }
+                else {
+                    sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\". Expecting translation text, color vector, alpha float.");
+                  
                 }
-                else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\". Expecting translation text, color vector, alpha float.");
             
             }
              else if (output_method == SLOODLE_TRANSLATE_IM) {

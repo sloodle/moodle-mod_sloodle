@@ -57,6 +57,7 @@ string SLOODLE_TRANSLATE_OWNER_SAY = "ownersay";    // No output parameters
 string SLOODLE_TRANSLATE_DIALOG = "dialog";         // Recipient avatar should be identified in link message keyval. At least 2 output parameters: first the channel number for the dialog, and then 1 to 12 button label strings.
 string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";      // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
+string SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= "hovertext_linked_prim"; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 integer SLOODLE_OBJECT_ACCESS_LEVEL_PUBLIC = 0;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
@@ -128,7 +129,7 @@ default {
                 TIMES_UP_MESSAGE=llList2String(data,2);
             }else
             if (chan==SLOODLE_TIMER_RESTART){//used to set the counter to 0 and begin counting down again
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 COUNT=0;
                 TIME_LIMIT=(integer)llList2Integer(data,0);
                 END_SOUND=llList2String(data,1);
@@ -136,7 +137,7 @@ default {
                 llSetTimerEvent(1);
             }else
             if (chan==SLOODLE_TIMER_STOP){//stop the timer at its current position
-                                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "timer_stopped", [" "], "", "hex_quizzer");
+                                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("timer_prim")], "timer_stopped", [" "], "", "hex_quizzer");
                 llSetTimerEvent(0);
             }else
             if (chan==SLOODLE_TIMER_STOP_AND_RESET){// stop the timer at its current position and reset count to 0
@@ -176,7 +177,7 @@ default {
             color=RED;
             llTriggerSound("SND_BEEPBEEP",0.2);
         };
-        sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("timer_prim")], "option", [timer_text], "", "hex_quizzer");
+        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [color, 1.0,get_prim("timer_prim")], "option", [timer_text], "", "hex_quizzer");
            
     }
 }
