@@ -410,20 +410,21 @@ default {
       llResetScript();
     }
     state_entry() {
-        NO_REZ_ZONE=(integer)llGetObjectDesc();
+        
         init();
       //  debug("default state");
         llTriggerSound("SND_STARTING_UP", 1);
         master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", "", "");
        
-    //    debug("asking for config");
+    	  debug("asking for config");
         llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
         sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
+        
         llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"||requesting config", "");
         
     }
     touch_start(integer num_detected) {
-       // debug("asking for config");
+        debug("asking for config");
         llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
         sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
         llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"||requesting config", "");
@@ -685,8 +686,8 @@ default {
 	                			}
 	                			
 	                		}	
-	                		debug("***********************************orbs to show: "+llList2CSV(orbs_to_show));
-			                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|"+llList2CSV(orbs_to_show)+"|10", NULL_KEY);
+	                		
+			                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|1,2,3,4,5,6|10", NULL_KEY);
 	                	
 		                	
 	            	}//for (avatar=0;avatar<num_avatars_detected;avatar++)
