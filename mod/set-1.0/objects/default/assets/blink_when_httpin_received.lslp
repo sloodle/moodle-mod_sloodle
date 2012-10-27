@@ -10,7 +10,7 @@ default {
     }
     link_message(integer sender_num, integer channel, string str, key id) {
     	if (channel==SLOODLE_HTTPIN_MESSAGE_RECEIVED){
-    		llMessageLinked(LINK_SET, SLOODLE_BLINKER, "blinker_prim|"+(string)ALL_SIDES+"|"+(string)BABYBLUE+"|"+(string)BLUE+"|"+(string)REZZER_GREY+"|3", NULL_KEY);
+    		llMessageLinked(LINK_SET, SLOODLE_BLINKER, "blinker_prim|"+(string)ALL_SIDES+"|"+(string)BABYBLUE+"|"+(string)BLUE+"|"+(string)REZZER_GREY+"|3|Received Message from the Server", NULL_KEY);
     	}
     }
 }

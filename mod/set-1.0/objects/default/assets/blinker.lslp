@@ -45,9 +45,9 @@
 */
 integer SLOODLE_SET_TEXTURE= -1639277010;
 integer SLOODLE_BLINKER=1639277019;//used to send commands to a prim which should blink
-
+vector YELLOW=<1.00000, 1.00000, 0.00000>;
 init(){
-	llSetTexture("blank_white", ALL_SIDES);
+    llSetTexture("blank_white", ALL_SIDES);
 }
 integer count=0;
 integer TIME_LIMIT=0;
@@ -55,13 +55,14 @@ integer TIME_LIMIT=0;
 vector TOGGLE_COLOR_1;
 vector TOGGLE_COLOR_2;
 vector DEFAULT_COLOR;
+string MESSAGE;
 default {
-	on_rez(integer start_param) {
-		init();
-	}
-	state_entry() {
-		init();
-	}
+    on_rez(integer start_param) {
+        init();
+    }
+    state_entry() {
+        init();
+    }
     link_message(integer sender_num, integer num, string str, key id) {
         if (num==SLOODLE_SET_TEXTURE){
             list data = llParseString2List(str, ["|"], []);
@@ -75,6 +76,7 @@ default {
         }
         else
         if (num==SLOODLE_BLINKER){
+            //"blinker_prim|"+(string)ALL_SIDES+"|"+(string)BABYBLUE+"|"+(string)BLUE+"|"+(string)REZZER_GREY+"|3|Received Message from the Server", NULL_KEY);
             list data = llParseString2List(str, ["|"], []);
             string prim=llList2String(data, 0);
             integer face=llList2Integer(data, 1);
@@ -82,28 +84,31 @@ default {
             vector TOGGLE_COLOR_2=llList2Vector(data, 3);
             vector DEFAULT_COLOR=llList2Vector(data, 4);
             TIME_LIMIT= llList2Integer(data,5);
+            MESSAGE= llList2String(data,6);
             if (prim!=llGetObjectName()){
                 return;
             }
             count=0;
             llSetColor(TOGGLE_COLOR_1, face);
+             llSetText(MESSAGE, YELLOW, 1);
             llSetTimerEvent(1);
         }
     }
     timer() {
-    	count++;
-    	if (count<=TIME_LIMIT){
-    		if (count%2==0){
-    			llSetColor(TOGGLE_COLOR_1, ALL_SIDES);
-    		}else{
-    			llSetColor(TOGGLE_COLOR_2, ALL_SIDES);
-    		}	
-    	}else{
-    		llSetTimerEvent(0);
-    		llSetColor(DEFAULT_COLOR, ALL_SIDES);
-    		count=0;
-    	}
-    	
+        count++;
+        if (count<=TIME_LIMIT){
+            if (count%2==0){
+                llSetColor(TOGGLE_COLOR_1, ALL_SIDES);
+            }else{
+                llSetColor(TOGGLE_COLOR_2, ALL_SIDES);
+            }    
+        }else{
+            llSetTimerEvent(0);
+            llSetColor(DEFAULT_COLOR, ALL_SIDES);
+            count=0;
+            llSetText("", YELLOW, 1);
+        }
+        
     }
     
 }
