@@ -54,6 +54,8 @@ integer doRandomize;
 integer master_listener;
 string qstring;
 integer doPlaySound;
+integer NO_REZ_ZONE;
+list ORBS_TOUCHED;
 integer pie_slice_num;
 string QUIZ_DATA_str;
 key MASTERS_KEY=NULL_KEY;
@@ -103,7 +105,7 @@ integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz
 integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
 integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
-integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
+string SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= "hovertext_linked_prim"; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string HEXAGON_PLATFORM="Hexagon Platform";
 integer TIMES_UP=TRUE;
 integer num_options=0;
@@ -202,7 +204,7 @@ set_all_pie_slice_hover_text(string msg){
     pie_slice_hover_text+=" ";
     integer pie_slice_num;
      for (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++){
-         sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [msg], "", "hex_quizzer");
+         sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [ORANGE, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [msg], "", "hex_quizzer");
          pie_slice_hover_text+=msg;
      }
 }
@@ -240,7 +242,7 @@ display_questions(string str,key id){
                 option_points= llParseString2List(llList2String(data,3), [","], []);
                 debug("---------------received question! str: "+str+"\nqdialogtext: "+qdialogtext+"\nhex: "+(string)hex+"\nqdialogoptions: "+llList2CSV(qdialogoptions)+"\noptionpoints: "+llList2CSV(option_points));
               //  debug("displaying question text: "+qdialogtext);
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
                 key user_key=id;
                 integer j=0;
                 //set the hover text of the pie_slices to the questions options
@@ -259,7 +261,7 @@ display_questions(string str,key id){
                /* for (j=1;j<=6;j++){
                     integer value = pie_slice_value(j);
                     integer prim_link=get_prim("pie_slice"+(string)j);
-                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,prim_link], "option", [value], "", "hex_quizzer");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,prim_link], "option", [value], "", "hex_quizzer");
                     debug("value for "+"pie_slice"+(string)j+" is: "+(string)value);
                 }*/
                 
@@ -389,25 +391,26 @@ init(){
         MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
         string name=llGetObjectName();
         llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|0,1,2,3,4,5,6|10", NULL_KEY);
-        sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
+        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
         set_texture_pie_slices("blank_white");
         integer num_prims = llGetNumberOfPrims();
         integer i=0;
         //clear text
         for (i=0;i<num_prims;i++){
-            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,i], "clear", [" "], "", "hex_quizzer");
+            sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,i], "clear", [" "], "", "hex_quizzer");
         }
         for (i=0;i<=6;i++){
             pie_slice_hover_text+=" ";//this list will save the text for each orb
         }
             
 }
+
 default {
     on_rez(integer start_param){
-        llResetScript();
+      llResetScript();
     }
     state_entry() {
-        
+        NO_REZ_ZONE=(integer)llGetObjectDesc();
         init();
       //  debug("default state");
         llTriggerSound("SND_STARTING_UP", 1);
@@ -415,19 +418,19 @@ default {
        
     //    debug("asking for config");
         llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
-        sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
+        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
         llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"||requesting config", "");
         
     }
     touch_start(integer num_detected) {
        // debug("asking for config");
         llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
-        sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
+        sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("question_prim")], "requesting_config", [], "", "hex_quizzer");
         llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"||requesting config", "");
     }
     link_message(integer sender_num, integer channel, string str, key id) {
                 if (channel==SLOODLE_TIMER_TIMES_UP){
-                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("question_prim")], "failedtoloadconfig", [], "", "hex_quizzer");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("question_prim")], "failedtoloadconfig", [], "", "hex_quizzer");
                     llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "GET CONFIG");
                  	llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"||requesting config", "");
                 }
@@ -448,8 +451,8 @@ default {
             	llTriggerSound("SND_FAX", 1);
                 llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
                 
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "receivingconfig", [], "", "hex_quizzer");
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("question_prim")], "receivingconfig", [], "", "hex_quizzer");
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                 //debug("received config: "+message);
                 string config = llList2String(data,1);
                 // Split the message into lines
@@ -484,7 +487,7 @@ default {
                 sloodlehttpvars += "&sloodlepwd=" + sloodlepwd;
                 sloodlehttpvars += "&sloodlemoduleid=" + (string)sloodlemoduleid;
                 sloodlehttpvars += "&sloodleserveraccesslevel=" + (string)sloodleserveraccesslevel;
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "loadingquiz", [], "", "hex_quizzer");
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("question_prim")], "loadingquiz", [], "", "hex_quizzer");
                 llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
                 llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");                
                 llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "LOAD QUIZ");
@@ -496,7 +499,7 @@ default {
             }
             link_message(integer sender_num, integer channel, string str, key id) {
                 if (channel==SLOODLE_TIMER_TIMES_UP){
-                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("question_prim")], "failedtoloadquiz", [], "", "hex_quizzer");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("question_prim")], "failedtoloadquiz", [], "", "hex_quizzer");
                        llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "LOAD QUIZ");
                        llMessageLinked(LINK_SET,SLOODLE_TIMER_RESTART, (string)5+"|", "");
                        
@@ -527,8 +530,8 @@ default {
                      // debug("current_question: "+(string)current_question);
                     //  debug("question_ids: "+(string)llList2String(quiz_data,3));
 
-                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("question_prim")], "quizloaded", [], "", "hex_quizzer");
-                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,get_prim("question_prim")], "quizloaded", [], "", "hex_quizzer");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
                     qstring=(string)question_id+"|";
                     qstring+=(string)current_question+"|";
                     qstring+=(string)num_questions+"|";
@@ -553,8 +556,8 @@ default {
         }
         state_entry() {
             debug("quizzing state");
-            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("question_prim")], "ready_click_colored_orb", [], "", "hex_quizzer");
-            sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
+            sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,get_prim("question_prim")], "ready_click_colored_orb", [], "", "hex_quizzer");
+            sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
             
         }
         touch_start(integer num_detected) {
@@ -566,7 +569,7 @@ default {
                 //request a question for first toucher 
                 llMessageLinked( LINK_SET, SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG,qstring,llDetectedKey(0));
                 //set hovertext over central orb to load question
-                sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("question_prim")], "loadingquestion", [" "], "", "hex_quizzer");
+                sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("question_prim")], "loadingquestion", [" "], "", "hex_quizzer");
                 
             }
         }
@@ -586,7 +589,14 @@ default {
             debug("received user touch: "+(string)id);
             debug("sending dialog message to user: "+(string)id);
             if (llListFindList(CORRECT_AVATARS, llKey2Name(id))!=-1){
-            	rez_hexagon(orb);
+            	if (llListFindList(ORBS_TOUCHED,[orb])==-1){
+	            	rez_hexagon(orb);
+	            	ORBS_TOUCHED+=orb;
+            	}
+            	else{
+            		sloodle_translation_request (SLOODLE_TRANSLATE_DIALOG, [1 , "Ok"], "rez_hex_denied_already_rezzed" , ["Ok"], id , "hex_quizzer");
+            	}
+            	
             	//after a user presses an edge selector, hide the selector
             	llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|"+(string)orb, NULL_KEY);
             	sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "rez_hex_granted", [llKey2Name(id)], id, "hex_quizzer");
@@ -666,8 +676,17 @@ default {
 	                		llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,"multichoice|"+(string)question_id+"|"+(string)opid+"|"+(string)score_change, avatar_key);
 	                	//report to other scripts of the scorechanges
 	                		llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANSWER_SCORE_FOR_AVATAR, (string)score_change+"|"+(string)llGetKey(), avatar_key);
-	                	//issue the command to show all of the orbs so users can click on them to rez other hexagons	
-			                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|0,1,2,3,4,5,6|10", NULL_KEY);
+	                	//issue the command to show all of the orbs so users can click on them to rez other hexagons
+	                		list orbs_to_show=[];
+	                		integer k;
+	                		for (k=1;k<=6;k++){
+	                			if (k!=NO_REZ_ZONE){
+	                				orbs_to_show+=k;	
+	                			}
+	                			
+	                		}	
+	                		debug("***********************************orbs to show: "+llList2CSV(orbs_to_show));
+			                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|"+llList2CSV(orbs_to_show)+"|10", NULL_KEY);
 	                	
 		                	
 	            	}//for (avatar=0;avatar<num_avatars_detected;avatar++)
@@ -678,12 +697,12 @@ default {
 	                		
 	                		for(j=1;j<=6;j++){
 	                			debug("sending message to: "+(string)get_prim("orb"+(string)j));
-	                			sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [GREEN, 1.0,get_prim("orb"+(string)j)], "option", [correct_avatars_str], "", "hex_quizzer");
+	                			sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,get_prim("orb"+(string)j)], "option", [correct_avatars_str], "", "hex_quizzer");
 	                		}//for (j=1;j<=6;j++)
             //open/close the pie_slices
             list grades=[];//retrieve the grade for each pie_slice
             for (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++){
-                    //sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [color, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
+                    //sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [color, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
                     integer grade = pie_slice_value(pie_slice_num);
                     grades+=grade;
             }//for  (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++)
@@ -728,7 +747,7 @@ default {
             string avatar_names;
             for (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++){
                     avatar_names=llList2String(pie_slice_hover_text,pie_slice_num);
-                    sloodle_translation_request("SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM", [YELLOW, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
             }
           
     }
