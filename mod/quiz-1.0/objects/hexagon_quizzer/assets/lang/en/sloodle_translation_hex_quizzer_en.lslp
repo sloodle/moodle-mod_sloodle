@@ -12,8 +12,7 @@
 //
 // Contributors:
 //  Peter R. Bloomfield
-//  Paul G. Preibisch
-//
+//  Paul Preibisch
 
 // Note: where a translation string contains {{x}} (where x is a number),
 //  it means that a parameter can be inserted. Please make sure to include these
@@ -28,7 +27,7 @@
 ///// TRANSLATION /////
 
 // Localization batch - indicates the purpose of this file
-string mybatch = "hex_quizzer";
+string mybatch = "quiz";
 
 
 // List of string names and translation pairs.
@@ -70,8 +69,9 @@ list locstrings = [
     "failedtoloadconfig","Failed to load configuration. Reconnecting with master hexagon...",
     "click_to_start_timer","Click to start the timer, and submit your answer.",
     "loadingquestion","Loading question...",
-    "rez_hex_denied","Sorry, only those who have answered the question correctly may rez a hexagon",
-    "rez_hex_granted","Rezzing a hexagon, please wait..."
+    "rez_hex_denied","Sorry, only those who have answered the question correctly may rez a hexagon. Please try answering the question again touching the central Orb.",
+    "rez_hex_granted","Rezzing a hexagon, please wait...",
+    "rez_hex_denied_already_rezzed","A hexagon has already been rezzed in that spot. Please select another orb."
     
     
 ];
@@ -94,7 +94,7 @@ string SLOODLE_TRANSLATE_DIALOG = "dialog";                 // Recipient avatar 
 string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";              // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_LOAD_URL_PARALLEL = "loadurlpar";  // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
-integer SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= -1639277009; // 3 output parameters: colour <r,g,b>,  alpha value, link number
+string SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= "hovertext_linked_prim"; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string SLOODLE_TRANSLATE_IM = "instantmessage";             // Recipient avatar should be identified in link message keyval. No output parameters.
 
 
@@ -115,9 +115,6 @@ integer SLOODLE_CHANNEL_OBJECT_LOAD_URL = -1639270041;
 sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch)
 {
     llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
-}
-string strReplace(string str, string search, string replace) {
-    return llDumpList2String(llParseStringKeepNulls(str, [search], []), replace);
 }
 
 // Send a translation response link message
@@ -185,13 +182,13 @@ string sloodle_get_string_f(string name, list params)
     integer curparamtoklength = 0;
     string curparamstr = "";
     integer tokpos = -1;
-    for (curparamnum=0; curparamnum < numparams; curparamnum++) {
+    for (; curparamnum < numparams; curparamnum++) {
         // Construct this parameter token
         curparamtok = "{{" + (string)(curparamnum) + "}}";
         curparamtoklength = llStringLength(curparamtok);
         // Fetch the parameter text
         curparamstr = llList2String(params, curparamnum);
-     
+        
         // Ensure the parameter text does NOT contain double braces (this avoids an infinite loop!)
         if (llSubStringIndex(curparamstr, "{{") < 0 && llSubStringIndex(curparamstr, "}}") < 0) {            
             // Go through every instance of this parameter's token
@@ -202,7 +199,7 @@ string sloodle_get_string_f(string name, list params)
             }
         }
     }
-    str=strReplace(str,"*%*%*",",");
+    
     return str;
 }
 
@@ -347,7 +344,9 @@ default
                 if (num_output_params >= 2) llSetText(trans, (vector)llList2String(output_params, 0), (float)llList2String(output_params, 1));
                 else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\".");
             
-              } else if (output_method == SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM) {
+            }
+             else if (output_method == SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM) {
+            	   
                 //example usage: sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [BLUE, 1.0,7], "quizname", [quiz_name], llGetOwner(), "quizzer");
                 // We need 1 additional parameter, containing the URL to load
                 if (num_output_params >= 3) {
@@ -357,7 +356,7 @@ default
                 else sloodle_debug("ERROR: Insufficient output parameters to show hover text with string \"" + string_name + "\". Expecting translation text, color vector, alpha float.");
             
             }
-            else if (output_method == SLOODLE_TRANSLATE_IM) {
+             else if (output_method == SLOODLE_TRANSLATE_IM) {
                 // Send an IM - we need a valid key
                 if (id == NULL_KEY) {
                     sloodle_debug("ERROR: Non-null key value required to send IM with string \"" + string_name + "\".");
@@ -373,5 +372,5 @@ default
         }
     }
 }
-// Please leave the following line intact to show where the script lives in Subversion:
-// SLOODLE LSL Script Subversion Location: lang/en_utf8/sloodle_translation_quiz_en.lsl 
+// Please leave the following line intact to show where the script lives in Git:
+// SLOODLE LSL Script Git Location: mod/quiz-1.0/objects/hexagon_quizzer/assets/lang/en/sloodle_translation_hex_quizzer_en.lslp
