@@ -45,10 +45,11 @@
 *
 */
 float edge_length;
+float tip_to_edge;
 list QUESTIONS_ASKED;
 float edge_length_half;
 string CONFIG;
-float tip_to_edge;
+
 list rezzed_hexes;
 list opids;
 integer PIN=7961;
@@ -113,7 +114,7 @@ integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
 integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 string SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= "hovertext_linked_prim"; // 3 output parameters: colour <r,g,b>,  alpha value, link number
-string HEXAGON_PLATFORM="Hexagon Platform";
+string HEXAGON_PLATFORM="Hexagon Quizzer";
 integer TIMES_UP=FALSE;
 integer num_options=0;
 list CORRECT_AVATARS;
@@ -263,7 +264,7 @@ default {
         for (j=0;j<n;j++){
             llSetLinkPrimitiveParamsFast( j,[PRIM_TEXT," ",GREEN,1]);
         }
-        llSetScriptState( "rezzer_platform.lslp", FALSE);
+        llSetScriptState( "_platform.lslp", FALSE);
     }
     link_message(integer sender_num, integer num, string str, key id) {
         if (num==SLOODLE_CHANNEL_OBJECT_DIALOG){
@@ -355,10 +356,10 @@ state quiz_loaded{
 	        	return;
             }
 	     }
-     	if (!ALREADY_REZZED){
+     	//if (!ALREADY_REZZED){
      		llRezAtRoot(HEXAGON_PLATFORM, llGetPos()+<0,0,2>, ZERO_VECTOR,  llGetRot(), 0);
      		ALREADY_REZZED=TRUE;
-     	}
+     //	}
 	}
 	
     object_rez(key platform) {
