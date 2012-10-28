@@ -134,7 +134,6 @@ integer SLOODLE_SENSOR_DETECTED_KEYS= -1639277017;//issue an llSensor
 integer SLOODLE_REMOTE_LOAD_SCRIPT=1639277018;//remote loader channel used by scripts who can't afford to sleep but need to use llRemoteScriptLoadPin, use this channel to get a remote loader script to handle the loading instead of main script
 integer SLOODLE_BLINKER=1639277019;//used to send commands to a prim which should blink
 integer SLOODLE_HTTPIN_MESSAGE_RECEIVED=1639277020;//used to tell other scripts a message has been received
-
-
+integer SLOODLE_OBSTRUCTION=1639277021;
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 

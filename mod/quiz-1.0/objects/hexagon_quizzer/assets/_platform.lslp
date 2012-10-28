@@ -79,6 +79,7 @@ list opids;
 integer PIN=7961;
 integer quiz_id;
 string quiz_name;
+string DELIMITER="*%*%*";
 integer question_id;
 integer current_question;
 list question_ids;
@@ -150,8 +151,9 @@ debug (string message ){
      }
 } 
 string strReplace(string str, string search, string replace) {
-    return llDumpList2String(llParseStringKeepNulls((str = "") + str, [search], []), replace);
+    return llDumpList2String(llParseStringKeepNulls(str, [search], []), replace);
 }
+
 //rezzes a hexagon at the indicated orb#
 rez_hexagon(integer orb){
     if (llGetListLength(QUESTIONS_ASKED)>=num_questions){
@@ -237,15 +239,17 @@ string get_detected_pie_slice(vector avatar){
 }
 
 display_questions(string str,key id){
- //   debug("displaying questions");
+
                
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
-                qdialogtext = strReplace(llList2String(data,0), ",", "*%*%*");
+                debug("displaying questions "+qdialogtext);
+                qdialogtext = strReplace(llList2String(data,0), ",", DELIMITER);
+                  
                 key hex = llList2Key(data,1);
                 list qdialogoptions= llParseString2List(llList2String(data,2), [","], []);
                 option_points= llParseString2List(llList2String(data,3), [","], []);
-                debug("---------------received question! str: "+str+"\nqdialogtext: "+qdialogtext+"\nhex: "+(string)hex+"\nqdialogoptions: "+llList2CSV(qdialogoptions)+"\noptionpoints: "+llList2CSV(option_points));
+                debug("---------------received question! str: \nqdialogtext: "+qdialogtext+"\nhex: "+(string)hex+"\nqdialogoptions: "+llList2CSV(qdialogoptions)+"\noptionpoints: "+llList2CSV(option_points));
               //  debug("displaying question text: "+qdialogtext);
                 sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
                 key user_key=id;
@@ -402,9 +406,7 @@ init(){
         for (i=0;i<num_prims;i++){
             sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,i], "clear", [" "], "", "hex_quizzer");
         }
-        for (i=0;i<=6;i++){
-            current_avatars_over_pie_slices+=" ";//this list will save the text for each orb
-        }
+       
             
 }
 
@@ -517,7 +519,7 @@ default {
               //  debug("Command: "+command);
                 if (command=="receive quiz data"){
                  //   llTriggerSound("SND_FAX_2", 1);
-                    llTriggerSound("SND_FAX", 1);
+                 //   llTriggerSound("SND_FAX", 1);
                     llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
                     QUIZ_DATA_str= llList2String(data,1);
                     list quiz_data =llParseString2List(QUIZ_DATA_str, ["|"], []);
@@ -559,10 +561,17 @@ default {
             llResetScript();
         }
         state_entry() {
+        	set_all_pie_slice_hover_text(" ");
+        	llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
+        	llListen(1, "", llGetOwner(), "");
             debug("quizzing state");
             sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,get_prim("question_prim")], "ready_click_colored_orb", [], "", "hex_quizzer");
             sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
             
+        }
+        listen(integer channel, string name, key id, string message) {
+        	TIME_LIMIT=(integer)message;
+        	llSay(0,"new time limit is: "+(string)TIME_LIMIT);
         }
         touch_start(integer num_detected) {
             if (TIMES_UP){//re-ask question
@@ -628,22 +637,23 @@ default {
                 quiz_loaded=TRUE;
                 display_questions(str,id);
                 
-                llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
+                
             }//if
         }else
         if (channel==SLOODLE_TIMER_TIMES_UP){
             integer p;
+            QUESTION_TIMER_ACTIVE=FALSE;
              for (p=1;p<=6;p++){
                    llSetLinkAlpha(get_prim("pie_slice"+(string)p), .5, ALL_SIDES );
             }
             //gets triggered when after a countdown and time is up
             //if (str=="QUESTION TIME LIMIT REACHED"){
                 debug("times up! QUESTION TIME LIMIT REACHED");
-                llSensorRemove();
+                
                 debug("times up! "+str);
-            debug("DETECTED_AVATARS "+llList2CSV(DETECTED_AVATARS));
-            debug("DETECTED_AVATARS_SCORE_CHANGE "+llList2CSV(DETECTED_AVATARS_SCORE_CHANGE));
-            debug("CORRECT_AVATARS "+llList2CSV(CORRECT_AVATARS));
+            	debug("DETECTED_AVATARS "+llList2CSV(DETECTED_AVATARS));
+            	debug("DETECTED_AVATARS_SCORE_CHANGE "+llList2CSV(DETECTED_AVATARS_SCORE_CHANGE));
+            	debug("CORRECT_AVATARS "+llList2CSV(CORRECT_AVATARS));
             
                 llTriggerSound("SND_BUZZER", 1);
                 //set times up to true so that a user can re-touch the central orb to re-ask the question 
@@ -725,10 +735,13 @@ default {
     sensor(integer num_avatars_detected) {
             //since this is a new sensor event, erase all recorded avatar sensed data - as the avatars may have moved to a new 
             //position before timer is up.
+            if (QUESTION_TIMER_ACTIVE==TRUE){
               DETECTED_AVATARS=[];
               DETECTED_AVATARS_OP_IDS=[];
               DETECTED_AVATARS_SCORE_CHANGE=[];
-             DETECTED_AVATARS_POSITION=[];
+              DETECTED_AVATARS_POSITION=[];
+            }
+            
             //go through each detected avatar and add their names to the prims they are standing in
             set_all_pie_slice_hover_text(" ");
             integer avatar;
@@ -756,15 +769,18 @@ default {
                     llSetLinkAlpha(get_prim("pie_slice"+(string)pie_slice_num), .9, ALL_SIDES );
                 //set text for pie_slice        
                     string pie_slice_text =llList2String(current_avatars_over_pie_slices,pie_slice_num);
-                    current_avatars_over_pie_slices= llListReplaceList(current_avatars_over_pie_slices, [pie_slice_text+","+avatar_name], pie_slice_num, pie_slice_num);
+                    current_avatars_over_pie_slices= llListReplaceList(current_avatars_over_pie_slices, [pie_slice_text+DELIMITER+avatar_name], pie_slice_num, pie_slice_num);
+                    debug("current_avatars_over_pie_slices: "+llList2CSV(current_avatars_over_pie_slices)+ "("+(string)pie_slice_num+")");
                 //DETECT WHO IS CORRECT AND INCORRECT
                     integer score_change = pie_slice_value(pie_slice_num);
                     integer opid = pie_slice_option_index(pie_slice_num);
                  //store detected avatars so we can submit scores later
-                    DETECTED_AVATARS_POSITION+=avatar_pos;
-                    DETECTED_AVATARS+=avatar_key;
-                    DETECTED_AVATARS_OP_IDS+=opid;
-                    DETECTED_AVATARS_SCORE_CHANGE+=score_change;
+                     if (QUESTION_TIMER_ACTIVE==TRUE){
+	                    DETECTED_AVATARS_POSITION+=avatar_pos;
+	                    DETECTED_AVATARS+=avatar_key;
+	                    DETECTED_AVATARS_OP_IDS+=opid;
+	                    DETECTED_AVATARS_SCORE_CHANGE+=score_change;
+                     }
             }
             
             for (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++){
@@ -773,13 +789,13 @@ default {
                //get all the avatar names that over a pie slice the last time this sensor ran
                        string last_avatar_names=llList2String(last_detection,pie_slice_num);
                //convert both results to a list
-                       list data = llParseString2List(avatar_names, [","], []);
-                       list last_data = llParseString2List(last_avatar_names, [","], []);
+                       list data = llParseString2List(avatar_names, [DELIMITER], []);
+                       list last_data = llParseString2List(last_avatar_names, [DELIMITER], []);
                //compare the length of both lists, if the lenght of the new data is greater than last data for this pie slice,
                //that means a new avatar has entered this pie slice so play a sound
-               if (llGetListLength(data)>llGetListLength(last_data)){
-                       llTriggerSound("SND_PIE_"+(string)pie_slice_num, 1);
-               }
+	               if (llGetListLength(data)>llGetListLength(last_data)){
+	                       llTriggerSound("SND_PIE_"+(string)pie_slice_num, 1);
+	               }
                //print names on pie slice hover text
                     sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
                         
