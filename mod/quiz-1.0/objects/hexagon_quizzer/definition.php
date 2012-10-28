@@ -1,6 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
-$sloodleconfig->primname   = 'Hexagon Quizzer';
+$sloodleconfig->primname   = 'Hexagon Rezzer';
 $sloodleconfig->module     = 'quiz';
 $sloodleconfig->module_choice_message = 'selectquiz';// TODO: There's some extra craziness to make sure we only have sloodle stuff
 $sloodleconfig->module_no_choices_message = 'noquizzes';
