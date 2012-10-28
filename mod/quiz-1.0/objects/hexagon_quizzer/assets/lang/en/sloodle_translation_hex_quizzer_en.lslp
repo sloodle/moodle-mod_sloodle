@@ -72,7 +72,8 @@ list locstrings = [
     "loadingquestion","Loading question...",
     "rez_hex_denied","Sorry, only those who have answered the question correctly may rez a hexagon. Please try answering the question again touching the central Orb.",
     "rez_hex_granted","Rezzing a hexagon, please wait...",
-    "rez_hex_denied_already_rezzed","A hexagon has already been rezzed in that spot. Please select another orb."
+    "rez_hex_denied_already_rezzed","A hexagon has already been rezzed in that spot. Please select another orb.",
+    "not_allowed_to_click","Sorry, you are not allowed to click this orb while it is hidden."
     
     
 ];
