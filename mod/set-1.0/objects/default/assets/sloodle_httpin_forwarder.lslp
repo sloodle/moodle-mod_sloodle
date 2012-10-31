@@ -160,6 +160,9 @@ state ready {
     // allow for reconfiguration without resetting
      link_message( integer sender_num, integer num, string str, key id)
     {
+
+        if (str == "do:reset") llResetScript();
+
            // llOwnerSay(str);
         // Check the channel
         if (num == SLOODLE_CHANNEL_OBJECT_DIALOG) {

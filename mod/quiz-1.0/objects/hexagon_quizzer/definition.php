@@ -1,6 +1,6 @@
 <?php
 $sloodleconfig = new SloodleObjectConfig();
-$sloodleconfig->primname   = 'Hexagon Quizzer';
+$sloodleconfig->primname   = 'Hexagon Rezzer';
 $sloodleconfig->module     = 'quiz';
 $sloodleconfig->module_choice_message = 'selectquiz';// TODO: There's some extra craziness to make sure we only have sloodle stuff
 $sloodleconfig->module_no_choices_message = 'noquizzes';
@@ -10,10 +10,8 @@ $sloodleconfig->field_sets = array(
 	'generalconfiguration' => array( //TODO: Check defaults
 		'sloodlerepeat' => new SloodleConfigurationOptionYesNo( 'sloodlerepeat', 'repeatquiz', null, 0 ),
 		'sloodlerandomize' => new SloodleConfigurationOptionYesNo( 'sloodlerandomize', 'randomquestionorder', null, 1 ),
-		'sloodledialog' => new SloodleConfigurationOptionYesNo( 'sloodledialog', 'usedialogs', null, 1 ),
-		'sloodlecorrecttocontinue' => new SloodleConfigurationOptionYesNo( 'sloodlecorrecttocontinue', 'correcttocontinue', null, 0 ),
-		'sloodleaskquestionscontinuously' => new SloodleConfigurationOptionYesNo( 'sloodleaskquestionscontinuously', 'askquestionscontinuously', null, 0 ),
 		'sloodleplaysound' => new SloodleConfigurationOptionYesNo( 'sloodleplaysound', 'playsounds', null, 0 ),
+		'questiontimelimit' => new SloodleConfigurationOptionText( 'questiontimelimit', 'quiz:questiontimelimit', '', '30', 3)
 	),
 	'accesslevel' => array(
 		'sloodleobjectaccessleveluse'  => $sloodleconfig->access_level_object_use_option(), 

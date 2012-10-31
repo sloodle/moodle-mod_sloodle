@@ -101,6 +101,14 @@ $string['controlaccess'] = 'You can control access to your courses by enabling o
 //$string['controllerinfo'] = 'This page represents a SLOODLE Classroom. These are used to control communications between Second Life and Moodle, keeping the site secure. This page is primarily for use by teachers and administrators.';
 
 $string['controllerinfo'] = 'This course is linked to learning activities in Second Life. This page is provided to allow students to check whether the Second Life interface is currently enabled, and for instructors to configure the interface.';
+$string['moduletype_controller_help'] = 'The controller links a Moodle course to a set of activities in a virtual world.';
+$string['moduletype_controller'] = 'Controlller';
+
+$string['moduletype_presenter_help'] = 'The presenter allows you to create slides in Moodle, and display them in a virtual world.'.
+$string['moduletype_presenter'] = 'Presenter';
+
+$string['moduletype_distributor_help'] = 'The distributor allows you to put virtual inventory in an object in a virtual world and distribute it to your students.';
+$string['moduletype_distributor'] = 'Distributor';
 
 $string['courseconfig'] = 'SLOODLE Course Configuration';
 $string['courseconfig:info'] = 'On this page, you can configure the SLOODLE settings which affect your entire course. However, some of the settings may be disabled on your Moodle site by an administrator.<br/><br/><b>Please note:</b> auto-registration and auto-enrolment are not suitable for all Moodle installations. Please read the documentation about each one before enabling them.';
@@ -393,6 +401,7 @@ $string['relativeresults'] = 'Show relative results?';
 $string['runningcompatibilitycheck'] = 'Running compatibility check...';
 $string['resettasks'] = 'Reset selected tasks';
 $string['resetallprogress'] = 'Reset all progress';
+$string['questiontimelimit']='Time limit for answering questions';
 
 $string['save'] = 'Save';
 $string['second'] = 'second';

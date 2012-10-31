@@ -1,4 +1,3 @@
-
 <?php 
 //require_once(SLOODLE_LIBROOT . '/krumo/class.krumo.php');
 function print_html_top($loadfrom = '', $is_logged_in) {?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -62,7 +61,7 @@ var active_object_uuid = '<?php echo  htmlentities($active_object_uuid) ?>';
         <div id="tabs-1">
 
             <div style="display:none" class="group divider above_scores"><?php echo  s(get_string($group_name, 'sloodle')) ?>
-                 <? s(get_string('scoreboard:displayedonscreen', 'sloodle'));?> 
+                 <?php s(get_string('scoreboard:displayedonscreen', 'sloodle'));?> 
                  - 
                  <?php echo  s($currency->name) ?>
             </div>

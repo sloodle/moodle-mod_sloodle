@@ -43,6 +43,16 @@ integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_ANYONE = -1639270124; // set the ope
 integer active_num;
 string url;
 string nourlmessage; // If we can't provide a URL, use this message instead, which should be passed to the translation script.
+string sloodleserverroot = "";
+integer sloodlecontrollerid = 0;
+string sloodlepwd = "";
+integer sloodlemoduleid = 0;
+integer sloodleobjectaccessleveluse = 0; // Who can use this object?
+integer sloodleobjectaccesslevelctrl = 0; // Who can control this object?
+integer sloodleserveraccesslevel = 0; // Who can use the server resource? (Value passed straight back to Moodle)
+integer isconfigured = FALSE; // Do we have all the configuration data we need?
+integer eof = FALSE; // Have we reached the end of the configuration data?
+string SLOODLE_EOF = "sloodleeof";
 
 // Link message channels
 integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
@@ -63,14 +73,38 @@ sloodle_translation_request(string output_method, list output_params, string str
 {
     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
 }
-
+integer sloodle_handle_command(string str){
+            list bits = llParseString2List(str,["|"],[]);
+            integer numbits = llGetListLength(bits);
+            string name = llList2String(bits,0);
+            string value1 = "";
+            string value2 = "";
+            if (numbits > 1) value1 = llList2String(bits,1);
+            if (numbits > 2) value2 = llList2String(bits,2);
+            if (name == "set:sloodleserverroot") sloodleserverroot = value1;
+            else if (name == "set:sloodlepwd") {
+                // The password may be a single prim password, or a UUID and a password
+                if (value2 != "") {
+                   sloodlepwd = value1 + "|" + value2;
+                }
+                else {
+                    sloodlepwd = value1;
+                }
+            }
+            else if (name == "set:sloodlecontrollerid") sloodlecontrollerid = (integer)value1;
+            else if (name == "set:sloodlemoduleid") sloodlemoduleid = (integer)value1;
+            else if (name == "set:sloodleobjectaccessleveluse") sloodleobjectaccessleveluse = (integer)value1;
+            else if (name == "set:sloodleserveraccesslevel") sloodleserveraccesslevel = (integer)value1;
+            else if (name == SLOODLE_EOF) eof = TRUE;
+            return (sloodleserverroot != "" && sloodlepwd != "" && sloodlecontrollerid > 0 && sloodlemoduleid > 0);
+}
 open_in_browser(key toucher) 
 {   
     if (nourlmessage != "") {
         if (toucher == llGetOwner()) {
-            sloodle_translation_request(SLOODLE_TRANSLATE_OWNER_SAY, [0], nourlmessage, [llKey2Name(toucher)], NULL_KEY, "");           
+            sloodle_translation_request(SLOODLE_TRANSLATE_OWNER_SAY, [0], nourlmessage, [llKey2Name(toucher)], NULL_KEY, "");
         } else {
-            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], nourlmessage, [llKey2Name(toucher)], NULL_KEY, "");                           
+            sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], nourlmessage, [llKey2Name(toucher)], NULL_KEY, "");
         }
         return; 
     }
@@ -78,9 +112,12 @@ open_in_browser(key toucher)
     llTriggerSound("click", 1.0);
     //sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], nourlmessage, [llKey2Name(toucher)], NULL_KEY, ""); 
     if (toucher == llGetOwner()) {
-        sloodle_translation_request(SLOODLE_TRANSLATE_OWNER_SAY, [0], "openrezzerurl", [url], NULL_KEY, "");           
+        sloodle_translation_request(SLOODLE_TRANSLATE_OWNER_SAY, [0], "openrezzerurl", [url], NULL_KEY, "");
+		sloodle_translation_request(SLOODLE_TRANSLATE_LOAD_URL, [url], "openrezzerurl", [], toucher, "");           
+                   
     } else {
-        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "openrezzerurl", [url], NULL_KEY, "");                           
+        sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "openrezzerurl", [url], NULL_KEY, "");
+		sloodle_translation_request(SLOODLE_TRANSLATE_LOAD_URL, [url], "openrezzerurl", [], toucher, "");
     }  
     /*  
     if (toucher == llGetOwner()) {
@@ -104,8 +141,28 @@ default {
             
             if (str=="do:reconfigure"||str=="do:reset"){
                 llResetScript();
+                return;
             }
-                
+        	// Split the message into lines
+            string config = str;
+            list lines = llParseString2List(str, ["\n"], []);
+            integer numlines = llGetListLength(lines);
+            integer i = 0;
+            for (i=0; i < numlines; i++) {
+            	isconfigured = sloodle_handle_command(llList2String(lines, i));
+            }
+            // If we've got all our data AND reached the end of the configuration data (eof), then move on
+            if (eof == TRUE) {
+            	if (isconfigured == TRUE) {
+                	sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                    	state load;
+				} else {
+                	// Go all configuration but, it's not complete... request reconfiguration
+                	sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [llGetScriptName()], NULL_KEY, "");
+                	llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
+                	eof = FALSE;
+              	}
+            }
         } else if ( ( num == SLOODLE_CHANNEL_SET_SET_BROWSER_URL_OWNER ) || ( num == SLOODLE_CHANNEL_SET_SET_BROWSER_URL_GROUP ) || ( num == SLOODLE_CHANNEL_SET_SET_BROWSER_URL_ANYONE) ) {
                 
             active_num = num;
