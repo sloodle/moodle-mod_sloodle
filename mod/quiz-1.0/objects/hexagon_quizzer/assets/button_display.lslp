@@ -77,6 +77,7 @@ sloodle_translation_request(string output_method, list output_params, string str
 }
 hide(integer orb){
     my_state="hide";
+    debug("*******************************************************hiding");
     if (myType=="orb"){
     	llSetPrimitiveParams([9,3,0,<0.730000, 0.750000, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>]);
     }else
@@ -90,11 +91,12 @@ hide(integer orb){
 }
 show(integer orb){
     my_state="show";
+    debug("*******************************************************showing");
 	if (myType=="orb"){
     	 llSetPrimitiveParams([9,3,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>]);
     }else
     if (myType=="rod_hor"){
-    	llSetPrimitiveParams([9,4,0,<0.505000, 0.525000, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.500000, 0.0>,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,1.0,0.0,0.0]);
+    	llSetPrimitiveParams([9,4,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.500000, 0.0>,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,1.0,0.0,0.0]);
     }else
     if (myType=="rod_ver"){
     	llSetPrimitiveParams([9,4,0,<0.0, 1.0, 0.0>,0.0,<0.0, 0.0, 0.0>,<1.0, 0.500000, 0.0>,<0.0, 0.0, 0.0>,<0.0, 1.0, 0.0>,<0.0, 0.0, 0.0>,1.0,0.0,0.0]);
@@ -148,8 +150,10 @@ default{
     touch_start(integer num_detected) {
          integer j;
          for (j=0;j<num_detected;j++){
+         	vector touch_pos= llDetectedTouchPos(j);
+         	vector my_pos = llGetPos();
             if (my_state=="show"){         
-                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_USER_TOUCH, myType+"|"+(string)my_num, llDetectedKey(j));
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_USER_TOUCH, myType+"|"+(string)my_num+"|"+(string)touch_pos+"|"+(string)my_pos, llDetectedKey(j));
                  //debug("sending touch event");
             }else{
              sloodle_translation_request (SLOODLE_TRANSLATE_DIALOG, [1 , "Ok"], "not_allowed_to_click" , ["Ok"], llDetectedKey(j) , "hex_quizzer");
@@ -207,13 +211,14 @@ default{
                  //if detected keys are orbs in the same linkset, ignore
                  
                  if (llListFindList(myFamily,[llDetectedKey(k)])!=-1){
-                     hide(my_num);
+                 	//its in the list so my family
+                     show(my_num);
                      OBSTRUCTED=TRUE;
                      debug("im a sensor, and heard that "+llDetectedName(k)+" has been rezzed around me, and it is of my family, I am going to show");
                  }else{
                          //only detected my root
                           debug("im a sensor, and heard that "+llDetectedName(k)+" has been rezzed around me, and it is NOT a family member so hiding so  dont overlap!");
-                         show(my_num);
+                         hide(my_num);
                 }
              }
          }
