@@ -255,11 +255,17 @@ rez_elevator(integer num,vector pos,string direction){
     if (direction=="up"){
         llRezAtRoot(llGetObjectName(), child_coord+<0,0,5>, ZERO_VECTOR,  llGetRot(), my_oposite_section);
         llRezAtRoot("elevator", pos+<0,0,2.5>, ZERO_VECTOR,  llGetRot(), num);
+        //seat to get to go up
         llRezAtRoot("elevator_seat", pos+<0,0,0.4>, ZERO_VECTOR,  llGetRot(), num);
+        //seat to get back down
+        llRezAtRoot("elevator_seat", pos+<0,0,5>, ZERO_VECTOR,  llGetRot(), -num);
     }else{
         llRezAtRoot(llGetObjectName(), child_coord+<0,0,-5>, ZERO_VECTOR,  llGetRot(), my_oposite_section);
-        llRezAtRoot("elevator", pos+<0,0,-2.5>, ZERO_VECTOR,  llGetRot(), num);
+        llRezAtRoot("elevator", pos+<0,0,-2.5>, ZERO_VECTOR,  llGetRot(), -num);
+        //seat to go down
         llRezAtRoot("elevator_seat", pos+<0,0,0.4>, ZERO_VECTOR,  llGetRot(), -num);
+        //seat to get back up
+        llRezAtRoot("elevator_seat", pos+<0,0,-5>, ZERO_VECTOR,  llGetRot(), num);
     }
    
     
