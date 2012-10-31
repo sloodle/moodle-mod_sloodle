@@ -130,10 +130,11 @@ integer SLOODLE_TIMER_STOP_AND_RESET= -1639277014;//should stop the timer at its
 integer SLOODLE_TIMER_RESET= -1639277015;//shoudl reset the count back to zero but not restart the timer
 integer SLOODLE_TIMER_TIMES_UP= -1639277016;//used to transmit the timer reached its time limit
 integer SLOODLE_SENSOR_ONCE= -1639277017;//issue an llSensor
-integer SLOODLE_SENSOR_DETECTED_KEYS= -1639277017;//issue an llSensor
 integer SLOODLE_REMOTE_LOAD_SCRIPT=1639277018;//remote loader channel used by scripts who can't afford to sleep but need to use llRemoteScriptLoadPin, use this channel to get a remote loader script to handle the loading instead of main script
 integer SLOODLE_BLINKER=1639277019;//used to send commands to a prim which should blink
 integer SLOODLE_HTTPIN_MESSAGE_RECEIVED=1639277020;//used to tell other scripts a message has been received
 integer SLOODLE_OBSTRUCTION=1639277021;
+integer SLOODLE_SENSOR_DETECTED_KEYS= -1639277022;//issue an llSensor
+
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 
