@@ -25,6 +25,8 @@ string SLOODLE_HTTP_IN_REQUEST_LINKER = "/mod/sloodle/classroom/httpin_config_li
 string SLOODLE_HTTP_IN_UPDATE_LINKER = "/mod/sloodle/classroom/httpin_url_update_linker.php";
 string SLOODLE_PING_LINKER = "/mod/sloodle/classroom/active_object_ping_linker.php";
 
+integer SLOODLE_CHANNEL_SET_CLEANUP_AND_DEREZ = -1639270131; // linked message to tell the object to derez if it has some object-specific cleanup tasks.
+
 float refreshseconds = 3600.0; // Number of seconds between pings. Some jitter will sometimes be added to prevent killing the server this number of seconds after a sim full of objects starts up. We start with a fairly slow default, but this can be altered by the server when we ping or send out config.
 
 string SLOODLE_EOF = "sloodleeof";
@@ -84,8 +86,16 @@ integer sloodle_handle_command(string str, integer do_persist)
             rezzer_uuid = llList2Key(bits,3);
             has_position = 1;
         } else if (name == "do:derez") {
-            llSleep(2); // This is needed to give the script a chance to finish making the http response.
-            llDie();
+            // If there is a script designed to handle derezzing, send it a message.
+            // It should do anything it needs to do, like saving inventory or derezzing child objects...
+            // ...then derez itself when it's done.
+            if (llGetInventoryType( "sloodle_rezzer_derez_handler" ) ==  INVENTORY_SCRIPT) {
+                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_SET_CLEANUP_AND_DEREZ, "", NULL_KEY);
+            } else {
+                llSleep(2); // This is needed to give the script a chance to finish making the http response.
+                llDie();
+            }
+            
         } else if ( (name=="do:requestconfig") || (name=="do:reset") ) {           
             string this_script = llGetScriptName();                
             integer n = llGetInventoryNumber(INVENTORY_SCRIPT); 
@@ -580,3 +590,4 @@ state reinitialize {
 
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: mod/set-1.0/objects/default/assets/sloodle_rezzer_object.lslp
+

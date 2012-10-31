@@ -20,12 +20,15 @@
 */
 
 integer SLOODLE_CHANNEL_HTTP_RESPONSE = -1639260101  // Tells the sloodle_rezzer_object script to send the contents as an http response, to the key specified as key
+
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_OWNER = -1639270111; // set the main shared media panel to the specified URL, accessible to the owner
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_GROUP = -1639270112; // set the main shared media panel to the specified URL, accessible to the group
 integer SLOODLE_CHANNEL_SET_SET_SHARED_MEDIA_URL_ANYONE = -1639270114; // set the main shared media panel to the specified URL, accessible to anyone
 integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_OWNER = -1639270121; // set the open browser button to url, accessible to owner
 integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_GROUP = -1639270122; // set the open browser button to url, accessible to group
 integer SLOODLE_CHANNEL_SET_SET_BROWSER_URL_ANYONE = -1639270124; // set the open browser button to url, accessible to anyone
+integer SLOODLE_CHANNEL_SET_CLEANUP_AND_DEREZ = -1639270131; // linked message to tell the object to derez if it has some object-specific cleanup tasks.
+
 integer SLOODLE_CHANNEL_QUIZ_START_FOR_AVATAR = -1639271102; //Tells us to start a quiz for the avatar, if possible.; Ordinary quiz chair will have a second script that detects and avatar sitting      on it and sends it. Awards-integrated version waits for a game ID to be set before doing this.
 integer SLOODLE_CHANNEL_QUIZ_STARTED_FOR_AVATAR = -1639271103; //Sent by main quiz script to tell UI scripts that quiz has started for avatar with key
 integer SLOODLE_CHANNEL_QUIZ_COMPLETED_FOR_AVATAR = -1639271104; //Sent by main quiz script to tell UI scripts that quiz has finished for avatar with key, with x/y correct in string
@@ -56,6 +59,10 @@ integer SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_SET_ADMIN_URL_CHANNEL= -16392711
 integer SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_CHANGE_ADMIN_URL_CHANNEL= -1639271129; // This is the channel that the scoreboard shouts out its admin URL WHEN It has changed due to a region event (lost its url etc)
 integer SLOODLE_SCOREBOARD_CONNECT_HUD= -1639271130; // channel which gets sent a linked message by the connect a hud button when it is touched.
 integer SLOODLE_SCOREBOARD_CONNECT_HUD_REGION_SAY= -1639271131; // broadcast to the region by the scoreboard when a user presses the connect scoreboard button
+
+integer SLOODLE_CHANNEL_BACKPACK_SHARED_MEDIA_SET_STUDENT_URL_CHANNEL = -1639271155; // broadcast to the region by the hud giver 
+integer SLOODLE_CHANNEL_BACKPACK_SHARED_MEDIA_REQUEST_STUDENT_URL_CHANNEL = -1639271156; // broadcast to the region by the hud 
+
 integer SLOODLE_OBJECT_INTERACTION= -1639271132; //channel interaction objects speak on
 integer SLOODLE_OBJECT_REGISTER_INTERACTION= -1639271133; //channel objects send interactions to the mod_interaction-1.0 script on to be forwarded to server
 integer SLOODLE_OBJECT_INTERACTION_SHOUT_COMMAND= -1639271134; //channel interaction object will shout commands to its consituent parts
