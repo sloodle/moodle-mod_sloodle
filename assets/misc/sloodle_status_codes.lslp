@@ -135,6 +135,7 @@ integer SLOODLE_BLINKER=1639277019;//used to send commands to a prim which shoul
 integer SLOODLE_HTTPIN_MESSAGE_RECEIVED=1639277020;//used to tell other scripts a message has been received
 integer SLOODLE_OBSTRUCTION=1639277021;
 integer SLOODLE_SENSOR_DETECTED_KEYS= -1639277022;//issue an llSensor
-
+integer SLOODLE_CHANNEL_CHILDREN=-1639277023;
+integer SLOODLE_CHANNEL_PARENT=-1639277024;
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 
