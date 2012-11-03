@@ -1,7 +1,7 @@
 //
 // The line above should be left blank to avoid script errors in OpenSim.
 /*
-*  ossl_teleport.lslp
+*  ossl_message.lslp
 *  Part of the Sloodle project (www.sloodle.org)
 *
 *  Copyright (c) 2011-06 contributors (see below)
@@ -29,13 +29,7 @@
 *
 *  DESCRIPTION
 *
-* IN GRID Teleport 
-* Destination = "1000,1000"; = Using In-Grid Map XXXX,YYYY coordinates
-* Region = "RegionName"; = Using RegionName
-* HyperGrid Teleport (region must be HG Enabled)
-* Destination = "TcpIpAddr:Port:RegionName"; = Using the Target/Destination IP Address
-* Destination = "DNSname:Port:RegionName"; = Using the Target/Detination DNSname
-* Note: RegionName is Optionally Specified to deliver Avatar to specific region in an instance.
+
 */
 integer SLOODLE_CHANNEL_OBJECT_DIALOG = -3857343; // an arbitrary channel the sloodle scripts will use to talk to each other. Doesn't atter what it is, as long as the same thing is set in the sloodle_slave script. 
 string sloodleserverroot = "";
@@ -111,17 +105,9 @@ sloodle_translation_request(string output_method, list output_params, string str
                     sloodlepwd = value1;
                 }
             }
-            else if (name == "set:region") {
-            	region = value1;
-            	debug("region: "+region);
-            }
-            else if (name == "set:landing_point") {
-            	landing_point = (vector)value1;
-            	debug("landing_point: "+(string)landing_point);
-            }
-            else if (name == "set:look_at"){
-            	look_at = (vector)value1;
-            	debug("look_at: "+(string)look_at);
+            else if (name == "set:ossl_message") {
+            	ossl_message = value1;
+            	debug("ossl_message: "+ossl_message);
             }
             else if (name == "set:sloodlecontrollerid"){
             	 sloodlecontrollerid = (integer)value1;
@@ -138,9 +124,6 @@ sloodle_translation_request(string output_method, list output_params, string str
             else if (name == "set:sloodleserveraccesslevel") {
             	sloodleserveraccesslevel = (integer)value1;
             	debug("sloodleserveraccesslevel: "+(string)sloodleserveraccesslevel);
-            }else if (name == "set:ossl_message") {
-            	ossl_message = (integer)value1;
-            	debug("teleporter_message: "+(string)ossl_message);
             }
             
             else if (name == SLOODLE_EOF) eof = TRUE;
@@ -191,16 +174,15 @@ state ready{
 		llResetScript();
 	}
 	state_entry() {
-		debug("ready");		
+		string CommandList = ""; // Storage for our drawing commands
+ 
+        CommandList = osMovePen( CommandList, 10, 10 );           // Upper left corner at <10,10>
+        CommandList = osDrawText( CommandList, ossl_msesage ); // Place some text
+ 
+        // Now draw the image
+        osSetDynamicTextureData( "", "vector", CommandList, "width:256,height:256", 0 );
 	}
-	  touch_start(integer num_detected){
-	    key avatar = llDetectedKey(0);
-	    llInstantMessage(avatar, "Teleporting you to : "+region);
-	    osTeleportAgent(avatar, region, landing_point, look_at); 
-  }
-	link_message(integer sender_num, integer chan, string str, key id) {
 	
-	}
 	
 
 }

@@ -12,16 +12,8 @@ $sloodleconfig->field_sets = array(
 	),
 	'generalconfiguration'=> array(
         'ossl_message' => new SloodleConfigurationOptionText( 'ossl_message', 'ossl_message:ossl_message', '', '', 50 ),
-        'region' => new SloodleConfigurationOptionText( 'region', 'ossl_teleporter:region', '', '', 50 ),
-        'landing_point' => new SloodleConfigurationOptionText( 'landing_point', 'ossl_teleporter:landing_point', '<100,100,100>', '', 50 ),
-        'look_at' => new SloodleConfigurationOptionText( 'look_at', 'teleporter:look_at', '', '<1,1,1>', 50 )
-   ),
-        'awards' => array_merge( 
-		$sloodleconfig->awards_deposit_options( array( 'accessteleporter' => 'awards:interactwithobjectplus' ) ),
-		$sloodleconfig->awards_require_options( array( 'accessteleporter' => 'awards:interactwithobjectrequires' ) ), 
-		$sloodleconfig->awards_withdraw_options( array( 'accessteleporter' => 'awards:interactwithobjectminus' ) )
+   )
 
-	 )
         
 );
 
