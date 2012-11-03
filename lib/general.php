@@ -1014,6 +1014,18 @@
     }
 
     /**
+    * Returns the src of the first <img> tag found in the html
+    * @param string str The string to clean.
+    * @return string
+    */
+    function sloodle_extract_first_image_url($html) {
+        if (preg_match("/<img .*?(?=src)src=\"([^\"]+)\"/si", $html, $m)) {
+            return $m[1];
+        }
+        return '';
+    }
+
+    /**
     * Returns the given string with new line characters removed
     * Removes new line characters
     * @param string data The string to clean.

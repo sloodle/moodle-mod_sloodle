@@ -406,6 +406,7 @@ exit;
         /// Print all the questions
         $number = quiz_first_questionnumber($attempt->layout, $pagelist);
         foreach ($pagequestions as $i) {
+
             $options = quiz_get_renderoptions($quiz->review, $states[$i]);
             // Print the question
             // var_dump($questions[$i]);
@@ -433,7 +434,8 @@ exit;
                     $q->maxgrade,
                     $q->single,
                     $shuffleanswers,
-                    0 //$deferred   // This variable doesn't seem to be mentioned anywhere else in the file
+                    0, //$deferred   // This variable doesn't seem to be mentioned anywhere else in the file
+                    sloodle_extract_first_image_url($q->questiontext)
                 );
 
                 // Create an output array for our options (available answers) so that we can shuffle them later if necessary
@@ -451,7 +453,9 @@ exit;
                         $ov->question,
                         sloodle_clean_for_output($ov->answer),
                         $ov->fraction,
-                        sloodle_clean_for_output($ov->feedback)
+                        sloodle_clean_for_output($ov->feedback),
+                        sloodle_extract_first_image_url($ov->answer),
+                        sloodle_extract_first_image_url($ov->feedback)
                       );
                    }
                 }
@@ -465,6 +469,7 @@ exit;
             save_question_session($questions[$i], $states[$i]);
             $number += $questions[$i]->length;
         }
+
 
         $secondsleft = ($quiz->timeclose ? $quiz->timeclose : 999999999999) - time();
         //if ($isteacher) {
