@@ -67,6 +67,7 @@ integer SLOODLE_OBJECT_ACCESS_LEVEL_OWNER = 1;
 integer SLOODLE_OBJECT_ACCESS_LEVEL_GROUP = 2;
 integer SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE= -1639271118; //user has tried to use the chair but doesnt have permission to do so.
 integer SLOODLE_CHANNEL_QUIZ_LOAD_QUIZ= -1639277003;//user touched object
+integer SLOODLE_CHANNEL_SET_CLEANUP_AND_DEREZ = -1639270131; // linked message to tell the object to derez if it has some object-specific cleanup tasks.
 list question_ids;
 integer num_questions;
 list DETECTED_AVATARS;
@@ -282,6 +283,9 @@ default {
                             state ready;
                         }
                     }
+        }else
+        if (num == SLOODLE_CHANNEL_SET_CLEANUP_AND_DEREZ) {
+            llDie(); // You should always do this once you're finished.
         }
     }
 }
@@ -302,7 +306,7 @@ state ready{
                 sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [ORANGE, 1.0,get_prim("status_prim")], "loadingquiz", [], "", "hex_quizzer");
 
                 if (!sloodle_check_access_use(user_key)) {
-                	sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(user_key)], NULL_KEY, "");
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "nopermission:use", [llKey2Name(user_key)], NULL_KEY, "");
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NO_PERMISSION_USE, "", user_key);
                     return;
                 }  
@@ -316,7 +320,7 @@ state ready{
         
         }
       
-    	link_message(integer link_set, integer channel, string str, key id) {
+        link_message(integer link_set, integer channel, string str, key id) {
           list data= llParseString2List(str, ["|"], []);
         if (channel == SLOODLE_CHANNEL_OBJECT_DIALOG) {
                     // Split the message into lines
@@ -331,37 +335,40 @@ state ready{
               question_ids=llParseString2List(llList2String(data,3), [","], []);
               debug("------quiz loaded: "+(string)quiz_id+" quiz name: "+quiz_name+" num questions: "+(string)num_questions);
               state quiz_loaded;
+        }else
+        if (channel == SLOODLE_CHANNEL_SET_CLEANUP_AND_DEREZ) {
+            llDie(); // You should always do this once you're finished.
         }
     }
 }
 state quiz_loaded{
-	on_rez(integer start_param) {
-		llResetScript();
-	}
-	state_entry() {
-		debug("********************************************************************quiz loaded");
-		  sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [ORANGE, 1.0,get_prim("status_prim")], "quizloaded", [], "", "hex_quizzer");
-		  
-		  llRezObject(HEXAGON_PLATFORM, llGetPos()+<0,0,2>, ZERO_VECTOR,  llGetRot(), 0);
-		  ALREADY_REZZED=TRUE;
-	}
-	touch_start(integer num_detected) {
-		 if (llGetListLength(QUESTIONS_ASKED)>=num_questions){
-		 	//quiz finished
-		 	 if (doRepeat==TRUE){
+    on_rez(integer start_param) {
+        llResetScript();
+    }
+    state_entry() {
+        debug("********************************************************************quiz loaded");
+          sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [ORANGE, 1.0,get_prim("status_prim")], "quizloaded", [], "", "hex_quizzer");
+          
+          llRezObject(HEXAGON_PLATFORM, llGetPos()+<0,0,2>, ZERO_VECTOR,  llGetRot(), 0);
+          ALREADY_REZZED=TRUE;
+    }
+    touch_start(integer num_detected) {
+         if (llGetListLength(QUESTIONS_ASKED)>=num_questions){
+             //quiz finished
+              if (doRepeat==TRUE){
                         current_question=0;
                         QUESTIONS_ASKED=[];
             }else{
-             	sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "no_more_questions", [llDetectedName(0)], llDetectedKey(0), "hex_quizzer");
-	        	return;
+                 sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "no_more_questions", [llDetectedName(0)], llDetectedKey(0), "hex_quizzer");
+                return;
             }
-	     }
-     	//if (!ALREADY_REZZED){
-     		llRezAtRoot(HEXAGON_PLATFORM, llGetPos()+<0,0,2>, ZERO_VECTOR,  llGetRot(), 0);
-     		ALREADY_REZZED=TRUE;
-     //	}
-	}
-	
+         }
+         //if (!ALREADY_REZZED){
+             llRezAtRoot(HEXAGON_PLATFORM, llGetPos()+<0,0,2>, ZERO_VECTOR,  llGetRot(), 0);
+             ALREADY_REZZED=TRUE;
+     //    }
+    }
+    
     object_rez(key platform) {
         //a new hex was rezzed, listen to the new hex platform
             llListen(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "", platform, "");
@@ -371,6 +378,27 @@ state quiz_loaded{
             //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
             llRemoteLoadScriptPin(platform, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
             llRemoteLoadScriptPin(platform, "_platform.lslp",PIN, TRUE, 0);
+    }
+    link_message(integer sender_num, integer num, string str, key id) {
+         if (num == SLOODLE_CHANNEL_SET_CLEANUP_AND_DEREZ) {
+             integer k=0;
+             integer len = llGetListLength(rezzed_hexes);
+             
+             for(k=0;k<len;k++){
+                 key hex=llList2Key(rezzed_hexes,k);
+                 llRegionSayTo(hex,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "die"+HEX_CONFIG_SEPARATOR+CONFIG);
+                 
+             }
+             k=0;
+             len = llGetListLength(GRAND_CHILDREN);
+             for(k=0;k<len;k++){
+                 key hex=llList2Key(GRAND_CHILDREN,k);
+                 llRegionSayTo(hex,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "die"+HEX_CONFIG_SEPARATOR+CONFIG);
+             }
+                 
+             llSleep(2);
+            llDie(); // You should always do this once you're finished.
+        }
     }
     listen(integer channel, string name, key id, string message) {
         list data = llParseString2List(message, ["|"], []);

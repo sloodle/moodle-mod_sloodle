@@ -1,7 +1,6 @@
 //
 // The line above should be left blank to avoid script errors in OpenSim.
 
-// LSL script generated: mod.set-1.0.rezzer_reset_btn.lslp Tue Nov 15 15:49:28 Tokyo Standard Time 2011
 /*
 *  Part of the Sloodle project (www.sloodle.org)
 *
@@ -28,7 +27,7 @@
 *  Paul Preibisch
 *
 *  DESCRIPTION
-*  rezzer_platform.lslp
+*  _platform.lslp
 *  This script is responsible for:
 
 *  *** requesting a question from the master hexagn and loading the options as texture maps on the child prims (pie_slices)
@@ -64,6 +63,7 @@ string QUIZ_DATA_str;
 key MASTERS_KEY=NULL_KEY;
 string sloodleserverroot = "";
 integer sloodlecontrollerid = 0;
+list other_objects;
 string sloodlepwd = "";
 integer sloodlemoduleid = 0;
 integer sloodleobjectaccessleveluse = 0; // Who can use this object?
@@ -88,6 +88,7 @@ integer num_questions;
 list  sides_rezzed;
 string sloodlehttpvars;
 string  SEPARATOR="****";
+integer SLOODLE_CHANNEL_CHILDREN=-1639277023;
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG = -1639271126; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
@@ -96,7 +97,7 @@ integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_SET_TEXTURE= -1639277010; 
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
-
+integer SLOODLE_CHANNEL_PARENT=-1639277024;
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; //used when this script wants to ask a question and have the results sent to the child hex
 integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
 integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
@@ -519,6 +520,14 @@ default {
                 llListenRemove(master_listener);
                 master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");
             }
+             if (command=="die"){
+                    integer k;
+                    integer len = llGetListLength(other_objects);
+                    for (k=0;k<len;k++){
+                        llRegionSayTo(llList2Key(other_objects,k),SLOODLE_CHANNEL_PARENT,"die");
+                    }
+                    llDie();
+            }else
             if (command=="receive config"){
                // llTriggerSound("SND_FAX", 1);
                 llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
@@ -578,11 +587,20 @@ default {
                 }
             }
             listen(integer channel, string name, key id, string message) {
+            
             if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE){
                // debug("got quiz data from server: "+message);
                 list data=llParseString2List(message, [HEX_CONFIG_SEPARATOR], []);
                 string command = llList2String(data,0);
               //  debug("Command: "+command);
+               if (command=="die"){
+                    integer k;
+                    integer len = llGetListLength(other_objects);
+                    for (k=0;k<len;k++){
+                        llRegionSayTo(llList2Key(other_objects,k),SLOODLE_CHANNEL_PARENT,"die");
+                    }
+                    llDie();
+                }else
                 if (command=="receive quiz data"){
                  //   llTriggerSound("SND_FAX_2", 1);
                  //   llTriggerSound("SND_FAX", 1);
@@ -627,17 +645,32 @@ default {
             llResetScript();
         }
         state_entry() {
+           
+            master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");
             set_all_pie_slice_hover_text(" ");
             llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
-            llListen(1, "", llGetOwner(), "");
+            
             debug("quizzing state");
             sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,get_prim("question_prim")], "ready_click_colored_orb", [], "", "hex_quizzer");
             sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
             
         }
         listen(integer channel, string name, key id, string message) {
-            TIME_LIMIT=(integer)message;
-            llSay(0,"new time limit is: "+(string)TIME_LIMIT);
+            if (channel==SLOODLE_CHANNEL_CHILDREN){
+            llRegionSayTo(id,SLOODLE_CHANNEL_PARENT,"I AM YOUR FATHER");//tell children to listen
+            }else
+            if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE){
+                 list data=llParseString2List(message, [HEX_CONFIG_SEPARATOR], []);
+                string command = llList2String(data,0);
+                if (command=="die"){
+                    integer k;
+                    integer len = llGetListLength(other_objects);
+                    for (k=0;k<len;k++){
+                        llRegionSayTo(llList2Key(other_objects,k),SLOODLE_CHANNEL_PARENT,"die");
+                    }
+                    llDie();
+                }
+            }
         }
         touch_start(integer num_detected) {
             if (TIMES_UP){//re-ask question
@@ -893,19 +926,23 @@ default {
                 
           
     }
-    
-     object_rez(key platform) {
-     	if (llKey2Name(platform)==llGetObjectName()){
+   
+     object_rez(key id) {
+         if (llKey2Name(id)==llGetObjectName()){
         //a new hex was rezzed, listen to the new hex platform
-              llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+platform);
-            rezzed_hexes+=platform;
-            llGiveInventory(platform, llGetObjectName());
+              llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+id);
+            rezzed_hexes+=id;
+            llGiveInventory(id, llGetObjectName());
             debug("giving platform script");
             //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
-            llRemoteLoadScriptPin(platform, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
-            llRemoteLoadScriptPin(platform, "_platform.lslp",PIN, TRUE, 0);
+            llRemoteLoadScriptPin(id, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
+            llRemoteLoadScriptPin(id, "_platform.lslp",PIN, TRUE, 0);
             //tell mother hex we rezzed a grandchild!  Mother will be happy!  we need to do this so that the mother hex will listen to her grandchildren when they are requesting questions
-     	}
+         }else{
+             other_objects+= id;
+             llListen(SLOODLE_CHANNEL_CHILDREN, "", id, "");
+             
+         }
 
     } 
 
