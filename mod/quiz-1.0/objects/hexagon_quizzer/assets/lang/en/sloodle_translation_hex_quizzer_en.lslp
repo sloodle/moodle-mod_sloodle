@@ -98,7 +98,7 @@ string SLOODLE_TRANSLATE_LOAD_URL_PARALLEL = "loadurlpar";  // Recipient avatar 
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
 string SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= "hovertext_linked_prim"; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string SLOODLE_TRANSLATE_IM = "instantmessage";             // Recipient avatar should be identified in link message keyval. No output parameters.
-
+string DELIMITER="*%*%*";
 
 // Used for sending parallel URL loading messages
 integer SLOODLE_CHANNEL_OBJECT_LOAD_URL = -1639270041;
@@ -170,7 +170,9 @@ sloodle_debug(string msg)
     llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
 }
 
-
+string strReplace(string str, string search, string replace) {
+    return llDumpList2String(llParseStringKeepNulls(str, [search], []), replace);
+}
 // Get a formatted translation of a string
 string sloodle_get_string_f(string name, list params)
 {
@@ -191,7 +193,7 @@ string sloodle_get_string_f(string name, list params)
         curparamtoklength = llStringLength(curparamtok);
         // Fetch the parameter text
         curparamstr = llList2String(params, curparamnum);
-        
+        curparamstr=strReplace(curparamstr, DELIMITER, ",");
         // Ensure the parameter text does NOT contain double braces (this avoids an infinite loop!)
         if (llSubStringIndex(curparamstr, "{{") < 0 && llSubStringIndex(curparamstr, "}}") < 0) {            
             // Go through every instance of this parameter's token

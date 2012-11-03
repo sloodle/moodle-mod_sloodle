@@ -1,7 +1,6 @@
 //
 // The line above should be left blank to avoid script errors in OpenSim.
 
-// LSL script generated: mod.set-1.0.rezzer_reset_btn.lslp Tue Nov 15 15:49:28 Tokyo Standard Time 2011
 /*
 *  Part of the Sloodle project (www.sloodle.org)
 *
@@ -28,7 +27,7 @@
 *  Paul Preibisch
 *
 *  DESCRIPTION
-*  rezzer_platform.lslp
+*  _platform.lslp
 *  This script is responsible for:
 
 *  *** requesting a question from the master hexagn and loading the options as texture maps on the child prims (pie_slices)
@@ -56,13 +55,15 @@ integer master_listener;
 string qstring;
 integer doPlaySound;
 integer NO_REZ_ZONE;
-list ORBS_TOUCHED;
+list VERTICAL_RODS_TOUCHED;
+list HORIZONTAL_RODS_TOUCHED;
 list last_detection;
 integer pie_slice_num;
 string QUIZ_DATA_str;
 key MASTERS_KEY=NULL_KEY;
 string sloodleserverroot = "";
 integer sloodlecontrollerid = 0;
+list other_objects;
 string sloodlepwd = "";
 integer sloodlemoduleid = 0;
 integer sloodleobjectaccessleveluse = 0; // Who can use this object?
@@ -79,6 +80,7 @@ list opids;
 integer PIN=7961;
 integer quiz_id;
 string quiz_name;
+string DELIMITER="*%*%*";
 integer question_id;
 integer current_question;
 list question_ids;
@@ -86,6 +88,7 @@ integer num_questions;
 list  sides_rezzed;
 string sloodlehttpvars;
 string  SEPARATOR="****";
+integer SLOODLE_CHANNEL_CHILDREN=-1639277023;
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG = -1639271126; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
@@ -94,6 +97,13 @@ integer SLOODLE_CHANNEL_ANIM= -1639277007;
 integer SLOODLE_SET_TEXTURE= -1639277010; 
 integer SLOODLE_CHANNEL_USER_TOUCH = -1639277002;//user touched object
 integer SLOODLE_CHANNEL_QUIZ_LOADING_QUIZ = -1639271109;
+integer SLOODLE_CHANNEL_PARENT=-1639277024;
+integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; //used when this script wants to ask a question and have the results sent to the child hex
+integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
+integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
+integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
+integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
+string SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= "hovertext_linked_prim"; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
 string SLOODLE_TRANSLATE_WHISPER = "whisper";               // 1 output parameter: chat channel number
 string SLOODLE_TRANSLATE_SAY = "say";               // 1 output parameter: chat channel number
@@ -102,13 +112,6 @@ string SLOODLE_TRANSLATE_DIALOG = "dialog";         // Recipient avatar should b
 string SLOODLE_TRANSLATE_LOAD_URL = "loadurl";      // Recipient avatar should be identified in link message keyval. 1 output parameter giving URL to load.
 string SLOODLE_TRANSLATE_IM = "instantmessage";     // Recipient avatar should be identified in link message keyval. No output parameters.
 integer SLOODLE_CHANNEL_TRANSLATION_REQUEST = -1928374651;
-integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; //used when this script wants to ask a question and have the results sent to the child hex
-integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
-integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
-integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
-integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
-string SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= "hovertext_linked_prim"; // 3 output parameters: colour <r,g,b>,  alpha value, link number
-
 integer TIMES_UP=TRUE;
 integer num_options=0;
 list CORRECT_AVATARS;
@@ -150,8 +153,9 @@ debug (string message ){
      }
 } 
 string strReplace(string str, string search, string replace) {
-    return llDumpList2String(llParseStringKeepNulls((str = "") + str, [search], []), replace);
+    return llDumpList2String(llParseStringKeepNulls(str, [search], []), replace);
 }
+
 //rezzes a hexagon at the indicated orb#
 rez_hexagon(integer orb){
     if (llGetListLength(QUESTIONS_ASKED)>=num_questions){
@@ -203,6 +207,71 @@ rez_hexagon(integer orb){
     //rez a new hexagon, and pass my_oppsosite_section as the start_parameter so that the new hexagon wont rez on that the my_oposite_section edge
     llRezAtRoot(llGetObjectName(), child_coord, ZERO_VECTOR,  llGetRot(), my_oposite_section);
 }
+rez_elevator(integer num,vector pos,string direction){
+    if (llGetListLength(QUESTIONS_ASKED)>=num_questions){
+        //quiz finished
+        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "no_more_questions", [], NULL_KEY, "hex_quizzer");
+        return;
+     }
+     integer my_oposite_section;
+     vector my_coord= llGetPos();
+     if (num==0){
+         return;
+     }
+     vector child_coord=my_coord;
+     integer DIVISER=1;
+     if (num==1){//yellow
+        child_coord.x=my_coord.x + edge_length + edge_length/2;
+        child_coord.y=my_coord.y -tip_to_edge;  
+        my_oposite_section=4;                              
+     }else
+     if (num==2){//pink
+        child_coord.x=my_coord.x;
+        child_coord.y=my_coord.y-tip_to_edge * 2;  
+        my_oposite_section=5;
+     }else
+     if (num==3){
+        child_coord.x=my_coord.x - edge_length- edge_length/2;
+        child_coord.y=my_coord.y - tip_to_edge; 
+        my_oposite_section=6;
+     }else
+     if (num==4){
+        child_coord.y=my_coord.y+tip_to_edge;   
+        child_coord.x=my_coord.x-edge_length-edge_length/2;
+        my_oposite_section=1;
+     }else 
+     if (num==5){
+        child_coord.x=my_coord.x;
+        child_coord.y=my_coord.y+ tip_to_edge * 2; 
+        my_oposite_section=2;
+     }else
+     if (num==6){
+        child_coord.x=my_coord.x+ edge_length+edge_length/2;
+        child_coord.y=my_coord.y+tip_to_edge; 
+        my_oposite_section=3;
+     }
+    // child_coord.x=child_coord.x+ adjustment_x;
+    // child_coord.y=child_coord.y+ adjustment_y;
+    //rez a new hexagon, and pass my_oppsosite_section as the start_parameter so that the new hexagon wont rez on that the my_oposite_section edge
+    if (direction=="up"){
+        llRezAtRoot(llGetObjectName(), child_coord+<0,0,5>, ZERO_VECTOR,  llGetRot(), my_oposite_section);
+        llRezAtRoot("elevator", pos+<0,0,2.5>, ZERO_VECTOR,  llGetRot(), num);
+        //seat to get to go up
+        llRezAtRoot("elevator_seat", pos+<0,0,0.4>, ZERO_VECTOR,  llGetRot(), num);
+        //seat to get back down
+        llRezAtRoot("elevator_seat", pos+<0,0,5>, ZERO_VECTOR,  llGetRot(), -num);
+    }else{
+        llRezAtRoot(llGetObjectName(), child_coord+<0,0,-5>, ZERO_VECTOR,  llGetRot(), my_oposite_section);
+        llRezAtRoot("elevator", pos+<0,0,-2.5>, ZERO_VECTOR,  llGetRot(), -num);
+        //seat to go down
+        llRezAtRoot("elevator_seat", pos+<0,0,0.4>, ZERO_VECTOR,  llGetRot(), -num);
+        //seat to get back up
+        llRezAtRoot("elevator_seat", pos+<0,0,-5>, ZERO_VECTOR,  llGetRot(), num);
+    }
+   
+    
+    
+}
 set_all_pie_slice_hover_text(string msg){
     current_avatars_over_pie_slices=[];
     current_avatars_over_pie_slices+=" ";
@@ -237,15 +306,17 @@ string get_detected_pie_slice(vector avatar){
 }
 
 display_questions(string str,key id){
- //   debug("displaying questions");
+
                
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
-                qdialogtext = strReplace(llList2String(data,0), ",", "*%*%*");
+                debug("displaying questions "+qdialogtext);
+                qdialogtext = strReplace(llList2String(data,0), ",", DELIMITER);
+                  
                 key hex = llList2Key(data,1);
                 list qdialogoptions= llParseString2List(llList2String(data,2), [","], []);
                 option_points= llParseString2List(llList2String(data,3), [","], []);
-                debug("---------------received question! str: "+str+"\nqdialogtext: "+qdialogtext+"\nhex: "+(string)hex+"\nqdialogoptions: "+llList2CSV(qdialogoptions)+"\noptionpoints: "+llList2CSV(option_points));
+                debug("---------------received question! str: \nqdialogtext: "+qdialogtext+"\nhex: "+(string)hex+"\nqdialogoptions: "+llList2CSV(qdialogoptions)+"\noptionpoints: "+llList2CSV(option_points));
               //  debug("displaying question text: "+qdialogtext);
                 sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [ORANGE, 1.0,get_prim("question_prim")], "option", [qdialogtext], "", "hex_quizzer");
                 key user_key=id;
@@ -393,7 +464,7 @@ init(){
         MY_SLICES=[1,2,3,4,5,6];
         MY_SLICES=llListRandomize(MY_SLICES, 1);//randomize list of pie slices so we can dont display the question options over the same pie_slices each time
         string name=llGetObjectName();
-        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|0,1,2,3,4,5,6|10", NULL_KEY);
+        llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "hide user buttons|0,1,2,3,4,5,6|10", NULL_KEY);
         sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,question_prim], "initquiz", [], "", "hex_quizzer");
         set_texture_pie_slices("blank_white");
         integer num_prims = llGetNumberOfPrims();
@@ -402,9 +473,7 @@ init(){
         for (i=0;i<num_prims;i++){
             sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,i], "clear", [" "], "", "hex_quizzer");
         }
-        for (i=0;i<=6;i++){
-            current_avatars_over_pie_slices+=" ";//this list will save the text for each orb
-        }
+       
             
 }
 
@@ -451,6 +520,14 @@ default {
                 llListenRemove(master_listener);
                 master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");
             }
+             if (command=="die"){
+                    integer k;
+                    integer len = llGetListLength(other_objects);
+                    for (k=0;k<len;k++){
+                        llRegionSayTo(llList2Key(other_objects,k),SLOODLE_CHANNEL_PARENT,"die");
+                    }
+                    llDie();
+            }else
             if (command=="receive config"){
                // llTriggerSound("SND_FAX", 1);
                 llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
@@ -510,14 +587,23 @@ default {
                 }
             }
             listen(integer channel, string name, key id, string message) {
+            
             if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE){
                // debug("got quiz data from server: "+message);
                 list data=llParseString2List(message, [HEX_CONFIG_SEPARATOR], []);
                 string command = llList2String(data,0);
               //  debug("Command: "+command);
+               if (command=="die"){
+                    integer k;
+                    integer len = llGetListLength(other_objects);
+                    for (k=0;k<len;k++){
+                        llRegionSayTo(llList2Key(other_objects,k),SLOODLE_CHANNEL_PARENT,"die");
+                    }
+                    llDie();
+                }else
                 if (command=="receive quiz data"){
                  //   llTriggerSound("SND_FAX_2", 1);
-                    llTriggerSound("SND_FAX", 1);
+                 //   llTriggerSound("SND_FAX", 1);
                     llMessageLinked(LINK_SET, SLOODLE_TIMER_RESET, "", NULL_KEY);
                     QUIZ_DATA_str= llList2String(data,1);
                     list quiz_data =llParseString2List(QUIZ_DATA_str, ["|"], []);
@@ -559,10 +645,32 @@ default {
             llResetScript();
         }
         state_entry() {
+           
+            master_listener=llListen(SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "", MASTERS_KEY, "");
+            set_all_pie_slice_hover_text(" ");
+            llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
+            
             debug("quizzing state");
             sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [GREEN, 1.0,get_prim("question_prim")], "ready_click_colored_orb", [], "", "hex_quizzer");
             sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [RED, 1.0,get_prim("timer_prim")], "option", [" "], "", "hex_quizzer");
             
+        }
+        listen(integer channel, string name, key id, string message) {
+            if (channel==SLOODLE_CHANNEL_CHILDREN){
+            llRegionSayTo(id,SLOODLE_CHANNEL_PARENT,"I AM YOUR FATHER");//tell children to listen
+            }else
+            if (channel==SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE){
+                 list data=llParseString2List(message, [HEX_CONFIG_SEPARATOR], []);
+                string command = llList2String(data,0);
+                if (command=="die"){
+                    integer k;
+                    integer len = llGetListLength(other_objects);
+                    for (k=0;k<len;k++){
+                        llRegionSayTo(llList2Key(other_objects,k),SLOODLE_CHANNEL_PARENT,"die");
+                    }
+                    llDie();
+                }
+            }
         }
         touch_start(integer num_detected) {
             if (TIMES_UP){//re-ask question
@@ -584,27 +692,49 @@ default {
         if (channel ==SLOODLE_CHANNEL_USER_TOUCH){
              //this script receives touch events from orbs sitting on the edge of the pie_slise         
             string type = llList2String(data,0);
-            if (type!="orb"){
-                 return;
+            integer object_num=llList2Integer(data, 1);     
+            // myType+"|"+(string)my_num+"|"+(string)touch_pos+"|"+(string)my_pos
+            vector pos_touched = llList2Vector(data,2);
+            vector object_pos = llList2Vector(data,3);
+            if (type!="orb"&&type!="rod_hor"&&type!="rod_ver"){
+                 return; 
             }
-               // a user touched an edge selector, so rez an edge                 
-            integer orb=llList2Integer(data, 1);                
+                       
             //check if toucher is permitted to rez an orb
             debug("received user touch: "+(string)id);
             debug("sending dialog message to user: "+(string)id);
             if (llListFindList(CORRECT_AVATARS, llKey2Name(id))!=-1){
-                if (llListFindList(ORBS_TOUCHED,[orb])==-1){
-                    rez_hexagon(orb);
-                    ORBS_TOUCHED+=orb;
-                }
-                else{
-                    sloodle_translation_request (SLOODLE_TRANSLATE_DIALOG, [1 , "Ok"], "rez_hex_denied_already_rezzed" , ["Ok"], id , "hex_quizzer");
-                }
+                if (type=="rod_hor"){
+                    if (llListFindList(HORIZONTAL_RODS_TOUCHED,[object_num])==-1){
+                        rez_hexagon(object_num);
+                        HORIZONTAL_RODS_TOUCHED+=object_num;
+                    }
+                    else{
+                        sloodle_translation_request (SLOODLE_TRANSLATE_DIALOG, [1 , "Ok"], "rez_hex_denied_already_rezzed" , ["Ok"], id , "hex_quizzer");
+                    }
                 
-                //after a user presses an edge selector, hide the selector
-                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb hide|"+(string)orb, NULL_KEY);
-                sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "rez_hex_granted", [llKey2Name(id)], id, "hex_quizzer");
+                    //after a user presses an edge selector, hide the selector
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "hide user buttons|"+(string)object_num, NULL_KEY);
+                    sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "rez_hex_granted", [llKey2Name(id)], id, "hex_quizzer");
+                }else
+                 if (type=="rod_ver"){
+                    if (llListFindList(VERTICAL_RODS_TOUCHED,[object_num])==-1){
+                        VERTICAL_RODS_TOUCHED+=object_num;
+                        if (pos_touched.z>object_pos.z){
+                            rez_elevator(object_num,object_pos,"up");
+                        }else{
+                            rez_elevator(object_num,object_pos,"down");
+                        }
+                        
+                    }
+                    else{
+                        sloodle_translation_request (SLOODLE_TRANSLATE_DIALOG, [1 , "Ok"], "rez_hex_denied_already_rezzed" , ["Ok"], id , "hex_quizzer");
+                    }
                 
+                    //after a user presses an edge selector, hide the selector
+                    llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "hide user buttons|"+(string)object_num, NULL_KEY);
+                    sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "rez_hex_granted", [llKey2Name(id)], id, "hex_quizzer");
+                }
             }else{
                 
                 sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "rez_hex_denied", [llKey2Name(id)], id, "hex_quizzer");
@@ -628,22 +758,23 @@ default {
                 quiz_loaded=TRUE;
                 display_questions(str,id);
                 
-                llSensorRepeat("", "", AGENT, edge_length, TWO_PI, 1);
+                
             }//if
         }else
         if (channel==SLOODLE_TIMER_TIMES_UP){
             integer p;
+            QUESTION_TIMER_ACTIVE=FALSE;
              for (p=1;p<=6;p++){
                    llSetLinkAlpha(get_prim("pie_slice"+(string)p), .5, ALL_SIDES );
             }
             //gets triggered when after a countdown and time is up
             //if (str=="QUESTION TIME LIMIT REACHED"){
                 debug("times up! QUESTION TIME LIMIT REACHED");
-                llSensorRemove();
+                
                 debug("times up! "+str);
-            debug("DETECTED_AVATARS "+llList2CSV(DETECTED_AVATARS));
-            debug("DETECTED_AVATARS_SCORE_CHANGE "+llList2CSV(DETECTED_AVATARS_SCORE_CHANGE));
-            debug("CORRECT_AVATARS "+llList2CSV(CORRECT_AVATARS));
+                debug("DETECTED_AVATARS "+llList2CSV(DETECTED_AVATARS));
+                debug("DETECTED_AVATARS_SCORE_CHANGE "+llList2CSV(DETECTED_AVATARS_SCORE_CHANGE));
+                debug("CORRECT_AVATARS "+llList2CSV(CORRECT_AVATARS));
             
                 llTriggerSound("SND_BUZZER", 1);
                 //set times up to true so that a user can re-touch the central orb to re-ask the question 
@@ -695,7 +826,7 @@ default {
                                 
                             }    
                             
-                            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "orb show|1,2,3,4,5,6|10", NULL_KEY);
+                            llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "show user buttons|1,2,3,4,5,6|10", NULL_KEY);
                         
                             
                     }//for (avatar=0;avatar<num_avatars_detected;avatar++)
@@ -725,10 +856,13 @@ default {
     sensor(integer num_avatars_detected) {
             //since this is a new sensor event, erase all recorded avatar sensed data - as the avatars may have moved to a new 
             //position before timer is up.
+            if (QUESTION_TIMER_ACTIVE==TRUE){
               DETECTED_AVATARS=[];
               DETECTED_AVATARS_OP_IDS=[];
               DETECTED_AVATARS_SCORE_CHANGE=[];
-             DETECTED_AVATARS_POSITION=[];
+              DETECTED_AVATARS_POSITION=[];
+            }
+            
             //go through each detected avatar and add their names to the prims they are standing in
             set_all_pie_slice_hover_text(" ");
             integer avatar;
@@ -756,15 +890,18 @@ default {
                     llSetLinkAlpha(get_prim("pie_slice"+(string)pie_slice_num), .9, ALL_SIDES );
                 //set text for pie_slice        
                     string pie_slice_text =llList2String(current_avatars_over_pie_slices,pie_slice_num);
-                    current_avatars_over_pie_slices= llListReplaceList(current_avatars_over_pie_slices, [pie_slice_text+","+avatar_name], pie_slice_num, pie_slice_num);
+                    current_avatars_over_pie_slices= llListReplaceList(current_avatars_over_pie_slices, [pie_slice_text+DELIMITER+avatar_name], pie_slice_num, pie_slice_num);
+                //    debug("current_avatars_over_pie_slices: "+llList2CSV(current_avatars_over_pie_slices)+ "("+(string)pie_slice_num+")");
                 //DETECT WHO IS CORRECT AND INCORRECT
                     integer score_change = pie_slice_value(pie_slice_num);
                     integer opid = pie_slice_option_index(pie_slice_num);
                  //store detected avatars so we can submit scores later
-                    DETECTED_AVATARS_POSITION+=avatar_pos;
-                    DETECTED_AVATARS+=avatar_key;
-                    DETECTED_AVATARS_OP_IDS+=opid;
-                    DETECTED_AVATARS_SCORE_CHANGE+=score_change;
+                     if (QUESTION_TIMER_ACTIVE==TRUE){
+                        DETECTED_AVATARS_POSITION+=avatar_pos;
+                        DETECTED_AVATARS+=avatar_key;
+                        DETECTED_AVATARS_OP_IDS+=opid;
+                        DETECTED_AVATARS_SCORE_CHANGE+=score_change;
+                     }
             }
             
             for (pie_slice_num=1;pie_slice_num<=6;pie_slice_num++){
@@ -773,13 +910,13 @@ default {
                //get all the avatar names that over a pie slice the last time this sensor ran
                        string last_avatar_names=llList2String(last_detection,pie_slice_num);
                //convert both results to a list
-                       list data = llParseString2List(avatar_names, [","], []);
-                       list last_data = llParseString2List(last_avatar_names, [","], []);
+                       list data = llParseString2List(avatar_names, [DELIMITER], []);
+                       list last_data = llParseString2List(last_avatar_names, [DELIMITER], []);
                //compare the length of both lists, if the lenght of the new data is greater than last data for this pie slice,
                //that means a new avatar has entered this pie slice so play a sound
-               if (llGetListLength(data)>llGetListLength(last_data)){
-                       llTriggerSound("SND_PIE_"+(string)pie_slice_num, 1);
-               }
+                   if (llGetListLength(data)>llGetListLength(last_data)){
+                           llTriggerSound("SND_PIE_"+(string)pie_slice_num, 1);
+                   }
                //print names on pie slice hover text
                     sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,get_prim("option"+(string)pie_slice_num)], "option", [avatar_names], "", "hex_quizzer");
                         
@@ -789,18 +926,23 @@ default {
                 
           
     }
-    
-     object_rez(key platform) {
+   
+     object_rez(key id) {
+         if (llKey2Name(id)==llGetObjectName()){
         //a new hex was rezzed, listen to the new hex platform
-              llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+platform);
-            rezzed_hexes+=platform;
-            llGiveInventory(platform, llGetObjectName());
+              llRegionSay(SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST, "rezzed grandchild"+"|"+id);
+            rezzed_hexes+=id;
+            llGiveInventory(id, llGetObjectName());
             debug("giving platform script");
             //since llRemoteLoadScriptPin makes a script sleep for 3 seconds, we need to offload the remote loading of the scripts to a seperate loader script
-            llRemoteLoadScriptPin(platform, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
-            llRemoteLoadScriptPin(platform, "_platform.lslp",PIN, TRUE, 0);
+            llRemoteLoadScriptPin(id, "sloodle_translation_hex_quizzer_en",PIN, TRUE, 0);
+            llRemoteLoadScriptPin(id, "_platform.lslp",PIN, TRUE, 0);
             //tell mother hex we rezzed a grandchild!  Mother will be happy!  we need to do this so that the mother hex will listen to her grandchildren when they are requesting questions
-            
+         }else{
+             other_objects+= id;
+             llListen(SLOODLE_CHANNEL_CHILDREN, "", id, "");
+             
+         }
 
     } 
 
