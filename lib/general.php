@@ -1019,9 +1019,8 @@
     * @return string
     */
     function sloodle_extract_first_image_url($html) {
-        //if (preg_match("/<img .*?(?=src)src=\"([^\"]+)\"/si", $html, $m)) {
-        if (preg_match("/<img .*?(?=src)src=\"@@PLUGINFILE@@.*?/([^\"]+)\"/si", $html, $m)) {
-            return $m[1];
+        if (preg_match("/<img .*?(?=src)src=\"([^\"]+)\"/si", $html, $m)) {
+        	return $m[1];
         }
         return '';
     }
