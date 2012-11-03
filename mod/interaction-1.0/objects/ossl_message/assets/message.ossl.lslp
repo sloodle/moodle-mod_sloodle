@@ -84,7 +84,21 @@ sloodle_debug(string msg){
 // Send a translation request link message
 sloodle_translation_request(string output_method, list output_params, string string_name, list string_params, key keyval, string batch){
     llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_TRANSLATION_REQUEST, output_method + "|" + llList2CSV(output_params) + "|" + string_name + "|" + llList2CSV(string_params) + "|" + batch, keyval);
-}        
+}    
+print_message(string message){
+    string CommandList = ""; // Storage for our drawing commands
+    integer font_size=42;
+      vector Extents = osGetDrawStringSize( "vector", message, "Arial", font_size );
+         CommandList = osSetFontSize( CommandList, font_size );             // Use 10-point text
+        integer xpos = 512 - ((integer) Extents.x >> 1);            // Center the text horizontally
+        integer ypos =  255 - ((integer) Extents.y >> 1);            //   and vertically
+        CommandList = osMovePen( CommandList, xpos, ypos );         // Position the text
+        CommandList = osDrawText( CommandList, ossl_message ); // Place some text
+ 
+        // Now draw the image
+        osSetDynamicTextureData( "", "vector", CommandList, "width:1024,height:512", 0 );
+    
+}    
 // Configure by receiving a linked message from another script in the object
 // Returns TRUE if the object has all the data it needs
  integer sloodle_handle_command(string str){
@@ -106,29 +120,30 @@ sloodle_translation_request(string output_method, list output_params, string str
                 }
             }
             else if (name == "set:ossl_message") {
-            	ossl_message = value1;
-            	debug("ossl_message: "+ossl_message);
+                ossl_message = value1;
+                debug("ossl_message: "+ossl_message);
+                print_message(ossl_message);
             }
             else if (name == "set:sloodlecontrollerid"){
-            	 sloodlecontrollerid = (integer)value1;
-            	 debug("sloodlecontrollerid: "+(string)sloodlecontrollerid);
+                 sloodlecontrollerid = (integer)value1;
+                 debug("sloodlecontrollerid: "+(string)sloodlecontrollerid);
             }
             else if (name == "set:sloodlemoduleid") {
-            	sloodlemoduleid = (integer)value1;
-            	 debug("sloodlemoduleid: "+(string)sloodlemoduleid);
+                sloodlemoduleid = (integer)value1;
+                 debug("sloodlemoduleid: "+(string)sloodlemoduleid);
             }
             else if (name == "set:sloodleobjectaccessleveluse") {
-            	sloodleobjectaccessleveluse = (integer)value1;
-            	 debug("sloodleobjectaccessleveluse: "+(string)sloodleobjectaccessleveluse);
+                sloodleobjectaccessleveluse = (integer)value1;
+                 debug("sloodleobjectaccessleveluse: "+(string)sloodleobjectaccessleveluse);
             }
             else if (name == "set:sloodleserveraccesslevel") {
-            	sloodleserveraccesslevel = (integer)value1;
-            	debug("sloodleserveraccesslevel: "+(string)sloodleserveraccesslevel);
+                sloodleserveraccesslevel = (integer)value1;
+                debug("sloodleserveraccesslevel: "+(string)sloodleserveraccesslevel);
             }
             
             else if (name == SLOODLE_EOF) eof = TRUE;
             
-            return (sloodleserverroot != "" && sloodlepwd != "" && sloodlecontrollerid > 0);
+            return (sloodleserverroot != ""  && sloodlecontrollerid > 0);
  }
  debug (string message ){
      list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
@@ -170,20 +185,38 @@ default {
     }
 }
 state ready{
-	on_rez(integer start_param) {
-		llResetScript();
-	}
-	state_entry() {
-		string CommandList = ""; // Storage for our drawing commands
- 
-        CommandList = osMovePen( CommandList, 10, 10 );           // Upper left corner at <10,10>
-        CommandList = osDrawText( CommandList, ossl_msesage ); // Place some text
- 
-        // Now draw the image
-        osSetDynamicTextureData( "", "vector", CommandList, "width:256,height:256", 0 );
-	}
-	
-	
+    on_rez(integer start_param) {
+        llResetScript();
+    }
+    state_entry() {
+       eof == FALSE;
+       isconfigured=FALSE; 
+    }
+    link_message( integer sender_num, integer chan, string str, key user_key){
+        // Check the channel for configuration messages
+        if (chan == SLOODLE_CHANNEL_OBJECT_DIALOG) {
+            // Split the message into lines
+            list lines = llParseString2List(str, ["\n"], []);
+            integer numlines = llGetListLength(lines);
+            integer i = 0;
+            for (i=0; i < numlines; i++) {
+                isconfigured = sloodle_handle_command(llList2String(lines, i));
+            }
+            // If we've got all our data AND reached the end of the configuration data (eof), then move on
+            if (eof == TRUE) {
+                if (isconfigured == TRUE) {
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configurationreceived", [], NULL_KEY, "");
+                } else {
+                    // Go all configuration but, it's not complete... request reconfiguration
+                    sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "configdatamissing", [llGetScriptName()], NULL_KEY, "");
+                    llMessageLinked(LINK_THIS, SLOODLE_CHANNEL_OBJECT_DIALOG, "do:reconfigure", NULL_KEY);
+                    eof = FALSE;
+                }
+            }
+        }
+    }
+    
+    
 
 }
 
