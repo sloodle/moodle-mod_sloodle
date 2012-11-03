@@ -1,5 +1,5 @@
 SLOODLE 2.x
-Edmund Edgar, 2012-05-12
+Edmund Edgar, Paul Preibisch, 2012-05-12
 
 This is the main server-side component for the SLOODLE system connecting Moodle the 3D virtual worlds of Second Life or OpenSim.
 See http://www.sloodle.org for details.
