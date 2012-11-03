@@ -418,9 +418,14 @@ exit;
  
                 // Make sure the variables exist (avoids warnings!)
                 if (!isset($q->single)) $q->single = 0;
-                $shuffleanswers = 0;
+                $shuffleanswers = 0;			
                 if (isset($q->options->shuffleanswers) && $q->options->shuffleanswers) $shuffleanswers = 1;
-            
+
+				$imgUrl = "{$CFG->wwwroot}/pluginfile.php/".$q->options->id."/question/questiontext/".$attempt->id."/".$q ->id."/".$q ->id;
+				$imgUrl .=substr ( sloodle_extract_first_image_url($q->questiontext), 14);
+                
+				
+            	
                 $output[] = array(
                     'question',
                     $localqnum, //$i, // The value in $i is equal to $q->id, rather than being sequential in the quiz
@@ -435,8 +440,12 @@ exit;
                     $q->single,
                     $shuffleanswers,
                     0, //$deferred   // This variable doesn't seem to be mentioned anywhere else in the file
-                    sloodle_extract_first_image_url($q->questiontext)
+                    $imgUrl
+					
+					
+					
                 );
+								
 
                 // Create an output array for our options (available answers) so that we can shuffle them later if necessary
                 $outputoptions = array();
@@ -446,6 +455,10 @@ exit;
                    
                    if (!is_array($op)) continue; // Ignore this if there are no options (Prevents nasty PHP notices!)
                    foreach($op as $ok=>$ov) {
+                   	$answer_imgUrl = "{$CFG->wwwroot}/pluginfile.php/".$ov->id."/question/questiontext/".$attempt->id."/".$ov->question."/".$ov->question;
+					$answer_imgUrl .=substr ( sloodle_extract_first_image_url($ov->answer), 14);
+                	$feedback_imgUrl = "{$CFG->wwwroot}/pluginfile.php/".$ov->id."/question/questiontext/".$attempt->id."/".$ov->question."/".$ov->question;
+					$feedback_imgUrl .=substr ( sloodle_extract_first_image_url($ov->feedback), 14);
                       $outputoptions[] = array(
                         'questionoption',
                         $i,
@@ -454,8 +467,8 @@ exit;
                         sloodle_clean_for_output($ov->answer),
                         $ov->fraction,
                         sloodle_clean_for_output($ov->feedback),
-                        sloodle_extract_first_image_url($ov->answer),
-                        sloodle_extract_first_image_url($ov->feedback)
+                        $answer_imgUrl,
+                        $feedback_imgUrl
                       );
                    }
                 }

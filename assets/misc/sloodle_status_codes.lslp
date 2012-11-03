@@ -137,5 +137,6 @@ integer SLOODLE_OBSTRUCTION=1639277021;
 integer SLOODLE_SENSOR_DETECTED_KEYS= -1639277022;//issue an llSensor
 integer SLOODLE_CHANNEL_CHILDREN=-1639277023;
 integer SLOODLE_CHANNEL_PARENT=-1639277024;
+integer SLOODLE_QUESTION_IMAGE=-1639277025;//used for in quiz scripts, when a question is recieved, send the image url|question dialog to an display
 // Please leave the following line intact to show where the script lives in Git:
 // SLOODLE LSL Script Git Location: assets/misc/sloodle_status_codes.lslp.lsl 

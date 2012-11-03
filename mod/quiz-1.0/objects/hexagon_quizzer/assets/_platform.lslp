@@ -55,6 +55,7 @@ integer master_listener;
 string qstring;
 integer doPlaySound;
 integer NO_REZ_ZONE;
+
 list VERTICAL_RODS_TOUCHED;
 list HORIZONTAL_RODS_TOUCHED;
 list last_detection;
@@ -88,6 +89,7 @@ integer num_questions;
 list  sides_rezzed;
 string sloodlehttpvars;
 string  SEPARATOR="****";
+integer SLOODLE_QUESTION_IMAGE=-1639277025;//used for in quiz scripts, when a question is recieved, send the image url|question dialog to an display
 integer SLOODLE_CHANNEL_CHILDREN=-1639277023;
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG = -1639271126; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
@@ -306,13 +308,21 @@ string get_detected_pie_slice(vector avatar){
 }
 
 display_questions(string str,key id){
-
+   							/* qdialogtext+"|";//question textindex 0
+                            question_data +=(string)hex+"|";//index 1
+                            question_data += qdialogoptions_string+"|";//index 2- options ie: a,b,c 
+                            question_data += opgrade_string+"|";//index 3 - grade for each option ie: -1.0,1,-1 (1=correct)
+                            question_data += opfeedback_string+"|";//index 4 - any feedback 
+                            question_data +=(string)question_id+"|";//index 5
+                            question_data +=qImageUrl; //index 6
+                            question_data +=opids_string; //index 7*/
                
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
                 debug("displaying questions "+qdialogtext);
                 qdialogtext = strReplace(llList2String(data,0), ",", DELIMITER);
-                  
+                string qImageUrl = llList2String(data,6);  
+                
                 key hex = llList2Key(data,1);
                 list qdialogoptions= llParseString2List(llList2String(data,2), [","], []);
                 option_points= llParseString2List(llList2String(data,3), [","], []);
@@ -340,6 +350,9 @@ display_questions(string str,key id){
                     sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,prim_link], "option", [value], "", "hex_quizzer");
                     debug("value for "+"pie_slice"+(string)j+" is: "+(string)value);
                 }*/
+                //send image and text to a prim that can display text and image - in opensim, this would be an OSSL script capable of displayign text and images
+                llMessageLinked(LINK_SET,SLOODLE_QUESTION_IMAGE,qImageUrl+"|"+qdialogtext,"");
+                
                 
 }
 
@@ -746,10 +759,20 @@ default {
             //asked and we need to populate pie_slices with options
             key hex = llList2Key(data,1);
           //  debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
-            opids=llParseString2List(llList2String(data,6),[","],[]);
+         /* qdialogtext+"|";//question textindex 0
+                            question_data +=(string)hex+"|";//index 1
+                            question_data += qdialogoptions_string+"|";//index 2- options ie: a,b,c 
+                            question_data += opgrade_string+"|";//index 3 - grade for each option ie: -1.0,1,-1 (1=correct)
+                            question_data += opfeedback_string+"|";//index 4 - any feedback 
+                            question_data +=(string)question_id+"|";//index 5
+                            question_data +=qImageUrl; //index 6
+                            question_data +=opids_string; //index 7*/
+            opids=llParseString2List(llList2String(data,7),[","],[]);
             if (hex==llGetKey()){
                 //get the question id
                 question_id =llList2Integer(data,5);
+                string qImageUrl = llList2String(data,6);
+                
                 if (llListFindList(QUESTIONS_ASKED, [question_id])==-1){
                     QUESTIONS_ASKED+=question_id;
                 }//if 

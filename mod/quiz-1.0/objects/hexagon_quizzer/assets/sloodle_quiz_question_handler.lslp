@@ -205,6 +205,7 @@
                     key user_key = llList2Key(statusfields,6);
                     integer user_id =llListFindList(users,[user_key]);
                     integer  question_id = llList2Integer(users_question_id,user_id);
+                    string qImageUrl="";
                     //the user who initiated this request
                     if (request_descriptor=="REQUESTING_QUESTION"){
                         request_descriptor="";
@@ -246,6 +247,7 @@
                                     // Grab the question information and reset the options
                                         qtext = llList2String(thisline, 4);
                                         qtype = llList2String(thisline, 7);
+                    					qImageUrl =llList2String(thisline, 13);                     
                                         // Make sure it's a valid question type
                                         if ((qtype != "multichoice")) {
                                               sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "hex_quizzer");
@@ -299,7 +301,11 @@
                             question_data += opgrade_string+"|";//index 3 - grade for each option ie: -1.0,1,-1 (1=correct)
                             question_data += opfeedback_string+"|";//index 4 - any feedback 
                             question_data +=(string)question_id+"|";//index 5
-                            question_data +=opids_string; //index 6
+                            question_data +=qImageUrl; //index 6
+                            question_data +=opids_string; //index 7
+                            
+                            
+                            
                             debug("+++++++++++++++++++= optioids_str: "+opids_string);
                             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, question_data, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
                             debug("question_data: "+question_data);
