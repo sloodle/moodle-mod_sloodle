@@ -19,6 +19,7 @@
      
 */
         integer SLOODLE_CHANNEL_ERROR_TRANSLATION_REQUEST=-1828374651;
+        integer SLOODLE_QUESTION_IMAGE=-1639277025;//used for in quiz scripts, when a question is recieved, send the image url|question dialog to an display
         integer doRepeat = 0; // whether we should run through the questions again when we're done
         integer doDialog = 1; // whether we should ask the questions using dialog rather than chat
         integer doPlaySound = 1; // whether we should play sound
@@ -269,7 +270,13 @@
                         //1|QUIZ||REQUESTING_QUESTION|||2102f5ab-6854-4ec3-aec5-6cd6233c31c6
                         string  request_descriptor =llList2String(statusfields, 3); 
                         key user_key = llList2Key(statusfields,6);
-                          llInstantMessage( user_key, llList2String(lines, 1) );
+                        string feedback = llList2String(lines, 1);
+                        string qImageUrl = llList2String(lines, 2);                        
+                        
+                        llMessageLinked(LINK_SET,SLOODLE_QUESTION_IMAGE,qImageUrl+"|"+feedback,"");
+                        llSay(0,"-----------------------------------------FFFEEEEEEEEEEEEEDBACK: "+llList2CSV(lines));
+                        
+                          llInstantMessage( user_key, feedback );
               }         
         }
 // Please leave the following line intact to show where the script lives in Git:

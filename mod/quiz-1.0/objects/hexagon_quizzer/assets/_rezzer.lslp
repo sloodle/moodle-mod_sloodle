@@ -423,7 +423,8 @@ state quiz_loaded{
             if (command=="LOAD QUIZ"){
                 key user_key = llList2Key(data,1);
                 debug("received load quiz - current question is: "+(string)current_question+ " num questions is : "+(string)num_questions);
-                if (current_question>num_questions){
+                if (current_question>=num_questions){
+                	  
                     if (doRepeat==TRUE){
                         current_question=0;
                         QUESTIONS_ASKED=[];
@@ -442,6 +443,7 @@ state quiz_loaded{
                 debug("sending quiz data");
                 debug("sending: "+"receive quiz data"+HEX_CONFIG_SEPARATOR+QUIZ_DATA+"|"+(string)question_id+"|"+(string)current_question);
                 llRegionSayTo(id,SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE, "receive quiz data"+HEX_CONFIG_SEPARATOR+QUIZ_DATA+"|"+(string)question_id+"|"+(string)current_question);
+                
             }
          }
             
