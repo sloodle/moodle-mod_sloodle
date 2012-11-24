@@ -408,7 +408,7 @@
                             // Correct to 0-based
                             answer_num -= 1;
                             feedback = llList2String(opfeedback, answer_num);
-                            scorechange = llList2Float(opgrade, answer_num);
+                             scorechange = llList2Float(opgrade, answer_num);
                             opid = llList2String(opids, answer_num);
                             answeroptext = llList2String(optext, answer_num);
 

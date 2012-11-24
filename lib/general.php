@@ -1020,7 +1020,7 @@
     */
     function sloodle_extract_first_image_url($html) {
         if (preg_match("/<img .*?(?=src)src=\"([^\"]+)\"/si", $html, $m)) {
-            return $m[1];
+        	return $m[1];
         }
         return '';
     }

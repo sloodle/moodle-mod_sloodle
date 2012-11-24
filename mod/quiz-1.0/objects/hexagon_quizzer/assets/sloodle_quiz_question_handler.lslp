@@ -69,6 +69,7 @@
         list optext = []; // Texts
         list opgrade = []; // Grades
         list opfeedback = []; // Feedback if this option is selected
+        list opfeedback_image=[];
         list users_menu_channels;
         list users;  
         list user_question_options; 
@@ -91,7 +92,7 @@
         sloodle_debug(string msg){
             llMessageLinked(LINK_THIS, DEBUG_CHANNEL, msg, NULL_KEY);
         }  
-         debug (string message ){
+        debug (string message ){
               list params = llGetPrimitiveParams ([PRIM_MATERIAL ]);
               if ( llList2Integer (params ,0)==PRIM_MATERIAL_FLESH ){
                    llOwnerSay(llGetScriptName ()+": " +message );
@@ -205,6 +206,7 @@
                     key user_key = llList2Key(statusfields,6);
                     integer user_id =llListFindList(users,[user_key]);
                     integer  question_id = llList2Integer(users_question_id,user_id);
+                    string qImageUrl="";
                     //the user who initiated this request
                     if (request_descriptor=="REQUESTING_QUESTION"){
                         request_descriptor="";
@@ -246,6 +248,7 @@
                                     // Grab the question information and reset the options
                                         qtext = llList2String(thisline, 4);
                                         qtype = llList2String(thisline, 7);
+                    					qImageUrl =llList2String(thisline, 13);                     
                                         // Make sure it's a valid question type
                                         if ((qtype != "multichoice")) {
                                               sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "invalidtype",  [llKey2Name(user_key)],user_key, "hex_quizzer");
@@ -262,7 +265,9 @@
                                     opids += [(integer)llList2String(thisline, 2)];
                                     optext += [llList2String(thisline, 4)];
                                     opgrade += [(float)llList2String(thisline, 5)];
-                                    opfeedback += [llList2String(thisline, 6)];                                                    
+                                    opfeedback += [llList2String(thisline, 6)];
+                                    opfeedback_image+=[llList2String(thisline, 8)]; 
+                                                                                       
                                 }
                             }
                             //remove the last trailing "|"
@@ -291,7 +296,7 @@
                                 // Add a button for this option
                                 qdialogoptions = qdialogoptions + [(string)qi];
                                 
-                            }
+                            } 
                             qdialogoptions_string = llList2CSV(qdialogoptions);
                             string question_data = qdialogtext+"|";//question textindex 0
                             question_data +=(string)hex+"|";//index 1
@@ -299,7 +304,16 @@
                             question_data += opgrade_string+"|";//index 3 - grade for each option ie: -1.0,1,-1 (1=correct)
                             question_data += opfeedback_string+"|";//index 4 - any feedback 
                             question_data +=(string)question_id+"|";//index 5
-                            question_data +=opids_string; //index 6
+                            question_data +=qImageUrl+"|"; //index 6
+                            question_data +=opids_string+"|"; //index 7
+                            question_data +=llList2CSV(opfeedback_image); //index 8
+                            
+                            //handle feedback
+                   
+		                  
+		                   
+                            
+                            
                             debug("+++++++++++++++++++= optioids_str: "+opids_string);
                             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR, question_data, user_key);//send back to rezzer so that pie_slices can show hovertext for each option
                             debug("question_data: "+question_data);

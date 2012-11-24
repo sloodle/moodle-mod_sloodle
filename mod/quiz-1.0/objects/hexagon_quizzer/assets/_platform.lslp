@@ -46,6 +46,8 @@
 string HEX_CONFIG_SEPARATOR="*^*^*^";
 float edge_length;
 key ROOT_HEX;
+list feedback_text_data;
+list feedback_image_data;
 list QUESTIONS_ASKED;
 integer QUESTION_TIMER_ACTIVE=FALSE;
 integer TIME_LIMIT;
@@ -55,6 +57,7 @@ integer master_listener;
 string qstring;
 integer doPlaySound;
 integer NO_REZ_ZONE;
+
 list VERTICAL_RODS_TOUCHED;
 list HORIZONTAL_RODS_TOUCHED;
 list last_detection;
@@ -88,7 +91,9 @@ integer num_questions;
 list  sides_rezzed;
 string sloodlehttpvars;
 string  SEPARATOR="****";
+integer SLOODLE_QUESTION_IMAGE=-1639277025;//used for in quiz scripts, when a question is recieved, send the image url|question dialog to an display
 integer SLOODLE_CHANNEL_CHILDREN=-1639277023;
+integer SLOODLE_CHANNEL_QUIZ_FEED_BACK_REQUEST= -1639277005;
 integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION_DIALOG = -1639271126; // Tells the question handler scripts to ask the question with the ID in str to the avatar with key VIA DIALOG.
 integer SLOODLE_CHANNEL_QUIZ_MASTER_REQUEST= -1639277006;
 integer SLOODLE_CHANNEL_QUIZ_MASTER_RESPONSE= -1639277008;
@@ -102,6 +107,7 @@ integer SLOODLE_CHANNEL_QUIZ_ASK_QUESTION = -1639271112; //used when this script
 integer SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR = -1639271105; //Sent by main quiz script to tell UI scripts that question has been asked to avatar with key. String contains question ID + "|" + question text
 integer SLOODLE_CHANNEL_QUIZ_LOADED_QUIZ = -1639271110;
 integer SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE= -1639277004;
+integer SLOODLE_FEEDBACK_OUTPUT=-1639277026;//used for in quiz scripts, when a user answers a question, output the feedback to linked message so it can be displayed
 integer SLOODLE_CHANNEL_QUIZ_STATE_ENTRY_LOAD_QUIZ_FOR_USER = -1639271116; //mod quiz script is in state CHECK_QUIZ
 string SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM= "hovertext_linked_prim"; // 3 output parameters: colour <r,g,b>,  alpha value, link number
 string SLOODLE_TRANSLATE_HOVER_TEXT = "hovertext";          // 2 output parameters: colour <r,g,b>, and alpha value
@@ -160,8 +166,13 @@ string strReplace(string str, string search, string replace) {
 rez_hexagon(integer orb){
     if (llGetListLength(QUESTIONS_ASKED)>=num_questions){
         //quiz finished
-        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "no_more_questions", [], NULL_KEY, "hex_quizzer");
-        return;
+        if (doRepeat!=TRUE){
+            sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "no_more_questions", [], NULL_KEY, "hex_quizzer");
+            return;
+        }else{
+            QUESTIONS_ASKED=[];
+        }
+        sloodle_translation_request(SLOODLE_TRANSLATE_SAY, [0], "rez_hex_granted", [], "", "hex_quizzer");
      }
      integer my_oposite_section;
      vector my_coord= llGetPos();
@@ -306,13 +317,21 @@ string get_detected_pie_slice(vector avatar){
 }
 
 display_questions(string str,key id){
-
+                               /* qdialogtext+"|";//question textindex 0
+                            question_data +=(string)hex+"|";//index 1
+                            question_data += qdialogoptions_string+"|";//index 2- options ie: a,b,c 
+                            question_data += opgrade_string+"|";//index 3 - grade for each option ie: -1.0,1,-1 (1=correct)
+                            question_data += opfeedback_string+"|";//index 4 - any feedback 
+                            question_data +=(string)question_id+"|";//index 5
+                            question_data +=qImageUrl; //index 6
+                            question_data +=opids_string; //index 7*/
                
                 list data= llParseString2List(str, ["|"], []);
                 string qdialogtext = llList2String(data,0);
                 debug("displaying questions "+qdialogtext);
                 qdialogtext = strReplace(llList2String(data,0), ",", DELIMITER);
-                  
+                string qImageUrl = llList2String(data,6);  
+                
                 key hex = llList2Key(data,1);
                 list qdialogoptions= llParseString2List(llList2String(data,2), [","], []);
                 option_points= llParseString2List(llList2String(data,3), [","], []);
@@ -340,6 +359,9 @@ display_questions(string str,key id){
                     sloodle_translation_request(SLOODLE_TRANSLATE_HOVER_TEXT_LINKED_PRIM, [YELLOW, 1.0,prim_link], "option", [value], "", "hex_quizzer");
                     debug("value for "+"pie_slice"+(string)j+" is: "+(string)value);
                 }*/
+                //send image and text to a prim that can display text and image - in opensim, this would be an OSSL script capable of displayign text and images
+                llMessageLinked(LINK_SET,SLOODLE_QUESTION_IMAGE,qImageUrl+"|"+qdialogtext,"");
+                
                 
 }
 
@@ -708,6 +730,7 @@ default {
                     if (llListFindList(HORIZONTAL_RODS_TOUCHED,[object_num])==-1){
                         rez_hexagon(object_num);
                         HORIZONTAL_RODS_TOUCHED+=object_num;
+                    
                     }
                     else{
                         sloodle_translation_request (SLOODLE_TRANSLATE_DIALOG, [1 , "Ok"], "rez_hex_denied_already_rezzed" , ["Ok"], id , "hex_quizzer");
@@ -715,7 +738,7 @@ default {
                 
                     //after a user presses an edge selector, hide the selector
                     llMessageLinked(LINK_SET, SLOODLE_CHANNEL_ANIM, "hide user buttons|"+(string)object_num, NULL_KEY);
-                    sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "rez_hex_granted", [llKey2Name(id)], id, "hex_quizzer");
+                    
                 }else
                  if (type=="rod_ver"){
                     if (llListFindList(VERTICAL_RODS_TOUCHED,[object_num])==-1){
@@ -746,10 +769,26 @@ default {
             //asked and we need to populate pie_slices with options
             key hex = llList2Key(data,1);
           //  debug("SLOODLE_CHANNEL_QUESTION_ASKED_AVATAR");
-            opids=llParseString2List(llList2String(data,6),[","],[]);
+         /* qdialogtext+"|";//question textindex 0
+                            question_data +=(string)hex+"|";//index 1
+                            question_data += qdialogoptions_string+"|";//index 2- options ie: a,b,c 
+                            question_data += opgrade_string+"|";//index 3 - grade for each option ie: -1.0,1,-1 (1=correct)
+                            question_data += opfeedback_string+"|";//index 4 - any feedback 
+                            question_data +=(string)question_id+"|";//index 5
+                            question_data +=qImageUrl; //index 6
+                            question_data +=opids_string; //index 7
+                            question_data +=llList2CSV(opfeedback_image); //index 8*/
+            opids=llParseString2List(llList2String(data,7),[","],[]);
+            feedback_text_data = llParseString2List(llList2String(data,4),[","],[]);
+            feedback_image_data= llParseString2List(llList2String(data,8),[","],[]);
+            debug("++++++++++++++++++++++++++++++++++++++++++++++++++feedback_text_data: "+llList2CSV(feedback_text_data));
+            debug("++++++++++++++++++++++++++++++++++++++++++++++++++feedback_image_data: "+llList2CSV(feedback_image_data));
             if (hex==llGetKey()){
                 //get the question id
                 question_id =llList2Integer(data,5);
+                string qImageUrl = llList2String(data,6);
+                
+                return;
                 if (llListFindList(QUESTIONS_ASKED, [question_id])==-1){
                     QUESTIONS_ASKED+=question_id;
                 }//if 
@@ -794,6 +833,18 @@ default {
                             pie_slice_num=(integer)llGetSubString(pie_slice, -1, -1);
                         //retrieve the opid associated with the pie_slice
                             integer opid = pie_slice_option_index(pie_slice_num);
+                            //give feedback
+                            string feedback_text = llList2String(feedback_text_data,opid);
+                            string feedback_image = llList2String(feedback_image_data,opid);
+                           
+                            if (feedback_text == "[[LONG]]") { // special long feedback placeholder for when there is too much feedback to give to the script
+                                llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_FEED_BACK_REQUEST, (string)question_id+"|"+(string)opid,avatar_key);
+                            }
+                            else if (feedback_text != ""){
+                                 llInstantMessage(avatar_key, feedback_text); // Text feedback
+                            }
+                            //let other scripts output the feedback in the way they see fit:
+                             llMessageLinked(LINK_SET, SLOODLE_FEEDBACK_OUTPUT, (string)opid+"|" + feedback_text+"|"+feedback_image, avatar_key);
                         //retrieve the scorechange associated with that pie_slice
                             integer score_change = pie_slice_value(pie_slice_num);
                         //Now award the users
@@ -812,6 +863,7 @@ default {
                             sloodle_translation_request(SLOODLE_TRANSLATE_IM, [0], "incorrect_can_not_select_orb", [llKey2Name(avatar_key)], avatar_key, "hex_quizzer");
                             llPushObject(avatar_key,<0,0,100>, <0,0,-100>, TRUE);
                         }//else
+                      
                         //submit answers to the server
                             llMessageLinked(LINK_SET, SLOODLE_CHANNEL_QUIZ_NOTIFY_SERVER_OF_RESPONSE,"multichoice|"+(string)question_id+"|"+(string)opid+"|"+(string)score_change, avatar_key);
                         //report to other scripts of the scorechanges
