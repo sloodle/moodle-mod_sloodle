@@ -60,8 +60,12 @@ integer SLOODLE_CHANNEL_SCOREBOARD_SHARED_MEDIA_CHANGE_ADMIN_URL_CHANNEL= -16392
 integer SLOODLE_SCOREBOARD_CONNECT_HUD= -1639271130; // channel which gets sent a linked message by the connect a hud button when it is touched.
 integer SLOODLE_SCOREBOARD_CONNECT_HUD_REGION_SAY= -1639271131; // broadcast to the region by the scoreboard when a user presses the connect scoreboard button
 
-integer SLOODLE_CHANNEL_BACKPACK_SHARED_MEDIA_SET_STUDENT_URL_CHANNEL = -1639271155; // broadcast to the region by the hud giver 
-integer SLOODLE_CHANNEL_BACKPACK_SHARED_MEDIA_REQUEST_STUDENT_URL_CHANNEL = -1639271156; // broadcast to the region by the hud 
+integer SLOODLE_CHANNEL_BACKPACK_SHARED_MEDIA_SET_STUDENT_URL_CHANNEL = -1639271161; // broadcast to the region by the hud giver 
+integer SLOODLE_CHANNEL_BACKPACK_SHARED_MEDIA_REQUEST_STUDENT_URL_CHANNEL = -1639271162; // broadcast to the region by the hud 
+integer SLOODLE_CHANNEL_BACKPACK_KNOWN_SITE_CONTROLLER_LIST = -1639271163; // list of available sites and controllers
+integer SLOODLE_CHANNEL_BACKPACK_SITE_CONTROLLER_TOGGLE_NEXT = -1639271164; // button to switch between controllers on the hud
+integer SLOODLE_CHANNEL_BACKPACK_SITE_CONTROLLER_TOGGLE_PREVIOUS = -1639271165; // button to switch between controllers on the hud
+integer SLOODLE_CHANNEL_BACKPACK_SITE_CONTROLLER_CURRENT_DISPLAY = -1639271166; // current site / controller for display 
 
 integer SLOODLE_OBJECT_INTERACTION= -1639271132; //channel interaction objects speak on
 integer SLOODLE_OBJECT_REGISTER_INTERACTION= -1639271133; //channel objects send interactions to the mod_interaction-1.0 script on to be forwarded to server
