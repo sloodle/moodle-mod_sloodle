@@ -856,11 +856,6 @@
                     }
                 }
 
-                if (count($relevant_configs) == 0) {
-                    // Nothing to do here
-                    continue;
-                }
-
                 if (!method_exists($module_class, 'ProcessActions')) {
                     continue;
                 } 
@@ -1005,6 +1000,9 @@
             return true;
             
         }
+
+
+
 
         // Return objects that say they have the capability to do the task
         // Since restricts to how recently they've been active.

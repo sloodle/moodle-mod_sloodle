@@ -130,6 +130,7 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
                 sloodle_insert_record( 'sloodle_award_points', $award);
 
+                SloodleModuleAwards::NotifyRealtimeBroadcastClients('awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );;
                 SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
 
 		return true;	
@@ -140,9 +141,10 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 
 		if (!sloodle_delete_records( 'sloodle_award_points', 'roundid', $this->roundid, 'userid', $userid )) {
 			return false;
-		}
+        }
 
-                SloodleActiveObject::NotifySubscriberObjects( 'awards_points_deletion', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
+        SloodleModuleAwards::NotifyRealtimeBroadcastClients('awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );;
+        SloodleActiveObject::NotifySubscriberObjects( 'awards_points_deletion', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
 	
 		return true;
 		
@@ -154,7 +156,8 @@ class SloodleScoreboardActiveObject extends SloodleActiveObject {
 			return false;
 		}
 		
-                SloodleActiveObject::NotifySubscriberObjects( 'awards_points_round_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
+        SloodleModuleAwards::NotifyRealtimeBroadcastClients('awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );;
+        SloodleActiveObject::NotifySubscriberObjects( 'awards_points_round_change', 10601, $this->controllerid, $userid, array('balance' => $userscore, 'roundid' => $this->roundid, 'userid' => $userid, 'currencyid' => $this->currencyid, 'timeawarded' => time() ), true );
 
 		return true;
 

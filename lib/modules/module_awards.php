@@ -152,6 +152,7 @@
 
             // This sends a single points change notification to an object.
             // It's used by the shared media scoreboard to prompt a re-fetch of score data.
+            SloodleModuleAwards::NotifyRealtimeBroadcastClients('awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );;
 			SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );
 
 
@@ -193,6 +194,7 @@
 
             // This sends a single points change notification to an object.
             // It's used by the shared media scoreboard to prompt a re-fetch of score data.
+            SloodleModuleAwards::NotifyRealtimeBroadcastClients('awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );;
 			SloodleActiveObject::NotifySubscriberObjects( 'awards_points_change', 10601, $controllerid, $userid, array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) );
 
 		}
@@ -417,6 +419,52 @@
 
         }
 
+        function NotifyRealtimeBroadcastClients($event_type, $some_code, $controllerid, $userid, $currencyid, $params) {
+            //
+            /*Params should look like:
+            array('balance' => $balance, 'roundid' => $roundid, 'userid' => $userid, 'currencyid' => $currencyid, 'timeawarded' => $time ) 
+            */
 
+            if (!defined('SLOODLE_REALTIME_BROADCAST_SERVER_UPDATE') || SLOODLE_REALTIME_BROADCAST_SERVER_UPDATE == '') {
+                return false;
+            }
+
+            global $CFG;
+
+            $currencyid = isset($params['currencyid']) ? intval($params['currencyid']) : 0;
+            $controllerid = isset($params['controllerid']) ? intval($params['controllerid']) : 0;
+
+            $useruuid = SloodleUser::AvatarUUIDForUserID($userid);
+		  SloodleDebugLogger::log('DEBUG', "got user uuid $useruuid for user $userid");
+
+            $site = $CFG->wwwroot;
+            $room = $site.'/scores/avatar/'.$useruuid.'/controller/'.$controllerid;
+            if (preg_match('#^(http|https)://(.*)$#', $room, $matches)) {
+                    $room = $matches[2];
+            }
+
+            $payloadobj = new stdClass();
+            $payloadobj->currencyid = $currencyid;
+            $payloadobj->points = $points;
+            $payloadjson = json_encode($payloadobj);
+
+            $url = SLOODLE_REALTIME_BROADCAST_SERVER_UPDATE.'/?cmd=update&uuid='.urlencode($useruuid).'&payload='.urlencode($payloadjson);
+		  SloodleDebugLogger::log('DEBUG', "sending to node server at url $url");
+
+            $ch = curl_init();    // initialize curl handle
+            curl_setopt($ch, CURLOPT_URL, $url); // set url to post to
+            curl_setopt($ch, CURLOPT_FAILONERROR,0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            // TODO: 
+            //curl_setopt($ch, CURLOPT_POST, 1); // set POST method
+            //curl_setopt($ch, CURLOPT_POSTFIELDS,$msg); // add POST fields
+
+            $result = curl_exec($ch); // run the whole process
+            $info = curl_getinfo($ch);
+            curl_close($ch);
+            return array('info'=>$info,'result'=>$result);
+
+        }
 }
 ?>

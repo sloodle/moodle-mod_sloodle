@@ -946,7 +946,7 @@
         }
         
 	/*
-	Statuic function returning a hash of userids to avatar names of admin users.
+	Static function returning a hash of userids to avatar names of admin users.
 	This is useful if you want to know everyone who may be able to user a course
 	*/
 	function SiteAdminUserIDsToAvatarNames() {
@@ -971,6 +971,20 @@
 	   return $users;
 
 	}
+
+        /*
+        Static function returning a hash of userids to avatar names of admin users.
+        This is useful if you want to know everyone who may be able to user a course
+        */
+        function AvatarUUIDForUserID($userid) {
+
+            if ($rec = sloodle_get_record('sloodle_users', 'userid', $userid)) {
+                return $rec->avuuid;
+            }
+
+            return 0;
+
+        }
 
     }
     
