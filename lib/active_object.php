@@ -1037,8 +1037,13 @@
                 }
                 $criteriastring = ' AND '.implode(' AND ', $wherepairs);
             }
-
-            $sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? $criteriastring order by a.timeupdated desc;";
+                    
+            $sql = '';
+            if ($criteriastring == '') {
+                $sql = "select a.* from {$CFG->prefix}sloodle_active_object a where a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? $criteriastring order by a.timeupdated desc;";
+            } else {
+                $sql = "select a.* from {$CFG->prefix}sloodle_active_object a inner join {$CFG->prefix}sloodle_object_config c on a.id=c.object where a.httpinurl IS NOT NULL and a.type in ($instr) and a.timeupdated>? $criteriastring order by a.timeupdated desc;";
+            }
             $recs = sloodle_get_records_sql_params($sql, $queryparams);
 
             $ret = array();
