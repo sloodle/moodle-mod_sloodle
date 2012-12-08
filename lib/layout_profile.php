@@ -547,10 +547,10 @@
         }
 
 	function active_objects() {
-            $recs = sloodle_get_records('sloodle_active_object','layout_entry',intval($this->id));
+            $recs = sloodle_get_records('sloodle_active_object','layoutentryid',intval($this->id));
 
             $aos = array();
-            if ($rec) {
+            if (is_array($recs) && (count($recs) > 0)) {
 		foreach($recs as $rec) {
                     $ao = new SloodleActiveObject();
                     $ao->loadFromRecord($rec);
