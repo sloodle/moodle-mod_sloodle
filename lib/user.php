@@ -365,7 +365,7 @@
         * @return bool True if successful, or false if not.
         * @access public
         */
-        function add_linked_avatar($userid, $uuid, $avname)
+        function add_linked_avatar($userid, $uuid, $avname, $profilepic = '')
         {
             // Setup our object
             $this->avatar_data = new stdClass();
@@ -373,6 +373,7 @@
             $this->avatar_data->userid = $userid;
             $this->avatar_data->uuid = $uuid;
             $this->avatar_data->avname = $avname;
+            $this->avatar_data->profilepic = $profilepic;
             
             // Add the data to the database
             $this->avatar_data->id = sloodle_insert_record('sloodle_users', $this->avatar_data);
