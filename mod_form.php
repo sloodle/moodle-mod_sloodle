@@ -75,7 +75,11 @@ class mod_sloodle_mod_form extends moodleform_mod {
         $mform->setDefault('type', $sloodletype);
         $typeelem->freeze();
         $typeelem->setPersistantFreeze(true);
-        $mform->setHelpButton('type', array("moduletype_$sloodletype", get_string('moduletype','sloodle'), 'sloodle'));
+        if (method_exists($mform, 'setHelpButton')) { // Deprecated in Moodle 2, gone from 2.4
+            $mform->setHelpButton('type', array("moduletype_$sloodletype", get_string('moduletype','sloodle'), 'sloodle'));
+        } else {
+            $mform->addHelpButton('type', "moduletype_$sloodletype", 'sloodle');
+        }
                 
         // Make a text box for the name of the module
         $mform->addElement('text', 'name', get_string('name', 'sloodle'), array('size'=>'64'));
@@ -93,8 +97,6 @@ class mod_sloodle_mod_form extends moodleform_mod {
 		$mform->setType('intro', PARAM_RAW);
 		// Make it required
 		$mform->addRule('intro', get_string('required'), 'required', null, 'client'); // Don't require description - PRB
-		// Provide an HTML editor help button
-		$mform->setHelpButton('intro', array('writing', 'questions', 'richtext'), false, 'editorhelpbutton');
 	}
 
 
@@ -125,7 +127,11 @@ class mod_sloodle_mod_form extends moodleform_mod {
             
             // Add a text-box for the prim password, with a help button describing it
             $mform->addElement('text', 'controller_password', get_string('primpass', 'sloodle'), array('size'=>'12','maxlength'=>'9'));
-            $mform->setHelpButton('controller_password', array('prim_password', get_string('help:primpassword','sloodle'), 'sloodle'));
+            if (method_exists($mform, 'setHelpButton')) { // Deprecated in Moodle 2, gone from 2.4
+                $mform->setHelpButton('controller_password', array('prim_password', get_string('help:primpassword','sloodle'), 'sloodle'));
+            } else {
+                $mform->addHelpButton('controller_password', 'primpass','sloodle');
+            }
             // Set the field requirements
             $mform->setDefault('controller_password', mt_rand(100000000, 999999999));
             $mform->addRule('controller_password', null, 'numeric', null, 'client');
