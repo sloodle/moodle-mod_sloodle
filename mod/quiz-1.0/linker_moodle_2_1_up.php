@@ -112,9 +112,20 @@ if ($currentattemptid) {
     $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
     $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
 
-    // Create the new attempt and initialize the question sessions
-    $attempt = quiz_create_attempt($quizobj->get_quiz(), $attemptnumber, $lastattempt, time(),
-            $quizobj->is_preview_user());
+    // API changes in 2.4. https://github.com/moodle/moodle/commit/8e771aed93eea08cc3e9410283f5354e02311281
+    if ($CFG->version < 2012120303) { 
+
+        // Create the new attempt and initialize the question sessions
+        $attempt = quiz_create_attempt($quizobj->get_quiz(), $attemptnumber, $lastattempt, time(),
+                $quizobj->is_preview_user());
+
+    } else {
+
+        // Create the new attempt and initialize the question sessions
+        $attempt = quiz_create_attempt($quizobj, $attemptnumber, $lastattempt, time(),
+                $quizobj->is_preview_user());
+
+    }
 
     if (!($quizobj->get_quiz()->attemptonlast && $lastattempt)) {
         // Starting a normal, new, quiz attempt.
