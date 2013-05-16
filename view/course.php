@@ -129,7 +129,7 @@ class sloodle_view_course extends sloodle_base_view
                 redirect("view.php?_type=course&id={$this->course->id}", get_string('changessaved'), 4);
                 exit();
             } else {
-                print_box(get_string('error'), 'generalbox boxwidthnarrow boxaligncenter');
+                sloodle_print_box(get_string('error'), 'generalbox boxwidthnarrow boxaligncenter');
             }
         }
         
@@ -140,7 +140,7 @@ class sloodle_view_course extends sloodle_base_view
         echo "<h2 style=\"text-align:center;\">(".get_string('course').": \"<a href=\"{$CFG->wwwroot}/course/view.php?id={$this->course->id}\">".$this->sloodle_course->get_full_name()."</a>\")</h2>";
         
 
-        print_box(get_string('courseconfig:info','sloodle'), 'generalbox boxaligncenter boxwidthnormal');
+        sloodle_print_box(get_string('courseconfig:info','sloodle'), 'generalbox boxaligncenter boxwidthnormal');
         echo "<br/>\n";
 
     // Get the initial form values
@@ -151,7 +151,7 @@ class sloodle_view_course extends sloodle_base_view
         $selection_menu = array(0 => $strdisabled, 1 => $strenabled);
         
         // Start the box
-        print_box_start('generalbox boxaligncenter boxwidthnormal');
+        sloodle_print_box_start('generalbox boxaligncenter boxwidthnormal');
         echo '<div style="text-align:center;"><h3>'.get_string('coursesettings','sloodle').'</h3>';
         
         // Start the form (including a course ID hidden parameter)
@@ -161,7 +161,7 @@ class sloodle_view_course extends sloodle_base_view
         
     // AUTO REGISTRATION //
         echo "<p>\n";
-        helpbutton('auto_registration', get_string('help:autoreg','sloodle'), 'sloodle', true, false, '', false);
+        sloodle_helpbutton('auto_registration', get_string('help:autoreg','sloodle'), 'sloodle', true, false, '', false);
         echo get_string('autoreg', 'sloodle').': ';
         choose_from_menu($selection_menu, 'autoreg', $val_autoreg, '', '', 0, false);
         // Add the site status
@@ -170,7 +170,7 @@ class sloodle_view_course extends sloodle_base_view
         
     // AUTO ENROLMENT //
         echo "<p>\n";
-        helpbutton('auto_enrolment', get_string('help:autoenrol','sloodle'), 'sloodle', true, false, '', false);
+        sloodle_helpbutton('auto_enrolment', get_string('help:autoenrol','sloodle'), 'sloodle', true, false, '', false);
         echo get_string('autoenrol', 'sloodle').': ';
         choose_from_menu($selection_menu, 'autoenrol', $val_autoenrol, '', '', 0, false);
         // Add the site status
@@ -183,13 +183,13 @@ class sloodle_view_course extends sloodle_base_view
         
         // Finish the box
         echo '</div>';
-        print_box_end();
+        sloodle_print_box_end();
 
         
     //------------------------------------------------------
 
         // Loginzone information
-        print_box_start('generalbox boxaligncenter boxwidthnarrow');
+        sloodle_print_box_start('generalbox boxaligncenter boxwidthnarrow');
         echo '<div style="text-align:center;"><h3>'.get_string('loginzonedata','sloodle').'</h3>';
         
         $lastupdated = '('.get_string('unknown','sloodle').')';
@@ -220,7 +220,7 @@ class sloodle_view_course extends sloodle_base_view
         
         
         echo '</div>';
-        print_box_end();
+        sloodle_print_box_end();
 
         
 
@@ -235,11 +235,11 @@ class sloodle_view_course extends sloodle_base_view
     /**
     * Print the footer for this course.
     */
-    function print_footer()
+    function sloodle_print_footer()
     {
         global $CFG;
         echo "<p style=\"text-align:center; margin-top:32px; font-size:90%;\"><a href=\"{$CFG->wwwroot}/course/view.php?id={$this->course->id}\">&lt;&lt;&lt; ".get_string('backtocoursepage','sloodle')."</a></h2>";
-        print_footer($this->course);
+        sloodle_print_footer($this->course);
     }
 
 }

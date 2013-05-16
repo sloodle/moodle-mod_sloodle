@@ -114,7 +114,7 @@
 //---------------------------------------------------------------------------------
     
     // Display intro information
-    print_box_start('generalbox boxwidthwide boxaligncenter');
+    sloodle_print_box_start('generalbox boxwidthwide boxaligncenter');
     echo '<div style="text-align:center;">';
     
     echo "<h1>$pagename</h1>";
@@ -163,12 +163,12 @@
     echo "<a href=\"notecard_configuration_form.php?sloodlecontrollerid=$sloodlecontrollerid&sloodleobjtype=$sloodleobjtype\">&lt;&lt; ".get_string('objectconfig:backtoform','sloodle')."</a>";
     
     echo '</div>';
-    print_box_end();
+    sloodle_print_box_end();
     
     
 //---------------------------------------------------------------------------------
     
     
     
-    print_footer();
+    sloodle_print_footer();
 ?>

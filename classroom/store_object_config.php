@@ -84,7 +84,7 @@
     
     
     // Display the information about the object
-    print_box_start('generalbox boxaligncenter boxwidthnarrow');
+    sloodle_print_box_start('generalbox boxaligncenter boxwidthnarrow');
     echo '<div style="text-align:center;">';
     echo '<span style="font-weight:bold; font-size:110%;">'.get_string('objectdetails','sloodle').'</span><br>';
     
@@ -99,7 +99,7 @@
     echo " $numstored</span><br>\n";
     
     echo '</div>';
-    print_box_end();
+    sloodle_print_box_end();
     echo '<br>';
     
     // Print a continue button, to go back to the course
@@ -109,6 +109,6 @@
     echo '<input type="submit" value="'.get_string('continue').'"/>';
     echo '</form></div>';
     
-    print_footer();
+    sloodle_print_footer();
     
 ?>

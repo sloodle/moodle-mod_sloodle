@@ -175,7 +175,7 @@ class sloodle_view_backpack extends sloodle_base_view {
         echo "<br>";
 
         //print titles
-        print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');                  
+        sloodle_print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');                  
 
         echo '<div style="position:relative ">';
         echo '<span style="position:relative;font-size:36px;font-weight:bold;">';
@@ -353,10 +353,10 @@ class sloodle_view_backpack extends sloodle_base_view {
 
         print('<form action="" method="POST">');
         echo '<input type="hidden" name="isItemAdd" value="1">';
-        print_table($sloodletable); 
+        sloodle_print_table($sloodletable); 
         print '</form>';
 
-        print_box_end(); 
+        sloodle_print_box_end(); 
     }
 
 }

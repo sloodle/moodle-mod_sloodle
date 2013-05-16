@@ -301,7 +301,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
         if (!is_array($entries)) $entries = array();
         $numentries = count($entries);
         // Open the presentation box
-        //print_box_start('generalbox boxaligncenter boxwidthwide');
+        //sloodle_print_box_start('generalbox boxaligncenter boxwidthwide');
 
         // Was a specific entry requested? This is the number of entry within the presentation, NOT entry ID.
         // They start at 1 and go up from there within each presentation.
@@ -400,7 +400,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
             $arrowLinks->data[]=$arow;
             
             echo '<div>';
-            print_table($arrowLinks); 
+            sloodle_print_table($arrowLinks); 
             echo '</div>';
             echo "<br><br>";
             echo '</td></tr>';
@@ -556,10 +556,10 @@ class sloodle_view_presenter extends sloodle_base_view_module
                 $linkCancel = SLOODLE_WWWROOT."/view.php?id={$this->cm->id}&amp;mode=edit";
                 $strcancel = get_string('cancel');
                 // Display a message and an optional 'cancel' link
-                print_box_start('generalbox', 'notice');
+                sloodle_print_box_start('generalbox', 'notice');
                 echo "<p>", get_string('presenter:movingslide', 'sloodle', $entries[$this->movingentryid]->name), "</p>\n";
                 echo "<p>(<a href=\"{$linkCancel}\">{$strcancel}</a>)</p>\n";
-                print_box_end();
+                sloodle_print_box_end();
             }
         
             // Setup a table object to display Presenter entries
@@ -661,7 +661,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
             echo '<form action="" method="get" id="editform" name="editform">';
             echo "<input type=\"hidden\" name=\"id\" value=\"{$this->cm->id}\" />\n"; // Course module ID so that the request comes to the right places
             echo "<input type=\"hidden\" name=\"mode\" value=\"confirmdeletemultiple\" />\n"; // The operation being conducted
-            print_table($entriesTable);
+            sloodle_print_table($entriesTable);
             echo "<input type=\"hidden\" name=\"sesskey\" value=\"".sesskey()."\" />\n"; // Session key to ensure unauthorised deletions are not possible (e.g. using XSS)
             echo '</form>';                
            
@@ -1000,7 +1000,7 @@ class sloodle_view_presenter extends sloodle_base_view_module
             }
 
             echo "<h4>{$strselectimporter}: </h4>\n";
-            print_table($table);
+            sloodle_print_table($table);
             
 
             return;

@@ -138,7 +138,7 @@ class sloodle_view_users extends sloodle_base_view
 
 
         // Moodle 2 rendering functions like to know the course.
-        // They get upset if you try to pass a course into print_footer() that isn't what they were expecting.
+        // They get upset if you try to pass a course into sloodle_print_footer() that isn't what they were expecting.
         if ($this->course) {
                 global $PAGE;
                 if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
@@ -187,7 +187,7 @@ class sloodle_view_users extends sloodle_base_view
         
 //------------------------------------------------------
         
-        print_box_start('generalbox boxwidthwide boxaligncenter');
+        sloodle_print_box_start('generalbox boxwidthwide boxaligncenter');
         echo '<table style="text-align:left; vertical-align:top; margin-left:auto; margin-right:auto;">';
 // // SEARCH FORMS // //
         echo '<tr>';
@@ -290,7 +290,7 @@ class sloodle_view_users extends sloodle_base_view
             echo '</p>';
         }
         
-        print_box_end();
+        sloodle_print_box_end();
 
         
 //------------------------------------------------------
@@ -414,7 +414,7 @@ class sloodle_view_users extends sloodle_base_view
             }
             
             // Display the table
-            print_table($sloodletable);
+            sloodle_print_table($sloodletable);
             
         } else {
             // Failed to query for list of users
@@ -433,9 +433,9 @@ class sloodle_view_users extends sloodle_base_view
     /**
     * Print the page footer.
     */
-    function print_footer()
+    function sloodle_print_footer()
     {
-        print_footer($this->course);
+        sloodle_print_footer($this->course);
     }
 
 }

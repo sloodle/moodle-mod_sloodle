@@ -132,15 +132,15 @@
         foreach ($sloodle_tables as $type => $table) {
             // Output a heading for this type
             if (!array_key_exists($type, $sloodle_type_names)) $sloodle_type_names[$type] = get_string("moduletype:{$type}", 'sloodle');
-            print_heading_with_help($sloodle_type_names[$type], "moduletype_$type", 'sloodle');
+            sloodle_print_heading_with_help($sloodle_type_names[$type], "moduletype_$type", 'sloodle');
             // Display the table
-            print_table($table);
+            sloodle_print_table($table);
         }
     } else {
-        print_heading(get_string('noentries', 'sloodle'));
+        sloodle_print_heading(get_string('noentries', 'sloodle'));
     }
     
     // Page footer
-    print_footer($course);
+    sloodle_print_footer($course);
 
 ?>

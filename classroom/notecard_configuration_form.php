@@ -83,7 +83,7 @@
 //---------------------------------------------------------------------------------
     
     // Display intro information
-    print_box_start('generalbox boxwidthwide boxaligncenter');
+    sloodle_print_box_start('generalbox boxwidthwide boxaligncenter');
     echo '<div style="text-align:center;">';
     
     echo "<h1>$pagename</h1>";
@@ -129,9 +129,9 @@
     echo '</form>';
     
     echo '</div>';
-    print_box_end();
+    sloodle_print_box_end();
     
 //---------------------------------------------------------------------------------    
     
-    print_footer();
+    sloodle_print_footer();
 ?>

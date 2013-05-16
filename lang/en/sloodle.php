@@ -158,12 +158,15 @@ $string['generalconfiguration'] = 'General Configuration'; // deprecated as the 
 $string['fieldset:generalconfiguration'] = 'General Configuration';
 
 $string['help:primpassword'] = 'What is the Prim Password for?';
+$string['primpass_help'] = 'What is the Prim Password for?';
 $string['help:userediting'] = 'What is the risk?';
 $string['help:autoreg'] = 'What is auto-registration?';
 $string['auto_registration_help'] = 'Turning this on will allow a Moodle account to be created automatically for avatars who use your SLOODLE objects in-world. Note that this will need to be turned on for each course as well as at the site level. If either is off, auto-registration won\'t work.';
 $string['auto_registration'] = 'Auto-registration?';
 $string['help:autoenrol'] = 'What is auto-enrolment?';
 $string['auto_enrolment_help'] = 'Turning this on will make Moodle try to enrol people who use your SLOODLE objects in-world automatically on the relevant course. Note that this will need to be turned on for each course as well as at the site level. If either is off, auto-enrolment won\'t work.';
+
+
 $string['auto_enrolment'] = 'Auto-enrolment';
 $string['object_authorization_help'] = 'The number of days before which an active object will expire if not used.';
 $string['object_authorization'] = 'Object Authorization';

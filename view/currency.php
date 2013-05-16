@@ -199,7 +199,7 @@ class sloodle_view_currency extends sloodle_base_view {
 
         // Display instrutions for this page        
         echo "<br>";
-        print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');
+        sloodle_print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');
 
         echo '<div style="position:relative ">';                                                                    
                      
@@ -278,9 +278,9 @@ class sloodle_view_currency extends sloodle_base_view {
 
         }
 
-        print_table($sloodletable);
+        sloodle_print_table($sloodletable);
 
-        print_box_end();
+        sloodle_print_box_end();
 
         //create an html table to display the users      
         $sloodletable = new stdClass(); 
@@ -319,19 +319,19 @@ class sloodle_view_currency extends sloodle_base_view {
             $cells[]='<input type="submit" name="add" value="'.get_string('currency:addcurrency','sloodle').'">';
             $sloodletable->data[]=$cells;
 
-            print_box_start('generalbox boxaligncenter center boxheightnarrow leftpara');
+            sloodle_print_box_start('generalbox boxaligncenter center boxheightnarrow leftpara');
 
             print "<h2><img align=\"left\" src=\"{$SLOODLE_WWWROOT}lib/media/addnew.png\" width=\"48\"/> ";
             print s(get_string('currency:addnew','sloodle'));
             print "</h2>";
 
-            print_table($sloodletable);
+            sloodle_print_table($sloodletable);
 
             print("</form>");
 
         }
 
-        print_box_end();
+        sloodle_print_box_end();
 
     }
 
@@ -346,13 +346,13 @@ class sloodle_view_currency extends sloodle_base_view {
 
         echo "<br>";            
         //print header box
-        print_box_start('generalbox boxaligncenter right boxwidthnarrow boxheightnarrow rightpara');
+        sloodle_print_box_start('generalbox boxaligncenter right boxwidthnarrow boxheightnarrow rightpara');
         echo "<h1 ><img align=\"left\" src=\"{SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
         echo get_string('currency:confirmdelete', 'sloodle')."</h1>";
-        print_box_end();
+        sloodle_print_box_end();
 
         //display all currencies
-        print_box_start('generalbox boxaligncenter boxwidthfull leftpara');
+        sloodle_print_box_start('generalbox boxaligncenter boxwidthfull leftpara');
         print('<form action="" method="POST">');
 
         $c = sloodle_get_record('sloodle_currency_types','id',$currencyid);
@@ -389,7 +389,7 @@ class sloodle_view_currency extends sloodle_base_view {
 
         $sloodletable->data[]=$row;
 
-        print_table($sloodletable);
+        sloodle_print_table($sloodletable);
 
     }
 
@@ -405,15 +405,15 @@ class sloodle_view_currency extends sloodle_base_view {
         echo "<br>";            
 
         //print header box
-        print_box_start('generalbox boxaligncenter center boxwidthnarrow boxheightnarrow leftpara');
+        sloodle_print_box_start('generalbox boxaligncenter center boxwidthnarrow boxheightnarrow leftpara');
 
         echo "<h1 color=\"Red\"><img align=\"center\" src=\"{SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
         echo get_string('currency:editcurrency', 'sloodle')."</h1>";
 
-        print_box_end();
+        sloodle_print_box_end();
 
         //display all currencies
-        print_box_start('generalbox boxaligncenter boxwidthfull leftpara');
+        sloodle_print_box_start('generalbox boxaligncenter boxwidthfull leftpara');
 
         print('<form action="" method="POST">');
 
@@ -448,7 +448,7 @@ class sloodle_view_currency extends sloodle_base_view {
         $row[]='<input type="submit" name="sumbit" value="submit">';
         $sloodletable->data[]=$row;
 
-        print_table($sloodletable);
+        sloodle_print_table($sloodletable);
 
         print("</form>");
 

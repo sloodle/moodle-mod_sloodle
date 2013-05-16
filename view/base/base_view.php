@@ -60,7 +60,7 @@ class sloodle_base_view
 
         // Output the page footer.
         // This is normally very simple, but can include other data too.
-        $this->print_footer();
+        $this->sloodle_print_footer();
     }
 
     /**
@@ -108,9 +108,9 @@ class sloodle_base_view
     * Output the page footer.
     * This does not usually have to be overridden, unless there is something to be added or a block element to be closed.
     */
-    function print_footer()
+    function sloodle_print_footer()
     {
-        print_footer();
+        sloodle_print_footer();
     }
 
 }
