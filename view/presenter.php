@@ -145,14 +145,14 @@ class sloodle_view_presenter extends sloodle_base_view_module
 
         // Make sure Moodle includes our JavaScript files if necessary
         if ($this->presenter_mode == 'edit' || $this->presenter_mode == 'addfiles') {
-            require_js($CFG->wwwroot .'/mod/sloodle/lib/jquery/jquery.js');
-            require_js($CFG->wwwroot .'/mod/sloodle/lib/jquery/jquery.uploadify.js');
-            require_js($CFG->wwwroot .'/mod/sloodle/lib/jquery/jquery.checkboxes.js');
-            require_js($CFG->wwwroot .'/mod/sloodle/lib/multiplefileupload/extra.js');
-            require_js($CFG->wwwroot .'/lib/filelib.php');      
+            sloodle_require_js($CFG->wwwroot .'/mod/sloodle/lib/jquery/jquery.js');
+            sloodle_require_js($CFG->wwwroot .'/mod/sloodle/lib/jquery/jquery.uploadify.js');
+            sloodle_require_js($CFG->wwwroot .'/mod/sloodle/lib/jquery/jquery.checkboxes.js');
+            sloodle_require_js($CFG->wwwroot .'/mod/sloodle/lib/multiplefileupload/extra.js');
+            sloodle_require_js($CFG->wwwroot .'/lib/filelib.php');      
         }
         if ( $this->presenter_mode == 'addfiles') {
-            require_js($CFG->wwwroot .'/mod/sloodle/lib/js/presenter_addfiles.js"');      
+            sloodle_require_js($CFG->wwwroot .'/mod/sloodle/lib/js/presenter_addfiles.js"');      
 	}
 
 
