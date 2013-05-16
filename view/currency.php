@@ -321,7 +321,7 @@ class sloodle_view_currency extends sloodle_base_view {
 
             print_box_start('generalbox boxaligncenter center boxheightnarrow leftpara');
 
-            print "<h2><img align=\"left\" src=\"{SLOODLE_WWWROOT}lib/media/addnew.png\" width=\"48\"/> ";
+            print "<h2><img align=\"left\" src=\"{$SLOODLE_WWWROOT}lib/media/addnew.png\" width=\"48\"/> ";
             print s(get_string('currency:addnew','sloodle'));
             print "</h2>";
 

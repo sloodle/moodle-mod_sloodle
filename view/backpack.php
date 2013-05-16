@@ -20,8 +20,8 @@ require_once(SLOODLE_LIBROOT.'/course.php');
 require_once(SLOODLE_LIBROOT.'/currency.php');    
 
 // Javascript for checking and unchecking checkboxes
-require_js($CFG->wwwroot . '/mod/sloodle/lib/jquery/jquery-1.3.2.min.js');
-require_js($CFG->wwwroot . '/mod/sloodle/lib/js/backpack.js');
+sloodle_require_js($CFG->wwwroot . '/mod/sloodle/lib/jquery/jquery-1.3.2.min.js');
+sloodle_require_js($CFG->wwwroot . '/mod/sloodle/lib/js/backpack.js');
 
 /**
 * Class for rendering a view of SLOODLE course information.

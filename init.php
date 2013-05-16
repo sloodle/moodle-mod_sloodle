@@ -21,6 +21,7 @@
     require_once (realpath(dirname(__FILE__) . "/" . "../../config.php"));
 
     require_once (realpath(dirname(__FILE__) . "/" . "lib/db.php"));
+    require_once (realpath(dirname(__FILE__) . "/" . "lib/compat.php"));
     
     // Is this a linker script?
     if (defined('SLOODLE_LINKER_SCRIPT')) {
