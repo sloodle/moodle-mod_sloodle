@@ -80,7 +80,7 @@
     $nav = get_string('modulename', 'sloodle').' -> ';
     $nav .= get_string('objectconfiguration','sloodle');
     // Display the page header
-    print_header(get_string('objectconfiguration','sloodle'), get_string('objectconfiguration','sloodle'), $nav, '', '', false);
+    sloodle_print_header(get_string('objectconfiguration','sloodle'), get_string('objectconfiguration','sloodle'), $nav, '', '', false);
     
     
     // Display the information about the object

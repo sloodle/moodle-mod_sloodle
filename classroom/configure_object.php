@@ -92,7 +92,7 @@
     $nav = get_string('modulename', 'sloodle').' -> ';
     $nav .= $pagename;
     // Display the page header
-    print_header($pagename, $pagename, $nav, '', '', false);
+    sloodle_print_header($pagename, $pagename, $nav, '', '', false);
     
     
 //------------------------------------------------------------

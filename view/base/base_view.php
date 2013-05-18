@@ -53,7 +53,7 @@ class sloodle_base_view
 
         // Output the page header.
         // This normally includes standard SLOODLE stuff, such as a note of whether or not the course allows auto-registration.
-        $this->print_header();
+        $this->sloodle_print_header();
 
         // Render the view of the module or feature itself
         $this->render();
@@ -91,9 +91,9 @@ class sloodle_base_view
     * Print the standard page header.
     * This should usually be overridden to add additional information, such as page title, header, and navigation links.
     */
-    function print_header()
+    function sloodle_print_header()
     {
-        print_header_simple();
+        sloodle_print_header_simple();
     }
 
     /**

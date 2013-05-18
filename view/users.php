@@ -161,12 +161,12 @@ class sloodle_view_users extends sloodle_base_view
     /**
     * Print the course settings page header.
     */
-    function print_header()
+    function sloodle_print_header()
     {
         $navigation = '';
         if ($this->courseid != SITEID) $navigation .= "<a href=\"{$this->courseurl}\">{$this->courseshortname}</a> -> ";
         $navigation .= get_string('sloodleuserprofiles', 'sloodle');
-        print_header(get_string('sloodleuserprofiles', 'sloodle'), get_string('sloodleuserprofiles', 'sloodle'), $navigation, "", "", false);
+        sloodle_print_header(get_string('sloodleuserprofiles', 'sloodle'), get_string('sloodleuserprofiles', 'sloodle'), $navigation, "", "", false);
     }
 
     /**

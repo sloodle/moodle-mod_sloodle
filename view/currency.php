@@ -156,12 +156,12 @@ class sloodle_view_currency extends sloodle_base_view {
     /**
     * Print the course settings page header.
     */
-    function print_header() {
+    function sloodle_print_header() {
 
         global $CFG;
         $id = required_param('id', PARAM_INT);
         $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?&_type=currency&mode=allcurrencies&id={$id}\">".get_string('currencies:view', 'sloodle')."</a>";
-        print_header_simple(get_string('backpack','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
+        sloodle_print_header_simple(get_string('backpack','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
 
     }
 
@@ -321,7 +321,7 @@ class sloodle_view_currency extends sloodle_base_view {
 
             sloodle_print_box_start('generalbox boxaligncenter center boxheightnarrow leftpara');
 
-            print "<h2><img align=\"left\" src=\"{$SLOODLE_WWWROOT}lib/media/addnew.png\" width=\"48\"/> ";
+            print "<h2><img align=\"left\" src=\"".SLOODLE_WWWROOT."/lib/media/addnew.png\" width=\"48\"/> ";
             print s(get_string('currency:addnew','sloodle'));
             print "</h2>";
 
@@ -347,7 +347,7 @@ class sloodle_view_currency extends sloodle_base_view {
         echo "<br>";            
         //print header box
         sloodle_print_box_start('generalbox boxaligncenter right boxwidthnarrow boxheightnarrow rightpara');
-        echo "<h1 ><img align=\"left\" src=\"{SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
+        echo "<h1 ><img align=\"left\" src=\"".SLOODLE_WWWROOT."/lib/media/vault48.png\" width=\"48\"/> ";
         echo get_string('currency:confirmdelete', 'sloodle')."</h1>";
         sloodle_print_box_end();
 
@@ -407,7 +407,7 @@ class sloodle_view_currency extends sloodle_base_view {
         //print header box
         sloodle_print_box_start('generalbox boxaligncenter center boxwidthnarrow boxheightnarrow leftpara');
 
-        echo "<h1 color=\"Red\"><img align=\"center\" src=\"{SLOODLE_WWWROOT}lib/media/vault48.png\" width=\"48\"/> ";
+        echo "<h1 color=\"Red\"><img align=\"center\" src=\"".SLOODLE_WWWROOT."/lib/media/vault48.png\" width=\"48\"/> ";
         echo get_string('currency:editcurrency', 'sloodle')."</h1>";
 
         sloodle_print_box_end();

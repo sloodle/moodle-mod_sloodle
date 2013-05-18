@@ -72,11 +72,11 @@ class sloodle_view_logs extends sloodle_base_view
     /**
     * Print the course settings page header.
     */
-    function print_header()
+    function sloodle_print_header()
     {
         global $CFG;
         $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view_logs.php?id={$this->course->id}\">".get_string('logs:view', 'sloodle')."</a>";
-        print_header_simple(get_string('logs:view','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
+        sloodle_print_header_simple(get_string('logs:view','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
     }
 
 

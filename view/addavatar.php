@@ -169,7 +169,7 @@ class sloodle_view_addavatar extends sloodle_base_view
     /**
     * Print the course settings page header.
     */
-    function print_header()
+    function sloodle_print_header()
     {
         global $CFG;
         
@@ -182,7 +182,7 @@ class sloodle_view_addavatar extends sloodle_base_view
         $navigation .= get_string('addavatar', 'sloodle');
         
         // Display the header
-        print_header(get_string('addavatar', 'sloodle'), get_string('addavatar','sloodle'), $navigation, "", "", true);
+        sloodle_print_header(get_string('addavatar', 'sloodle'), get_string('addavatar','sloodle'), $navigation, "", "", true);
     }
 
 

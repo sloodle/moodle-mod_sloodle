@@ -55,6 +55,73 @@ function sloodle_print_heading($text, $align = '', $size = 2, $class = 'main', $
     }
 }
 
+function sloodle_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags) {
+ 
+    global $CFG;
+    global $OUTPUT;
+    global $PAGE;
+    if ($CFG->version >= 2012120303) {
+        $PAGE->set_heading($heading); // Required
+        $PAGE->set_title($title);
+        $PAGE->set_cacheable($cache);
+        $PAGE->set_focuscontrol($focus);
+        $PAGE->set_button($button);
+        if (is_array($navigation) && count($navigation)) {
+           foreach($navigation as $naventry) {
+              if ($naventry) {
+                 $PAGE->navbar->add($naventry);
+              }
+           }
+        }
+        return $OUTPUT->header();
+    } else {
+        return print_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags, true); 
+    }
+
+}
+
+function sloodle_print_header($title='', $heading='', $navigation='', $focus='',$meta='', $cache=true, $button='&nbsp;', $menu='',$usexml=false, $bodytags='', $return=false)  {
+    if ($return) {
+        return sloodle_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags); 
+    } else {
+        echo sloodle_header($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags); 
+    }
+}
+
+function sloodle_print_header_simple($title='', $heading='', $navigation='', $focus='', $meta='',$cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='', $return=false) {
+    if ($return) {
+        return sloodle_header_simple($title, $heading, $navigation, $focus, $meta,$cache, $button, $menu, $usexml, $bodytags, true); 
+    } else {
+        echo sloodle_header_simple($title, $heading, $navigation, $focus, $meta,$cache, $button, $menu, $usexml, $bodytags, true); 
+    }
+}
+
+
+function sloodle_header_simple($title='', $heading='', $navigation='', $focus='', $meta='',$cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='') {
+
+    global $CFG;
+    global $OUTPUT;
+    global $PAGE;
+    if ($CFG->version >= 2012120303) {
+        $PAGE->set_heading($heading); // Required
+        $PAGE->set_title($title);
+        $PAGE->set_cacheable($cache);
+        $PAGE->set_focuscontrol($focus);
+        $PAGE->set_button($button);
+        if (is_array($navigation) && count($navigation)) {
+           foreach($navigation as $naventry) {
+              if ($naventry) {
+                 $PAGE->navbar->add($naventry);
+              }
+           }
+        }
+        return $OUTPUT->header();
+    } else {
+        return print_header_simple($title, $heading, $navigation, $focus, $meta, $cache, $button, $menu, $usexml, $bodytags, true); 
+    }
+
+}
+
 
 function sloodle_print_footer($course = null) {
  
