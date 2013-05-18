@@ -279,7 +279,7 @@ XXXEODXXX;
                     $resultsdisplayed++;
                 //}
                 
-                print_table($sloodletable);
+                sloodle_print_table($sloodletable);
 
 				//Now all the tasks in the Tracker are displayed
 				echo "<div style=\"text-align:center;\">\n";
@@ -340,14 +340,14 @@ XXXEODXXX;
                     	echo '<input type="hidden" name="id" value="'.$this->cm->id.'"/>';
                    		echo '<input type="hidden" name="action" value="reset_tasks"/>';
                    		
-                   		print_table($objects_table);
+                   		sloodle_print_table($objects_table);
                    		echo '<h3>Completed: '.$overall.'%</h3>';
                    		echo '<input type="submit" value="'.get_string('resettasks','sloodle').'"/>';
                         echo '</form>';
             		}
                 	else
                 	{
-                		print_table($objects_table);
+                		sloodle_print_table($objects_table);
                    		echo '<h3>Completed: '.$overall.'%</h3>';
                    	}
             	}

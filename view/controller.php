@@ -82,7 +82,7 @@ class sloodle_view_controller extends sloodle_base_view_module
         if ($this->canedit) {
        
             // Active (authorised) objects
-            print_box_start('generalbox boxaligncenter boxwidthwide');
+            sloodle_print_box_start('generalbox boxaligncenter boxwidthwide');
             echo '<h3>'.get_string('authorizedobjects','sloodle').'</h3>';
             
             // Has a delete objects action been requested
@@ -132,7 +132,7 @@ class sloodle_view_controller extends sloodle_base_view_module
                 echo '<input type="hidden" name="id" value="'.$this->cm->id.'"/>';
                 echo '<input type="hidden" name="action" value="delete_objects"/>';
                 
-                print_table($objects_table);
+                sloodle_print_table($objects_table);
                 echo '<input type="submit" value="'.get_string('deleteselected','sloodle').'"/>';
                 
                 echo '</form>';
@@ -141,7 +141,7 @@ class sloodle_view_controller extends sloodle_base_view_module
                 echo '<span style="text-align:center;color:red">'.get_string('noentries','sloodle').'</span><br>';
             }
             
-            print_box_end();
+            sloodle_print_box_end();
         }
         
         echo "</div>\n"; 

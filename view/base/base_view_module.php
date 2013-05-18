@@ -133,7 +133,7 @@ class sloodle_base_view_module extends sloodle_base_view
     /**
     * Print module header info.
     */
-    function print_header()
+    function sloodle_print_header()
     {
         global $CFG;
 
@@ -144,21 +144,21 @@ class sloodle_base_view_module extends sloodle_base_view
         }
         // Display the header
         $navigation = "<a href=\"index.php?id={$this->course->id}\">".get_string('modulenameplural','sloodle')."</a> ->";
-        print_header_simple(format_string($this->sloodle->name), "&nbsp;", "{$navigation} ".format_string($this->sloodle->name), "", "", true, $editbuttons, navmenu($this->course, $this->cm));
+        sloodle_print_header_simple(format_string($this->sloodle->name), "&nbsp;", "{$navigation} ".format_string($this->sloodle->name), "", "", true, $editbuttons, navmenu($this->course, $this->cm));
 
         // Display the module name
         $img = '<img src="'.$CFG->wwwroot.'/mod/sloodle/icon.gif" width="16" height="16" alt=""/> ';
-        print_heading($img.$this->sloodle->name, 'center');
+        sloodle_print_heading($img.$this->sloodle->name, 'center');
     
         // Display the module type and description
         $fulltypename = get_string("moduletype:{$this->sloodle->type}", 'sloodle');
         echo '<h4 style="text-align:center;">'.get_string('moduletype', 'sloodle').': '.$fulltypename;
-        echo helpbutton("moduletype_{$this->sloodle->type}", $fulltypename, 'sloodle', true, false, '', true).'</h4>';
+        echo sloodle_helpbutton("moduletype_{$this->sloodle->type}", $fulltypename, 'sloodle', true, false, '', true).'</h4>';
         // We'll apply a general introduction to all Controllers, since they seem to confuse lots of people!
         $intro = $this->sloodle->intro;
         if ($this->sloodle->type == SLOODLE_TYPE_CTRL) $intro = '<p style="font-style:italic;">'.get_string('controllerinfo','sloodle').'</p>' . $this->sloodle->intro;
 		// Display the intro in a box, if we have an intro
-		if (!empty($intro)) print_box($intro, 'generalbox', 'intro');
+		if (!empty($intro)) sloodle_print_box($intro, 'generalbox', 'intro');
     
     }
 
@@ -173,9 +173,9 @@ class sloodle_base_view_module extends sloodle_base_view
     /**
     * Print the footer for this course.
     */
-    function print_footer()
+    function sloodle_print_footer()
     {
-        print_footer($this->course);
+        sloodle_print_footer($this->course);
     }
 }
 

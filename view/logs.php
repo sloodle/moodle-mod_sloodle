@@ -72,11 +72,11 @@ class sloodle_view_logs extends sloodle_base_view
     /**
     * Print the course settings page header.
     */
-    function print_header()
+    function sloodle_print_header()
     {
         global $CFG;
         $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view_logs.php?id={$this->course->id}\">".get_string('logs:view', 'sloodle')."</a>";
-        print_header_simple(get_string('logs:view','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
+        sloodle_print_header_simple(get_string('logs:view','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($this->course));
     }
 
 
@@ -93,7 +93,7 @@ class sloodle_view_logs extends sloodle_base_view
         echo "<h1 style=\"text-align:center;\">".get_string('logs:sloodlelogs','sloodle')."</h1>\n";
         
 
-      // print_box(get_string('logs:info','sloodle'), 'generalbox boxaligncenter boxwidthnormal');
+      // sloodle_print_box(get_string('logs:info','sloodle'), 'generalbox boxaligncenter boxwidthnormal');
         $sloodletable = new stdClass(); 
          $sloodletable->head = array(                         
              '<h4><div style="color:red;text-align:left;">'.get_string('avatarname', 'sloodle').'</h4>',
@@ -132,7 +132,7 @@ class sloodle_view_logs extends sloodle_base_view
                 $sloodletable->data[] = $trowData;
             }
         
-        print_table($sloodletable); 
+        sloodle_print_table($sloodletable); 
         
  
  
@@ -141,11 +141,11 @@ class sloodle_view_logs extends sloodle_base_view
     /**
     * Print the footer for this course.
     */
-    function print_footer()
+    function sloodle_print_footer()
     {
         global $CFG;
         echo "<p style=\"text-align:center; margin-top:32px; font-size:90%;\"><a href=\"{$CFG->wwwroot}/course/view.php?id={$this->course->id}\">&lt;&lt;&lt; ".get_string('backtocoursepage','sloodle')."</a></h2>";
-        print_footer($this->course);
+        sloodle_print_footer($this->course);
     }
 
 }

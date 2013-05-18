@@ -93,7 +93,7 @@
     // Display the page header
     //$navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/index.php?id=$course->id\">$strsloodles</a> ->";
     $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?id=$sloodlecontrollerid\">".format_string($sloodle->name)."</a> ->";
-    print_header_simple($pagename, "&nbsp;", "$navigation ". $pagename, "", "", true, '', navmenu($course, $cm));
+    sloodle_print_header_simple($pagename, "&nbsp;", "$navigation ". $pagename, "", "", true, '', navmenu($course, $cm));
 
     // We can display the Sloodle module info... log the view
     add_to_log($course->id, 'sloodle', 'view sloodle config', "classroom/notecard_configuration.php?sloodlecontrollerid=$sloodlecontrollerid&sloodleobjtype=$sloodleobjtype", $sloodleobjtype, $cm->id);
@@ -114,7 +114,7 @@
 //---------------------------------------------------------------------------------
     
     // Display intro information
-    print_box_start('generalbox boxwidthwide boxaligncenter');
+    sloodle_print_box_start('generalbox boxwidthwide boxaligncenter');
     echo '<div style="text-align:center;">';
     
     echo "<h1>$pagename</h1>";
@@ -163,12 +163,12 @@
     echo "<a href=\"notecard_configuration_form.php?sloodlecontrollerid=$sloodlecontrollerid&sloodleobjtype=$sloodleobjtype\">&lt;&lt; ".get_string('objectconfig:backtoform','sloodle')."</a>";
     
     echo '</div>';
-    print_box_end();
+    sloodle_print_box_end();
     
     
 //---------------------------------------------------------------------------------
     
     
     
-    print_footer();
+    sloodle_print_footer();
 ?>
