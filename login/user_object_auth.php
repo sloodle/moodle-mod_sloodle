@@ -39,7 +39,7 @@
     
     // Display the page header
     $strsloodle = get_string('modulename', 'sloodle');
-    print_header_simple(get_string('userobjectauth', 'sloodle'), "&nbsp;", get_string('userobjectauth', 'sloodle'), "", "", true);
+    sloodle_print_header_simple(get_string('userobjectauth', 'sloodle'), "&nbsp;", get_string('userobjectauth', 'sloodle'), "", "", true);
     
     // Make sure it's not a guest who is logged in
     if (isguestuser()) {
@@ -49,7 +49,7 @@
          <p><?php print_string('noguestaccess', 'sloodle'); ?></p>
         </div>
         <?php
-        print_footer();
+        sloodle_print_footer();
 		exit();
     }
     
@@ -80,7 +80,7 @@
              <p><?php print_string('pendingavatarnotfound', 'sloodle'); ?></p>
             </div>
             <?php
-            print_footer();
+            sloodle_print_footer();
     		exit();
         }
         
@@ -93,7 +93,7 @@
              <p><?php print_string('failedcreatesloodleuser', 'sloodle'); ?></p>
             </div>
             <?php
-            print_footer();
+            sloodle_print_footer();
             exit();
         }
     }
@@ -118,7 +118,7 @@
     }
     
     
-    print_footer();
+    sloodle_print_footer();
     exit();
     
     

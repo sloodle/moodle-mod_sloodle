@@ -146,7 +146,7 @@ class sloodle_view_backpack extends sloodle_base_view {
     /**
     * Print the course settings page header.
     */
-    function print_header()
+    function sloodle_print_header()
     {
     global $CFG;
 
@@ -155,7 +155,7 @@ class sloodle_view_backpack extends sloodle_base_view {
     $navigation .= get_string('backpack:view', 'sloodle');
     $navigation .= "</a>";
     //print the header
-    print_header_simple(get_string('backpack','sloodle'), '&nbsp;', $navigation, "", "", true, '', navmenu($this->course));
+    sloodle_print_header_simple(get_string('backpack','sloodle'), '&nbsp;', $navigation, "", "", true, '', navmenu($this->course));
     }
 
     /**
@@ -175,7 +175,7 @@ class sloodle_view_backpack extends sloodle_base_view {
         echo "<br>";
 
         //print titles
-        print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');                  
+        sloodle_print_box_start('generalbox boxaligncenter center  boxheightnarrow leftpara');                  
 
         echo '<div style="position:relative ">';
         echo '<span style="position:relative;font-size:36px;font-weight:bold;">';
@@ -304,7 +304,6 @@ class sloodle_view_backpack extends sloodle_base_view {
             $sloodletable->data[] = $row;
         }
 
-        $sloodletable->data[] = $trowData; 
 
         if ($this->can_edit) {
 
@@ -353,10 +352,10 @@ class sloodle_view_backpack extends sloodle_base_view {
 
         print('<form action="" method="POST">');
         echo '<input type="hidden" name="isItemAdd" value="1">';
-        print_table($sloodletable); 
+        sloodle_print_table($sloodletable); 
         print '</form>';
 
-        print_box_end(); 
+        sloodle_print_box_end(); 
     }
 
 }

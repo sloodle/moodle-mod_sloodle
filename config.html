@@ -25,22 +25,17 @@
     if (!empty($CFG->sloodle_active_object_lifetime)) $active_object_lifetime = $CFG->sloodle_active_object_lifetime;
     $user_object_lifetime = 21; // Give user objects 3 weeks by default
     if (!empty($CFG->sloodle_user_object_lifetime)) $user_object_lifetime = $CFG->sloodle_user_object_lifetime;
-?>
-
-
-<!-- Version Numbers -->
-<?php
     // Display the Sloodle version
-    print_heading(get_string('sloodleversion','sloodle').': '.(string)SLOODLE_VERSION, 'center', 3);
+    sloodle_print_heading(get_string('sloodleversion','sloodle').': '.(string)SLOODLE_VERSION, 'center', 3);
     // Get and display the module version number (from version.php)
     $sloodlemodule = sloodle_get_record('modules', 'name', 'sloodle');
     $releasenum = 0;
     if ($sloodlemodule !== FALSE) $releasenum = $sloodlemodule->version;
-    print_heading(get_string('releasenum','sloodle').': '.(string)$releasenum, 'center', 5);
+    sloodle_print_heading(get_string('releasenum','sloodle').': '.(string)$releasenum, 'center', 5);
     
     // Display a help button regarding the version numbers
     echo '<div style="text-align:center;">(';
-    helpbutton('version_numbers', get_string('help:versionnumbers', 'sloodle'), 'sloodle', true, true);
+    sloodle_helpbutton('version_numbers', get_string('help:versionnumbers', 'sloodle'), 'sloodle', true, true);
     echo ')</div>';
 ?>
 
@@ -71,7 +66,7 @@
 <tr>
     <td colspan="3" align="left">
 
-        <h3><?php print_string('autoreg', 'sloodle'); ?> <?php echo helpbutton('auto_registration', get_string('help:autoreg','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <h3><?php print_string('autoreg', 'sloodle'); ?> <?php echo sloodle_helpbutton('auto_registration', get_string('help:autoreg','sloodle'), 'sloodle', true, false, '', true); ?></h3>
         <p>
          <?php
             print_string("autoreg:allowforsite", "sloodle");
@@ -86,7 +81,7 @@
 <tr>
     <td colspan="3" align="left">
 
-        <h3><?php print_string('autoenrol', 'sloodle'); ?> <?php echo helpbutton('auto_enrolment', get_string('help:autoenrol','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <h3><?php print_string('autoenrol', 'sloodle'); ?> <?php echo sloodle_helpbutton('auto_enrolment', get_string('help:autoenrol','sloodle'), 'sloodle', true, false, '', true); ?></h3>
         <p>
          <?php
             print_string("autoenrol:allowforsite", "sloodle");
@@ -102,7 +97,7 @@
 <tr>
     <td colspan="3" align="left">
 
-        <h3><?php print_string('activeobjectlifetime', 'sloodle'); ?> <?php echo helpbutton('object_authorization', get_string('activeobjects','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <h3><?php print_string('activeobjectlifetime', 'sloodle'); ?> <?php echo sloodle_helpbutton('object_authorization', get_string('activeobjects','sloodle'), 'sloodle', true, false, '', true); ?></h3>
         <p>
          <?php
             print_string("activeobjectlifetime:info", "sloodle");
@@ -118,7 +113,7 @@
 <tr>
     <td colspan="3" align="left">
 
-        <h3><?php print_string('userobjectlifetime', 'sloodle'); ?> <?php echo helpbutton('user_objects', get_string('userobjects','sloodle'), 'sloodle', true, false, '', true); ?></h3>
+        <h3><?php print_string('userobjectlifetime', 'sloodle'); ?> <?php echo sloodle_helpbutton('user_objects', get_string('userobjects','sloodle'), 'sloodle', true, false, '', true); ?></h3>
         <p>
          <?php
             print_string("userobjectlifetime:info", "sloodle");

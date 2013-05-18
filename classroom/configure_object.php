@@ -92,7 +92,7 @@
     $nav = get_string('modulename', 'sloodle').' -> ';
     $nav .= $pagename;
     // Display the page header
-    print_header($pagename, $pagename, $nav, '', '', false);
+    sloodle_print_header($pagename, $pagename, $nav, '', '', false);
     
     
 //------------------------------------------------------------
@@ -129,21 +129,21 @@
             // Attempt to delete the entry
             $sloodle->course->controller->remove_object($sloodleauthid);
             // Display the result
-            print_box(get_string('objectauthcancelled', 'sloodle'), 'generalbox boxaligncenter boxwidthnarrow');
+            sloodle_print_box(get_string('objectauthcancelled', 'sloodle'), 'generalbox boxaligncenter boxwidthnarrow');
             $action_success = true;
         }
     } else if ($object_authorised) {
         // If the object has already been authorised, then display a message about it
-        print_box_start('generalbox boxwidthnarrow boxaligncenter');
+        sloodle_print_box_start('generalbox boxwidthnarrow boxaligncenter');
         echo '<span style="color:red; font-weight:bold; text-align:center;">'.get_string('objectauthalready','sloodle').'</span>';
-        print_box_end();
+        sloodle_print_box_end();
     }
     
 //------------------------------------------------------------
 // OBJECT INFO
     
     // Display the information about the object
-    print_box_start('generalbox boxaligncenter boxwidthnarrow');
+    sloodle_print_box_start('generalbox boxaligncenter boxwidthnarrow');
     echo '<div style="text-align:center;">';
     echo '<span style="font-weight:bold; font-size:110%;">'.get_string('objectdetails','sloodle').'</span><br>';
     
@@ -155,7 +155,7 @@
     else echo '-<br>';
     
     echo '</div>';
-    print_box_end();
+    sloodle_print_box_end();
     echo '<br>';
     
 //------------------------------------------------------------
@@ -163,7 +163,7 @@
     
     // If the action was not performed or successful, then display the authorisation form
     if ($action_success == false && $object_authorised == false) {
-        print_box_start('generalbox boxaligncenter boxwidthnormal');
+        sloodle_print_box_start('generalbox boxaligncenter boxwidthnormal');
         echo '<div style="text-align:center;">';
         echo '<h3>'.get_string('objectauth','sloodle').'</h3>';
 
@@ -248,7 +248,7 @@
         echo "</form>\n";
         
         echo '</div>';
-        print_box_end();
+        sloodle_print_box_end();
     }
     
     
@@ -278,7 +278,7 @@
         $hascustomconfig = $auth_obj->has_custom_config();
         
         // Display the configuration section
-        print_box_start('generalbox boxwidthnormal boxaligncenter');
+        sloodle_print_box_start('generalbox boxwidthnormal boxaligncenter');
         echo '<div style="text-align:center;"><h2>'.get_string('objectconfiguration','sloodle').'</h2>';
         
         // Do we have custom configuration settings?
@@ -319,11 +319,11 @@
         }
         
         echo '</div>';
-        print_box_end();
+        sloodle_print_box_end();
     }
     
     
     // Finish
-    print_footer();
+    sloodle_print_footer();
 
 ?>

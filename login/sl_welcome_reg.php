@@ -48,7 +48,7 @@
     require_once(SLOODLE_LIBROOT.'/sloodle_session.php');
     
     // Display the page header
-    print_header_simple(get_string('welcometosloodle', 'sloodle'), "&nbsp;", get_string('welcometosloodle', 'sloodle'), "", "", true);
+    sloodle_print_header_simple(get_string('welcometosloodle', 'sloodle'), "&nbsp;", get_string('welcometosloodle', 'sloodle'), "", "", true);
     
     
     // Process the request data
@@ -69,7 +69,7 @@
          <p><?php print_string('pendingavatarnotfound', 'sloodle'); ?></p>
         </div>
         <?php
-        print_footer();
+        sloodle_print_footer();
 		exit();
     }
     
@@ -82,7 +82,7 @@
          <p><?php print_string('failedcreatesloodleuser', 'sloodle'); ?></p>
         </div>
         <?php
-        print_footer();
+        sloodle_print_footer();
         exit();
     }
 
@@ -129,7 +129,7 @@
     }
     
     
-    print_footer();
+    sloodle_print_footer();
     exit();
 
 ?>

@@ -55,22 +55,22 @@
 
     // Display the page header
     $navigation = "<a href=\"{$CFG->wwwroot}/mod/sloodle/classroom/loginzone.php?id={$course->id}\">".get_string('loginzone','sloodle')."</a>";
-    print_header_simple(get_string('loginzone','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($course));
+    sloodle_print_header_simple(get_string('loginzone','sloodle'), "&nbsp;", $navigation, "", "", true, '', navmenu($course));
     
     echo '<h1 style="text-align:center;">'.get_string('loginzone','sloodle').'</h1>';
     
 //------------------------------------------------------    
  
     // Loginzone information
-    print_box_start('generalbox boxaligncenter boxwidthnormal');
+    sloodle_print_box_start('generalbox boxaligncenter boxwidthnormal');
     echo '<div style="text-align:center;"><h3>'.get_string('loginzonedata','sloodle').'</h3>';
     
     // Does the user have an avatar?
     if ($has_avatar) {
-        print_box_start('generalbox boxaligncenter boxwidthwide');
+        sloodle_print_box_start('generalbox boxaligncenter boxwidthwide');
         echo get_string('loginzone:alreadyregistered','sloodle').'<br><br>';
         echo "<a href=\"{$CFG->wwwroot}/mod/sloodle/view.php?_type=user&amp;id={$USER->id}&course={$course->id}\">".get_string('viewmyavatar', 'sloodle')."</a><br>\n";
-        print_box_end();
+        sloodle_print_box_end();
     }
     
     // Check we have all the data we need
@@ -91,8 +91,8 @@
         }
         echo ')</i><br><br>';
         print_string('loginzone:mayneedrez','sloodle');
-        print_box_end();
-        print_footer();
+        sloodle_print_box_end();
+        sloodle_print_footer();
         exit();
     }
     
@@ -100,12 +100,12 @@
     $lastupdated = '('.get_string('unknown','sloodle').')';
     if ($sloodle_course->get_loginzone_time_updated() > 0) $lastupdated = date('Y-m-d H:i:s', $sloodle_course->get_loginzone_time_updated());
     
-    print_box_start('generalbox boxaligncenter boxwidthnarrow');
+    sloodle_print_box_start('generalbox boxaligncenter boxwidthnarrow');
     echo get_string('position','sloodle').': '.$sloodle_course->get_loginzone_position().'<br>';
     echo get_string('size','sloodle').': '.$sloodle_course->get_loginzone_size().'<br>';
     echo get_string('region','sloodle').': '.$sloodle_course->get_loginzone_region().'<br>';
     echo get_string('lastupdated','sloodle').': '.$lastupdated.'<br>';
-    print_box_end();
+    sloodle_print_box_end();
     echo '<br>';
     
     // How long ago was the loginzone rezzed?
@@ -117,8 +117,8 @@
     
     // If the user already had an avatar, then there's nothing else to do
     if ($has_avatar) {
-        print_box_end();
-        print_footer();
+        sloodle_print_box_end();
+        sloodle_print_footer();
         exit();
     }
     
@@ -163,12 +163,12 @@
     
     
     echo '</div>';
-    print_box_end();
+    sloodle_print_box_end();
 
     
 
 //------------------------------------------------------
     
-    print_footer($course);
+    sloodle_print_footer($course);
     
 ?>

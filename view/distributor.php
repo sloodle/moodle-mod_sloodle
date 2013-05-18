@@ -148,7 +148,7 @@ class sloodle_view_distributor extends sloodle_base_view_module
             }
             
             // What was the result?
-            print_box_start('generalbox boxaligncenter boxwidthnarrow centerpara');
+            sloodle_print_box_start('generalbox boxaligncenter boxwidthnarrow centerpara');
             if ($ok) {
                 print '<h3 style="color:green;text-align:center;">'.get_string('sloodleobjectdistributor:successful','sloodle').'</h3>';
             } else {
@@ -159,19 +159,19 @@ class sloodle_view_distributor extends sloodle_base_view_module
                 print get_string('uuid','sloodle').': '.$send_user.'<br/>';
                 //print get_string('xmlrpc:channel','sloodle').': '.$this->distributor->channel.'<br/>';
                 print '</p>';
-            print_box_end();
+            sloodle_print_box_end();
         }
         
         // // ----------- // //
         
 
         // If there are no items in the distributor, then simply display an error message
-        if ($numitems < 1) print_box('<span style="font-weight:bold; color:red;">'.get_string('sloodleobjectdistributor:noobjects','sloodle').'</span>', 'generalbox boxaligncenter boxwidthnormal centerpara');
+        if ($numitems < 1) sloodle_print_box('<span style="font-weight:bold; color:red;">'.get_string('sloodleobjectdistributor:noobjects','sloodle').'</span>', 'generalbox boxaligncenter boxwidthnormal centerpara');
         //error(get_string('sloodleobjectdistributor:noobjects','sloodle'));
         // If there is no XMLRPC channel specified, then display a warning message
         $disabledattr = '';
         if ( empty($this->distributor->channel) && (count($capableobjects) == 0) ) {
-            print_box('<span style="font-weight:bold; color:red;">'.get_string('sloodleobjectdistributor:nochannel','sloodle').'</span>', 'generalbox boxaligncenter boxwidthnormal centerpara');
+            sloodle_print_box('<span style="font-weight:bold; color:red;">'.get_string('sloodleobjectdistributor:nochannel','sloodle').'</span>', 'generalbox boxaligncenter boxwidthnormal centerpara');
             $disabledattr = 'disabled="true"';
         }
         
@@ -210,7 +210,7 @@ class sloodle_view_distributor extends sloodle_base_view_module
         // Furthermore, the 2nd form will only be available if there is at least 1 avatar registered on the site.
 
         // Start of the sending forms
-        print_box_start('generalbox boxaligncenter boxwidthnormal centerpara');
+        sloodle_print_box_start('generalbox boxaligncenter boxwidthnormal centerpara');
         
     // // SEND TO SELF // //
         
@@ -240,7 +240,7 @@ XXXEODXXX;
         }
         
         // Print the table
-        print_table($table_sendtoself);
+        sloodle_print_table($table_sendtoself);
         
         // End the form
         echo "</form>";
@@ -275,7 +275,7 @@ XXXEODXXX;
             }
             
             // Print the table
-            print_table($table);
+            sloodle_print_table($table);
             
             // End the form
             echo "</form>";
@@ -303,7 +303,7 @@ XXXEODXXX;
             $table->data[] = array('<input type="submit" '.$disabledattr.' value="'.get_string('sloodleobjectdistributor:sendtocustomavatar','sloodle').'" />');
             
             // Print the table
-            print_table($table);
+            sloodle_print_table($table);
             
             // End the form
             echo "</form>";
@@ -312,7 +312,7 @@ XXXEODXXX;
         }
     
         
-        print_box_end();
+        sloodle_print_box_end();
     
     }
 

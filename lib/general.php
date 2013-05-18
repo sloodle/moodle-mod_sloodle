@@ -722,7 +722,7 @@
                                         SLOODLE_SERVER_ACCESS_LEVEL_STAFF => get_string('accesslevel:staff','sloodle') );
     
         // Display box and a heading
-        print_box_start('generalbox boxaligncenter');
+        sloodle_print_box_start('generalbox boxaligncenter');
         echo '<h3>'.get_string('accesslevel','sloodle').'</h3>';
     
         // Print the object settings
@@ -753,7 +753,7 @@
             echo '<br>';
         }        
         
-        print_box_end();
+        sloodle_print_box_end();
     }
 
     function sloodle_access_level_option_choice($option, $current_config, $show, $prefix = '', $suffix = '') {

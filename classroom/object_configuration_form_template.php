@@ -53,7 +53,7 @@
         
 	foreach($fieldsets as $fieldsetname => $fieldset) {
 
-		print_box_start('generalbox boxaligncenter');
+		sloodle_print_box_start('generalbox boxaligncenter');
 		echo '<h3>'.get_string($fieldsetname,'sloodle').'</h3>';
 
 		foreach($fieldset as $field) {
@@ -70,7 +70,7 @@
 		}
 
 
-		print_box_end();
+		sloodle_print_box_end();
 
 	}
 

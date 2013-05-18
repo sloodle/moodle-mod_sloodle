@@ -161,7 +161,7 @@ class sloodle_view_user extends sloodle_base_view
         if ($this->start < 0) $this->start = 0;
 
 	// Moodle 2 rendering functions like to know the course.
-	// They get upset if you try to pass a course into print_footer() that isn't what they were expecting.
+	// They get upset if you try to pass a course into sloodle_print_footer() that isn't what they were expecting.
 	if ($this->course) {
 		global $PAGE;
 		if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
@@ -222,7 +222,7 @@ class sloodle_view_user extends sloodle_base_view
     /**
     * Print the course settings page header.
     */
-    function print_header()
+    function sloodle_print_header()
     {
     }
 
@@ -405,7 +405,7 @@ class sloodle_view_user extends sloodle_base_view
         }
         
         // Display the header
-        print_header(get_string('sloodleuserprofile', 'sloodle'), get_string('sloodleuserprofile','sloodle'), $navigation, "", "", true);
+        sloodle_print_header(get_string('sloodleuserprofile', 'sloodle'), get_string('sloodleuserprofile','sloodle'), $navigation, "", "", true);
         
         echo '<div style="text-align:center;padding-left:8px;padding-right:8px;">';
         // Display the deletion message if we have one
@@ -444,7 +444,7 @@ class sloodle_view_user extends sloodle_base_view
             } else if ($numsloodleentries > 1) {
                 echo '<span style="color:red; font-weight:bold; border:solid 2px #990000; padding:4px; background-color:white;">';
                 print_string('multipleentries', 'sloodle');
-                helpbutton('multiple_entries', get_string('help:multipleentries', 'sloodle'), 'sloodle', true, false);
+                sloodle_helpbutton('multiple_entries', get_string('help:multipleentries', 'sloodle'), 'sloodle', true, false);
                 echo '</span>';
             }
             echo '</p>';
@@ -645,7 +645,7 @@ class sloodle_view_user extends sloodle_base_view
             }
             
             // Display the table
-            print_table($sloodletable);
+            sloodle_print_table($sloodletable);
             
         }
          
@@ -670,7 +670,7 @@ class sloodle_view_user extends sloodle_base_view
             // Display a list of user-authorised objects
             if (!$allentries && !$searchentries) {
                 echo '<br/><h3>'.get_string('userobjects','sloodle');
-                helpbutton('user_objects', get_string('userobjects','sloodle'), 'sloodle', true, false, '', false);
+                sloodle_helpbutton('user_objects', get_string('userobjects','sloodle'), 'sloodle', true, false, '', false);
                 echo "</h3>\n";
                 
                 
@@ -750,7 +750,7 @@ class sloodle_view_user extends sloodle_base_view
                     }
                     
                     // Display the table
-                    print_table($sloodletable);
+                    sloodle_print_table($sloodletable);
                     
                     // Display a button to delete all the Sloodle objects
                     if (empty($deleteuserobjects)) {
@@ -781,10 +781,10 @@ class sloodle_view_user extends sloodle_base_view
     /**
     * Print the page footer.
     */
-    function print_footer()
+    function sloodle_print_footer()
     {
 
-        print_footer($this->course);
+        sloodle_print_footer($this->course);
     }
 
 }

@@ -105,7 +105,7 @@ class sloodle_view_addavatar extends sloodle_base_view
         if (!$this->course = sloodle_get_record('course', 'id', $courseid)) error('Could not find course.');
 
 	// Moodle 2 rendering functions like to know the course.
-	// They get upset if you try to pass a course into print_footer() that isn't what they were expecting.
+	// They get upset if you try to pass a course into sloodle_print_footer() that isn't what they were expecting.
 	if ($this->course) {
 		global $PAGE;
 		if (isset($PAGE) && method_exists($PAGE, 'set_course')) {
@@ -169,7 +169,7 @@ class sloodle_view_addavatar extends sloodle_base_view
     /**
     * Print the course settings page header.
     */
-    function print_header()
+    function sloodle_print_header()
     {
         global $CFG;
         
@@ -182,7 +182,7 @@ class sloodle_view_addavatar extends sloodle_base_view
         $navigation .= get_string('addavatar', 'sloodle');
         
         // Display the header
-        print_header(get_string('addavatar', 'sloodle'), get_string('addavatar','sloodle'), $navigation, "", "", true);
+        sloodle_print_header(get_string('addavatar', 'sloodle'), get_string('addavatar','sloodle'), $navigation, "", "", true);
     }
 
 
@@ -205,27 +205,27 @@ class sloodle_view_addavatar extends sloodle_base_view
         // Display any information messages
         if (count($this->msg_info) > 0)
         {
-            print_box_start('generalbox boxwidthwide boxaligncenter centerpara');
+            sloodle_print_box_start('generalbox boxwidthwide boxaligncenter centerpara');
             echo "<ul style=\"list-style:none;\">\n";
             foreach ($this->msg_info as $msg)
             {
                 echo "<li><img src=\"{$CFG->wwwroot}/pix/i/tick_green_big.gif\" alt=\"[tick icon]\" /> <strong>{$msg}</strong></li>\n";
             }
             echo "</ul>\n";
-            print_box_end();
+            sloodle_print_box_end();
         }
         
         // Display any error messages
         if (count($this->msg_error) > 0)
         {
-            print_box_start('generalbox boxwidthwide boxaligncenter centerpara');
+            sloodle_print_box_start('generalbox boxwidthwide boxaligncenter centerpara');
             echo "<ul style=\"list-style:none;\">\n";
             foreach ($this->msg_error as $msg)
             {
                 echo "<li><img src=\"{$CFG->wwwroot}/pix/i/cross_red_big.gif\" alt=\"[error icon]\" /> {$msg}</li>\n";
             }
             echo "</ul>\n";
-            print_box_end();
+            sloodle_print_box_end();
         }
         
         // Prepare the form default values
@@ -243,7 +243,7 @@ class sloodle_view_addavatar extends sloodle_base_view
         $userid = $this->user->get_user_id();
         $userfullname = $this->user->get_user_firstname().' '.$this->user->get_user_lastname();
         
-        print_box_start('generalbox boxwidthwide boxaligncenter centerpara');
+        sloodle_print_box_start('generalbox boxwidthwide boxaligncenter centerpara');
         echo "<h2>",get_string('addavatar', 'sloodle'),"</h2>\n";
         
         echo <<<ADD_AVATAR_FORM
@@ -271,7 +271,7 @@ class sloodle_view_addavatar extends sloodle_base_view
 </form>
 ADD_AVATAR_FORM;
         
-        print_box_end();
+        sloodle_print_box_end();
         
         
         echo "<div style=\"text-align:center;\">\n";
@@ -282,9 +282,9 @@ ADD_AVATAR_FORM;
     /**
     * Print the footer for this course.
     */
-    function print_footer()
+    function sloodle_print_footer()
     {
-        print_footer($this->course);
+        sloodle_print_footer($this->course);
     }
 
 }
