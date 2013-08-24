@@ -465,7 +465,7 @@ if ($isnotify) {
                     continue; // Ignore this if there are no options (Prevents nasty PHP notices!)
                 }
 
-                $feedback = sloodle_clean_for_output($ov->feedback);
+                $feedback = sloodle_clean_for_output($op->feedback);
 
                 // If the feedback is too long, substitute a placeholder. 
                 // The script will see that and grab the feedback in a separate request. 
