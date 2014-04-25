@@ -106,10 +106,8 @@ XXXEODXXX;
         
         // Check to see if we need to convert the video URL for video-sharing sites
         if (strpos($url, '://www.youtube.com') !== false || strpos($url, '://youtube.com') !== false) {
-            $index = strpos($url, 'v=');
-            $vidid = substr($url, $index + 2, 11);
-            $url = "http://www.youtubemp4.com/video/".$vidid.".mp4";
-            $type = "video/mp4";
+            $url = preg_replace('/watch\?v\=/', 'embed/', $url);
+            //$type = 'web/*'; // Just display this like a regular 
         }
 
         return array($type, $url);
